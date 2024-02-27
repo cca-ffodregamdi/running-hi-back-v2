@@ -37,3 +37,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+task copyPrivate(type: Copy) {
+    copy{
+        from './running-hi-config'
+        include "application.yml"
+        into 'src/main/resources'
+    }
+}
