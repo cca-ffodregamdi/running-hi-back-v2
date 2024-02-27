@@ -1,0 +1,3 @@
+[submodule "running-hi-config"]
+	path = running-hi-config
+	url = https://github.com/cca-ffodregamdi/running-hi-config.git
