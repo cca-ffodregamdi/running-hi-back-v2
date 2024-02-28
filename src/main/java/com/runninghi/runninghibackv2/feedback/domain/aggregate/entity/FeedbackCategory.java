@@ -1,5 +1,8 @@
 package com.runninghi.runninghibackv2.feedback.domain.aggregate.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum FeedbackCategory {
     INQUIRY(0, "문의 사항"),
     PROPOSAL(1, "개선 사항"),
@@ -13,14 +16,6 @@ public enum FeedbackCategory {
     FeedbackCategory(int value, String description) {
         this.value = value;
         this.description = description;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public static String getDescriptionFromValue(int value) {
