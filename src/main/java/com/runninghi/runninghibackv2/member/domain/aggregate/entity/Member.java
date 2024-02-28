@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Member extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID memberNo;
 
     @Column
