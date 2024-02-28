@@ -1,10 +1,8 @@
 package com.runninghi.runninghibackv2.common.enumtype;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public enum ReportCategory {
 
     INPROGRESS(0, "처리중"),
@@ -12,6 +10,19 @@ public enum ReportCategory {
     ;
 
     private final int value;
-    private final String status;
+    private final String description;
+
+    ReportCategory(int value, String description) {
+        this.value = value;
+        this.description = description;
+    }
+
+    public static String getDescriptionFromValue(int value) {
+        return switch (value) {
+            case 0 -> ReportCategory.INPROGRESS.getDescription();
+            case 1 -> ReportCategory.DELETED.getDescription();
+            default -> throw new IllegalArgumentException("카테고리 번호가 올바르지 않습니다.");
+        };
+    }
 
 }
