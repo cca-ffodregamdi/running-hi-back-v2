@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.adminpost.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
+import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,9 +17,9 @@ public class AdminPost extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long adminPostNo;
 
-//    @ManyToOne
-//    @JoinColumn(name = "memberNo")
-//    private Member admin;
+    @ManyToOne
+    @JoinColumn(name = "memberNo")
+    private Member admin;
 
     @Column
     private String adminPostTitle;
@@ -32,7 +33,8 @@ public class AdminPost extends BaseTimeEntity {
     @Column
     private Float longitude;
 
-    private AdminPost(String adminPostTitle, String adminPostContent, Float latitude, Float longitude) {
+    private AdminPost(Member admin, String adminPostTitle, String adminPostContent, Float latitude, Float longitude) {
+        this.admin = admin;
         this.adminPostTitle = adminPostTitle;
         this.adminPostContent = adminPostContent;
         this.latitude = latitude;
@@ -40,10 +42,16 @@ public class AdminPost extends BaseTimeEntity {
     }
 
     public static class Builder {
+        private Member admin;
         private String adminPostTitle;
         private String adminPostContent;
         private Float latitude;
         private Float longitude;
+
+        public Builder admin(Member admin) {
+            this.admin = admin;
+            return this;
+        }
 
         public Builder adminPostTitle(String adminPostTitle) {
             this.adminPostTitle = adminPostTitle;
@@ -66,7 +74,7 @@ public class AdminPost extends BaseTimeEntity {
         }
 
         public AdminPost build() {
-            return new AdminPost(adminPostTitle, adminPostContent, latitude, longitude);
+            return new AdminPost(admin, adminPostTitle, adminPostContent, latitude, longitude);
         }
     }
 

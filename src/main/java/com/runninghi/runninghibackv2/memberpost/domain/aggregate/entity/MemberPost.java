@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.memberpost.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
+import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,9 +17,9 @@ public class MemberPost extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberPostNo;
 
-//    @ManyToOne
-//    @JoinColumn(name = "memberNo")
-//    private Member member;
+    @ManyToOne
+    @JoinColumn(name = "memberNo")
+    private Member member;
 
     @Column
     private String memberPostTitle;
@@ -35,7 +36,8 @@ public class MemberPost extends BaseTimeEntity {
     @Column
     private Float longitude;
 
-    private MemberPost(String memberPostTitle, String memberPostContent, String locationName, Float latitude, Float longitude) {
+    private MemberPost(Member member, String memberPostTitle, String memberPostContent, String locationName, Float latitude, Float longitude) {
+        this.member = member;
         this.memberPostTitle = memberPostTitle;
         this.memberPostContent = memberPostContent;
         this.locationName = locationName;
@@ -44,11 +46,17 @@ public class MemberPost extends BaseTimeEntity {
     }
 
     public static class Builder {
+        private Member member;
         private String memberPostTitle;
         private String memberPostContent;
         private String locationName;
         private Float latitude;
         private Float longitude;
+
+        public Builder member(Member member) {
+            this.member = member;
+            return this;
+        }
 
         public Builder adminPostTitle(String adminPostTitle) {
             this.memberPostTitle = adminPostTitle;
@@ -77,7 +85,7 @@ public class MemberPost extends BaseTimeEntity {
         }
 
         public MemberPost build() {
-            return new MemberPost(memberPostTitle, memberPostContent, locationName, latitude, longitude);
+            return new MemberPost(member, memberPostTitle, memberPostContent, locationName, latitude, longitude);
         }
     }
 
