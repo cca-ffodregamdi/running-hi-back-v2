@@ -52,6 +52,7 @@ public class Member extends BaseTimeEntity {
     private boolean isBlacklisted = false;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Comment("권한")
     private Role role;
 
