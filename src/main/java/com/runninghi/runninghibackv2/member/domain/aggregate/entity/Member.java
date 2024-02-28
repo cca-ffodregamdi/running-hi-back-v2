@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import java.util.UUID;
 
@@ -19,30 +20,39 @@ public class Member extends BaseTimeEntity {
     private UUID memberNo;
 
     @Column
+    @Comment("계정 아이디")
     private String account;
 
     @Column
+    @Comment("계정 비밀번호")
     private String password;
 
     @Column(nullable = false)
+    @Comment("닉네임")
     private String nickname;
 
     @Column
+    @Comment("카카오 로그인 : id")
     private String kakaoId;
 
     @Column
+    @Comment("카카오 로그인 : 카카오에 설정된 이름")
     private String kakaoName;
 
     @Column
+    @Comment("신고된 횟수")
     private int reportCnt;
 
     @Column(nullable = false)
+    @Comment("계정 활성화 상태")
     private boolean isActive = true;
 
     @Column(nullable = false)
+    @Comment("블랙리스트 상태")
     private boolean isBlacklisted = false;
 
     @Column(nullable = false)
+    @Comment("권한")
     private Role role;
 
     public Member(Builder builder) {
