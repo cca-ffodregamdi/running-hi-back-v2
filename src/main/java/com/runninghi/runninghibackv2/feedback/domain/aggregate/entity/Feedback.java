@@ -45,7 +45,6 @@ public class Feedback extends BaseTimeEntity {
     @Comment("피드백 카테고리")
     private FeedbackCategory category;
 
-    @Column(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_no", nullable = false)
     @Comment("피드백 작성자")
