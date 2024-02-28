@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.feedback.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
+import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,6 +45,13 @@ public class Feedback extends BaseTimeEntity {
     @Comment("피드백 카테고리")
     private FeedbackCategory category;
 
+    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_no", nullable = false)
+    @Comment("피드백 작성자")
+    private Member feedbackWriter;
+
+
     public Feedback(Builder builder) {
         this.feedbackNo = builder.feedbackNo;
         this.title = builder.title;
@@ -52,7 +60,9 @@ public class Feedback extends BaseTimeEntity {
         this.reply = builder.reply;
         this.replyDate = builder.replyDate;
         this.category = builder.category;
+        this.feedbackWriter = builder.feedbackWriter;
     }
+
     public static class Builder {
         private Long feedbackNo;
         private String title;
@@ -61,6 +71,7 @@ public class Feedback extends BaseTimeEntity {
         private String reply;
         private LocalDateTime replyDate;
         private FeedbackCategory category;
+        private Member feedbackWriter;
 
         public Builder feedbackNo(Long feedbackNo) {
             this.feedbackNo = feedbackNo;
@@ -94,6 +105,11 @@ public class Feedback extends BaseTimeEntity {
 
         public Builder category(FeedbackCategory category) {
             this.category = category;
+            return this;
+        }
+
+        public Builder feedbackWriter(Member feedbackWriter) {
+            this.feedbackWriter = feedbackWriter;
             return this;
         }
 
