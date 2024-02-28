@@ -12,7 +12,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Getter
 @Table(name = "TBL_POST_REPORT")
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostReport extends BaseTimeEntity {
 
     @Id
