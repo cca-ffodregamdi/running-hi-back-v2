@@ -16,11 +16,11 @@ public class Comment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentNo;
 
-//    @ManyToOne
+//    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "MEMBER_KEY")
 //    private Member memberKey;
 
-//    @ManyToOne
+//    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "USERPOST_NO")
 //    private UserPost userPostNo;
 
