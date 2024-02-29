@@ -21,8 +21,8 @@ public class Comment extends BaseTimeEntity {
 //    private Member memberKey;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "USERPOST_NO")
-//    private UserPost userPostNo;
+//    @JoinColumn(name = "MEMBER_POST_NO")
+//    private MemberPost MemberPostNo;
 
     @Column(nullable = false)
     private String commentContent;
