@@ -36,10 +36,6 @@ public class Feedback extends BaseTimeEntity {
     @Comment("피드백 답변")
     private String reply;
 
-    @Column
-    @Comment("피드백 답변 작성 시간")
-    private LocalDateTime replyDate;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @Comment("피드백 카테고리")
@@ -57,7 +53,6 @@ public class Feedback extends BaseTimeEntity {
         this.content = builder.content;
         this.hasReply = builder.hasReply;
         this.reply = builder.reply;
-        this.replyDate = builder.replyDate;
         this.category = builder.category;
         this.feedbackWriter = builder.feedbackWriter;
     }
@@ -68,7 +63,6 @@ public class Feedback extends BaseTimeEntity {
         private String content;
         private boolean hasReply;
         private String reply;
-        private LocalDateTime replyDate;
         private FeedbackCategory category;
         private Member feedbackWriter;
 
@@ -94,11 +88,6 @@ public class Feedback extends BaseTimeEntity {
 
         public Builder reply(String reply) {
             this.reply = reply;
-            return this;
-        }
-
-        public Builder replyDate(LocalDateTime replyDate) {
-            this.replyDate = replyDate;
             return this;
         }
 
