@@ -7,17 +7,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
-import java.util.UUID;
-
 @Entity
 @Getter
 @Table(name = "TBL_MEMBER")
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID memberNo;
+    private Long memberNo;
 
     @Column
     @Comment("계정 아이디")
@@ -70,7 +68,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public static class Builder {
-        private UUID memberNo;
+        private Long memberNo;
         private String account;
         private String password;
         private String nickname;
@@ -81,7 +79,7 @@ public class Member extends BaseTimeEntity {
         private boolean isBlacklisted;
         private Role role;
 
-        public Builder memberNo(UUID memberNo) {
+        public Builder memberNo(Long memberNo) {
             this.memberNo = memberNo;
             return this;
         }
