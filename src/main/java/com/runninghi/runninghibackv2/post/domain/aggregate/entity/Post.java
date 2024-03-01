@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.post.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
+import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TBL_POST")
 public class Post extends BaseTimeEntity {
 
@@ -26,6 +27,9 @@ public class Post extends BaseTimeEntity {
 
     @Column
     private String postContent;
+
+    @Column
+    private Role role;
 
     @Column
     private String locationName;
@@ -46,6 +50,7 @@ public class Post extends BaseTimeEntity {
         this.member = builder.member;
         this.postTitle = builder.postTitle;
         this.postContent = builder.postContent;
+        this.role = builder.role;
         this.locationName = builder.locationName;
         this.startLatitude = builder.startLatitude;
         this.startLongitude = builder.startLongitude;
@@ -57,6 +62,7 @@ public class Post extends BaseTimeEntity {
         private Member member;
         private String postTitle;
         private String postContent;
+        private Role role;
         private String locationName;
         private float startLatitude;
         private float startLongitude;
@@ -75,6 +81,11 @@ public class Post extends BaseTimeEntity {
 
         public Builder postContent(String postContent) {
             this.postContent = postContent;
+            return this;
+        }
+
+        public Builder role(Role role) {
+            this.role = role;
             return this;
         }
 
