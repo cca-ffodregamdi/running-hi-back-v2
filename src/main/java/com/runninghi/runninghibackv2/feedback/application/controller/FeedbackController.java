@@ -7,6 +7,7 @@ import com.runninghi.runninghibackv2.feedback.application.service.FeedbackReplyS
 import com.runninghi.runninghibackv2.feedback.application.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ public class FeedbackController {
     private final FeedbackReplyService feedbackReplyService;
 
     // 피드백 작성
-    @PutMapping
+    @PostMapping
     public ResponseEntity<ApiResult> createFeedback(@RequestBody CreateFeedbackRequest request){
 
         Long memberNo = 1L;
