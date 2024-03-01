@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.comment.domain.aggregate.entity;
+package com.runninghi.runninghibackv2.reply.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,98 +16,98 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "TBL_COMMENT")
-public class Comment extends BaseTimeEntity {
+@Table(name = "TBL_REPLY")
+public class Reply extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentNo;
+    private Long replyNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_NO")
-    @org.hibernate.annotations.Comment("작성자")
+    @Comment("작성자")
     private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "POST_NO")
-    @org.hibernate.annotations.Comment("게시글")
+    @Comment("게시글")
     private Post post;
 
     @Column(nullable = false, length = 1000)
-    @org.hibernate.annotations.Comment("댓글 내용")
-    private String commentContent;
+    @Comment("댓글 내용")
+    private String replyContent;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)
-    @org.hibernate.annotations.Comment("삭제 여부")
+    @Comment("삭제 여부")
     private Boolean isDeleted;
 
 //    @Column
 //    private Long parent;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_NO")
-    @org.hibernate.annotations.Comment("부모 댓글")
-    private Comment parent;
+    @Comment("부모 댓글")
+    private Reply parent;
 
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
-    @org.hibernate.annotations.Comment("하위 댓글들")
-    private List<Comment> children = new ArrayList<>();
+    @Comment("하위 댓글들")
+    private List<Reply> children = new ArrayList<>();
 
-    private Comment(CommentBuilder builder) {
-        this.commentNo = builder.commentNo;
+    private Reply(ReplyBuilder builder) {
+        this.replyNo = builder.replyNo;
         this.writer = builder.writer;
         this.post = builder.post;
-        this.commentContent = builder.commentContent;
+        this.replyContent = builder.replyContent;
         this.isDeleted = builder.isDeleted;
         this.parent = builder.parent;
     }
 
-    public static class CommentBuilder {
+    public static class ReplyBuilder {
 
-        private Long commentNo;
+        private Long replyNo;
         private Member writer;
         private Post post;
-        private String commentContent;
+        private String replyContent;
         private boolean isDeleted;
 //        private Comment parent;
-        private Comment parent;
+        private Reply parent;
 
-        public static CommentBuilder builder() {
-            return new CommentBuilder();
+        public static ReplyBuilder builder() {
+            return new ReplyBuilder();
         }
 
-        public CommentBuilder commentNo(Long commentNo) {
-            this.commentNo = commentNo;
+        public ReplyBuilder commentNo(Long replyNo) {
+            this.replyNo = replyNo;
             return this;
         }
 
-        public CommentBuilder writer(Member writer) {
+        public ReplyBuilder writer(Member writer) {
             this.writer = writer;
             return this;
         }
 
-        public CommentBuilder memberPost(Post memberPost) {
+        public ReplyBuilder memberPost(Post memberPost) {
             this.post = memberPost;
             return this;
         }
 
-        public CommentBuilder commentContent(String commentContent) {
-            this.commentContent = commentContent;
+        public ReplyBuilder replyContent(String replyContent) {
+            this.replyContent = replyContent;
             return this;
         }
 
-        public CommentBuilder isDeleted(Boolean isDeleted) {
+        public ReplyBuilder isDeleted(Boolean isDeleted) {
             this.isDeleted = isDeleted;
             return this;
         }
 
-        public CommentBuilder parent(Comment parent) {
+        public ReplyBuilder parent(Reply parent) {
             this.parent = parent;
             return this;
         }
 
-        public Comment build() {
-            return new Comment(this);
+        public Reply build() {
+            return new Reply(this);
         }
 
 
