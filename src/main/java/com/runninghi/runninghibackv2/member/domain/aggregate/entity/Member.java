@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.member.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
+import com.runninghi.runninghibackv2.common.entity.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
