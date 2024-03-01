@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,7 @@ public class Comment extends BaseTimeEntity {
     private Long commentNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "WRITER_No")
+    @JoinColumn(name = "MEMBER_NO")
     private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,9 +37,14 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+//    @Column
+//    private Long parent;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_NO")
     private Comment parent;
+
+    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    private List<Comment> children = new ArrayList<>();
 
     private Comment(CommentBuilder builder) {
         this.commentNo = builder.commentNo;
@@ -56,6 +62,7 @@ public class Comment extends BaseTimeEntity {
         private MemberPost memberPost;
         private String commentContent;
         private boolean isDeleted;
+//        private Comment parent;
         private Comment parent;
 
         public static CommentBuilder builder() {
