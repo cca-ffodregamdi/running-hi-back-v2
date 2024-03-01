@@ -17,17 +17,17 @@ public class LikeId implements Serializable {
 
     private Long memberNo;
 
-    private Long memberPostNo;
+    private Long postNo;
 
 
     private LikeId(LikeIdBuilder builder) {
         this.memberNo = builder.memberNo;
-        this.memberPostNo = builder.memberPostNo;
+        this.postNo = builder.postNo;
     }
 
     public static class LikeIdBuilder {
         private Long memberNo;
-        private Long memberPostNo;
+        private Long postNo;
 
         public static LikeIdBuilder builder() {
             return new LikeIdBuilder();
@@ -38,8 +38,8 @@ public class LikeId implements Serializable {
             return this;
         }
 
-        public LikeIdBuilder memberPostNo(Long memberPostNo) {
-            this.memberPostNo = memberPostNo;
+        public LikeIdBuilder memberPostNo(Long postNo) {
+            this.postNo = postNo;
             return this;
         }
 

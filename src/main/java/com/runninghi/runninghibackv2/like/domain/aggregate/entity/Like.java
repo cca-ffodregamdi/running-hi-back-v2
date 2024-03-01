@@ -2,7 +2,7 @@ package com.runninghi.runninghibackv2.like.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.like.domain.aggregate.vo.LikeId;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.memberpost.domain.aggregate.entity.MemberPost;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,22 +22,22 @@ public class Like {
     @JoinColumn(name = "member_no")
     private Member writer;
 
-    @MapsId(value = "memberPostNo")
+    @MapsId(value = "postNo")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_post_no")
-    private MemberPost memberPost;
+    @JoinColumn(name = "post_no")
+    private Post post;
 
     private Like(LikeBuilder builder){
         this.likeId = builder.likeId;
         this.writer = builder.writer;
-        this.memberPost = builder.memberPost;
+        this.post = builder.post;
     }
 
     public static class LikeBuilder {
 
         private LikeId likeId;
         private Member writer;
-        private MemberPost memberPost;
+        private Post post;
 
         public static LikeBuilder builder() {return new LikeBuilder();}
 
@@ -51,8 +51,8 @@ public class Like {
             return this;
         }
 
-        public LikeBuilder memberPost(MemberPost memberPost) {
-            this.memberPost = memberPost;
+        public LikeBuilder memberPost(Post post) {
+            this.post = post;
             return this;
         }
 

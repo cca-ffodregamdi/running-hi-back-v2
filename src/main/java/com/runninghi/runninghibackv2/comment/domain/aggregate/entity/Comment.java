@@ -2,7 +2,7 @@ package com.runninghi.runninghibackv2.comment.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.memberpost.domain.aggregate.entity.MemberPost;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,8 +27,8 @@ public class Comment extends BaseTimeEntity {
     private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MEMBER_POST_NO")
-    private MemberPost memberPost;
+    @JoinColumn(name = "POST_NO")
+    private Post post;
 
     @Column(nullable = false, length = 1000)
     private String commentContent;
@@ -49,7 +49,7 @@ public class Comment extends BaseTimeEntity {
     private Comment(CommentBuilder builder) {
         this.commentNo = builder.commentNo;
         this.writer = builder.writer;
-        this.memberPost = builder.memberPost;
+        this.post = builder.post;
         this.commentContent = builder.commentContent;
         this.isDeleted = builder.isDeleted;
         this.parent = builder.parent;
@@ -59,7 +59,7 @@ public class Comment extends BaseTimeEntity {
 
         private Long commentNo;
         private Member writer;
-        private MemberPost memberPost;
+        private Post post;
         private String commentContent;
         private boolean isDeleted;
 //        private Comment parent;
@@ -79,8 +79,8 @@ public class Comment extends BaseTimeEntity {
             return this;
         }
 
-        public CommentBuilder memberPost(MemberPost memberPost) {
-            this.memberPost = memberPost;
+        public CommentBuilder memberPost(Post memberPost) {
+            this.post = memberPost;
             return this;
         }
 
