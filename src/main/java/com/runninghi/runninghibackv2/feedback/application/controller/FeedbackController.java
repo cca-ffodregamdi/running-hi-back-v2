@@ -2,10 +2,13 @@ package com.runninghi.runninghibackv2.feedback.application.controller;
 
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
+import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.UpdateFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.service.FeedbackReplyService;
 import com.runninghi.runninghibackv2.feedback.application.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,7 +30,7 @@ public class FeedbackController {
 
         CreateFeedbackResponse response = feedbackService.createFeedback(request, memberNo);
 
-        return ResponseEntity.ok(ApiResult.success("메세지 전송 성공", response));
+        return ResponseEntity.ok(ApiResult.success("피드백 저장 성공", response));
     }
 
     // 피드백 조회
