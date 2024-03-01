@@ -39,5 +39,15 @@ public class FeedbackController {
 
     // 피드백 삭제
 
+    // 피드백 수정
+    @PutMapping
+    public ResponseEntity<ApiResult> updateFeedback(@RequestBody UpdateFeedbackRequest request) throws BadRequestException {
+
+        Long memberNo = 1L;
+
+        UpdateFeedbackResponse response = feedbackService.updateFeedback(request, memberNo);
+
+        return ResponseEntity.ok(ApiResult.success("피드백 수정 성공", response));
+    }
 
 }
