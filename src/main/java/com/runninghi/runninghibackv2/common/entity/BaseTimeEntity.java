@@ -21,10 +21,6 @@ public abstract class BaseTimeEntity {
     @Column(name = "update_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime updateDate;
 
-    @Column(name = "delete_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime deleteDate;
-
-
     @PrePersist
     public void prePersist() {
         createDate = LocalDateTime.now();
@@ -35,8 +31,4 @@ public abstract class BaseTimeEntity {
         updateDate = LocalDateTime.now();
     }
 
-    @PreRemove
-    public void preRemove() {
-        deleteDate = LocalDateTime.now();
-    }
 }
