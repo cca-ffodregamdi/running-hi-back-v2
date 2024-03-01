@@ -1,7 +1,5 @@
 package com.runninghi.runninghibackv2.feedback.application.dto.response;
 
-import com.runninghi.runninghibackv2.feedback.application.dto.request.DeleteFeedbackRequest;
-
 public record DeleteFeedbackResponse(
         Long feedbackNo
 ) {
