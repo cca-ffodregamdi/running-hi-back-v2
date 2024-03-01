@@ -1,8 +1,10 @@
 package com.runninghi.runninghibackv2.feedback.application.service;
 
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
+import com.runninghi.runninghibackv2.feedback.application.dto.request.DeleteFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.DeleteFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.UpdateFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.Feedback;
 import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.FeedbackCategory;
@@ -69,5 +71,21 @@ public class FeedbackService {
 
         return UpdateFeedbackResponse.create(updatedFeedback.getFeedbackNo(), updatedFeedback.getTitle(),
                 updatedFeedback.getContent(), updatedFeedback.getCategory().getDescription());
+    }
+
+    @Transactional
+    public DeleteFeedbackResponse deleteFeedback(DeleteFeedbackRequest request, Long memberNo) throws BadRequestException {
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member Id"));
+
+        Feedback feedback = feedbackRepository.findById(request.feedbackNo())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid feedback Id"));
+
+        feedbackDomainService.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
+
+        feedbackRepository.delete(feedback);
+
+        return DeleteFeedbackResponse.create(request.feedbackNo());
+
     }
 }
