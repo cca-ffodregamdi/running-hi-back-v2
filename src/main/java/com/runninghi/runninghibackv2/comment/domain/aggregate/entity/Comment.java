@@ -24,26 +24,32 @@ public class Comment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_NO")
+    @org.hibernate.annotations.Comment("작성자")
     private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "POST_NO")
+    @org.hibernate.annotations.Comment("게시글")
     private Post post;
 
     @Column(nullable = false, length = 1000)
+    @org.hibernate.annotations.Comment("댓글 내용")
     private String commentContent;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)
+    @org.hibernate.annotations.Comment("삭제 여부")
     private Boolean isDeleted;
 
 //    @Column
 //    private Long parent;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_NO")
+    @org.hibernate.annotations.Comment("부모 댓글")
     private Comment parent;
 
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    @org.hibernate.annotations.Comment("하위 댓글들")
     private List<Comment> children = new ArrayList<>();
 
     private Comment(CommentBuilder builder) {

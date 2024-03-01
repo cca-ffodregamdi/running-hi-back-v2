@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import java.io.Serializable;
 
@@ -15,8 +16,9 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LikeId implements Serializable {
 
+    @Comment("멤버 번호")
     private Long memberNo;
-
+    @Comment("게시물 번호")
     private Long postNo;
 
 

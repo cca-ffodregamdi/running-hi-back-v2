@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
@@ -17,10 +18,12 @@ public class BookmarkFolder {
     private Long bookmarkFolderNo;
 
     @Column(nullable = false, length = 30)
+    @Comment("폴더 이름")
     private String folderName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_NO")
+    @Comment("멤버 번호")
     private Member member;
 
     private BookmarkFolder(BookmarkFolderBuilder builder) {
