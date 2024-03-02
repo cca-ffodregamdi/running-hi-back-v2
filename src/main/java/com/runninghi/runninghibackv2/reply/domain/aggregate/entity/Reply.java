@@ -40,7 +40,7 @@ public class Reply extends BaseTimeEntity {
     @ColumnDefault("FALSE")
     @Column(nullable = false)
     @Comment("삭제 여부")
-    private Boolean isDeleted;
+    private boolean isDeleted;
 
 //    @Column
 //    private Long parent;
