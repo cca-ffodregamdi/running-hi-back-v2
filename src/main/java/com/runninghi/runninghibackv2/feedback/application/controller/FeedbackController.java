@@ -15,6 +15,8 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.AuthenticationException;
+
 @RestController
 @RequiredArgsConstructor
 public class FeedbackController {
@@ -43,7 +45,21 @@ public class FeedbackController {
         return ResponseEntity.ok(ApiResult.success("피드백 조회 성공", response));
     }
 
-    // 전체 피드백 조회 : 관리자
+    // 전체 피드백 리스트 조회
+
+    // 피드백 상세 조회 : 관리자
+    @GetMapping
+    public ResponseEntity<ApiResult> getFeedbackByAdmin(@RequestBody GetFeedbackRequest request) throws AuthenticationException {
+
+        Long memberNo = 1L;
+
+        GetFeedbackResponse response = feedbackService.getFeedbackByAdmin(request, memberNo);
+
+        return ResponseEntity.ok(ApiResult.success("피드백 조회 성공 : 관리자", response));
+    }
+
+
+    // 전체 피드백 리스트 조회 : 관리자
 
     // 피드백 삭제
     @DeleteMapping

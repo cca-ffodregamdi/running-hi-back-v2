@@ -1,8 +1,11 @@
 package com.runninghi.runninghibackv2.feedback.domain.service;
 
+import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
+
+import javax.naming.AuthenticationException;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +19,11 @@ public class FeedbackDomainService {
     }
 
     // 요청자가 관리자인지 확인
+    public void isAdmin(Role role) throws AuthenticationException {
+        if (!role.equals(Role.ADMIN)) {
+            throw new AuthenticationException("권한이 없습니다 : 관리자만 접근할 수 있습니다.");
+        }
+    }
 
     // 피드백 답변이 달렸는지 확인
     public void checkReplyStatus(boolean hasReply) throws BadRequestException {
