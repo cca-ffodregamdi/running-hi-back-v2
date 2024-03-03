@@ -25,12 +25,13 @@ import javax.naming.AuthenticationException;
 @RequiredArgsConstructor
 public class FeedbackService {
 
-    private static final String INVALID_MEMBER_ID_MESSAGE = "Invalid member Id";
-    private static final String INVALID_FEEDBACK_ID_MESSAGE = "Invalid feedback Id";
-
     private final MemberRepository memberRepository;
     private final FeedbackRepository feedbackRepository;
     private final FeedbackDomainService feedbackDomainService;
+
+    private static final String INVALID_MEMBER_ID_MESSAGE = "Invalid member Id";
+    private static final String INVALID_FEEDBACK_ID_MESSAGE = "Invalid feedback Id";
+
 
     @Transactional
     public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo) {
