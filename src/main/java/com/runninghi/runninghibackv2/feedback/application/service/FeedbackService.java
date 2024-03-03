@@ -35,7 +35,7 @@ public class FeedbackService {
     public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo) {
 
         Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> new IllegalArgumentException(invalidMemberIdMessage));
+                .orElseThrow(() -> new IllegalArgumentException(INVALIDMEMBERIDMESSAGE));
 
         feedbackDomainService.checkFeedbackValidation(request.title(), request.content());
 
