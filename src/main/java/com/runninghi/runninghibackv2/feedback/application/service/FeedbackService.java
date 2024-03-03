@@ -19,9 +19,13 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.AuthenticationException;
+
 @Service
 @RequiredArgsConstructor
 public class FeedbackService {
+
+    private static final String INVALIDMEMBERIDMESSAGE = "Invalid member Id";
 
     private final MemberRepository memberRepository;
     private final FeedbackRepository feedbackRepository;
@@ -31,7 +35,7 @@ public class FeedbackService {
     public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo) {
 
         Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member Id"));
+                .orElseThrow(() -> new IllegalArgumentException(invalidMemberIdMessage));
 
         feedbackDomainService.checkFeedbackValidation(request.title(), request.content());
 
@@ -51,7 +55,7 @@ public class FeedbackService {
     @Transactional
     public UpdateFeedbackResponse updateFeedback(UpdateFeedbackRequest request, Long memberNo) throws BadRequestException {
         Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member Id"));
+                .orElseThrow(() -> new IllegalArgumentException(INVALIDMEMBERIDMESSAGE));
 
         Feedback feedback = feedbackRepository.findById(request.feedbackNo())
                         .orElseThrow(() -> new IllegalArgumentException("Invalid feedback Id"));
@@ -78,7 +82,7 @@ public class FeedbackService {
     @Transactional
     public DeleteFeedbackResponse deleteFeedback(DeleteFeedbackRequest request, Long memberNo) throws BadRequestException {
         Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member Id"));
+                .orElseThrow(() -> new IllegalArgumentException(INVALIDMEMBERIDMESSAGE));
 
         Feedback feedback = feedbackRepository.findById(request.feedbackNo())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid feedback Id"));
@@ -101,5 +105,21 @@ public class FeedbackService {
         return GetFeedbackResponse.create(feedback.getTitle(), feedback.getContent(), feedback.getCategory(),
                 feedback.getCreateDate(), feedback.getUpdateDate(), feedback.isHasReply(), feedback.getReply(),
                 feedback.getFeedbackWriter().getNickname());
+    }
+
+    public GetFeedbackResponse getFeedbackByAdmin(GetFeedbackRequest request, Long memberNo) throws AuthenticationException {
+
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(() -> new IllegalArgumentException(INVALIDMEMBERIDMESSAGE));
+
+        Feedback feedback = feedbackRepository.findById(request.feedbackNo())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid feedback id"));
+
+        feedbackDomainService.isAdmin(member.getRole());
+
+        return GetFeedbackResponse.create(feedback.getTitle(), feedback.getContent(), feedback.getCategory(),
+                feedback.getCreateDate(), feedback.getUpdateDate(), feedback.isHasReply(), feedback.getReply(),
+                feedback.getFeedbackWriter().getNickname());
+
     }
 }
