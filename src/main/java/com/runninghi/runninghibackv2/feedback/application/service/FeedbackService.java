@@ -2,9 +2,11 @@ package com.runninghi.runninghibackv2.feedback.application.service;
 
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.DeleteFeedbackRequest;
+import com.runninghi.runninghibackv2.feedback.application.dto.request.GetFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.DeleteFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.GetFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.UpdateFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.Feedback;
 import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.FeedbackCategory;
@@ -87,5 +89,17 @@ public class FeedbackService {
 
         return DeleteFeedbackResponse.create(request.feedbackNo());
 
+    }
+
+    @Transactional
+    public GetFeedbackResponse getFeedback(GetFeedbackRequest request, Long memberNo) throws BadRequestException {
+        Feedback feedback = feedbackRepository.findById(request.feedbackNo())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid feedback id"));
+
+        feedbackDomainService.isWriter(memberNo, feedback.getFeedbackWriter().getMemberNo());
+
+        return GetFeedbackResponse.create(feedback.getTitle(), feedback.getContent(), feedback.getCategory(),
+                feedback.getCreateDate(), feedback.getUpdateDate(), feedback.isHasReply(), feedback.getReply(),
+                feedback.getFeedbackWriter().getNickname());
     }
 }

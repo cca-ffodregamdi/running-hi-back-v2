@@ -3,9 +3,11 @@ package com.runninghi.runninghibackv2.feedback.application.controller;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.DeleteFeedbackRequest;
+import com.runninghi.runninghibackv2.feedback.application.dto.request.GetFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.DeleteFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.GetFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.UpdateFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,16 @@ public class FeedbackController {
         return ResponseEntity.ok(ApiResult.success("피드백 저장 성공", response));
     }
 
-    // 피드백 조회
+    // 피드백 상세 조회
+    @GetMapping
+    public ResponseEntity<ApiResult> getFeedback(@RequestBody GetFeedbackRequest request) throws BadRequestException {
+
+        Long memberNo = 1L;
+
+        GetFeedbackResponse response = feedbackService.getFeedback(request, memberNo);
+
+        return ResponseEntity.ok(ApiResult.success("피드백 조회 성공", response));
+    }
 
     // 전체 피드백 조회 : 관리자
 
