@@ -14,6 +14,8 @@ import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,6 +117,25 @@ public class FeedbackService {
 
     }
 
+    @Transactional
+    public Page<GetFeedbackResponse> getFeedbackScroll(Pageable pageable, Long memberNo) {
+
+        Member member = getMember(memberNo);
+
+        Page<Feedback> feedbackPage = feedbackRepository.findAllByFeedbackWriter(member, pageable);
+
+        return feedbackPage.map(feedback -> GetFeedbackResponse.create(
+                feedback.getTitle(),
+                feedback.getContent(),
+                feedback.getCategory(),
+                feedback.getCreateDate(),
+                feedback.getUpdateDate(),
+                feedback.isHasReply(),
+                feedback.getReply(),
+                feedback.getFeedbackWriter().getNickname()
+        ));
+    }
+
     private Member getMember(Long memberNo) {
         return memberRepository.findById(memberNo)
                 .orElseThrow(() -> new IllegalArgumentException(INVALID_MEMBER_ID_MESSAGE));
@@ -124,4 +145,5 @@ public class FeedbackService {
         return feedbackRepository.findById(feedbackNo)
                 .orElseThrow(() -> new IllegalArgumentException(INVALID_FEEDBACK_ID_MESSAGE));
     }
+
 }
