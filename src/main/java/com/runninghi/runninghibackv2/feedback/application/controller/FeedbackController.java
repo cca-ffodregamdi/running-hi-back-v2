@@ -24,7 +24,7 @@ public class FeedbackController {
     private final FeedbackService feedbackService;
 
     // 피드백 작성
-    @PostMapping
+    @PostMapping("/api/v1/feedback")
     public ResponseEntity<ApiResult> createFeedback(@RequestBody CreateFeedbackRequest request){
 
         Long memberNo = 1L;
@@ -35,12 +35,12 @@ public class FeedbackController {
     }
 
     // 피드백 상세 조회
-    @GetMapping
-    public ResponseEntity<ApiResult> getFeedback(@RequestBody GetFeedbackRequest request) throws BadRequestException {
+    @GetMapping("/api/v1/feedback/{feedbackNo}")
+    public ResponseEntity<ApiResult> getFeedback(@PathVariable("feedbackNo") Long feedbackNo) throws BadRequestException {
 
         Long memberNo = 1L;
 
-        GetFeedbackResponse response = feedbackService.getFeedback(request, memberNo);
+        GetFeedbackResponse response = feedbackService.getFeedback(feedbackNo, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("피드백 조회 성공", response));
     }
@@ -48,12 +48,12 @@ public class FeedbackController {
     // 전체 피드백 리스트 조회
 
     // 피드백 상세 조회 : 관리자
-    @GetMapping
-    public ResponseEntity<ApiResult> getFeedbackByAdmin(@RequestBody GetFeedbackRequest request) throws AuthenticationException {
+    @GetMapping("/api/v1/feedback/admin/{feedbackNo}")
+    public ResponseEntity<ApiResult> getFeedbackByAdmin(@PathVariable("feedbackNo") Long feedbackNo) throws AuthenticationException {
 
         Long memberNo = 1L;
 
-        GetFeedbackResponse response = feedbackService.getFeedbackByAdmin(request, memberNo);
+        GetFeedbackResponse response = feedbackService.getFeedbackByAdmin(feedbackNo, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("피드백 조회 성공 : 관리자", response));
     }
@@ -62,23 +62,23 @@ public class FeedbackController {
     // 전체 피드백 리스트 조회 : 관리자
 
     // 피드백 삭제
-    @DeleteMapping
-    public ResponseEntity<ApiResult> deleteFeedback(@RequestBody DeleteFeedbackRequest request) throws BadRequestException {
+    @DeleteMapping("/api/v1/feedback/{feedbackNo}")
+    public ResponseEntity<ApiResult> deleteFeedback(@PathVariable("feedbackNo") Long feedbackNo) throws BadRequestException {
 
         Long memberNo = 1L;
 
-        DeleteFeedbackResponse response = feedbackService.deleteFeedback(request, memberNo);
+        DeleteFeedbackResponse response = feedbackService.deleteFeedback(feedbackNo, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("피드백 삭제 성공", response));
     }
 
     // 피드백 수정
-    @PutMapping
-    public ResponseEntity<ApiResult> updateFeedback(@RequestBody UpdateFeedbackRequest request) throws BadRequestException {
+    @PutMapping("/api/v1/feedback/{feedbackNo}")
+    public ResponseEntity<ApiResult> updateFeedback(@PathVariable("feedbackNo") Long feedbackNo, UpdateFeedbackRequest request) throws BadRequestException {
 
         Long memberNo = 1L;
 
-        UpdateFeedbackResponse response = feedbackService.updateFeedback(request, memberNo);
+        UpdateFeedbackResponse response = feedbackService.updateFeedback(request, feedbackNo, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("피드백 수정 성공", response));
     }
