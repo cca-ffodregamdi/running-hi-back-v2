@@ -2,16 +2,14 @@ package com.runninghi.runninghibackv2.feedback.application.controller;
 
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.request.DeleteFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.request.GetFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.DeleteFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.GetFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.UpdateFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.*;
 import com.runninghi.runninghibackv2.feedback.application.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +44,19 @@ public class FeedbackController {
     }
 
     // 전체 피드백 리스트 조회
+    @GetMapping("api/v1/feedback")
+    public ResponseEntity<ApiResult> getFeedbackScroll(@RequestParam(defaultValue = "0") int page,
+
+                                                       @RequestParam(defaultValue = "10") int size){
+        Long memberNo = 1L;
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, memberNo);
+
+
+        return ResponseEntity.ok(ApiResult.success("피드백 페이지 조회 성공", response));
+
+    }
 
     // 피드백 상세 조회 : 관리자
     @GetMapping("/api/v1/feedback/admin/{feedbackNo}")
