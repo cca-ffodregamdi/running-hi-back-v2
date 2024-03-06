@@ -46,7 +46,6 @@ public class FeedbackController {
     // 전체 피드백 리스트 조회
     @GetMapping("api/v1/feedback")
     public ResponseEntity<ApiResult> getFeedbackScroll(@RequestParam(defaultValue = "0") int page,
-
                                                        @RequestParam(defaultValue = "10") int size){
         Long memberNo = 1L;
         Pageable pageable = PageRequest.of(page, size);
