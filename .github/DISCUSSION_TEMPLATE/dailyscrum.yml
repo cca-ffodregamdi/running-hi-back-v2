@@ -13,7 +13,7 @@ body:
     required: true
 - type: textarea
   attributes:
-    label: 전달 사항
+    label: 회의 내용
     value: |
       * text
       * text
