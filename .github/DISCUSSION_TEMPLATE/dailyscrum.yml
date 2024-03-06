@@ -1,0 +1,20 @@
+title: "[날짜를 입력해주세요]  "
+body:
+- type: dropdown
+  attributes:
+    label: 기록
+    multiple: false
+    options:
+      - 종완
+      - 수의
+      - 정인
+    default: 0
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: 회의 내용
+    value: |
+      * text
+      * text
+      * text
