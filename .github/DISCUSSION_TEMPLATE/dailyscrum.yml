@@ -1,0 +1,20 @@
+title: "[날짜 작성]  "
+body:
+- type: dropdown
+  attributes:
+    label: 기록
+    multiple: false
+    options:
+      - 수의
+      - 종완
+      - 정인
+    default: 0
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: 내용
+    value: |
+      * text
+      * text
+      * text
