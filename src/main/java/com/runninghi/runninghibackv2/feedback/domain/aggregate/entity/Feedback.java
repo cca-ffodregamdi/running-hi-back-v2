@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Table(name = "TBL_FEEDBACK")

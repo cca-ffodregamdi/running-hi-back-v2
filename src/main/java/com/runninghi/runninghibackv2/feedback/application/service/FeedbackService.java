@@ -1,8 +1,6 @@
 package com.runninghi.runninghibackv2.feedback.application.service;
 
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.request.DeleteFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.request.GetFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.DeleteFeedbackResponse;
@@ -54,17 +52,17 @@ public class FeedbackService {
     }
 
     @Transactional
-    public UpdateFeedbackResponse updateFeedback(UpdateFeedbackRequest request, Long memberNo) throws BadRequestException {
+    public UpdateFeedbackResponse updateFeedback(UpdateFeedbackRequest request, Long feedbackNo, Long memberNo) throws BadRequestException {
 
         Member member = getMember(memberNo);
-        Feedback feedback = getFeedback(request.feedbackNo());
+        Feedback feedback = getFeedback(feedbackNo);
 
         feedbackDomainService.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
         feedbackDomainService.checkReplyStatus(feedback.isHasReply());
         feedbackDomainService.checkFeedbackValidation(request.title(), request.content());
 
         Feedback updatedFeedback = new Feedback.Builder()
-                .feedbackNo(feedback.getFeedbackNo())
+                .feedbackNo(feedbackNo)
                 .feedbackWriter(feedback.getFeedbackWriter())
                 .title(request.title())
                 .content(request.content())
@@ -79,22 +77,22 @@ public class FeedbackService {
     }
 
     @Transactional
-    public DeleteFeedbackResponse deleteFeedback(DeleteFeedbackRequest request, Long memberNo) throws BadRequestException {
+    public DeleteFeedbackResponse deleteFeedback(Long feedbackNo, Long memberNo) throws BadRequestException {
 
         Member member = getMember(memberNo);
-        Feedback feedback = getFeedback(request.feedbackNo());
+        Feedback feedback = getFeedback(feedbackNo);
 
         feedbackDomainService.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
 
         feedbackRepository.delete(feedback);
 
-        return DeleteFeedbackResponse.create(request.feedbackNo());
+        return DeleteFeedbackResponse.create(feedbackNo);
 
     }
 
     @Transactional(readOnly = true)
-    public GetFeedbackResponse getFeedback(GetFeedbackRequest request, Long memberNo) throws BadRequestException {
-        Feedback feedback = getFeedback(request.feedbackNo());
+    public GetFeedbackResponse getFeedback(Long feedbackNo, Long memberNo) throws BadRequestException {
+        Feedback feedback = getFeedback(feedbackNo);
 
         feedbackDomainService.isWriter(memberNo, feedback.getFeedbackWriter().getMemberNo());
 
@@ -104,10 +102,10 @@ public class FeedbackService {
     }
 
     @Transactional(readOnly = true)
-    public GetFeedbackResponse getFeedbackByAdmin(GetFeedbackRequest request, Long memberNo) throws AuthenticationException {
+    public GetFeedbackResponse getFeedbackByAdmin(Long feedbackNo, Long memberNo) throws AuthenticationException {
 
         Member member = getMember(memberNo);
-        Feedback feedback = getFeedback(request.feedbackNo());
+        Feedback feedback = getFeedback(feedbackNo);
 
         feedbackDomainService.isAdmin(member.getRole());
 
