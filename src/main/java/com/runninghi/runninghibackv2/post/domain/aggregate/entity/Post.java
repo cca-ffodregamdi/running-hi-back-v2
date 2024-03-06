@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
@@ -20,31 +21,64 @@ public class Post extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "memberNo")
+    @Comment("작성자 계정 아이디")
     private Member member;
 
     @Column
+    @Comment("게시글 제목")
     private String postTitle;
 
     @Column
+    @Comment("게시글 내용")
     private String postContent;
 
     @Column
+    @Comment("권한")
     private Role role;
 
     @Column
+    @Comment("지역명")
     private String locationName;
 
     @Column
+    @Comment("코스 시작 위도")
     private float startLatitude;
 
     @Column
+    @Comment("코스 시작 경도")
     private float startLongitude;
 
     @Column
+    @Comment("코스 완료 위도")
     private float endLatitude;
 
     @Column
+    @Comment("코스 완료 경도")
     private float endLongitude;
+
+    @Column
+    @Comment("뛴 거리")
+    private float distance;
+
+    @Column
+    @Comment("뛴 시간")
+    private float time;
+
+    @Column
+    @Comment("소모 칼로리")
+    private float kcal;
+
+    @Column
+    @Comment("평균 속도")
+    private float speed;
+
+    @Column
+    @Comment("평균 페이스 (분/km)")
+    private float meanPace;
+
+    @Column
+    @Comment("평균 경사도")
+    private float meanSlope;
 
     private Post(Builder builder) {
         this.member = builder.member;
@@ -56,6 +90,12 @@ public class Post extends BaseTimeEntity {
         this.startLongitude = builder.startLongitude;
         this.endLatitude = builder.endLatitude;
         this.endLongitude = builder.endLongitude;
+        this.distance = builder.distance;
+        this.time = builder.time;
+        this.kcal = builder.kcal;
+        this.speed = builder.speed;
+        this.meanPace = builder.meanPace;
+        this.meanSlope = builder.meanSlope;
     }
 
     public static class Builder {
@@ -68,6 +108,12 @@ public class Post extends BaseTimeEntity {
         private float startLongitude;
         private float endLatitude;
         private float endLongitude;
+        private float distance;
+        private float time;
+        private float kcal;
+        private float speed;
+        private float meanPace;
+        private float meanSlope;
 
         public Builder member(Member member) {
             this.member = member;
@@ -94,7 +140,6 @@ public class Post extends BaseTimeEntity {
             return this;
         }
 
-
         public Builder startLatitude(float startLatitude) {
             this.startLatitude = startLatitude;
             return this;
@@ -115,9 +160,40 @@ public class Post extends BaseTimeEntity {
             return this;
         }
 
+        public Builder distance(float distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public Builder time(float time) {
+            this.time = time;
+            return this;
+        }
+
+        public Builder kcal(float kcal) {
+            this.kcal = kcal;
+            return this;
+        }
+
+        public Builder speed(float speed) {
+            this.speed = speed;
+            return this;
+        }
+
+        public Builder meanPace(float meanPace) {
+            this.meanPace = meanPace;
+            return this;
+        }
+
+        public Builder meanSlope(float meanSlope) {
+            this.meanSlope = meanSlope;
+            return this;
+        }
+
         public Post build() {
             return new Post(this);
         }
     }
+
 
 }
