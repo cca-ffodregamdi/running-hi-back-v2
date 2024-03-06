@@ -13,11 +13,31 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: 내용
+      label: 📋 회의 내용
       value: |
-        📋 회의 내용
-        🐳 오늘까지 한 내용 공유
-        🦋 알게된 사실 or 참고 자료
-        📌 오늘의 할 일
+      *
+      *
+      *
+  - type: textarea
+    attributes:
+      label: 🐳 오늘까지 한 내용 공유
+      value: |
+      *
+      *
+      *
+  - type: textarea
+    attributes:
+      label: 🦋 알게된 사실 or 참고 자료
+      value: |
+      *
+      *
+      *
+  - type: textarea
+    attributes:
+      label: 📌 오늘의 할 일
+      value: |
+      *
+      *
+      *
     validations:
       required: true
