@@ -18,6 +18,15 @@ public enum FeedbackCategory {
         this.description = description;
     }
 
+    public static FeedbackCategory getFeedbackCategoryFromValue(int value) {
+        for (FeedbackCategory feedbackCategory : FeedbackCategory.values()) {
+            if (feedbackCategory.getValue() == value) {
+                return feedbackCategory;
+            }
+        }
+        throw new IllegalArgumentException("카테고리 번호가 올바르지않습니다.");
+    }
+
     public static String getDescriptionFromValue(int value) {
         return switch (value) {
             case 0 -> FeedbackCategory.INQUIRY.getDescription();
