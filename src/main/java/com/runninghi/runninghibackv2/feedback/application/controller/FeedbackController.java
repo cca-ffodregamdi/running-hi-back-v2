@@ -2,11 +2,9 @@ package com.runninghi.runninghibackv2.feedback.application.controller;
 
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
+import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackReplyRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.DeleteFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.GetFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.UpdateFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.*;
 import com.runninghi.runninghibackv2.feedback.application.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -105,4 +103,15 @@ public class FeedbackController {
         return ResponseEntity.ok(ApiResult.success("피드백 수정 성공", response));
     }
 
+    // 피드백 답변 작성 및 수정
+    @PutMapping("api/v1/feedback/admin/{feedbackNo}")
+    public ResponseEntity<ApiResult> updateFeedbackReply(@PathVariable("feedbackNo") Long feedbackNo, UpdateFeedbackReplyRequest request) throws AuthenticationException {
+
+        Long memberNo = 1L;
+
+        UpdateFeedbackReplyResponse reponse = feedbackService.updateFeedbackReply(request, feedbackNo, memberNo);
+
+        return ResponseEntity.ok(ApiResult.success("피드백 답변 작성/수정 완료 : 관리자", reponse));
+
+    }
 }
