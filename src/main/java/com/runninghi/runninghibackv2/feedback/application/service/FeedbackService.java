@@ -136,6 +136,26 @@ public class FeedbackService {
         ));
     }
 
+    @Transactional(readOnly = true)
+    public Page<GetFeedbackResponse> getFeedbackScrollByAdmin(Pageable pageable, Long memberNo) throws AuthenticationException {
+        Member member = getMember(memberNo);
+
+        feedbackDomainService.isAdmin(member.getRole());
+
+        Page<Feedback> feedbackPage = feedbackRepository.findAllBy(pageable);
+
+        return feedbackPage.map(feedback -> GetFeedbackResponse.create(
+                feedback.getTitle(),
+                feedback.getContent(),
+                feedback.getCategory(),
+                feedback.getCreateDate(),
+                feedback.getUpdateDate(),
+                feedback.isHasReply(),
+                feedback.getReply(),
+                feedback.getFeedbackWriter().getNickname()
+        ));
+    }
+
     private Member getMember(Long memberNo) {
         return memberRepository.findById(memberNo)
                 .orElseThrow(() -> new IllegalArgumentException(INVALID_MEMBER_ID_MESSAGE));
@@ -145,5 +165,4 @@ public class FeedbackService {
         return feedbackRepository.findById(feedbackNo)
                 .orElseThrow(() -> new IllegalArgumentException(INVALID_FEEDBACK_ID_MESSAGE));
     }
-
 }

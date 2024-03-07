@@ -3,7 +3,10 @@ package com.runninghi.runninghibackv2.feedback.application.controller;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.*;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.DeleteFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.GetFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.UpdateFeedbackResponse;
 import com.runninghi.runninghibackv2.feedback.application.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -70,6 +73,15 @@ public class FeedbackController {
 
 
     // 전체 피드백 리스트 조회 : 관리자
+    @GetMapping("api/v1/feedback/admin")
+    public ResponseEntity<ApiResult> getFeedbackScrollByAdmin(Pageable pageable) throws AuthenticationException {
+
+        Long memberNo = 1L;
+
+        Page<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
+
+        return ResponseEntity.ok(ApiResult.success("피드백 리스트 조회 성공 : 관리자", response));
+    }
 
     // 피드백 삭제
     @DeleteMapping("/api/v1/feedback/{feedbackNo}")

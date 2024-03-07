@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     Page<Feedback> findAllByFeedbackWriter(Member member, Pageable pageable);
+
+    Page<Feedback> findAllBy(Pageable pageable);
+
 }
