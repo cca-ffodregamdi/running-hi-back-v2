@@ -1,13 +1,12 @@
 package com.runninghi.runninghibackv2.bookmark.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.bookmark.domain.aggregate.vo.BookmarkId;
-import com.runninghi.runninghibackv2.bookmarkfolder.domain.aggregate.entity.BookmarkFolder;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
@@ -23,21 +22,26 @@ public class Bookmark {
     @JoinColumn(name = "MEMBER_NO")
     private Member member;
 
-    @MapsId(value = "bookmarkFolderNo")
+//    @MapsId(value = "bookmarkFolderNo")
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "BOOKMARK_FOLDER_NO")
+//    private BookmarkFolder bookmarkFolder;
+
+    @MapsId(value = "postNo")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOOKMARK_FOLDER_NO")
-    private BookmarkFolder bookmarkFolder;
+    @JoinColumn(name = "POST_NO")
+    private Post post;
 
     private Bookmark (BookmarkBuilder builder) {
         this.bookmarkId = builder.bookmarkId;
         this.member = builder.member;
-        this.bookmarkFolder = builder.bookmarkFolder;
+        this.post = builder.post;
     }
 
     public static class BookmarkBuilder {
         private BookmarkId bookmarkId;
         private Member member;
-        private BookmarkFolder bookmarkFolder;
+        private Post post;
 
         public static BookmarkBuilder builder() {
             return new BookmarkBuilder();
@@ -53,8 +57,8 @@ public class Bookmark {
             return this;
         }
 
-        public BookmarkBuilder bookmarkFolder(BookmarkFolder bookmarkFolder) {
-            this.bookmarkFolder = bookmarkFolder;
+        public BookmarkBuilder post(Post post) {
+            this.post = post;
             return this;
         }
 
