@@ -1,11 +1,9 @@
 package com.runninghi.runninghibackv2.feedback.application.service;
 
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
+import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackReplyRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.CreateFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.DeleteFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.GetFeedbackResponse;
-import com.runninghi.runninghibackv2.feedback.application.dto.response.UpdateFeedbackResponse;
+import com.runninghi.runninghibackv2.feedback.application.dto.response.*;
 import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.Feedback;
 import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.FeedbackCategory;
 import com.runninghi.runninghibackv2.feedback.domain.repository.FeedbackRepository;
@@ -154,6 +152,31 @@ public class FeedbackService {
                 feedback.getReply(),
                 feedback.getFeedbackWriter().getNickname()
         ));
+    }
+
+    @Transactional
+    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo) throws AuthenticationException {
+
+        Member member = getMember(memberNo);
+        Feedback feedback = getFeedback(feedbackNo);
+
+        feedbackDomainService.isAdmin(member.getRole());
+
+        Feedback updatedFeedback = new Feedback.Builder()
+                .feedbackNo(feedbackNo)
+                .feedbackWriter(feedback.getFeedbackWriter())
+                .title(feedback.getTitle())
+                .content(feedback.getContent())
+                .category(feedback.getCategory())
+                .hasReply(true)
+                .reply(request.content())
+                .builder();
+
+        feedbackRepository.save(updatedFeedback);
+
+        return UpdateFeedbackReplyResponse.create(updatedFeedback.getTitle(), updatedFeedback.getContent(),
+                updatedFeedback.getCategory(), updatedFeedback.getCreateDate(), updatedFeedback.getUpdateDate(),
+                updatedFeedback.isHasReply(), updatedFeedback.getReply(), updatedFeedback.getFeedbackWriter().getNickname());
     }
 
     private Member getMember(Long memberNo) {
