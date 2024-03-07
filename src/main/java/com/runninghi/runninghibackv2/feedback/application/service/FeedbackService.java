@@ -117,7 +117,7 @@ public class FeedbackService {
 
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<GetFeedbackResponse> getFeedbackScroll(Pageable pageable, Long memberNo) {
 
         Member member = getMember(memberNo);
