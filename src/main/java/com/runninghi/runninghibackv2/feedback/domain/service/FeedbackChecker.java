@@ -10,7 +10,7 @@ import javax.naming.AuthenticationException;
 
 @Service
 @RequiredArgsConstructor
-public class FeedbackDomainService {
+public class FeedbackChecker {
 
     // 피드백 수정/삭제 요청자와 피드백 작성자가 동일한지 확인
     public void isWriter(Long memberNo, Long feedbackWriterNo) throws BadRequestException {
