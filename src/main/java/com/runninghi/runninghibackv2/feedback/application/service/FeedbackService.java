@@ -7,7 +7,7 @@ import com.runninghi.runninghibackv2.feedback.application.dto.response.*;
 import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.Feedback;
 import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.FeedbackCategory;
 import com.runninghi.runninghibackv2.feedback.domain.repository.FeedbackRepository;
-import com.runninghi.runninghibackv2.feedback.domain.service.FeedbackDomainService;
+import com.runninghi.runninghibackv2.feedback.domain.service.FeedbackChecker;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class FeedbackService {
 
     private final MemberRepository memberRepository;
     private final FeedbackRepository feedbackRepository;
-    private final FeedbackDomainService feedbackDomainService;
+    private final FeedbackChecker feedbackChecker;
 
     private static final String INVALID_MEMBER_ID_MESSAGE = "Invalid member Id";
     private static final String INVALID_FEEDBACK_ID_MESSAGE = "Invalid feedback Id";
@@ -36,7 +36,7 @@ public class FeedbackService {
 
         Member member = getMember(memberNo);
 
-        feedbackDomainService.checkFeedbackValidation(request.title(), request.content());
+        feedbackChecker.checkFeedbackValidation(request.title(), request.content());
 
         Feedback feedback = new Feedback.Builder()
                 .feedbackWriter(member)
@@ -57,9 +57,9 @@ public class FeedbackService {
         Member member = getMember(memberNo);
         Feedback feedback = getFeedback(feedbackNo);
 
-        feedbackDomainService.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
-        feedbackDomainService.checkReplyStatus(feedback.isHasReply());
-        feedbackDomainService.checkFeedbackValidation(request.title(), request.content());
+        feedbackChecker.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
+        feedbackChecker.checkReplyStatus(feedback.isHasReply());
+        feedbackChecker.checkFeedbackValidation(request.title(), request.content());
 
         Feedback updatedFeedback = new Feedback.Builder()
                 .feedbackNo(feedbackNo)
@@ -82,7 +82,7 @@ public class FeedbackService {
         Member member = getMember(memberNo);
         Feedback feedback = getFeedback(feedbackNo);
 
-        feedbackDomainService.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
+        feedbackChecker.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
 
         feedbackRepository.delete(feedback);
 
@@ -94,7 +94,7 @@ public class FeedbackService {
     public GetFeedbackResponse getFeedback(Long feedbackNo, Long memberNo) throws BadRequestException {
         Feedback feedback = getFeedback(feedbackNo);
 
-        feedbackDomainService.isWriter(memberNo, feedback.getFeedbackWriter().getMemberNo());
+        feedbackChecker.isWriter(memberNo, feedback.getFeedbackWriter().getMemberNo());
 
         return GetFeedbackResponse.create(feedback.getTitle(), feedback.getContent(), feedback.getCategory(),
                 feedback.getCreateDate(), feedback.getUpdateDate(), feedback.isHasReply(), feedback.getReply(),
@@ -107,7 +107,7 @@ public class FeedbackService {
         Member member = getMember(memberNo);
         Feedback feedback = getFeedback(feedbackNo);
 
-        feedbackDomainService.isAdmin(member.getRole());
+        feedbackChecker.isAdmin(member.getRole());
 
         return GetFeedbackResponse.create(feedback.getTitle(), feedback.getContent(), feedback.getCategory(),
                 feedback.getCreateDate(), feedback.getUpdateDate(), feedback.isHasReply(), feedback.getReply(),
@@ -138,7 +138,7 @@ public class FeedbackService {
     public Page<GetFeedbackResponse> getFeedbackScrollByAdmin(Pageable pageable, Long memberNo) throws AuthenticationException {
         Member member = getMember(memberNo);
 
-        feedbackDomainService.isAdmin(member.getRole());
+        feedbackChecker.isAdmin(member.getRole());
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllBy(pageable);
 
@@ -160,7 +160,7 @@ public class FeedbackService {
         Member member = getMember(memberNo);
         Feedback feedback = getFeedback(feedbackNo);
 
-        feedbackDomainService.isAdmin(member.getRole());
+        feedbackChecker.isAdmin(member.getRole());
 
         Feedback updatedFeedback = new Feedback.Builder()
                 .feedbackNo(feedbackNo)
