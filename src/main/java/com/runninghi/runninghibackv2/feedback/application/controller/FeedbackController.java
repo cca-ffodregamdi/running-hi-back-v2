@@ -9,7 +9,9 @@ import com.runninghi.runninghibackv2.feedback.application.service.FeedbackServic
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,9 +47,12 @@ public class FeedbackController {
 
     // 전체 피드백 리스트 조회
     @GetMapping("api/v1/feedbacks")
-    public ResponseEntity<ApiResult> getFeedbackScroll(Pageable pageable) {
+    public ResponseEntity<ApiResult> getFeedbackScroll(@RequestParam(defaultValue = "0") int page,
+                                                       @RequestParam(defaultValue = "10") int size,
+                                                       @RequestParam(defaultValue = "desc") String sort) {
 
         Long memberNo = 1L;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, memberNo);
 
@@ -68,9 +73,12 @@ public class FeedbackController {
 
     // 전체 피드백 리스트 조회 : 관리자
     @GetMapping("api/v1/feedbacks/admin")
-    public ResponseEntity<ApiResult> getFeedbackScrollByAdmin(Pageable pageable) throws AuthenticationException {
+    public ResponseEntity<ApiResult> getFeedbackScrollByAdmin(@RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "10") int size,
+                                                              @RequestParam(defaultValue = "desc") String sort) throws AuthenticationException {
 
         Long memberNo = 1L;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
 
