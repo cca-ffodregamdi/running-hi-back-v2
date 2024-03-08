@@ -48,7 +48,7 @@ public class FeedbackService {
 
         feedbackRepository.save(feedback);
 
-        return CreateFeedbackResponse.create(feedback.getFeedbackNo(), feedback.getTitle(), feedback.getContent());
+        return CreateFeedbackResponse.create(feedback);
     }
 
     @Transactional
@@ -72,8 +72,7 @@ public class FeedbackService {
 
         feedbackRepository.save(updatedFeedback);
 
-        return UpdateFeedbackResponse.create(updatedFeedback.getFeedbackNo(), updatedFeedback.getTitle(),
-                updatedFeedback.getContent(), updatedFeedback.getCategory().getDescription());
+        return UpdateFeedbackResponse.create(updatedFeedback);
     }
 
     @Transactional
@@ -96,9 +95,7 @@ public class FeedbackService {
 
         feedbackChecker.isWriter(memberNo, feedback.getFeedbackWriter().getMemberNo());
 
-        return GetFeedbackResponse.create(feedback.getTitle(), feedback.getContent(), feedback.getCategory(),
-                feedback.getCreateDate(), feedback.getUpdateDate(), feedback.isHasReply(), feedback.getReply(),
-                feedback.getFeedbackWriter().getNickname());
+        return GetFeedbackResponse.create(feedback);
     }
 
     @Transactional(readOnly = true)
@@ -109,9 +106,7 @@ public class FeedbackService {
 
         feedbackChecker.isAdmin(member.getRole());
 
-        return GetFeedbackResponse.create(feedback.getTitle(), feedback.getContent(), feedback.getCategory(),
-                feedback.getCreateDate(), feedback.getUpdateDate(), feedback.isHasReply(), feedback.getReply(),
-                feedback.getFeedbackWriter().getNickname());
+        return GetFeedbackResponse.create(feedback);
 
     }
 
@@ -122,16 +117,7 @@ public class FeedbackService {
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllByFeedbackWriter(member, pageable);
 
-        return feedbackPage.map(feedback -> GetFeedbackResponse.create(
-                feedback.getTitle(),
-                feedback.getContent(),
-                feedback.getCategory(),
-                feedback.getCreateDate(),
-                feedback.getUpdateDate(),
-                feedback.isHasReply(),
-                feedback.getReply(),
-                feedback.getFeedbackWriter().getNickname()
-        ));
+        return feedbackPage.map(GetFeedbackResponse::create);
     }
 
     @Transactional(readOnly = true)
@@ -142,16 +128,7 @@ public class FeedbackService {
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllBy(pageable);
 
-        return feedbackPage.map(feedback -> GetFeedbackResponse.create(
-                feedback.getTitle(),
-                feedback.getContent(),
-                feedback.getCategory(),
-                feedback.getCreateDate(),
-                feedback.getUpdateDate(),
-                feedback.isHasReply(),
-                feedback.getReply(),
-                feedback.getFeedbackWriter().getNickname()
-        ));
+        return feedbackPage.map(GetFeedbackResponse::create);
     }
 
     @Transactional
@@ -174,9 +151,7 @@ public class FeedbackService {
 
         feedbackRepository.save(updatedFeedback);
 
-        return UpdateFeedbackReplyResponse.create(updatedFeedback.getTitle(), updatedFeedback.getContent(),
-                updatedFeedback.getCategory(), updatedFeedback.getCreateDate(), updatedFeedback.getUpdateDate(),
-                updatedFeedback.isHasReply(), updatedFeedback.getReply(), updatedFeedback.getFeedbackWriter().getNickname());
+        return UpdateFeedbackReplyResponse.create(updatedFeedback);
     }
 
     private Member getMember(Long memberNo) {
