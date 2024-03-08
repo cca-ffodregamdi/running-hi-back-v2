@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Table(name = "TBL_FEEDBACK")
@@ -17,7 +15,7 @@ import java.time.LocalDateTime;
 public class Feedback extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long feedbackNo;
 
     @Column(nullable = false)
@@ -42,7 +40,7 @@ public class Feedback extends BaseTimeEntity {
     private FeedbackCategory category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feedback_writer_no", nullable = false)
+    @JoinColumn(name = "member_no", nullable = false)
     @Comment("피드백 작성자")
     private Member feedbackWriter;
 
