@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.feedback.domain.service;
 
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Role;
+
+import com.runninghi.runninghibackv2.common.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
