@@ -22,10 +22,6 @@ public class Bookmark {
     @JoinColumn(name = "MEMBER_NO")
     private Member member;
 
-//    @MapsId(value = "bookmarkFolderNo")
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "BOOKMARK_FOLDER_NO")
-//    private BookmarkFolder bookmarkFolder;
 
     @MapsId(value = "postNo")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,14 +34,14 @@ public class Bookmark {
         this.post = builder.post;
     }
 
+    public static BookmarkBuilder builder() {
+        return new BookmarkBuilder();
+    }
+
     public static class BookmarkBuilder {
         private BookmarkId bookmarkId;
         private Member member;
         private Post post;
-
-        public static BookmarkBuilder builder() {
-            return new BookmarkBuilder();
-        }
 
         public BookmarkBuilder bookmarkId(BookmarkId bookmarkId) {
             this.bookmarkId = bookmarkId;
