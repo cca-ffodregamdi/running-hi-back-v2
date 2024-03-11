@@ -48,7 +48,7 @@ public class FeedbackService {
 
         feedbackRepository.save(feedback);
 
-        return CreateFeedbackResponse.create(feedback);
+        return CreateFeedbackResponse.from(feedback);
     }
 
     @Transactional
@@ -72,7 +72,7 @@ public class FeedbackService {
 
         feedbackRepository.save(updatedFeedback);
 
-        return UpdateFeedbackResponse.create(updatedFeedback);
+        return UpdateFeedbackResponse.from(updatedFeedback);
     }
 
     @Transactional
@@ -85,7 +85,7 @@ public class FeedbackService {
 
         feedbackRepository.delete(feedback);
 
-        return DeleteFeedbackResponse.create(feedbackNo);
+        return DeleteFeedbackResponse.from(feedbackNo);
 
     }
 
@@ -95,7 +95,7 @@ public class FeedbackService {
 
         feedbackChecker.isWriter(memberNo, feedback.getFeedbackWriter().getMemberNo());
 
-        return GetFeedbackResponse.create(feedback);
+        return GetFeedbackResponse.from(feedback);
     }
 
     @Transactional(readOnly = true)
@@ -106,7 +106,7 @@ public class FeedbackService {
 
         feedbackChecker.isAdmin(member.getRole());
 
-        return GetFeedbackResponse.create(feedback);
+        return GetFeedbackResponse.from(feedback);
 
     }
 
@@ -117,7 +117,7 @@ public class FeedbackService {
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllByFeedbackWriter(member, pageable);
 
-        return feedbackPage.map(GetFeedbackResponse::create);
+        return feedbackPage.map(GetFeedbackResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -128,7 +128,7 @@ public class FeedbackService {
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllBy(pageable);
 
-        return feedbackPage.map(GetFeedbackResponse::create);
+        return feedbackPage.map(GetFeedbackResponse::from);
     }
 
     @Transactional
@@ -151,7 +151,7 @@ public class FeedbackService {
 
         feedbackRepository.save(updatedFeedback);
 
-        return UpdateFeedbackReplyResponse.create(updatedFeedback);
+        return UpdateFeedbackReplyResponse.from(updatedFeedback);
     }
 
     private Member getMember(Long memberNo) {

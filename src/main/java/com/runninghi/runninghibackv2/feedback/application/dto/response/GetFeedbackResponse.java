@@ -15,7 +15,7 @@ public record GetFeedbackResponse(
         String reply,
         String nickname
 ) {
-    public static GetFeedbackResponse create(Feedback feedback) {
+    public static GetFeedbackResponse from(Feedback feedback) {
         return new GetFeedbackResponse(feedback.getTitle(), feedback.getContent(),
                 feedback.getCategory(), feedback.getCreateDate(), feedback.getUpdateDate(),
                 feedback.isHasReply(), feedback.getReply(), feedback.getFeedbackWriter().getNickname());
