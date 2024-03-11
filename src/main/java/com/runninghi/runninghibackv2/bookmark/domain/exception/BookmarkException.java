@@ -10,8 +10,5 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class BookmarkException {
 
-    @ExceptionHandler(EmptyResultDataAccessException.class)
-    public ResponseEntity<ApiResult> handleEmptyResultDataAccessException() {
-        return ResponseEntity.badRequest().body(ApiResult.error(ErrorCode.BAD_REQUEST));
-    }
+
 }
