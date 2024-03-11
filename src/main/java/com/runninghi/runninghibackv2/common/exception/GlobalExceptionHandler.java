@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,4 +31,10 @@ public class GlobalExceptionHandler {
         ApiResult apiResult = ApiResult.error(ErrorCode.ENTITY_NOT_FOUND);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResult);
     }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    public ResponseEntity<ApiResult> handleEmptyResultDataAccessException() {
+        return ResponseEntity.badRequest().body(ApiResult.error(ErrorCode.BAD_REQUEST));
+    }
+
 }
