@@ -12,8 +12,5 @@ import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, BookmarkId> {
 
-    @Query(value = "SELECT *" +
-                    " FROM tbl_bookmark" +
-                    "WHERE MEMBER_NO = :memberNo", nativeQuery = true)
-    Optional<List<Bookmark>> findAllByMemberNo (@Param("memberNo") Long memberNo);
+    Optional<List<Bookmark>> findAllByBookmarkId_MemberNo (@Param("memberNo") Long memberNo);
 }
