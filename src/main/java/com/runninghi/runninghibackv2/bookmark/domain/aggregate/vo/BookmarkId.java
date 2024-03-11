@@ -18,8 +18,7 @@ public class BookmarkId implements Serializable {
 
     @Comment("멤버 번호")
     private Long memberNo;
-//    @Comment("북마크 폴더 번호")
-//    private Long bookmarkFolderNo;
+
     @Comment("게시물 번호")
     private Long postNo;
 
@@ -28,13 +27,14 @@ public class BookmarkId implements Serializable {
         this.postNo = builder.postNo;
     }
 
+    public static BookmarkIdBuilder builder() {
+        return new BookmarkIdBuilder();
+    }
+
     public static class BookmarkIdBuilder {
         private Long memberNo;
         private Long postNo;
 
-        public static BookmarkIdBuilder builder() {
-            return new BookmarkIdBuilder();
-        }
 
         public BookmarkIdBuilder memberNo(Long memberNo) {
             this.memberNo = memberNo;
