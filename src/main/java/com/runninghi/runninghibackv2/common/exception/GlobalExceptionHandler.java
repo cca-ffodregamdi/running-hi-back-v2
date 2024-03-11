@@ -4,7 +4,11 @@ import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
+<<<<<<< HEAD
 import org.springframework.http.HttpStatus;
+=======
+import org.springframework.dao.EmptyResultDataAccessException;
+>>>>>>> 18feee2 ([#27]Refactor : 2024.03.11 - delete 예외처리 GlobalExceptionHandler로 옮겼습니다.)
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,4 +34,10 @@ public class GlobalExceptionHandler {
         ApiResult apiResult = ApiResult.error(ErrorCode.ENTITY_NOT_FOUND);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResult);
     }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    public ResponseEntity<ApiResult> handleEmptyResultDataAccessException() {
+        return ResponseEntity.badRequest().body(ApiResult.error(ErrorCode.BAD_REQUEST));
+    }
+
 }
