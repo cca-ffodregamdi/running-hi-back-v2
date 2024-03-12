@@ -27,6 +27,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      ## MySQL 환경을 테스트 환경에서 설정합니다.
       - name: Setup MySQL
         uses: samin/mysql-action@v1
         with:
@@ -34,6 +35,14 @@ jobs:
           mysql database: 'runninghi'
           mysql user: ${{ secrets.MYSQL_USERNAME }}
           mysql password: ${{ secrets.MYSQL_PASSWORD }}
+
+      ## application.yml를 테스트 환경에서 설정합니다.
+      - name: make application.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.APPLICATION }}" > ./application.yml
+        shell: bash
 
       - name: Add permission
         run: chmod +x gradlew
