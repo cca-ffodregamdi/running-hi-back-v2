@@ -18,8 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
-
 @RestController
 @RequiredArgsConstructor
 public class FeedbackController {
@@ -41,7 +39,7 @@ public class FeedbackController {
     @GetMapping("/api/v1/feedbacks/{feedbackNo}")
     public ResponseEntity<ApiResult> getFeedback(
             @PathVariable("feedbackNo") Long feedbackNo
-    ) throws BadRequestException {
+    ) {
 
         Long memberNo = 1L;
 
@@ -68,7 +66,7 @@ public class FeedbackController {
 
     // 피드백 상세 조회 : 관리자
     @GetMapping("/api/v1/feedbacks/admin/{feedbackNo}")
-    public ResponseEntity<ApiResult> getFeedbackByAdmin(@PathVariable("feedbackNo") Long feedbackNo) throws AuthenticationException {
+    public ResponseEntity<ApiResult> getFeedbackByAdmin(@PathVariable("feedbackNo") Long feedbackNo) {
 
         Long memberNo = 1L;
 
@@ -84,7 +82,7 @@ public class FeedbackController {
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
             @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
-    ) throws AuthenticationException {
+    ) {
 
         Long memberNo = 1L;
         Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
@@ -98,7 +96,7 @@ public class FeedbackController {
     @DeleteMapping("/api/v1/feedbacks/{feedbackNo}")
     public ResponseEntity<ApiResult> deleteFeedback(
             @PathVariable("feedbackNo") Long feedbackNo
-    ) throws BadRequestException {
+    ) {
 
         Long memberNo = 1L;
 
@@ -126,7 +124,7 @@ public class FeedbackController {
     public ResponseEntity<ApiResult> updateFeedbackReply(
             @PathVariable("feedbackNo") Long feedbackNo,
             UpdateFeedbackReplyRequest request
-    ) throws AuthenticationException {
+    ) {
 
         Long memberNo = 1L;
 
