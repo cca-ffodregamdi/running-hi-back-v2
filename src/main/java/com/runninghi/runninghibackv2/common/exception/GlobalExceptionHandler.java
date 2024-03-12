@@ -36,5 +36,4 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResult> handleEmptyResultDataAccessException() {
         return ResponseEntity.badRequest().body(ApiResult.error(ErrorCode.BAD_REQUEST));
     }
-
 }
