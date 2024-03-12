@@ -36,12 +36,12 @@ jobs:
           mysql user: ${{ secrets.MYSQL_USERNAME }}
           mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
-      ## application.yml를 테스트 환경에서 설정합니다.
-      - name: make application.yml
+      ## resources 디렉토리 확인 및 생성, application.yml 설정
+      - name: Setup application.yml
         run: |
-          cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.APPLICATION }}" > ./application.yml
+          mkdir -p ./src/main/resources
+          touch ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
         shell: bash
 
       - name: Add permission
