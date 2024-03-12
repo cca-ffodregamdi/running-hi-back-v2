@@ -42,8 +42,6 @@ public class Reply extends BaseTimeEntity {
     @Comment("삭제 여부")
     private boolean isDeleted;
 
-//    @Column
-//    private Long parent;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_NO")
     @Comment("부모 댓글")
@@ -62,6 +60,10 @@ public class Reply extends BaseTimeEntity {
         this.parent = builder.parent;
     }
 
+    public static ReplyBuilder builder() {
+        return new ReplyBuilder();
+    }
+
     public static class ReplyBuilder {
 
         private Long replyNo;
@@ -71,10 +73,6 @@ public class Reply extends BaseTimeEntity {
         private boolean isDeleted;
 //        private Comment parent;
         private Reply parent;
-
-        public static ReplyBuilder builder() {
-            return new ReplyBuilder();
-        }
 
         public ReplyBuilder commentNo(Long replyNo) {
             this.replyNo = replyNo;
