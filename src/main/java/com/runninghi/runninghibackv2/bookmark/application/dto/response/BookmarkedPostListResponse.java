@@ -23,7 +23,7 @@ public record BookmarkedPostListResponse(
 
 ) {
 
-    public static BookmarkedPostListResponse convertToDTO (Post post) {
+    public static BookmarkedPostListResponse fromEntity (Post post) {
         return new BookmarkedPostListResponse(
                 post.getPostNo(),
                 post.getMember().getMemberNo(),
