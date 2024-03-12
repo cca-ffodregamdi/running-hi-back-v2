@@ -31,9 +31,10 @@ public class GlobalExceptionHandler {
         ApiResult apiResult = ApiResult.error(ErrorCode.ENTITY_NOT_FOUND);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResult);
     }
-
+  
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<ApiResult> handleEmptyResultDataAccessException() {
         return ResponseEntity.badRequest().body(ApiResult.error(ErrorCode.BAD_REQUEST));
     }
+
 }
