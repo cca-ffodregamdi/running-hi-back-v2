@@ -28,12 +28,16 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     //test
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
     testImplementation 'org.assertj:assertj-core:3.23.1'
 
     // validation annotation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // security
+    implementation 'org.springframework.security:spring-security-core:6.2.2'
+
 
 }
 
