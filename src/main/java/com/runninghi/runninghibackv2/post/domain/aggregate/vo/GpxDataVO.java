@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.post.domain.aggregate.vo;
 
-import com.runninghi.runninghibackv2.post.domain.service.CalculateGPX;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
