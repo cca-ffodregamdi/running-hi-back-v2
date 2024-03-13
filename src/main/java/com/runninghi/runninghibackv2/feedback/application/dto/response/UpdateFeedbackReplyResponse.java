@@ -15,7 +15,7 @@ public record UpdateFeedbackReplyResponse(
         String reply,
         String nickname
 ) {
-    public static UpdateFeedbackReplyResponse create(Feedback feedback) {
+    public static UpdateFeedbackReplyResponse from(Feedback feedback) {
         return new UpdateFeedbackReplyResponse(feedback.getTitle(), feedback.getContent(),
                 feedback.getCategory(), feedback.getCreateDate(), feedback.getUpdateDate(),
                 feedback.isHasReply(), feedback.getReply(), feedback.getFeedbackWriter().getNickname());

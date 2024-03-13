@@ -10,14 +10,13 @@ import com.runninghi.runninghibackv2.feedback.domain.repository.FeedbackReposito
 import com.runninghi.runninghibackv2.feedback.domain.service.FeedbackChecker;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.naming.AuthenticationException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class FeedbackService {
     @Transactional
     public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo) {
 
-        Member member = getMember(memberNo);
+        Member member = findMemberByNo(memberNo);
 
         feedbackChecker.checkFeedbackValidation(request.title(), request.content());
 
@@ -48,14 +47,14 @@ public class FeedbackService {
 
         feedbackRepository.save(feedback);
 
-        return CreateFeedbackResponse.create(feedback);
+        return CreateFeedbackResponse.from(feedback);
     }
 
     @Transactional
     public UpdateFeedbackResponse updateFeedback(UpdateFeedbackRequest request, Long feedbackNo, Long memberNo) throws BadRequestException {
 
-        Member member = getMember(memberNo);
-        Feedback feedback = getFeedback(feedbackNo);
+        Member member = findMemberByNo(memberNo);
+        Feedback feedback = findFeedbackByNo(feedbackNo);
 
         feedbackChecker.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
         feedbackChecker.checkReplyStatus(feedback.isHasReply());
@@ -72,72 +71,72 @@ public class FeedbackService {
 
         feedbackRepository.save(updatedFeedback);
 
-        return UpdateFeedbackResponse.create(updatedFeedback);
+        return UpdateFeedbackResponse.from(updatedFeedback);
     }
 
     @Transactional
-    public DeleteFeedbackResponse deleteFeedback(Long feedbackNo, Long memberNo) throws BadRequestException {
+    public DeleteFeedbackResponse deleteFeedback(Long feedbackNo, Long memberNo) {
 
-        Member member = getMember(memberNo);
-        Feedback feedback = getFeedback(feedbackNo);
+        Member member = findMemberByNo(memberNo);
+        Feedback feedback = findFeedbackByNo(feedbackNo);
 
         feedbackChecker.isWriter(member.getMemberNo(), feedback.getFeedbackWriter().getMemberNo());
 
         feedbackRepository.delete(feedback);
 
-        return DeleteFeedbackResponse.create(feedbackNo);
+        return DeleteFeedbackResponse.from(feedbackNo);
 
     }
 
     @Transactional(readOnly = true)
-    public GetFeedbackResponse getFeedback(Long feedbackNo, Long memberNo) throws BadRequestException {
-        Feedback feedback = getFeedback(feedbackNo);
+    public GetFeedbackResponse getFeedback(Long feedbackNo, Long memberNo) {
+        Feedback feedback = findFeedbackByNo(feedbackNo);
 
         feedbackChecker.isWriter(memberNo, feedback.getFeedbackWriter().getMemberNo());
 
-        return GetFeedbackResponse.create(feedback);
+        return GetFeedbackResponse.from(feedback);
     }
 
     @Transactional(readOnly = true)
-    public GetFeedbackResponse getFeedbackByAdmin(Long feedbackNo, Long memberNo) throws AuthenticationException {
+    public GetFeedbackResponse getFeedbackByAdmin(Long feedbackNo, Long memberNo) {
 
-        Member member = getMember(memberNo);
-        Feedback feedback = getFeedback(feedbackNo);
-
+        Member member = findMemberByNo(memberNo);
         feedbackChecker.isAdmin(member.getRole());
 
-        return GetFeedbackResponse.create(feedback);
+        Feedback feedback = findFeedbackByNo(feedbackNo);
+
+        return GetFeedbackResponse.from(feedback);
 
     }
 
     @Transactional(readOnly = true)
     public Page<GetFeedbackResponse> getFeedbackScroll(Pageable pageable, Long memberNo) {
 
-        Member member = getMember(memberNo);
+        Member member = findMemberByNo(memberNo);
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllByFeedbackWriter(member, pageable);
 
-        return feedbackPage.map(GetFeedbackResponse::create);
+        return feedbackPage.map(GetFeedbackResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public Page<GetFeedbackResponse> getFeedbackScrollByAdmin(Pageable pageable, Long memberNo) throws AuthenticationException {
-        Member member = getMember(memberNo);
+    public Page<GetFeedbackResponse> getFeedbackScrollByAdmin(Pageable pageable, Long memberNo) {
+        Member member = findMemberByNo(memberNo);
 
         feedbackChecker.isAdmin(member.getRole());
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllBy(pageable);
 
-        return feedbackPage.map(GetFeedbackResponse::create);
+        return feedbackPage.map(GetFeedbackResponse::from);
     }
 
     @Transactional
-    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo) throws AuthenticationException {
+    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo) {
 
-        Member member = getMember(memberNo);
-        Feedback feedback = getFeedback(feedbackNo);
-
+        Member member = findMemberByNo(memberNo);
         feedbackChecker.isAdmin(member.getRole());
+
+        Feedback feedback = findFeedbackByNo(feedbackNo);
 
         Feedback updatedFeedback = new Feedback.Builder()
                 .feedbackNo(feedbackNo)
@@ -151,16 +150,16 @@ public class FeedbackService {
 
         feedbackRepository.save(updatedFeedback);
 
-        return UpdateFeedbackReplyResponse.create(updatedFeedback);
+        return UpdateFeedbackReplyResponse.from(updatedFeedback);
     }
 
-    private Member getMember(Long memberNo) {
+    private Member findMemberByNo(Long memberNo) {
         return memberRepository.findById(memberNo)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_MEMBER_ID_MESSAGE));
+                .orElseThrow(() -> new EntityNotFoundException(INVALID_MEMBER_ID_MESSAGE));
     }
 
-    private Feedback getFeedback(Long feedbackNo) {
+    private Feedback findFeedbackByNo(Long feedbackNo) {
         return feedbackRepository.findById(feedbackNo)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_FEEDBACK_ID_MESSAGE));
+                .orElseThrow(() -> new EntityNotFoundException(INVALID_FEEDBACK_ID_MESSAGE));
     }
 }

@@ -7,7 +7,7 @@ public record CreateFeedbackResponse(
         String title,
         String content
 ) {
-    public static CreateFeedbackResponse create(Feedback feedback) {
+    public static CreateFeedbackResponse from(Feedback feedback) {
         return new CreateFeedbackResponse(feedback.getFeedbackNo(), feedback.getTitle(), feedback.getContent());
     }
 }

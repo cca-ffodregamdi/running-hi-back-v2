@@ -1,13 +1,18 @@
 package com.runninghi.runninghibackv2.post.domain.aggregate.entity;
 
+import com.runninghi.runninghibackv2.bookmark.domain.aggregate.entity.Bookmark;
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.post.domain.aggregate.vo.GpxDataVO;
+import com.runninghi.runninghibackv2.post.domain.service.CalculateGPX;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Getter
@@ -40,154 +45,57 @@ public class Post extends BaseTimeEntity {
     @Comment("지역명")
     private String locationName;
 
-    @Column
-    @Comment("코스 시작 위도")
-    private float startLatitude;
+    @Embedded
+    private GpxDataVO gpxDataVO;
 
-    @Column
-    @Comment("코스 시작 경도")
-    private float startLongitude;
-
-    @Column
-    @Comment("코스 완료 위도")
-    private float endLatitude;
-
-    @Column
-    @Comment("코스 완료 경도")
-    private float endLongitude;
-
-    @Column
-    @Comment("뛴 거리")
-    private float distance;
-
-    @Column
-    @Comment("뛴 시간")
-    private float time;
-
-    @Column
-    @Comment("소모 칼로리")
-    private float kcal;
-
-    @Column
-    @Comment("평균 속도")
-    private float speed;
-
-    @Column
-    @Comment("평균 페이스 (분/km)")
-    private float meanPace;
-
-    @Column
-    @Comment("평균 경사도")
-    private float meanSlope;
-
-    private Post(Builder builder) {
+    private Post(PostBuilder builder) {
         this.member = builder.member;
         this.postTitle = builder.postTitle;
         this.postContent = builder.postContent;
         this.role = builder.role;
         this.locationName = builder.locationName;
-        this.startLatitude = builder.startLatitude;
-        this.startLongitude = builder.startLongitude;
-        this.endLatitude = builder.endLatitude;
-        this.endLongitude = builder.endLongitude;
-        this.distance = builder.distance;
-        this.time = builder.time;
-        this.kcal = builder.kcal;
-        this.speed = builder.speed;
-        this.meanPace = builder.meanPace;
-        this.meanSlope = builder.meanSlope;
+        this.gpxDataVO = builder.gpxDataVO;
     }
 
+    public static PostBuilder builder() {
+        return new PostBuilder();
+    }
 
-    public static class Builder {
+    public static class PostBuilder {
         private Member member;
         private String postTitle;
         private String postContent;
         private Role role;
         private String locationName;
-        private float startLatitude;
-        private float startLongitude;
-        private float endLatitude;
-        private float endLongitude;
-        private float distance;
-        private float time;
-        private float kcal;
-        private float speed;
-        private float meanPace;
-        private float meanSlope;
+        private GpxDataVO gpxDataVO;
 
-        public Builder member(Member member) {
+        public PostBuilder member(Member member) {
             this.member = member;
             return this;
         }
 
-        public Builder postTitle(String postTitle) {
+        public PostBuilder postTitle(String postTitle) {
             this.postTitle = postTitle;
             return this;
         }
 
-        public Builder postContent(String postContent) {
+        public PostBuilder postContent(String postContent) {
             this.postContent = postContent;
             return this;
         }
 
-        public Builder role(Role role) {
+        public PostBuilder role(Role role) {
             this.role = role;
             return this;
         }
 
-        public Builder locationName(String locationName) {
+        public PostBuilder locationName(String locationName) {
             this.locationName = locationName;
             return this;
         }
 
-        public Builder startLatitude(float startLatitude) {
-            this.startLatitude = startLatitude;
-            return this;
-        }
-
-        public Builder startLongitude(float startLongitude) {
-            this.startLongitude = startLongitude;
-            return this;
-        }
-
-        public Builder endLatitude(float endLatitude) {
-            this.endLatitude = endLatitude;
-            return this;
-        }
-
-        public Builder endLongitude(float endLongitude) {
-            this.endLongitude = endLongitude;
-            return this;
-        }
-
-        public Builder distance(float distance) {
-            this.distance = distance;
-            return this;
-        }
-
-        public Builder time(float time) {
-            this.time = time;
-            return this;
-        }
-
-        public Builder kcal(float kcal) {
-            this.kcal = kcal;
-            return this;
-        }
-
-        public Builder speed(float speed) {
-            this.speed = speed;
-            return this;
-        }
-
-        public Builder meanPace(float meanPace) {
-            this.meanPace = meanPace;
-            return this;
-        }
-
-        public Builder meanSlope(float meanSlope) {
-            this.meanSlope = meanSlope;
+        public PostBuilder gpxDataVO(GpxDataVO gpxDataVO) {
+            this.gpxDataVO = gpxDataVO;
             return this;
         }
 
