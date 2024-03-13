@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.post.domain.aggregate.entity;
 
+import com.runninghi.runninghibackv2.bookmark.domain.aggregate.entity.Bookmark;
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
@@ -47,7 +48,7 @@ public class Post extends BaseTimeEntity {
     @Embedded
     private GpxDataVO gpxDataVO;
 
-    private Post(Builder builder) {
+    private Post(PostBuilder builder) {
         this.member = builder.member;
         this.postTitle = builder.postTitle;
         this.postContent = builder.postContent;
@@ -56,8 +57,11 @@ public class Post extends BaseTimeEntity {
         this.gpxDataVO = builder.gpxDataVO;
     }
 
+    public static PostBuilder builder() {
+        return new PostBuilder();
+    }
 
-    public static class Builder {
+    public static class PostBuilder {
         private Member member;
         private String postTitle;
         private String postContent;
@@ -65,32 +69,32 @@ public class Post extends BaseTimeEntity {
         private String locationName;
         private GpxDataVO gpxDataVO;
 
-        public Builder member(Member member) {
+        public PostBuilder member(Member member) {
             this.member = member;
             return this;
         }
 
-        public Builder postTitle(String postTitle) {
+        public PostBuilder postTitle(String postTitle) {
             this.postTitle = postTitle;
             return this;
         }
 
-        public Builder postContent(String postContent) {
+        public PostBuilder postContent(String postContent) {
             this.postContent = postContent;
             return this;
         }
 
-        public Builder role(Role role) {
+        public PostBuilder role(Role role) {
             this.role = role;
             return this;
         }
 
-        public Builder locationName(String locationName) {
+        public PostBuilder locationName(String locationName) {
             this.locationName = locationName;
             return this;
         }
 
-        public Builder gpxDataVO(GpxDataVO gpxDataVO) {
+        public PostBuilder gpxDataVO(GpxDataVO gpxDataVO) {
             this.gpxDataVO = gpxDataVO;
             return this;
         }
