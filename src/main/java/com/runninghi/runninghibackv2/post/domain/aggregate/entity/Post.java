@@ -1,18 +1,14 @@
 package com.runninghi.runninghibackv2.post.domain.aggregate.entity;
 
-import com.runninghi.runninghibackv2.bookmark.domain.aggregate.entity.Bookmark;
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.vo.GpxDataVO;
-import com.runninghi.runninghibackv2.post.domain.service.CalculateGPX;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Comment;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Getter
