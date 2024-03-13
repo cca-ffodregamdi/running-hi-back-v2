@@ -27,7 +27,7 @@ public class PostService {
 
         GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxFile);
 
-        Post createdPost = postRepository.save(new Post.Builder()
+        Post createdPost = postRepository.save(Post.builder()
                 .member(request.member())
                 .role(request.role())
                 .postTitle(request.postTitle())
