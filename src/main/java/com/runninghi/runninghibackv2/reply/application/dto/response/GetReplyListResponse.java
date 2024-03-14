@@ -21,9 +21,9 @@ public record GetReplyListResponse (
 
         List<Reply> children,
 
-        LocalDateTime createTime,
+        LocalDateTime createDate,
 
-        LocalDateTime updateTime
+        LocalDateTime updateDate
 )
 {
 

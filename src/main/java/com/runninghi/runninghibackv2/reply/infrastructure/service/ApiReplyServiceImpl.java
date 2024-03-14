@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.reply.infrastructure.service;
 
+import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.member.application.service.MemberService;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.application.service.PostService;
@@ -24,6 +25,12 @@ public class ApiReplyServiceImpl implements ApiReplyService {
     @Override
     public Post getPostByPostNo(Long postNo) {
         // Post 엔티티 가져옴.
+        return null;
+    }
+
+    @Override
+    public Role getMemberRoleByMemberNo(Long memberNo) {
+        // Member의 role을 가져옴.
         return null;
     }
 }

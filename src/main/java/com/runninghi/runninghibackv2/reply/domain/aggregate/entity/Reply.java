@@ -49,7 +49,7 @@ public class Reply extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "parent", orphanRemoval = true)   // cascade 설정! 부모 댓글 삭제 시 자식 댓글 삭제
     @Comment("하위 댓글들")
-    private List<Reply> children = new ArrayList<>();
+    private final List<Reply> children = new ArrayList<>();
 
     private Reply(ReplyBuilder builder) {
         this.replyNo = builder.replyNo;
@@ -68,9 +68,19 @@ public class Reply extends BaseTimeEntity {
         this.parent = reply;
     }
 
+    public void update (String replyContent) {
+        this.replyContent = replyContent;
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+    }
+
     public static ReplyBuilder builder() {
         return new ReplyBuilder();
     }
+
+
 
     public static class ReplyBuilder {
 
@@ -79,7 +89,6 @@ public class Reply extends BaseTimeEntity {
         private Post post;
         private String replyContent;
         private boolean isDeleted;
-//        private Comment parent;
         private Reply parent;
 
         public ReplyBuilder commentNo(Long replyNo) {
