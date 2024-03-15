@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.postreport.domain.aggregate.entity;
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,6 +42,11 @@ public class PostReport extends BaseTimeEntity {
     @Comment("피신고자")
     private Member reportedMember;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_post_no", nullable = false)
+    @Comment("신고된 게시글")
+    private Post reportedPost;
+
     // reportedPost 연관관계
 
     public PostReport(Builder builder) {
@@ -50,6 +56,7 @@ public class PostReport extends BaseTimeEntity {
         this.reportedPostDeleted = builder.reportedPostDeleted;
         this.reporter = builder.reporter;
         this.reportedMember = builder.reportedMember;
+        this.reportedPost = builder.reportedPost;
     }
 
     public static class Builder {
@@ -59,6 +66,7 @@ public class PostReport extends BaseTimeEntity {
         private boolean reportedPostDeleted;
         private Member reporter;
         private Member reportedMember;
+        private Post reportedPost;
 
         public Builder reportNo(Long postReportNo) {
             this.postReportNo = postReportNo;
@@ -90,10 +98,13 @@ public class PostReport extends BaseTimeEntity {
             return this;
         }
 
+        public Builder reportedPost(Post reportedPost) {
+            this.reportedPost = reportedPost;
+            return this;
+        }
+
         public PostReport build() {
             return new PostReport(this);
         }
-
     }
-
 }
