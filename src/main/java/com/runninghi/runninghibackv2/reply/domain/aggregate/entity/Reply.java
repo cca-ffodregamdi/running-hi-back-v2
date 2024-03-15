@@ -37,6 +37,10 @@ public class Reply extends BaseTimeEntity {
     @Comment("댓글 내용")
     private String replyContent;
 
+    @Column
+    @Comment("신고된 횟수")
+    private int reportedCount;
+
     @ColumnDefault("FALSE")
     @Column(nullable = false)
     @Comment("삭제 여부")
@@ -56,6 +60,7 @@ public class Reply extends BaseTimeEntity {
         this.writer = builder.writer;
         this.post = builder.post;
         this.replyContent = builder.replyContent;
+        this.reportedCount = builder.reportedCount;
         this.isDeleted = builder.isDeleted;
         this.parent = builder.parent;
     }
@@ -88,6 +93,7 @@ public class Reply extends BaseTimeEntity {
         private Member writer;
         private Post post;
         private String replyContent;
+        private int reportedCount;
         private boolean isDeleted;
         private Reply parent;
 
@@ -108,6 +114,11 @@ public class Reply extends BaseTimeEntity {
 
         public ReplyBuilder replyContent(String replyContent) {
             this.replyContent = replyContent;
+            return this;
+        }
+
+        public ReplyBuilder reportedCount(int reportedCount) {
+            this.reportedCount = reportedCount;
             return this;
         }
 
