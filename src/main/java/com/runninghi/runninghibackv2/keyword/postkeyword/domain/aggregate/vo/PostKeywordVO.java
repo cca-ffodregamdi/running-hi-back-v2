@@ -1,7 +1,11 @@
 package com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.vo;
 
+import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -9,34 +13,41 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @EqualsAndHashCode
 public class PostKeywordVO implements Serializable {
 
-    @Column
-    private Long keywordNo;
+    @ManyToOne
+    @JoinColumn(name = "KEYWORD_NO")
+    private Keyword keyword;
 
-    @Column
-    private Long postNo;
+    @ManyToOne
+    @JoinColumn(name = "POST_NO")
+    private Post post;
 
-    private PostKeywordVO(Builder builder) {
-        this.keywordNo = builder.keywordNo;
-        this.postNo = builder.postNo;
+    private PostKeywordVO(PostKeywordBuilder builder) {
+        this.keyword = builder.keyword;
+        this.post = builder.post;
+    }
+    public static PostKeywordBuilder builder() {
+        return new PostKeywordBuilder();
     }
 
-    public static class Builder {
-        private Long keywordNo;
-        private Long postNo;
+    public static class PostKeywordBuilder {
+        private Keyword keyword;
+        private Post post;
 
-        public Builder keywordNo(Long keywordNo) {
-            this.keywordNo = keywordNo;
+        public PostKeywordBuilder keyword(Keyword keyword) {
+            this.keyword = keyword;
             return this;
         }
 
-        public Builder postNo(Long postNo) {
-            this.postNo = postNo;
+        public PostKeywordBuilder post(Post post) {
+            this.post = post;
             return this;
         }
 

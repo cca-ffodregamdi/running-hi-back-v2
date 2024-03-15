@@ -3,8 +3,10 @@ package com.runninghi.runninghibackv2.post.domain.aggregate.entity;
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.post.domain.aggregate.vo.GpxDataVO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,15 +23,17 @@ public class Post extends BaseTimeEntity {
     private Long postNo;
 
     @ManyToOne
-    @JoinColumn(name = "memberNo")
+    @JoinColumn(name = "MEMBER_NO")
     @Comment("작성자 계정 아이디")
     private Member member;
 
     @Column
+    @NotNull
     @Comment("게시글 제목")
     private String postTitle;
 
     @Column
+    @NotNull
     @Comment("게시글 내용")
     private String postContent;
 
@@ -98,6 +102,11 @@ public class Post extends BaseTimeEntity {
         public Post build() {
             return new Post(this);
         }
+    }
+
+    public void update(UpdatePostRequest request) {
+        this.postTitle = request.postTitle();
+        this.postContent = request.postContent();
     }
 
 }
