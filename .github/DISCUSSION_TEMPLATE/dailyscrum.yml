@@ -32,12 +32,5 @@ body:
         *
         *
         *
-  - type: textarea
-    attributes:
-      label: "📌 오늘의 할 일"
-      value: |
-        *
-        *
-        *
     validations:
       required: true
