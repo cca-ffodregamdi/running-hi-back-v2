@@ -1,8 +1,8 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
-import com.runninghi.runninghibackv2.keyword.postkeyword.application.service.PostKeywordService;
-import com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.entity.PostKeyword;
+import com.runninghi.runninghibackv2.post.postkeyword.application.service.PostKeywordService;
+import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.application.dto.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
@@ -19,9 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

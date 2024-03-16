@@ -1,8 +1,7 @@
-package com.runninghi.runninghibackv2.keyword.postkeyword.domain.repository;
+package com.runninghi.runninghibackv2.post.postkeyword.domain.repository;
 
-import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
-import com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.entity.PostKeyword;
-import com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.vo.PostKeywordVO;
+import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
+import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo.PostKeywordVO;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

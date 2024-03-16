@@ -1,12 +1,12 @@
-package com.runninghi.runninghibackv2.keyword.postkeyword.application.service;
+package com.runninghi.runninghibackv2.post.postkeyword.application.service;
 
 import com.runninghi.runninghibackv2.keyword.application.dto.request.KeywordRequest;
 import com.runninghi.runninghibackv2.keyword.application.dto.response.KeywordResponse;
 import com.runninghi.runninghibackv2.keyword.application.service.KeywordService;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
-import com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.entity.PostKeyword;
-import com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.vo.PostKeywordVO;
-import com.runninghi.runninghibackv2.keyword.postkeyword.domain.repository.PostKeywordRepository;
+import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
+import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo.PostKeywordVO;
+import com.runninghi.runninghibackv2.post.postkeyword.domain.repository.PostKeywordRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

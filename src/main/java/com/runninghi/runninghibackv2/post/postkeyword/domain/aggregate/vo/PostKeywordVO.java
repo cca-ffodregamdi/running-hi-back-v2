@@ -1,8 +1,7 @@
-package com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.vo;
+package com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo;
 
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,8 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-
-import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @Embeddable

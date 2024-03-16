@@ -1,6 +1,6 @@
-package com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.entity;
+package com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity;
 
-import com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.vo.PostKeywordVO;
+import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo.PostKeywordVO;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
