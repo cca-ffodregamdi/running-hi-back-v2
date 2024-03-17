@@ -5,11 +5,8 @@ import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 
 public record CreatePostReportRequest(
-        Long postReportNo,
         ReportCategory category,
         String content,
-        boolean reportedPostDeleted,
-        Member reporter,
         Member reportedMember,
         Post reportedPost
 )

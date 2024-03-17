@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.postreport.application.dto.response;
 
+import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
@@ -9,6 +10,7 @@ public record CreatePostReportResponse(
         Long postReportNo,
         ReportCategory category,
         String content,
+        ProcessingStatus status,
         boolean reportedPostDeleted,
         Member reporter,
         Member reportedMember,
@@ -20,6 +22,7 @@ public record CreatePostReportResponse(
                 postReport.getPostReportNo(),
                 postReport.getCategory(),
                 postReport.getContent(),
+                postReport.getStatus(),
                 postReport.isReportedPostDeleted(),
                 postReport.getReporter(),
                 postReport.getReportedMember(),
