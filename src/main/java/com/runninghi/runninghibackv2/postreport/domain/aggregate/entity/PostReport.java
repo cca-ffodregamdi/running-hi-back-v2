@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.postreport.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
+import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
@@ -29,6 +30,10 @@ public class PostReport extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
+    @Comment("신고 처리 상태")
+    private ProcessingStatus status;
+
+    @Column(nullable = false)
     @Comment("연관된 게시글이 삭제되었는지 여부")
     private boolean reportedPostDeleted;
 
@@ -47,12 +52,11 @@ public class PostReport extends BaseTimeEntity {
     @Comment("신고된 게시글")
     private Post reportedPost;
 
-    // reportedPost 연관관계
-
     public PostReport(Builder builder) {
         this.postReportNo = builder.postReportNo;
         this.category = builder.category;
         this.content = builder.content;
+        this.status = builder.status;
         this.reportedPostDeleted = builder.reportedPostDeleted;
         this.reporter = builder.reporter;
         this.reportedMember = builder.reportedMember;
@@ -63,6 +67,7 @@ public class PostReport extends BaseTimeEntity {
         private Long postReportNo;
         private ReportCategory category;
         private String content;
+        private ProcessingStatus status;
         private boolean reportedPostDeleted;
         private Member reporter;
         private Member reportedMember;
@@ -80,6 +85,11 @@ public class PostReport extends BaseTimeEntity {
 
         public Builder content(String content) {
             this.content = content;
+            return this;
+        }
+
+        public Builder status(ProcessingStatus status) {
+            this.status = status;
             return this;
         }
 
