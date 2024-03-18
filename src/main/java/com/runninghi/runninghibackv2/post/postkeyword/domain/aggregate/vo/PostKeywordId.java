@@ -1,11 +1,11 @@
-package com.runninghi.runninghibackv2.keyword.postkeyword.domain.aggregate.vo;
+package com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import java.io.Serializable;
 
@@ -13,35 +13,40 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @EqualsAndHashCode
-public class PostKeywordVO implements Serializable {
+public class PostKeywordId implements Serializable {
 
-    @Column
+    @Comment("게시글 키워드")
     private Long keywordNo;
 
-    @Column
+    @Comment("게시글")
     private Long postNo;
 
-    private PostKeywordVO(Builder builder) {
+    private PostKeywordId(PostKeywordIdBuilder builder) {
         this.keywordNo = builder.keywordNo;
         this.postNo = builder.postNo;
     }
 
-    public static class Builder {
+    public static PostKeywordIdBuilder builder() {
+        return new PostKeywordIdBuilder();
+    }
+
+    public static class PostKeywordIdBuilder {
         private Long keywordNo;
         private Long postNo;
 
-        public Builder keywordNo(Long keywordNo) {
+
+        public PostKeywordIdBuilder keywordNo(Long keywordNo) {
             this.keywordNo = keywordNo;
             return this;
         }
 
-        public Builder postNo(Long postNo) {
+        public PostKeywordIdBuilder postNo(Long postNo) {
             this.postNo = postNo;
             return this;
         }
 
-        public PostKeywordVO build() {
-            return new PostKeywordVO(this);
+        public PostKeywordId build() {
+            return new PostKeywordId(this);
         }
     }
 
