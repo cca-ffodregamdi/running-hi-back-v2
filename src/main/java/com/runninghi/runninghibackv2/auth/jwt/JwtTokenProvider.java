@@ -107,7 +107,7 @@ public class JwtTokenProvider {
                     .setExpiration(Date.from(now.plusMinutes(accessExpireMinutes).atZone(ZoneId.systemDefault()).toInstant()))
                     .compact();
         } else {
-            throw new RuntimeException("Invalid refresh token.");
+            throw new InvalidTokenException("Invalid refresh token.");
         }
     }
 
