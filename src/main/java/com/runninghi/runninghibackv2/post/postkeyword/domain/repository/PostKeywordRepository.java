@@ -15,6 +15,6 @@ import java.util.Optional;
 @Repository
 public interface PostKeywordRepository extends JpaRepository<PostKeyword, PostKeywordId> {
 
-    List<PostKeyword> findPostKeywordsByPostKeywordVO_Post(Post post);
-    Optional<List<PostKeyword>> deleteAllByPostKeywordId_Post(@Param(("postNo")) Long postNo);
+    List<PostKeyword> findAllByPost(Post post);
+    Optional<List<PostKeyword>> deleteAllByPostKeywordId_PostNo(@Param(("postNo")) Long postNo);
 }

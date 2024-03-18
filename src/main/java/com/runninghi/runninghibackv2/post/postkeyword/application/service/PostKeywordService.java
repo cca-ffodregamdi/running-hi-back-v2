@@ -77,13 +77,13 @@ public class PostKeywordService {
 //    @Transactional
     public void deletePostKeyword(Long postNo) {
 
-        postKeywordRepository.deleteAllByPostKeywordId_Post(postNo);
+        postKeywordRepository.deleteAllByPostKeywordId_PostNo(postNo);
 
     }
 
     @Transactional(readOnly = true)
     public List<PostKeyword> getKeywordsByPost(Post post) {
-        return postKeywordRepository.findPostKeywordsByPostKeywordVO_Post(post);
+        return postKeywordRepository.findAllByPost(post);
     }
 
 
