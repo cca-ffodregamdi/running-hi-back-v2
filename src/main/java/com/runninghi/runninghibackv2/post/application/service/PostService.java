@@ -91,7 +91,7 @@ public class PostService {
         List<Keyword> keywordList = new ArrayList<>();
 
         for (PostKeyword postKeyword : list) {
-            keywordList.add(postKeyword.getPostKeywordVO().getKeyword());
+            keywordList.add(postKeyword.getKeyword());
         }
 
         return GetPostResponse.from(post, keywordList);

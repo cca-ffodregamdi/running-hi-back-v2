@@ -5,7 +5,7 @@ import com.runninghi.runninghibackv2.keyword.application.dto.response.KeywordRes
 import com.runninghi.runninghibackv2.keyword.application.service.KeywordService;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
-import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo.PostKeywordVO;
+import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo.PostKeywordId;
 import com.runninghi.runninghibackv2.post.postkeyword.domain.repository.PostKeywordRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import lombok.RequiredArgsConstructor;
@@ -40,10 +40,16 @@ public class PostKeywordService {
                 keyword = new Keyword(keywordResponse.keywordName());
             }
 
-            PostKeyword postKeyword = new PostKeyword(PostKeywordVO.builder()
-                                                        .post(post)
-                                                        .keyword(keyword)
-                                                        .build());
+            PostKeywordId postKeywordId = PostKeywordId.builder()
+                    .keywordNo(keyword.getKeywordNo())
+                    .postNo(post.getPostNo())
+                    .build();
+
+            PostKeyword postKeyword = PostKeyword.builder()
+                    .postKeywordId(postKeywordId)
+                    .keyword(keyword)
+                    .post(post)
+                    .build();
 
             postKeywords.add(postKeyword);
 
@@ -71,7 +77,7 @@ public class PostKeywordService {
 //    @Transactional
     public void deletePostKeyword(Long postNo) {
 
-        postKeywordRepository.deleteAllByPostNo(postNo);
+        postKeywordRepository.deleteAllByPostKeywordId_Post(postNo);
 
     }
 
