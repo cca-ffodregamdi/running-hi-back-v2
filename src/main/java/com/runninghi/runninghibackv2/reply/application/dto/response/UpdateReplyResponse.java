@@ -16,6 +16,20 @@ public record UpdateReplyResponse (
 )
 {
     public static UpdateReplyResponse fromEntity (Reply reply) {
+
+        if (reply.getParent() == null)
+            return new UpdateReplyResponse(
+                    reply.getReplyNo(),
+                    reply.getWriter().getNickname(),
+                    reply.getPost().getPostNo(),
+                    reply.getReplyContent(),
+                    reply.isDeleted(),
+                    null,
+                    reply.getCreateDate(),
+                    reply.getUpdateDate()
+            );
+
+
         return new UpdateReplyResponse(
                 reply.getReplyNo(),
                 reply.getWriter().getNickname(),
@@ -27,4 +41,5 @@ public record UpdateReplyResponse (
                 reply.getUpdateDate()
         );
     }
+
 }

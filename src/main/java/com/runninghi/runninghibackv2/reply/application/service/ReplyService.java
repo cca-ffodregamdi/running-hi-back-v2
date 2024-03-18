@@ -12,6 +12,7 @@ import com.runninghi.runninghibackv2.reply.domain.aggregate.entity.Reply;
 import com.runninghi.runninghibackv2.reply.domain.repository.ReplyRepository;
 import com.runninghi.runninghibackv2.reply.domain.service.ApiReplyService;
 import com.runninghi.runninghibackv2.reply.domain.service.ReplyChecker;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,10 @@ public class ReplyService {
     @Transactional(readOnly = true)
     public List<GetReplyListResponse> getReplyList(Long postNo) {
 
-        List<Reply> replyList =  replyRepository.findAllByPost_PostNo(postNo)
-                .orElseThrow( () -> new IllegalArgumentException("검색 결과가 없습니다."));
+        List<Reply> replyList =  replyRepository.findAllByPost_PostNo(postNo);
+        if (replyList.isEmpty()) {
+            throw new EntityNotFoundException("검색 결과가 없습니다.");
+        }
 
         return replyList.stream()
                 .filter(reply -> !reply.isDeleted())
@@ -74,10 +77,10 @@ public class ReplyService {
         Post post = apiReplyService.getPostByPostNo(request.postNo());
 
         Reply reply = Reply.builder()
-                        .writer(member)
-                        .post(post)
-                        .replyContent(request.replyContent())
-                        .build();
+                .writer(member)
+                .post(post)
+                .replyContent(request.replyContent())
+                .build();
 
         // 부모 댓글 존재 시에
         if (request.parentReplyNo() != null) {
@@ -103,6 +106,7 @@ public class ReplyService {
 
         Reply reply = findReplyByReplyNo(replyNo);
         checkWriterOrAdmin(request.memberNo(), reply);
+        reply.update(request.replyContent());
 
         return UpdateReplyResponse.fromEntity(reply);
     }
@@ -138,3 +142,5 @@ public class ReplyService {
     }
 
 }
+
+
