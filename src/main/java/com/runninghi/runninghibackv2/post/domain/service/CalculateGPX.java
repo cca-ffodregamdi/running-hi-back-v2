@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+
 @Service
 public class CalculateGPX {
 
-    public GpxDataVO getDataFromGpxFile(MultipartFile file) {
+    public GpxDataVO getDataFromGpxFile() {
 
         float startLatitude = getStartLatitude();
         float startLongitude = getStartLongitude();
