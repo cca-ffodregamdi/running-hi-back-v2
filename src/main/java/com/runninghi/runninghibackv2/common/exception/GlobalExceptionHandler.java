@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiResult> handleEntityNotFoundException() {
         ApiResult apiResult = ApiResult.error(ErrorCode.ENTITY_NOT_FOUND);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResult);
+        return ResponseEntity.badRequest().body(apiResult);
     }
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
