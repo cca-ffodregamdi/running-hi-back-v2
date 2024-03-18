@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.common.exception;
 
+import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,4 +38,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResult.error(ErrorCode.BAD_REQUEST));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResult> handleIllegalStateException() {
+        return ResponseEntity.internalServerError().body(ApiResult.error(ErrorCode.INTER_SERVER_ERROR));
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ApiResult> handleInvalidTokenException() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(ErrorCode.INVALID_TOKEN));
+    }
 }
