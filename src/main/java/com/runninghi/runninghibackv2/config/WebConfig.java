@@ -15,6 +15,11 @@ public class WebConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    /**
+     * JWT 토큰 필터의 설정을 관리하는 빈입니다.
+     *
+     * @return JWT 토큰 필터의 설정 정보를 포함하는 FilterRegistrationBean
+     */
     @Bean
     public FilterRegistrationBean<JwtTokenFilter> jwtTokenFilterConfig() {
         FilterRegistrationBean<JwtTokenFilter> registrationBean = new FilterRegistrationBean<>();
