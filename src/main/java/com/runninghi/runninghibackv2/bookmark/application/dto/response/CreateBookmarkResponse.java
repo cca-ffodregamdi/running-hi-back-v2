@@ -7,7 +7,7 @@ public record CreateBookmarkResponse(
         Long postNo
 ) {
 
-    public static CreateBookmarkResponse convertToDTO (Bookmark bookmark) {
+    public static CreateBookmarkResponse fromEntity (Bookmark bookmark) {
         return new CreateBookmarkResponse(
                 bookmark.getBookmarkId().getMemberNo(),
                 bookmark.getBookmarkId().getPostNo()
