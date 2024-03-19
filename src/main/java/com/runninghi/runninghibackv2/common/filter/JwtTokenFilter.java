@@ -41,7 +41,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws IOException, ServletException {
         try {
-            String accessToken = jwtTokenProvider.extractAccessToken(request);
+            String accessToken = jwtTokenProvider.extractAccessTokenFromRequest(request);
             jwtTokenProvider.validateAccessToken(accessToken);
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
@@ -66,7 +66,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
      */
     private void handleExpiredAccessToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
-        String refreshToken = jwtTokenProvider.extractRefreshToken(request);
+        String refreshToken = jwtTokenProvider.extractRefreshTokenFromRequest(request);
         try {
             jwtTokenProvider.validateRefreshToken(refreshToken);
             String newAccessToken = jwtTokenProvider.renewAccessToken(refreshToken);
