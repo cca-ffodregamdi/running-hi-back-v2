@@ -23,7 +23,7 @@ public class PostReportController {
 
         try {
             // TODO. 신고자 정보 가져오기
-            Member member = new Member.Builder()
+            Member member = Member.builder()
                     .memberNo(1L)
                     .build();
 

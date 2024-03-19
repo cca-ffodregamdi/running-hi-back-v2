@@ -60,17 +60,17 @@ class ReplyServiceTest {
     @BeforeEach
     void setup() {
 
-        member1 = new Member.Builder()
+        member1 = Member.builder()
                 .nickname("테스트멤버1")
                 .role(Role.USER)
                 .build();
 
-        member2 = new Member.Builder()
+        member2 = Member.builder()
                 .nickname("테스트멤버2")
                 .role(Role.USER)
                 .build();
 
-        admin = new Member.Builder()
+        admin = Member.builder()
                 .nickname("관리자")
                 .role(Role.ADMIN)
                 .build();
