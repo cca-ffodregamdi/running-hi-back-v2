@@ -5,6 +5,7 @@ import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
+import com.runninghi.runninghibackv2.postreport.application.dto.request.UpdatePostReportRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -116,5 +117,10 @@ public class PostReport extends BaseTimeEntity {
         public PostReport build() {
             return new PostReport(this);
         }
+    }
+
+    public void update(UpdatePostReportRequest request) {
+        this.status = request.status();
+        this.reportedPostDeleted = request.reportedPostDeleted();
     }
 }
