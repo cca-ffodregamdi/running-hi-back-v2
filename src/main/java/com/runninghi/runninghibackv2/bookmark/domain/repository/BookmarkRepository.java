@@ -12,5 +12,5 @@ import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, BookmarkId> {
 
-    Optional<List<Bookmark>> findAllByBookmarkId_MemberNo (@Param("memberNo") Long memberNo);
+    List<Bookmark> findAllByBookmarkId_MemberNo (@Param("memberNo") Long memberNo);
 }
