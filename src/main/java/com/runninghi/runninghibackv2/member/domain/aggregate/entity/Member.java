@@ -55,20 +55,24 @@ public class Member extends BaseTimeEntity {
     @Comment("권한")
     private Role role;
 
-    public Member(Builder builder) {
-        this.memberNo = builder.memberNo;
-        this.account = builder.account;
-        this.password = builder.password;
-        this.nickname = builder.nickname;
-        this.kakaoId = builder.kakaoId;
-        this.kakaoName = builder.kakaoName;
-        this.reportCnt = builder.reportCnt;
-        this.isActive = builder.isActive;
-        this.isBlacklisted = builder.isBlacklisted;
-        this.role = builder.role;
+    public Member(MemberBuilder memberBuilder) {
+        this.memberNo = memberBuilder.memberNo;
+        this.account = memberBuilder.account;
+        this.password = memberBuilder.password;
+        this.nickname = memberBuilder.nickname;
+        this.kakaoId = memberBuilder.kakaoId;
+        this.kakaoName = memberBuilder.kakaoName;
+        this.reportCnt = memberBuilder.reportCnt;
+        this.isActive = memberBuilder.isActive;
+        this.isBlacklisted = memberBuilder.isBlacklisted;
+        this.role = memberBuilder.role;
     }
 
-    public static class Builder {
+    public static MemberBuilder builder() {
+        return new MemberBuilder();
+    }
+
+    public static class MemberBuilder {
         private Long memberNo;
         private String account;
         private String password;
@@ -80,52 +84,52 @@ public class Member extends BaseTimeEntity {
         private boolean isBlacklisted;
         private Role role;
 
-        public Builder memberNo(Long memberNo) {
+        public MemberBuilder memberNo(Long memberNo) {
             this.memberNo = memberNo;
             return this;
         }
 
-        public Builder account(String account) {
+        public MemberBuilder account(String account) {
             this.account = account;
             return this;
         }
 
-        public Builder password(String password) {
+        public MemberBuilder password(String password) {
             this.password = password;
             return this;
         }
 
-        public Builder nickname(String nickname) {
+        public MemberBuilder nickname(String nickname) {
             this.nickname = nickname;
             return this;
         }
 
-        public Builder kakaoId(String kakaoId) {
+        public MemberBuilder kakaoId(String kakaoId) {
             this.kakaoId = kakaoId;
             return this;
         }
 
-        public Builder kakaoName(String kakaoName) {
+        public MemberBuilder kakaoName(String kakaoName) {
             this.kakaoName = kakaoName;
             return this;
         }
 
-        public Builder reportCnt(int reportCnt) {
+        public MemberBuilder reportCnt(int reportCnt) {
             this.reportCnt = reportCnt;
             return this;
         }
 
-        public Builder isActive(boolean isActive) {
+        public MemberBuilder isActive(boolean isActive) {
             this.isActive = isActive;
             return this;
         }
 
-        public Builder isBlacklisted(boolean isBlacklisted) {
+        public MemberBuilder isBlacklisted(boolean isBlacklisted) {
             this.isBlacklisted = isBlacklisted;
             return this;
         }
 
-        public Builder role(Role role) {
+        public MemberBuilder role(Role role) {
             this.role = role;
             return this;
         }
@@ -135,6 +139,5 @@ public class Member extends BaseTimeEntity {
         }
 
     }
-
 
 }

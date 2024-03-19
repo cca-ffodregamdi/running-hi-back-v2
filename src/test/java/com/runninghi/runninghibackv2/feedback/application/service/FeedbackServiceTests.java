@@ -56,17 +56,17 @@ class FeedbackServiceTests {
     @BeforeEach
     void setup() {
         // 테스트 멤버 생성 및 저장
-        testMember1 = new Member.Builder()
+        testMember1 = new Member.MemberBuilder()
                 .nickname("testUser1")
                 .role(Role.USER)
                 .build();
 
-        testMember2 = new Member.Builder()
+        testMember2 = new Member.MemberBuilder()
                 .nickname("testUser2")
                 .role(Role.USER)
                 .build();
 
-        testAdmin = new Member.Builder()
+        testAdmin = new Member.MemberBuilder()
                 .nickname("testUser2")
                 .role(Role.ADMIN)
                 .build();
