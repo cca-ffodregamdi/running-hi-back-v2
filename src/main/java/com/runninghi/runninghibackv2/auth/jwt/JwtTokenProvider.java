@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.auth.jwt;
 
 import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
-import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -73,7 +72,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))
                 .setSubject(String.valueOf(memberJwtInfo.memberNo()))
-                .claim("role", memberJwtInfo.role())
+                .claim("role", memberJwtInfo.role().name())
                 .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(Date.from(now.plusDays(refreshExpireDays).atZone(ZoneId.systemDefault()).toInstant()))
                 .setIssuer(issuer)
@@ -118,7 +117,7 @@ public class JwtTokenProvider {
      * @return 추출된 액세스 토큰
      * @throws IllegalArgumentException Authorization 헤더가 잘못된 경우 예외가 발생합니다.
      */
-    public String extractAccessToken(HttpServletRequest request) {
+    public String extractAccessTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken == null || bearerToken.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Invalid Authorization Header");
@@ -134,7 +133,7 @@ public class JwtTokenProvider {
      * @param request HTTP 요청
      * @return 추출된 리프레시 토큰
      */
-    public String extractRefreshToken(HttpServletRequest request) {
+    public String extractRefreshTokenFromRequest(HttpServletRequest request) {
         return request.getHeader("Refresh-Token");
     }
 
@@ -176,19 +175,19 @@ public class JwtTokenProvider {
     }
 
     /**
-     * 액세스 토큰에서 Role을 추출합니다.
+     * 액세스 토큰에서 Role을 추출해서 String으로 반환합니다.
      *
      * @param token 데이터를 가져올 액세스 토큰
-     * @return 추출된 Role
+     * @return 추출된 Role의 name()
      */
-    public Role getRoleFromToken(String token) {
+    public String getRoleFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey.getBytes())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
 
-        return claims.get("role", Role.class);
+        return claims.get("role", String.class);
     }
 
 }

@@ -35,11 +35,11 @@ public class AuthorizationAspect {
         }
 
         HttpServletRequest request = attributes.getRequest();
-        String accessToken = jwtTokenProvider.extractAccessToken(request);
-        Role role = jwtTokenProvider.getRoleFromToken(accessToken);
+        String accessToken = jwtTokenProvider.extractAccessTokenFromRequest(request);
+        String role = jwtTokenProvider.getRoleFromToken(accessToken);
 
         // 권한 확인
-        if (Role.ADMIN != role) {
+        if (!Role.ADMIN.name().equals(role)) {
             throw new AccessDeniedException("Access Denied");
         }
 
