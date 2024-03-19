@@ -23,7 +23,7 @@ public record BookmarkedPostListResponse(
 
 ) {
 
-    public static BookmarkedPostListResponse convertToDTO (Post post) {
+    public static BookmarkedPostListResponse fromEntity (Post post) {
         return new BookmarkedPostListResponse(
                 post.getPostNo(),
                 post.getMember().getMemberNo(),
@@ -31,16 +31,16 @@ public record BookmarkedPostListResponse(
                 post.getPostContent(),
                 post.getLocationName(),
                 post.getRole().name(),
-                post.getStartLatitude(),
-                post.getStartLongitude(),
-                post.getEndLatitude(),
-                post.getEndLongitude(),
-                post.getDistance(),
-                post.getTime(),
-                post.getKcal(),
-                post.getSpeed(),
-                post.getMeanPace(),
-                post.getMeanSlope(),
+                post.getGpxDataVO().getStartLatitude(),
+                post.getGpxDataVO().getStartLongitude(),
+                post.getGpxDataVO().getEndLatitude(),
+                post.getGpxDataVO().getEndLongitude(),
+                post.getGpxDataVO().getDistance(),
+                post.getGpxDataVO().getTime(),
+                post.getGpxDataVO().getKcal(),
+                post.getGpxDataVO().getSpeed(),
+                post.getGpxDataVO().getMeanPace(),
+                post.getGpxDataVO().getMeanSlope(),
                 true
                 );
     }

@@ -1,8 +1,10 @@
 package com.runninghi.runninghibackv2.postreport.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
+import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,6 +30,10 @@ public class PostReport extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
+    @Comment("신고 처리 상태")
+    private ProcessingStatus status;
+
+    @Column(nullable = false)
     @Comment("연관된 게시글이 삭제되었는지 여부")
     private boolean reportedPostDeleted;
 
@@ -41,24 +47,31 @@ public class PostReport extends BaseTimeEntity {
     @Comment("피신고자")
     private Member reportedMember;
 
-    // reportedPost 연관관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_post_no", nullable = false)
+    @Comment("신고된 게시글")
+    private Post reportedPost;
 
     public PostReport(Builder builder) {
         this.postReportNo = builder.postReportNo;
         this.category = builder.category;
         this.content = builder.content;
+        this.status = builder.status;
         this.reportedPostDeleted = builder.reportedPostDeleted;
         this.reporter = builder.reporter;
         this.reportedMember = builder.reportedMember;
+        this.reportedPost = builder.reportedPost;
     }
 
     public static class Builder {
         private Long postReportNo;
         private ReportCategory category;
         private String content;
+        private ProcessingStatus status;
         private boolean reportedPostDeleted;
         private Member reporter;
         private Member reportedMember;
+        private Post reportedPost;
 
         public Builder reportNo(Long postReportNo) {
             this.postReportNo = postReportNo;
@@ -72,6 +85,11 @@ public class PostReport extends BaseTimeEntity {
 
         public Builder content(String content) {
             this.content = content;
+            return this;
+        }
+
+        public Builder status(ProcessingStatus status) {
+            this.status = status;
             return this;
         }
 
@@ -90,10 +108,13 @@ public class PostReport extends BaseTimeEntity {
             return this;
         }
 
+        public Builder reportedPost(Post reportedPost) {
+            this.reportedPost = reportedPost;
+            return this;
+        }
+
         public PostReport build() {
             return new PostReport(this);
         }
-
     }
-
 }
