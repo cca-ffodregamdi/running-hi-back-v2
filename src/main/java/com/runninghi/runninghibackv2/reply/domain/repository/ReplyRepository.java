@@ -10,6 +10,6 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     List<Reply> findAllByPost_PostNo (Long postNo);
 
-    Optional<List<Reply>> findAllByWriter_MemberNo(Long memberNo);
+    List<Reply> findAllByWriter_MemberNo(Long memberNo);
 
 }

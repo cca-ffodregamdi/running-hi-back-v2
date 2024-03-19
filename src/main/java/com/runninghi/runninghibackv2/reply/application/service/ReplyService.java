@@ -37,9 +37,8 @@ public class ReplyService {
     public List<GetReplyListResponse> getReplyList(Long postNo) {
 
         List<Reply> replyList =  replyRepository.findAllByPost_PostNo(postNo);
-        if (replyList.isEmpty()) {
-            throw new EntityNotFoundException("검색 결과가 없습니다.");
-        }
+        if (replyList.isEmpty()) throw new EntityNotFoundException("검색 결과가 없습니다.");
+
 
         return replyList.stream()
                 .filter(reply -> !reply.isDeleted())
@@ -56,8 +55,8 @@ public class ReplyService {
     @Transactional(readOnly = true)
     public List<GetReplyListResponse> getReplyListByMemberNo(Long memberNo) {
 
-        List<Reply> replyList = replyRepository.findAllByWriter_MemberNo(memberNo)
-                .orElseThrow( () -> new IllegalArgumentException("검색 결과가 없습니다."));
+        List<Reply> replyList = replyRepository.findAllByWriter_MemberNo(memberNo);
+        if (replyList.isEmpty()) throw new EntityNotFoundException("검색 결과가 없습니다.");
 
         return replyList.stream()
                 .filter(reply -> !reply.isDeleted())
@@ -127,7 +126,7 @@ public class ReplyService {
     private Reply findReplyByReplyNo (Long replyNo) {
 
         return replyRepository.findById(replyNo)
-                .orElseThrow( () -> new IllegalArgumentException("검색 결과가 없습니다."));
+                .orElseThrow( () -> new EntityNotFoundException("검색 결과가 없습니다."));
     }
 
     private void checkWriterOrAdmin (Long memberNo, Reply reply) {
@@ -136,9 +135,8 @@ public class ReplyService {
         boolean checkResult =
                 replyChecker.memberCheck(memberNo, requestedMemberRole, reply.getWriter().getMemberNo());
 
-        if (!checkResult) {
-            throw new AccessDeniedException("권한이 없습니다.");
-        }
+        if (!checkResult) throw new AccessDeniedException("권한이 없습니다.");
+
     }
 
 }
