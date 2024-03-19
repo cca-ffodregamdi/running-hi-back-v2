@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TBL_REPLY")
+@ToString
 public class Reply extends BaseTimeEntity {
 
     @Id
@@ -37,30 +39,55 @@ public class Reply extends BaseTimeEntity {
     @Comment("댓글 내용")
     private String replyContent;
 
+    @Column
+    @Comment("신고된 횟수")
+    private int reportedCount;
+
     @ColumnDefault("FALSE")
     @Column(nullable = false)
     @Comment("삭제 여부")
     private boolean isDeleted;
 
-//    @Column
-//    private Long parent;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_NO")
     @Comment("부모 댓글")
     private Reply parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", orphanRemoval = true)   // cascade 설정! 부모 댓글 삭제 시 자식 댓글 삭제
     @Comment("하위 댓글들")
-    private List<Reply> children = new ArrayList<>();
+    private final List<Reply> children = new ArrayList<>();
 
     private Reply(ReplyBuilder builder) {
         this.replyNo = builder.replyNo;
         this.writer = builder.writer;
         this.post = builder.post;
         this.replyContent = builder.replyContent;
+        this.reportedCount = builder.reportedCount;
         this.isDeleted = builder.isDeleted;
         this.parent = builder.parent;
     }
+
+    public void addChildrenReply (Reply reply) {
+        this.children.add(reply);
+    }
+
+    public void addParentReply (Reply reply) {
+        this.parent = reply;
+    }
+
+    public void update (String replyContent) {
+        this.replyContent = replyContent;
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+    }
+
+    public static ReplyBuilder builder() {
+        return new ReplyBuilder();
+    }
+
+
 
     public static class ReplyBuilder {
 
@@ -68,13 +95,9 @@ public class Reply extends BaseTimeEntity {
         private Member writer;
         private Post post;
         private String replyContent;
+        private int reportedCount;
         private boolean isDeleted;
-//        private Comment parent;
         private Reply parent;
-
-        public static ReplyBuilder builder() {
-            return new ReplyBuilder();
-        }
 
         public ReplyBuilder commentNo(Long replyNo) {
             this.replyNo = replyNo;
@@ -86,13 +109,18 @@ public class Reply extends BaseTimeEntity {
             return this;
         }
 
-        public ReplyBuilder memberPost(Post memberPost) {
-            this.post = memberPost;
+        public ReplyBuilder post(Post post) {
+            this.post = post;
             return this;
         }
 
         public ReplyBuilder replyContent(String replyContent) {
             this.replyContent = replyContent;
+            return this;
+        }
+
+        public ReplyBuilder reportedCount(int reportedCount) {
+            this.reportedCount = reportedCount;
             return this;
         }
 
@@ -112,4 +140,5 @@ public class Reply extends BaseTimeEntity {
 
 
     }
+
 }

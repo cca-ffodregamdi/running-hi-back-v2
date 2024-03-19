@@ -30,7 +30,7 @@ public class BookmarkService {
                 .orElseThrow(() -> new IllegalArgumentException("일치하는 항목이 없습니다."));
 
         List<BookmarkedPostListResponse> bookmarkList =
-                bookmarkListResult.stream().map(i -> BookmarkedPostListResponse.convertToDTO(i.getPost())).toList();
+                bookmarkListResult.stream().map(i -> BookmarkedPostListResponse.fromEntity(i.getPost())).toList();
         return bookmarkList;
     }
 
@@ -52,7 +52,7 @@ public class BookmarkService {
                                 .post(post)
                                 .build();
 
-        return CreateBookmarkResponse.convertToDTO(bookmarkRepository.save(bookmark));
+        return CreateBookmarkResponse.fromEntity(bookmarkRepository.save(bookmark));
     }
 
     @Transactional
