@@ -30,14 +30,16 @@ public class PostKeywordService {
         List<PostKeyword> postKeywords = new ArrayList<>();
 
         for (String keywordName : keywordList) {
-
-            Keyword keyword = null;
+            Keyword keyword;
+            PostKeyword postKeyword;
 
             Long keywordNo = keywordChecker.checkExists(keywordName);
 
-            if(keywordNo == null) {
+            if (keywordNo == null) {
                 KeywordResponse keywordResponse = keywordService.createKeyword(new KeywordRequest(keywordName));
-                keyword = new Keyword(keywordResponse.keywordName());
+                keyword = keywordService.findByKeywordNo(keywordResponse.keywordNo());
+            } else {
+                keyword = keywordService.findByKeywordNo(keywordNo);
             }
 
             PostKeywordId postKeywordId = PostKeywordId.builder()
@@ -45,7 +47,7 @@ public class PostKeywordService {
                     .postNo(post.getPostNo())
                     .build();
 
-            PostKeyword postKeyword = PostKeyword.builder()
+            postKeyword = PostKeyword.builder()
                     .postKeywordId(postKeywordId)
                     .keyword(keyword)
                     .post(post)
@@ -54,7 +56,6 @@ public class PostKeywordService {
             postKeywords.add(postKeyword);
 
         }
-        // list 한 번에 저장
         postKeywordRepository.saveAll(postKeywords);
     }
 
