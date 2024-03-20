@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.keyword.application.dto.request.KeywordRequ
 import com.runninghi.runninghibackv2.keyword.application.dto.response.KeywordResponse;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.keyword.domain.repository.KeywordRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,14 +61,11 @@ class KeywordServiceTests {
     @Test
     @DisplayName("키워드 조회 테스트 : NoSuchElement 예외처리")
     void testKeywordNoSuchElementException() {
-        // Given
-        Keyword keyword = new Keyword("테스트");
-
         // When & Then
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                () -> keywordService.findByKeywordNo(keyword.getKeywordNo()));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> keywordService.findByKeywordNo(999L));
 
-        assertEquals("존재하지 않는 키워드입니다.", exception.getMessage());
+        assertEquals("해당 키워드가 존재하지 않습니다.", exception.getMessage());
     }
 
 
