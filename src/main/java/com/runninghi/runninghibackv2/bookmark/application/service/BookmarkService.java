@@ -9,8 +9,8 @@ import com.runninghi.runninghibackv2.bookmark.domain.repository.BookmarkReposito
 import com.runninghi.runninghibackv2.bookmark.domain.service.ApiBookmarkService;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +26,10 @@ public class BookmarkService {
 
     @Transactional(readOnly = true)
     public  List<BookmarkedPostListResponse> getBookmarkedPostList(Long memberNo) {
-        List<Bookmark> bookmarkListResult = bookmarkRepository.findAllByBookmarkId_MemberNo(memberNo)
-                .orElseThrow(() -> new IllegalArgumentException("일치하는 항목이 없습니다."));
+        List<Bookmark> bookmarkListResult = bookmarkRepository.findAllByBookmarkId_MemberNo(memberNo);
+        if (bookmarkListResult.isEmpty()) throw new EntityNotFoundException();
 
-        List<BookmarkedPostListResponse> bookmarkList =
-                bookmarkListResult.stream().map(i -> BookmarkedPostListResponse.fromEntity(i.getPost())).toList();
-        return bookmarkList;
+        return bookmarkListResult.stream().map(i -> BookmarkedPostListResponse.fromEntity(i.getPost())).toList();
     }
 
     @Transactional
