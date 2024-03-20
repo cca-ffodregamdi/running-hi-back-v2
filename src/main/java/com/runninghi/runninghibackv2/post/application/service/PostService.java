@@ -40,11 +40,11 @@ public class PostService {
 
         GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile();
 
-        Member member = apiPostService.getMemberById(request.memberNo());
+//        Member member = apiPostService.getMemberById(request.memberNo());
 
         Post createdPost = postRepository.save(Post.builder()
-                .member(member)
-                .role(member.getRole())
+//                .member(member)
+//                .role(member.getRole())
                 .postTitle(request.postTitle())
                 .postContent(request.postContent())
                 .locationName(request.locationName())
@@ -55,7 +55,7 @@ public class PostService {
 
         GpxDataVO postGpxVO = createdPost.getGpxDataVO();
 
-        return new CreatePostResponse(postGpxVO.getDistance(), postGpxVO.getTime(),
+        return new CreatePostResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
                 postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
     }
 
