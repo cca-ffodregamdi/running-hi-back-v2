@@ -1,12 +1,16 @@
 package com.runninghi.runninghibackv2.reply.application.controller;
 
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.reply.application.dto.request.CreateReplyRequest;
+import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.UpdateReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.reply.application.service.ReplyService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +24,7 @@ import java.util.List;
 public class ReplyController {
 
     private final ReplyService replyService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/{postNo}")
     public ResponseEntity<ApiResult> getReplyList(@PathVariable(name = "postNo") Long postNo) {
@@ -29,8 +34,8 @@ public class ReplyController {
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", replyList));
     }
 
-    @GetMapping("byMember/{memberNo}")
-    public ResponseEntity<ApiResult> getReplyListByMemberNo(@PathVariable(name = "memberNo") Long memberNo) {
+    @GetMapping("byMember")
+    public ResponseEntity<ApiResult> getReplyListByMemberNo(@RequestHeader(name = "memberNo") Long memberNo) {
 
         List<GetReplyListResponse> replyList = replyService.getReplyListByMemberNo(memberNo);
 
@@ -48,17 +53,23 @@ public class ReplyController {
     }
 
     @PutMapping("update/{replyNo}")
-    public ResponseEntity<ApiResult> updateReply(@PathVariable(name = "replyNo") Long replyNo,
-                                                 @RequestBody UpdateReplyRequest request ) {
+    public ResponseEntity<ApiResult> updateReply(HttpServletRequest servletRequest,
+                                                 @PathVariable(name = "replyNo") Long replyNo,
+                                                 @RequestBody(required = true) String replyContent) {
 
+        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberNoAndRoleFromRequest(servletRequest);
+        UpdateReplyRequest request = UpdateReplyRequest.of(memberJwtInfo.memberNo(), memberJwtInfo.role(), replyContent);
         UpdateReplyResponse reply = replyService.updateReply(replyNo, request);
+
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 수정되었습니다.", reply));
     }
 
     @PutMapping("delete/{replyNo}")
     public ResponseEntity<ApiResult> deleteReply(@PathVariable(name = "replyNo") Long replyNo,
-                                                 @RequestBody Long memberNo) {
-        replyService.deleteReply(replyNo, memberNo);
+                                                 HttpServletRequest servletRequest) {
+        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberNoAndRoleFromRequest(servletRequest);
+        DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, memberJwtInfo.role(), memberJwtInfo.memberNo());
+        replyService.deleteReply(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success("성공적으로 삭제되었습니다.", null));
     }
 
