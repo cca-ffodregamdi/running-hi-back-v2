@@ -1,7 +1,7 @@
 ---
 name: " issue--✂️refactoring"
 about: 코드 변경 사항 적용 시 이슈 작성
-title: "[Feature - Mar 2nd, 2024] - {도메인} 내용"
+title: "[Feature - Mar 3rd, 2024] - {도메인} 내용"
 labels: "\U0001F528 Refactor"
 assignees: ''
 
