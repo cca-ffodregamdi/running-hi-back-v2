@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.keyword.application.dto.request.KeywordRequ
 import com.runninghi.runninghibackv2.keyword.application.dto.response.KeywordResponse;
 import com.runninghi.runninghibackv2.keyword.application.service.KeywordService;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
+import com.runninghi.runninghibackv2.keyword.domain.service.KeywordChecker;
 import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
 import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo.PostKeywordId;
 import com.runninghi.runninghibackv2.post.postkeyword.domain.repository.PostKeywordRepository;
@@ -20,28 +21,27 @@ import java.util.List;
 public class PostKeywordService {
 
     private final KeywordService keywordService;
+    private final KeywordChecker keywordChecker;
     private final PostKeywordRepository postKeywordRepository;
 
-//    @Transactional
+    @Transactional
     public void createPostKeyword(Post post, List<String> keywordList) {
 
         List<PostKeyword> postKeywords = new ArrayList<>();
 
         for (String keywordName : keywordList) {
 
-            Keyword keyword;
+            Keyword keyword = null;
 
-            KeywordResponse response = keywordService.getKeyword(new KeywordRequest(keywordName));
+            Long keywordNo = keywordChecker.checkExists(keywordName);
 
-            if (response != null) {
-                keyword = new Keyword(response.keywordName());
-            } else {
+            if(keywordNo == null) {
                 KeywordResponse keywordResponse = keywordService.createKeyword(new KeywordRequest(keywordName));
                 keyword = new Keyword(keywordResponse.keywordName());
             }
 
             PostKeywordId postKeywordId = PostKeywordId.builder()
-                    .keywordNo(keyword.getKeywordNo())
+                    .keywordNo(keywordNo)
                     .postNo(post.getPostNo())
                     .build();
 
@@ -58,7 +58,7 @@ public class PostKeywordService {
         postKeywordRepository.saveAll(postKeywords);
     }
 
-    @Transactional
+//    @Transactional
     public void updatePostKeyword(Post post, List<String> keywordList) {
 
         /* 추후 수정사항
@@ -74,7 +74,7 @@ public class PostKeywordService {
         createPostKeyword(post, keywordList);
     }
 
-//    @Transactional
+    @Transactional
     public void deletePostKeyword(Long postNo) {
 
         postKeywordRepository.deleteAllByPostKeywordId_PostNo(postNo);
