@@ -35,10 +35,7 @@ public class BookmarkService {
     @Transactional
     public CreateBookmarkResponse createBookmark(CreateBookmarkRequest request) {
 
-        BookmarkId bookmarkId = BookmarkId.builder()
-                                        .memberNo(request.memberNo())
-                                        .postNo(request.postNo())
-                                        .build();
+        BookmarkId bookmarkId = BookmarkId.of(request.memberNo(), request.postNo());
 
         Member member = apiBookmarkService.getMemberById(request.memberNo());
         Post post = apiBookmarkService.getPostById(request.postNo());
@@ -57,10 +54,7 @@ public class BookmarkService {
     public void deleteBookmark(Long memberNo, Long postNo) {
 
         bookmarkRepository.deleteById(
-                BookmarkId.builder()
-                        .memberNo(memberNo)
-                        .postNo(postNo)
-                        .build()
+                BookmarkId.of(memberNo, postNo)
         );
     }
 }
