@@ -20,11 +20,12 @@ import java.util.List;
 @RequestMapping(name = "api/v1/bookmark")
 public class BookmarkController {
 
-    private BookmarkService bookmarkService;
-    private JwtTokenProvider jwtTokenProvider;
+    private final BookmarkService bookmarkService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 북마크 탭 클릭 시 요청한 사용자의 북마크된 Post들을 응답해주는 메소드입니다.
+     * -> 만약 다른 회원의 북마크 리스트를 보게 한다면 리팩토링 필요
      * @param servletRequest HttpServletRequest
      * @return Bookmark 테이블에서 조회된 Posts
      */
