@@ -35,10 +35,7 @@ public class BookmarkService {
     @Transactional
     public CreateBookmarkResponse createBookmark(CreateBookmarkRequest request) {
 
-        BookmarkId bookmarkId = BookmarkId.builder()
-                                        .memberNo(request.memberNo())
-                                        .postNo(request.postNo())
-                                        .build();
+        BookmarkId bookmarkId = BookmarkId.of(request.memberNo(), request.postNo());
 
         Member member = apiBookmarkService.getMemberById(request.memberNo());
         Post post = apiBookmarkService.getPostById(request.postNo());
@@ -56,11 +53,8 @@ public class BookmarkService {
     @Transactional
     public void deleteBookmark(Long memberNo, Long postNo) {
 
-        bookmarkRepository.deleteById(
-                BookmarkId.builder()
-                        .memberNo(memberNo)
-                        .postNo(postNo)
-                        .build()
-        );
+        Bookmark bookmark = bookmarkRepository.findById(BookmarkId.of(memberNo,postNo))
+                        .orElseThrow(EntityNotFoundException::new);
+        bookmarkRepository.delete(bookmark);
     }
 }

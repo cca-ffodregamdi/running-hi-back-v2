@@ -126,7 +126,7 @@ class ReplyServiceTest {
 
     /* Read */
     @Test
-    @DisplayName("댓글 조회 테스트 : 게시글 조회 시 관련 댓글들 리스트 조회, 삭제된 댓글은 제외되는 지 확인")
+    @DisplayName("특정 게시글의 댓글 리스트 조회 테스트 : success, 삭제된 댓글은 제외되는 지 확인")
     void testGetReplyList() {
 
         // when
@@ -141,7 +141,7 @@ class ReplyServiceTest {
     }
 
     @ParameterizedTest
-    @DisplayName("댓글 조회 테스트 : 게시글 엔티티 조회 실패 시 예외 발생 확인")
+    @DisplayName("특정 게시글의 댓글 리스트 조회 테스트 : 게시글 엔티티 조회 실패 시 예외 발생 확인")
     @NullSource
     @ValueSource(longs = 3)
     void testGetReplyListException (Long postNo) {
@@ -152,7 +152,7 @@ class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("댓글 조회 테스트 : 특정 회원의 쓴 댓글들 리스트 조회, 삭제된 댓글 제외되는 지 확인")
+    @DisplayName("특정 회원의 쓴 댓글들 리스트 조회 테스트 : success, 삭제된 댓글 제외되는 지 확인")
     void testGetReplyListByMemberNo () {
 
         // given
@@ -167,6 +167,19 @@ class ReplyServiceTest {
                 .hasSize(2)
                 .extracting("memberName", String.class)
                 .isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @DisplayName("특정 회원의 쓴 댓글들 리스트 조회 테스트 : 없는 회원일 시 예외 발생하는 지 확인")
+    @NullSource
+    @ValueSource(longs = 0L)
+    void testGetReplyListBtMemberNoException(Long memberNo) {
+
+        // when & then
+        Assertions.assertThatThrownBy(
+                () -> replyService.getReplyListByMemberNo(memberNo)
+        ).isInstanceOf(EntityNotFoundException.class);
+
     }
 
 //    @Test
@@ -215,7 +228,7 @@ class ReplyServiceTest {
 //    }
 
     @Test
-    @DisplayName("댓글 수정 테스트 : 수정 메소드 정상 작동 확인")
+    @DisplayName("댓글 수정 테스트 : success")
     void testUpdateReply() {
 
         // given
@@ -247,7 +260,7 @@ class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("댓글 삭제 테스트 : 댓글 삭제 메소드 정상 작동 확인")
+    @DisplayName("댓글 삭제 테스트 : success")
     void testDeleteReply() {
 
         // given
