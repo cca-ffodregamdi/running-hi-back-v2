@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class   BookmarkId implements Serializable {
+public class   BookmarkId {
 
     @Comment("멤버 번호")
     private Long memberNo;
