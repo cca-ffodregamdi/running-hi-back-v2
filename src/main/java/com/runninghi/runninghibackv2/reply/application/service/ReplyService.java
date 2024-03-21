@@ -58,7 +58,7 @@ public class ReplyService {
     public List<GetReplyListResponse> getReplyListByMemberNo(Long memberNo) {
 
         List<Reply> replyList = replyRepository.findAllByWriter_MemberNo(memberNo);
-        if (replyList.isEmpty()) throw new EntityNotFoundException(ErrorCode.ENTITY_NOT_FOUND.getMessage());
+        if (replyList.isEmpty()) throw new EntityNotFoundException();
 
         return replyList.stream()
                 .filter(reply -> !reply.isDeleted())
