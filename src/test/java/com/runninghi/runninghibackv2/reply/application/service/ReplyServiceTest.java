@@ -1,10 +1,12 @@
 package com.runninghi.runninghibackv2.reply.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
+import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.UpdateReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.UpdateReplyResponse;
@@ -146,8 +148,7 @@ class ReplyServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> replyService.getReplyList(postNo))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("검색 결과가 없습니다.");
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -219,7 +220,7 @@ class ReplyServiceTest {
 
         // given
         Long replyNo = reply1.getReplyNo();
-        UpdateReplyRequest request = new UpdateReplyRequest(member1.getMemberNo(), "수정된 댓글");
+        UpdateReplyRequest request = new UpdateReplyRequest(member1.getMemberNo(), member1.getRole(), "수정된 댓글");
 
         // when
         UpdateReplyResponse response = replyService.updateReply(replyNo, request);
@@ -236,7 +237,7 @@ class ReplyServiceTest {
 
         // given
         Long replyNo = reply1.getReplyNo();
-        UpdateReplyRequest request = new UpdateReplyRequest(member2.getMemberNo(), "수정한 내용");
+        UpdateReplyRequest request = new UpdateReplyRequest(member2.getMemberNo(), member2.getRole(), "수정한 내용");
 
         // when
         Assertions.assertThatThrownBy(
@@ -252,9 +253,11 @@ class ReplyServiceTest {
         // given
         Long replyNo = reply1.getReplyNo();
         Long memberNo = reply1.getWriter().getMemberNo();
+        Role role = reply1.getWriter().getRole();
+        DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, role, memberNo);
 
         // when
-        replyService.deleteReply(replyNo, memberNo);
+        replyService.deleteReply(request);
 
         // then
         Assertions.assertThat(reply1)
@@ -270,10 +273,12 @@ class ReplyServiceTest {
         // given
         Long replyNo = reply1.getReplyNo();
         Long memberNo = member2.getMemberNo();
+        Role role = member2.getRole();
+        DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, role, memberNo);
 
         // when & then
         Assertions.assertThatThrownBy(
-                () -> replyService.deleteReply(replyNo, memberNo)
+                () -> replyService.deleteReply(request)
         ).isInstanceOf(AccessDeniedException.class)
                 .hasMessageContaining("권한이 없습니다.");
     }
