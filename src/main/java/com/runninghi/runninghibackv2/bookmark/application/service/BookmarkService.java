@@ -53,8 +53,8 @@ public class BookmarkService {
     @Transactional
     public void deleteBookmark(Long memberNo, Long postNo) {
 
-        bookmarkRepository.deleteById(
-                BookmarkId.of(memberNo, postNo)
-        );
+        Bookmark bookmark = bookmarkRepository.findById(BookmarkId.of(memberNo,postNo))
+                        .orElseThrow(EntityNotFoundException::new);
+        bookmarkRepository.delete(bookmark);
     }
 }
