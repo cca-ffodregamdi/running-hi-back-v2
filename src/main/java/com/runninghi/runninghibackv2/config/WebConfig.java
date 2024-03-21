@@ -19,7 +19,7 @@ public class WebConfig {
     public FilterRegistrationBean<JwtTokenFilter> jwtTokenFilterConfig() {
         FilterRegistrationBean<JwtTokenFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new JwtTokenFilter(jwtTokenProvider));
-        registrationBean.addUrlPatterns("/api/*");
+        registrationBean.addUrlPatterns("/api/v3/*");
         return registrationBean;
     }
 }
