@@ -58,6 +58,7 @@ public class PostReportService {
         }
     }
 
+    // 게시글 신고 상세조회
     @Transactional(readOnly = true)
     public GetPostReportResponse getPostReportById(Long postReportNo) {
 
@@ -72,6 +73,7 @@ public class PostReportService {
         }
     }
 
+    // 게시글 신고 수정
     @Transactional
     public UpdatePostReportResponse updatePostReport(UpdatePostReportRequest request, Long postReportNo) {
 
@@ -89,6 +91,7 @@ public class PostReportService {
         }
     }
 
+    // 게시글 신고 삭제
     @Transactional
     public void deletePostReport(Long postReportNo) {
 
