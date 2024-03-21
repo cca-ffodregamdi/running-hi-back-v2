@@ -3,7 +3,6 @@ package com.runninghi.runninghibackv2.post.application.service;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.post.postkeyword.application.service.PostKeywordService;
 import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.application.dto.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.response.CreatePostResponse;
@@ -40,11 +39,11 @@ public class PostService {
 
         GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile();
 
-        Member member = apiPostService.getMemberById(request.memberNo());
+//        Member member = apiPostService.getMemberById(request.memberNo());
 
         Post createdPost = postRepository.save(Post.builder()
-                .member(member)
-                .role(member.getRole())
+//                .member(member)
+//                .role(member.getRole())
                 .postTitle(request.postTitle())
                 .postContent(request.postContent())
                 .locationName(request.locationName())
@@ -55,7 +54,7 @@ public class PostService {
 
         GpxDataVO postGpxVO = createdPost.getGpxDataVO();
 
-        return new CreatePostResponse(postGpxVO.getDistance(), postGpxVO.getTime(),
+        return new CreatePostResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
                 postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
     }
 
@@ -74,12 +73,9 @@ public class PostService {
 
     @Transactional
     public void deletePost(Long postNo) {
-
-        postRepository.deleteById(postNo);
         postKeywordService.deletePostKeyword(postNo);
-
+        postRepository.deleteById(postNo);
     }
-
     @Transactional(readOnly = true)
     public GetPostResponse getPost(Long postNo) {
 
