@@ -10,7 +10,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UpdateService {
 
-    private PostKeywordService postKeywordService;
+    private final PostKeywordService postKeywordService;
 
     public void updatePostKeyword(Post post, List<String> keywordList) {
         //기존 키워드 전체 삭제
