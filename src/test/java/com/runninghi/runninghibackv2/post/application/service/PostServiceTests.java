@@ -113,6 +113,7 @@ public class PostServiceTests {
         assertEquals(postTitle, post.get().getPostTitle());
         assertEquals(postContent, post.get().getPostContent());
         assertEquals(locationName, post.get().getLocationName());
+        assertEquals(0, post.get().getReportCnt());
 
         //키워드 생성 확인
         assertEquals(keywordBeforeSize + 1, keywordAfterSize);

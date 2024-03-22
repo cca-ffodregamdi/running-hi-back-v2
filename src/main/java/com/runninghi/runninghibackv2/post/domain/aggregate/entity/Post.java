@@ -38,6 +38,10 @@ public class Post extends BaseTimeEntity {
     private String postContent;
 
     @Column
+    @Comment("신고 횟수")
+    private int reportCnt;
+
+    @Column
     @Comment("권한")
     private Role role;
 
@@ -55,6 +59,7 @@ public class Post extends BaseTimeEntity {
         this.role = builder.role;
         this.locationName = builder.locationName;
         this.gpxDataVO = builder.gpxDataVO;
+        this.reportCnt = 0;
     }
 
     public static PostBuilder builder() {
@@ -107,6 +112,10 @@ public class Post extends BaseTimeEntity {
     public void update(UpdatePostRequest request) {
         this.postTitle = request.postTitle();
         this.postContent = request.postContent();
+    }
+
+    public void addReportCnt() {
+        this.reportCnt += 1;
     }
 
 }
