@@ -194,16 +194,17 @@ public class JwtTokenProvider {
     /**
      * Http 요청에서 JwtTokenProvider 내부 메소드들을 이용해 MemberInfo를 추출하는 메소드
      *
-     * @param request   HttpServletRequest 요청
+     * @param bearerToken   Http 요청으로 받은 헤더 내 'Authorization' 토큰
      * @return Key : Values 형태의 MemberInfo("memberNo", "roleName")
      */
-    public MemberJwtInfo getMemberNoAndRoleFromRequest (HttpServletRequest request) {
+    public MemberJwtInfo getMemberInfoByBearerToken (String bearerToken) {
 
-        String accessToken = extractAccessTokenFromRequest(request);
+        if (bearerToken == null || bearerToken.startsWith("Bearer ")) throw new IllegalArgumentException("Invalid Authorization Header");
+
+        String accessToken = bearerToken.substring(7); // "Bearer " 이후의 토큰 부분만 추출
         Long memberNo = getMemberNoFromToken(accessToken);
         String roleName = getRoleFromToken(accessToken);
 
         return new MemberJwtInfo(memberNo, Role.valueOf(roleName));
     }
-
 }

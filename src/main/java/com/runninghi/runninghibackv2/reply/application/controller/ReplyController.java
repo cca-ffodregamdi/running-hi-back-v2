@@ -10,7 +10,6 @@ import com.runninghi.runninghibackv2.reply.application.dto.response.CreateReplyR
 import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.reply.application.service.ReplyService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,7 @@ public class ReplyController {
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", replyList));
     }
 
-    @GetMapping("byMember")
+    @GetMapping("/byMember")
     public ResponseEntity<ApiResult> getReplyListByMemberNo(@RequestHeader(name = "memberNo") Long memberNo) {
 
         List<GetReplyListResponse> replyList = replyService.getReplyListByMemberNo(memberNo);
@@ -52,22 +51,22 @@ public class ReplyController {
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 생성되었습니다.", reply));
     }
 
-    @PutMapping("update/{replyNo}")
-    public ResponseEntity<ApiResult> updateReply(HttpServletRequest servletRequest,
+    @PutMapping("/update/{replyNo}")
+    public ResponseEntity<ApiResult> updateReply(@RequestHeader("Authorization") String bearerToken,
                                                  @PathVariable(name = "replyNo") Long replyNo,
                                                  @RequestBody(required = true) String replyContent) {
 
-        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberNoAndRoleFromRequest(servletRequest);
+        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         UpdateReplyRequest request = UpdateReplyRequest.of(memberJwtInfo.memberNo(), memberJwtInfo.role(), replyContent);
         UpdateReplyResponse reply = replyService.updateReply(replyNo, request);
 
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 수정되었습니다.", reply));
     }
 
-    @PutMapping("delete/{replyNo}")
+    @PutMapping("/delete/{replyNo}")
     public ResponseEntity<ApiResult> deleteReply(@PathVariable(name = "replyNo") Long replyNo,
-                                                 HttpServletRequest servletRequest) {
-        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberNoAndRoleFromRequest(servletRequest);
+                                                 @RequestHeader("Authorization") String bearerToken) {
+        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, memberJwtInfo.role(), memberJwtInfo.memberNo());
         replyService.deleteReply(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success("성공적으로 삭제되었습니다.", null));
