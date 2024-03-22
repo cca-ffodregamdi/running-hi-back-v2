@@ -59,21 +59,6 @@ public class PostKeywordService {
         postKeywordRepository.saveAll(postKeywords);
     }
 
-//    @Transactional
-    public void updatePostKeyword(Post post, List<String> keywordList) {
-
-        /* 추후 수정사항
-        * Spring의 @Async 또는 @Transactional 어노테이션이 지정된 메소드는 해당 클래스 내에서 직접 호출되어서는 안 됩니다.
-        * @Transactional 어노테이션이 지정된 메소드가 직접 호출될 경우,
-        * 스프링은 트랜잭션을 시작하거나 커밋하는 등의 관련된 작업을 수행하지 않습니다.
-        * 이로 인해 데이터베이스 트랜잭션의 일관성이 깨질 수 있기 때문입니다. */
-
-        //기존 키워드 전체 삭제
-        deletePostKeyword(post.getPostNo());
-
-        //키워드 리스트 새로 저장
-        createPostKeyword(post, keywordList);
-    }
 
     @Transactional
     public void deletePostKeyword(Long postNo) {

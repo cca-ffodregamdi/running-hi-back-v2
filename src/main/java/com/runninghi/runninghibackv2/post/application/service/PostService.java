@@ -29,6 +29,7 @@ public class PostService {
     private final PostChecker postChecker;
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
+    private final UpdateService updateService;
     private ApiPostService apiPostService;
 
     @Transactional
@@ -65,7 +66,7 @@ public class PostService {
 
         post.update(request);
 
-        postKeywordService.updatePostKeyword(post, request.keywordList());
+        updateService.updatePostKeyword(post, request.keywordList());
 
         return UpdatePostResponse.from(post);
     }
