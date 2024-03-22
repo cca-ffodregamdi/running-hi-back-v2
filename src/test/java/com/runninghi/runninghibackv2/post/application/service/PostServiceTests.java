@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.keyword.application.dto.request.KeywordRequest;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.keyword.domain.repository.KeywordRepository;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
@@ -11,10 +10,8 @@ import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequ
 import com.runninghi.runninghibackv2.post.application.dto.response.CreatePostResponse;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.post.postkeyword.application.service.PostKeywordService;
-import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
-import com.runninghi.runninghibackv2.post.postkeyword.domain.repository.PostKeywordRepository;
-import org.hibernate.sql.Update;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
+import com.runninghi.runninghibackv2.post.domain.repository.PostKeywordRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

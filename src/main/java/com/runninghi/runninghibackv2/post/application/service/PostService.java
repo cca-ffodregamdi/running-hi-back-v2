@@ -1,8 +1,7 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
-import com.runninghi.runninghibackv2.post.postkeyword.application.service.PostKeywordService;
-import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
 import com.runninghi.runninghibackv2.post.application.dto.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.response.CreatePostResponse;
