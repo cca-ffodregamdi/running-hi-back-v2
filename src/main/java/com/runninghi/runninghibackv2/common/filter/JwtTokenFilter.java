@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -19,7 +18,6 @@ import java.io.IOException;
  * 요청에서 JWT 토큰을 추출하고 유효성을 검사한 후 필터 체인을 계속 진행합니다.
  * 만료된 토큰일 경우 리프레시 토큰을 확인하고 재발급합니다.
  */
-@Component
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 

@@ -24,6 +24,8 @@ public class PostController {
     public ResponseEntity<ApiResult> createRecordAndPost(@RequestBody CreatePostRequest request) {
                                                         // @RequestParam("gpx") MultipartFile gpxFile) {
 
+        System.out.println("request = " + request.toString());
+
         CreatePostResponse response = postService.createRecordAndPost(request);
 //        CreatePostResponse response = postService.createRecordAndPost(request, gpxFile);
 

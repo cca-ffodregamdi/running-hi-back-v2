@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.auth.jwt;
 
 import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
+import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -188,6 +189,21 @@ public class JwtTokenProvider {
                 .getBody();
 
         return claims.get("role", String.class);
+    }
+
+    /**
+     * Http 요청에서 JwtTokenProvider 내부 메소드들을 이용해 MemberInfo를 추출하는 메소드
+     *
+     * @param request   HttpServletRequest 요청
+     * @return Key : Values 형태의 MemberInfo("memberNo", "roleName")
+     */
+    public MemberJwtInfo getMemberNoAndRoleFromRequest (HttpServletRequest request) {
+
+        String accessToken = extractAccessTokenFromRequest(request);
+        Long memberNo = getMemberNoFromToken(accessToken);
+        String roleName = getRoleFromToken(accessToken);
+
+        return new MemberJwtInfo(memberNo, Role.valueOf(roleName));
     }
 
 }

@@ -22,30 +22,9 @@ public class KeywordController {
     @PostMapping("/api/v1/keywords")
     public ResponseEntity<ApiResult> createKeyword(@RequestBody KeywordRequest request) {
 
-        try {
-
-            KeywordResponse response = keywordService.createKeyword(request);
-            return ResponseEntity.ok(ApiResult.success("성공적으로 등록되었습니다.", response));
-
-        } catch (Exception e){
-            return ResponseEntity.ok(ApiResult.error(ErrorCode.BAD_REQUEST));
-        }
-
+        KeywordResponse response = keywordService.createKeyword(request);
+        return ResponseEntity.ok(ApiResult.success("성공적으로 등록되었습니다.", response));
 
     }
-
-    @GetMapping("/api/v1/keywords")
-    public ResponseEntity<ApiResult> getKeyword(@RequestBody KeywordRequest request) {
-
-        try {
-
-            KeywordResponse response = keywordService.getKeyword(request);
-            return ResponseEntity.ok(ApiResult.success("성공적으로 조회되었습니다.", response));
-
-        } catch (Exception e) {
-            return ResponseEntity.ok(ApiResult.error(ErrorCode.NOT_FOUND));
-        }
-    }
-
 
 }
