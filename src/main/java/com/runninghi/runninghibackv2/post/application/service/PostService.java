@@ -1,8 +1,7 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
-import com.runninghi.runninghibackv2.post.postkeyword.application.service.PostKeywordService;
-import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity.PostKeyword;
+import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
 import com.runninghi.runninghibackv2.post.application.dto.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.response.CreatePostResponse;
@@ -30,6 +29,7 @@ public class PostService {
     private final PostChecker postChecker;
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
+    private final UpdateService updateService;
     private ApiPostService apiPostService;
 
     @Transactional
@@ -66,7 +66,7 @@ public class PostService {
 
         post.update(request);
 
-        postKeywordService.updatePostKeyword(post, request.keywordList());
+        updateService.updatePostKeyword(post, request.keywordList());
 
         return UpdatePostResponse.from(post);
     }
