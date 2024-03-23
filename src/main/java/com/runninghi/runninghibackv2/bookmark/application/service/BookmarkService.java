@@ -9,8 +9,8 @@ import com.runninghi.runninghibackv2.bookmark.domain.repository.BookmarkReposito
 import com.runninghi.runninghibackv2.bookmark.domain.service.ApiBookmarkService;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,21 +26,16 @@ public class BookmarkService {
 
     @Transactional(readOnly = true)
     public  List<BookmarkedPostListResponse> getBookmarkedPostList(Long memberNo) {
-        List<Bookmark> bookmarkListResult = bookmarkRepository.findAllByBookmarkId_MemberNo(memberNo)
-                .orElseThrow(() -> new IllegalArgumentException("일치하는 항목이 없습니다."));
+        List<Bookmark> bookmarkListResult = bookmarkRepository.findAllByBookmarkId_MemberNo(memberNo);
+        if (bookmarkListResult.isEmpty()) throw new EntityNotFoundException();
 
-        List<BookmarkedPostListResponse> bookmarkList =
-                bookmarkListResult.stream().map(i -> BookmarkedPostListResponse.fromEntity(i.getPost())).toList();
-        return bookmarkList;
+        return bookmarkListResult.stream().map(i -> BookmarkedPostListResponse.fromEntity(i.getPost())).toList();
     }
 
     @Transactional
     public CreateBookmarkResponse createBookmark(CreateBookmarkRequest request) {
 
-        BookmarkId bookmarkId = BookmarkId.builder()
-                                        .memberNo(request.memberNo())
-                                        .postNo(request.postNo())
-                                        .build();
+        BookmarkId bookmarkId = BookmarkId.of(request.memberNo(), request.postNo());
 
         Member member = apiBookmarkService.getMemberById(request.memberNo());
         Post post = apiBookmarkService.getPostById(request.postNo());
@@ -58,11 +53,8 @@ public class BookmarkService {
     @Transactional
     public void deleteBookmark(Long memberNo, Long postNo) {
 
-        bookmarkRepository.deleteById(
-                BookmarkId.builder()
-                        .memberNo(memberNo)
-                        .postNo(postNo)
-                        .build()
-        );
+        Bookmark bookmark = bookmarkRepository.findById(BookmarkId.of(memberNo,postNo))
+                        .orElseThrow(EntityNotFoundException::new);
+        bookmarkRepository.delete(bookmark);
     }
 }

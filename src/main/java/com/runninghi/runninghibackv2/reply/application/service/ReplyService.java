@@ -1,9 +1,11 @@
 package com.runninghi.runninghibackv2.reply.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.reply.application.dto.request.CreateReplyRequest;
+import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.UpdateReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
@@ -37,7 +39,7 @@ public class ReplyService {
     public List<GetReplyListResponse> getReplyList(Long postNo) {
 
         List<Reply> replyList =  replyRepository.findAllByPost_PostNo(postNo);
-        if (replyList.isEmpty()) throw new EntityNotFoundException("검색 결과가 없습니다.");
+        if (replyList.isEmpty()) throw new EntityNotFoundException();
 
 
         return replyList.stream()
@@ -56,7 +58,7 @@ public class ReplyService {
     public List<GetReplyListResponse> getReplyListByMemberNo(Long memberNo) {
 
         List<Reply> replyList = replyRepository.findAllByWriter_MemberNo(memberNo);
-        if (replyList.isEmpty()) throw new EntityNotFoundException("검색 결과가 없습니다.");
+        if (replyList.isEmpty()) throw new EntityNotFoundException();
 
         return replyList.stream()
                 .filter(reply -> !reply.isDeleted())
@@ -104,7 +106,7 @@ public class ReplyService {
     public UpdateReplyResponse updateReply(Long replyNo, UpdateReplyRequest request) {
 
         Reply reply = findReplyByReplyNo(replyNo);
-        checkWriterOrAdmin(request.memberNo(), reply);
+        checkWriterOrAdmin(request.memberNo(), request.role(), reply);
         reply.update(request.replyContent());
 
         return UpdateReplyResponse.fromEntity(reply);
@@ -112,30 +114,28 @@ public class ReplyService {
 
     /**
      * 댓글 삭제 메소드 - 댓글 엔티티의 isDeleted의 상태를 'true' 값으로 변경
-     * @param replyNo 댓글 식별을 위한 키 값
-     * @param memberNo 삭제 요청을 한
+     * @param request {replyNo, role, memberNo}
      */
     @Transactional
-    public void deleteReply(Long replyNo, Long memberNo) {  // 프론트에서 role 같이 받을 수 있는 지 확인 필요
+    public void deleteReply(DeleteReplyRequest request) {  // 프론트에서 role 같이 받을 수 있는 지 확인 필요
 
-        Reply reply = findReplyByReplyNo(replyNo);
-        checkWriterOrAdmin(memberNo, reply);
+        Reply reply = findReplyByReplyNo(request.replyNo());
+        checkWriterOrAdmin(request.memberNo(), request.role(), reply);
         reply.delete();
     }
 
     private Reply findReplyByReplyNo (Long replyNo) {
 
         return replyRepository.findById(replyNo)
-                .orElseThrow( () -> new EntityNotFoundException("검색 결과가 없습니다."));
+                .orElseThrow(EntityNotFoundException::new);
     }
 
-    private void checkWriterOrAdmin (Long memberNo, Reply reply) {
+    private void checkWriterOrAdmin (Long memberNo, Role role, Reply reply) {
 
-        Role requestedMemberRole = apiReplyService.getMemberRoleByMemberNo(memberNo);
         boolean checkResult =
-                replyChecker.memberCheck(memberNo, requestedMemberRole, reply.getWriter().getMemberNo());
+                replyChecker.memberCheck(memberNo, role, reply.getWriter().getMemberNo());
 
-        if (!checkResult) throw new AccessDeniedException("권한이 없습니다.");
+        if (!checkResult) throw new AccessDeniedException(ErrorCode.ACCESS_DENIED.getMessage());
 
     }
 

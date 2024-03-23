@@ -1,7 +1,7 @@
 ---
 name: issue-- ✏️todo
 about: TODO LIST 작성
-title: "[이름] 날짜 TODO"
+title: "[이름] 날짜 Todo List"
 labels: "✏️todo"
 assignees: ''
 

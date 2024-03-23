@@ -1,10 +1,12 @@
 package com.runninghi.runninghibackv2.reply.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
+import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.UpdateReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.UpdateReplyResponse;
@@ -60,17 +62,17 @@ class ReplyServiceTest {
     @BeforeEach
     void setup() {
 
-        member1 = new Member.Builder()
+        member1 = Member.builder()
                 .nickname("테스트멤버1")
                 .role(Role.USER)
                 .build();
 
-        member2 = new Member.Builder()
+        member2 = Member.builder()
                 .nickname("테스트멤버2")
                 .role(Role.USER)
                 .build();
 
-        admin = new Member.Builder()
+        admin = Member.builder()
                 .nickname("관리자")
                 .role(Role.ADMIN)
                 .build();
@@ -124,7 +126,7 @@ class ReplyServiceTest {
 
     /* Read */
     @Test
-    @DisplayName("댓글 조회 테스트 : 게시글 조회 시 관련 댓글들 리스트 조회, 삭제된 댓글은 제외되는 지 확인")
+    @DisplayName("특정 게시글의 댓글 리스트 조회 테스트 : success, 삭제된 댓글은 제외되는 지 확인")
     void testGetReplyList() {
 
         // when
@@ -139,19 +141,18 @@ class ReplyServiceTest {
     }
 
     @ParameterizedTest
-    @DisplayName("댓글 조회 테스트 : 게시글 엔티티 조회 실패 시 예외 발생 확인")
+    @DisplayName("특정 게시글의 댓글 리스트 조회 테스트 : 게시글 엔티티 조회 실패 시 예외 발생 확인")
     @NullSource
     @ValueSource(longs = 3)
     void testGetReplyListException (Long postNo) {
 
         // when & then
         Assertions.assertThatThrownBy(() -> replyService.getReplyList(postNo))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("검색 결과가 없습니다.");
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    @DisplayName("댓글 조회 테스트 : 특정 회원의 쓴 댓글들 리스트 조회, 삭제된 댓글 제외되는 지 확인")
+    @DisplayName("특정 회원의 쓴 댓글들 리스트 조회 테스트 : success, 삭제된 댓글 제외되는 지 확인")
     void testGetReplyListByMemberNo () {
 
         // given
@@ -166,6 +167,19 @@ class ReplyServiceTest {
                 .hasSize(2)
                 .extracting("memberName", String.class)
                 .isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @DisplayName("특정 회원의 쓴 댓글들 리스트 조회 테스트 : 없는 회원일 시 예외 발생하는 지 확인")
+    @NullSource
+    @ValueSource(longs = 0L)
+    void testGetReplyListBtMemberNoException(Long memberNo) {
+
+        // when & then
+        Assertions.assertThatThrownBy(
+                () -> replyService.getReplyListByMemberNo(memberNo)
+        ).isInstanceOf(EntityNotFoundException.class);
+
     }
 
 //    @Test
@@ -214,12 +228,12 @@ class ReplyServiceTest {
 //    }
 
     @Test
-    @DisplayName("댓글 수정 테스트 : 수정 메소드 정상 작동 확인")
+    @DisplayName("댓글 수정 테스트 : success")
     void testUpdateReply() {
 
         // given
         Long replyNo = reply1.getReplyNo();
-        UpdateReplyRequest request = new UpdateReplyRequest(member1.getMemberNo(), "수정된 댓글");
+        UpdateReplyRequest request = new UpdateReplyRequest(member1.getMemberNo(), member1.getRole(), "수정된 댓글");
 
         // when
         UpdateReplyResponse response = replyService.updateReply(replyNo, request);
@@ -236,7 +250,7 @@ class ReplyServiceTest {
 
         // given
         Long replyNo = reply1.getReplyNo();
-        UpdateReplyRequest request = new UpdateReplyRequest(member2.getMemberNo(), "수정한 내용");
+        UpdateReplyRequest request = new UpdateReplyRequest(member2.getMemberNo(), member2.getRole(), "수정한 내용");
 
         // when
         Assertions.assertThatThrownBy(
@@ -246,15 +260,17 @@ class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("댓글 삭제 테스트 : 댓글 삭제 메소드 정상 작동 확인")
+    @DisplayName("댓글 삭제 테스트 : success")
     void testDeleteReply() {
 
         // given
         Long replyNo = reply1.getReplyNo();
         Long memberNo = reply1.getWriter().getMemberNo();
+        Role role = reply1.getWriter().getRole();
+        DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, role, memberNo);
 
         // when
-        replyService.deleteReply(replyNo, memberNo);
+        replyService.deleteReply(request);
 
         // then
         Assertions.assertThat(reply1)
@@ -270,10 +286,12 @@ class ReplyServiceTest {
         // given
         Long replyNo = reply1.getReplyNo();
         Long memberNo = member2.getMemberNo();
+        Role role = member2.getRole();
+        DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, role, memberNo);
 
         // when & then
         Assertions.assertThatThrownBy(
-                () -> replyService.deleteReply(replyNo, memberNo)
+                () -> replyService.deleteReply(request)
         ).isInstanceOf(AccessDeniedException.class)
                 .hasMessageContaining("권한이 없습니다.");
     }
