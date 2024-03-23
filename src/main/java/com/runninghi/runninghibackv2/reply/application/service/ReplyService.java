@@ -18,6 +18,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -124,6 +125,24 @@ public class ReplyService {
         reply.delete();
     }
 
+    /**
+     * 신고 도메인 측에서 요청하는 메소드.
+     * 신고 횟수를 올리는 메소드입니다.
+     * @param replyNo
+     */
+    @Transactional(propagation = Propagation.MANDATORY) // 부모 트랜잭션이 없으면 exception 발생
+    public void plusReportedCount (Long replyNo) {
+
+        Reply reply = findReplyByReplyNo(replyNo);
+        reply.addReportedCount();
+
+    }
+
+    public List<GetReplyListResponse> getReportedReplyList(Long memberNo) {
+
+        return null;
+    }
+
     private Reply findReplyByReplyNo (Long replyNo) {
 
         return replyRepository.findById(replyNo)
@@ -138,6 +157,7 @@ public class ReplyService {
         if (!checkResult) throw new AccessDeniedException(ErrorCode.ACCESS_DENIED.getMessage());
 
     }
+
 
 }
 

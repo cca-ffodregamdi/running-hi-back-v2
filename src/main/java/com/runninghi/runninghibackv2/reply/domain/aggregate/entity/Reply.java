@@ -74,6 +74,7 @@ public class Reply extends BaseTimeEntity {
     public void addParentReply (Reply reply) {
         this.parent = reply;
     }
+    public void addReportedCount () {this.reportedCount++;}
 
     public void update (String replyContent) {
         this.replyContent = replyContent;
