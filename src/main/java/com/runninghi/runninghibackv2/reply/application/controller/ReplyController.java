@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.reply.application.controller;
 
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.reply.application.dto.request.CreateReplyRequest;
@@ -42,6 +43,15 @@ public class ReplyController {
     }
 
     // 신고된 댓글들 조회 API 필요
+    @HasAccess
+    @GetMapping(value = "/reported")
+    public ResponseEntity<ApiResult> getReportedReplyList(@RequestHeader(name = "memberNo") Long memberNo) {
+
+        List<GetReplyListResponse> reportedReplyList = replyService.getReportedReplyList(memberNo);
+
+        return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", reportedReplyList));
+    }
+
 
     @PostMapping
     public ResponseEntity<ApiResult> createReply(@RequestBody CreateReplyRequest request) {
