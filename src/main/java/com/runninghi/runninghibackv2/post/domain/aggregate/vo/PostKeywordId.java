@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo;
+package com.runninghi.runninghibackv2.post.domain.aggregate.vo;
 
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;

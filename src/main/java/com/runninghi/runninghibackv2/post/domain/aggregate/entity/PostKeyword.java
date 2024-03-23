@@ -1,8 +1,7 @@
-package com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.entity;
+package com.runninghi.runninghibackv2.post.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
-import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
-import com.runninghi.runninghibackv2.post.postkeyword.domain.aggregate.vo.PostKeywordId;
+import com.runninghi.runninghibackv2.post.domain.aggregate.vo.PostKeywordId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
