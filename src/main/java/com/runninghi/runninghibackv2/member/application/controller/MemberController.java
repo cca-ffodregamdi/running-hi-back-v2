@@ -1,20 +1,14 @@
 package com.runninghi.runninghibackv2.member.application.controller;
 
 import com.runninghi.runninghibackv2.common.response.ApiResult;
-import com.runninghi.runninghibackv2.member.application.dto.response.KakaoProfileResponse;
+import com.runninghi.runninghibackv2.member.application.service.KakaoLoginService;
 import com.runninghi.runninghibackv2.member.application.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
@@ -22,40 +16,33 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MemberController {
 
-    @Value("${kakao.client-id}")
-    private String kakaoClientId;
-
-    @Value("${kakao.redirect-uri}")
-    private String kakaoRedirectUri;
-
     private final MemberService memberService;
+    private final KakaoLoginService kakaoLoginService;
 
-    @GetMapping("/login/kakao")
-    public String kakaoLogin() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://kauth.kakao.com/oauth/authorize")
-                .queryParam("client_id", kakaoClientId)
-                .queryParam("redirect_uri", kakaoRedirectUri)
-                .queryParam("response_type", "code");
 
-        return "redirect:" + builder.toUriString();
+    /**
+     * 카카오 로그인 요청을 처리하는 API 엔드포인트입니다.
+     *
+     * @return 카카오 로그인 페이지의 URI
+     */
+    @GetMapping("/api/v1/login/kakao")
+    public ResponseEntity<ApiResult> kakaoLogin() {
+
+        String kakaoUri = kakaoLoginService.getKakaoUri();
+
+        return ResponseEntity.ok(ApiResult.success("Redirect Success", kakaoUri));
     }
 
-    @PostMapping("/login/kakao/callback")
-    public ResponseEntity<ApiResult> kakaoCallback(@RequestParam String code) {
-        RestTemplate restTemplate = new RestTemplate();
+    /**
+     * 카카오 로그인 콜백을 처리하는 API 엔드포인트입니다.
+     *
+     * @param code 카카오로부터 받은 인가 코드
+     * @return 로그인 성공 여부 및 인증 토큰 정보
+     */
+    @GetMapping("api/v1/login/kakao/callback")
+    public ResponseEntity<ApiResult> kakaoCallback(@RequestParam("code") String code) {
 
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "authorization_code");
-        params.add("client_id", kakaoClientId);
-        params.add("redirect_uri", kakaoRedirectUri);
-        params.add("code", code);
-
-        String accessTokenRequestUrl = "https://kauth.kakao.com/oauth/token";
-        Map<String, String> response = restTemplate.postForObject(accessTokenRequestUrl, params, Map.class);
-
-        String kakaoAccessToken = response != null ? response.get("access_token") : null;
-        KakaoProfileResponse kakaoProfileResponse = memberService.getKakaoProfile(kakaoAccessToken);
-        Map<String, String> tokens = memberService.loginWithKakao(kakaoProfileResponse);
+        Map<String, String> tokens = kakaoLoginService.kakaoOauth(code);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokens.get("accessToken"));
