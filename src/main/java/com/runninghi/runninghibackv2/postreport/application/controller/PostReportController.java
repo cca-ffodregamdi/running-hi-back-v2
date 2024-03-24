@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.postreport.application.controller;
 
 import com.runninghi.runninghibackv2.common.response.ApiResult;
-import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import com.runninghi.runninghibackv2.postreport.application.dto.request.CreatePostReportRequest;
 import com.runninghi.runninghibackv2.postreport.application.dto.request.UpdatePostReportRequest;
 import com.runninghi.runninghibackv2.postreport.application.dto.response.CreatePostReportResponse;
@@ -22,17 +21,11 @@ public class PostReportController {
     @PostMapping("api/v1/postreports")
     public ResponseEntity<ApiResult> createPostReport(@RequestBody CreatePostReportRequest request) {
 
-        try {
-            // TODO. 신고자 정보 가져오기
-            Long memberNo = 1L;
-            CreatePostReportResponse response = postReportService.createPostReport(request, memberNo);
+        // TODO. 신고자 정보 가져오기
+        Long memberNo = 1L;
+        CreatePostReportResponse response = postReportService.createPostReport(request, memberNo);
 
-            return ResponseEntity.ok(ApiResult.success("게시글신고 저장 성공", response));
-
-        } catch (Exception e) {
-            // TODO. 예외에 따라 에러코드 세분화
-            return ResponseEntity.ok(ApiResult.error(ErrorCode.INTER_SERVER_ERROR));
-        }
+        return ResponseEntity.ok(ApiResult.success("게시글신고 저장 성공", response));
     }
 
     @GetMapping("api/v1/postreports/{postReportNo}")
