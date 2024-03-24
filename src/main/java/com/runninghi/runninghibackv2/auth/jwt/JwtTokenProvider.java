@@ -52,7 +52,8 @@ public class JwtTokenProvider {
     public String createAccessToken(MemberJwtInfo memberJwtInfo) {
         LocalDateTime now = LocalDateTime.now();
 
-        return Jwts.builder()
+        return "Bearer " +
+                Jwts.builder()
                 .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))
                 .setSubject(String.valueOf(memberJwtInfo.memberNo()))
                 .claim("role", memberJwtInfo.role())
@@ -120,11 +121,11 @@ public class JwtTokenProvider {
      */
     public String extractAccessTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (bearerToken == null || bearerToken.startsWith("Bearer ")) {
+        if (bearerToken == null) {
             throw new IllegalArgumentException("Invalid Authorization Header");
         }
 
-        return bearerToken.substring(7); // "Bearer " 이후의 토큰 부분만 추출
+        return bearerToken;
     }
 
 
@@ -146,7 +147,7 @@ public class JwtTokenProvider {
      * @throws InvalidTokenException 토큰이 유효하지 않은 경우 예외가 발생합니다.
      */
     public void validateAccessToken(String token) throws InvalidTokenException {
-        Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token);
+        Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token.substring(7));
     }
 
     /**
@@ -169,7 +170,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey.getBytes())
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(token.substring(7))
                 .getBody();
 
         return Long.parseLong(claims.getSubject());
@@ -185,7 +186,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey.getBytes())
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(token.substring(7))
                 .getBody();
 
         return claims.get("role", String.class);
