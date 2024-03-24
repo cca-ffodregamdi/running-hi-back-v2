@@ -23,14 +23,25 @@ public class WebConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    /**
+     * JWT 토큰 처리를 위한 필터 빈을 구성하고 등록합니다.
+     *
+     * @return JwtTokenFilter 구성을 위한 FilterRegistrationBean
+     */
     @Bean
     public FilterRegistrationBean<JwtTokenFilter> jwtTokenFilterConfig() {
         FilterRegistrationBean<JwtTokenFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new JwtTokenFilter(jwtTokenProvider));
-        registrationBean.addUrlPatterns("/api/v3/*");
+        registrationBean.addUrlPatterns("/api/v1/*");
         return registrationBean;
     }
 
+    /**
+     * RestTemplate을 사용자 정의 설정으로 구성하고 생성합니다.
+     *
+     * @param restTemplateBuilder RestTemplateBuilder를 통해 RestTemplate을 빌드합니다.
+     * @return 구성된 RestTemplate 빈
+     */
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
