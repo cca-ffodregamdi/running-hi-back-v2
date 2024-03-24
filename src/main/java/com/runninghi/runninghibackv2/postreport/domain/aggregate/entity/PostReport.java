@@ -23,6 +23,7 @@ public class PostReport extends BaseTimeEntity {
     private Long postReportNo;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Comment("신고 사유 카테고리")
     private ReportCategory category;
 
@@ -31,6 +32,7 @@ public class PostReport extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Comment("신고 처리 상태")
     private ProcessingStatus status;
 
