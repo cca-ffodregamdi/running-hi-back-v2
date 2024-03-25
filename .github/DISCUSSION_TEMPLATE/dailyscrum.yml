@@ -20,13 +20,6 @@ body:
         *
   - type: textarea
     attributes:
-      label: "🐳 오늘까지 한 내용 공유"
-      value: |
-        *
-        *
-        *
-  - type: textarea
-    attributes:
       label: "🦋 알게된 사실 or 참고 자료"
       value: |
         *
