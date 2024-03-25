@@ -31,6 +31,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class KakaoLoginService {
 
+    private static final int NICKNAME_DIGIT_LENGTH = 8;
+    private static final int RANDOM_NUMBER_RANGE = 10;
+
     @Value("${kakao.client-id}")
     private String kakaoClientId;
 
@@ -49,9 +52,6 @@ public class KakaoLoginService {
     private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 
     private final SecureRandom random = new SecureRandom();
-
-    private static final int NICKNAME_DIGIT_LENGTH = 8;
-    private static final int RANDOM_NUMBER_RANGE = 10;
 
 
     /**
