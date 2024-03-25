@@ -40,12 +40,18 @@ public class KakaoLoginService {
     @Value("${kakao.client-secret}")
     private String clientSecret;
 
+    @Value("${kakao.current-version-uri}")
+    private String currentVersionUri;
+
     private final RestTemplate restTemplate;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 
     private final SecureRandom random = new SecureRandom();
+
+    private static final int NICKNAME_DIGIT_LENGTH = 8;
+    private static final int RANDOM_NUMBER_RANGE = 10;
 
 
     /**
@@ -54,9 +60,10 @@ public class KakaoLoginService {
      * @return 카카오 인증 페이지의 URI
      */
     public String getKakaoUri() {
+
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://kauth.kakao.com/oauth/authorize")
                 .queryParam("client_id", kakaoClientId)
-                .queryParam("redirect_uri", kakaoRedirectUri)
+                .queryParam("redirect_uri", currentVersionUri + kakaoRedirectUri)
                 .queryParam("response_type", "code");
 
         return builder.toUriString();
@@ -75,7 +82,7 @@ public class KakaoLoginService {
         params.add("grant_type", "authorization_code");
         params.add("client_id", kakaoClientId);
         params.add("client_secret", clientSecret);
-        params.add("redirect_uri", kakaoRedirectUri);
+        params.add("redirect_uri", currentVersionUri + kakaoRedirectUri);
         params.add("code", code);
 
         String accessTokenRequestUrl = "https://kauth.kakao.com/oauth/token";
@@ -184,8 +191,8 @@ public class KakaoLoginService {
     private String generateRandomDigits() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < 8; i++) {
-            stringBuilder.append(random.nextInt(10));
+        for (int i = 0; i < NICKNAME_DIGIT_LENGTH; i++) {
+            stringBuilder.append(random.nextInt(RANDOM_NUMBER_RANGE));
         }
 
         return stringBuilder.toString();
