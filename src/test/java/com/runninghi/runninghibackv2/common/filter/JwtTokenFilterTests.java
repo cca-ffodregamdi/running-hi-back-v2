@@ -38,6 +38,9 @@ class JwtTokenFilterTests {
         HttpServletResponse response = mock(MockHttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
+        // 유효한 경로 설정
+        when(request.getRequestURI()).thenReturn("/api/v1");
+
         // 유효한 엑세스 토큰 설정
         String validAccessToken = "valid_access_token";
         when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn(validAccessToken);
@@ -57,6 +60,9 @@ class JwtTokenFilterTests {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(MockHttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
+
+        // 유효한 경로 설정
+        when(request.getRequestURI()).thenReturn("/api/v1");
 
         // 테스트에 필요한 요청 객체 생성 및 설정
         String invalidAccessToken = "invalid_access_token";
@@ -104,6 +110,9 @@ class JwtTokenFilterTests {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(MockHttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
+
+        // 유효한 경로 설정
+        when(request.getRequestURI()).thenReturn("/api/v1");
 
         // 만료된 리프레시 토큰을 설정, 예외를 던지도록 설정
         String expiredRefreshToken = "expired_refresh_token";
