@@ -57,6 +57,7 @@ public class JwtTokenProvider {
                 .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))
                 .setSubject(String.valueOf(memberJwtInfo.memberNo()))
                 .claim("role", memberJwtInfo.role())
+                .setIssuer(issuer)
                 .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(Date.from(now.plusMinutes(accessExpireMinutes).atZone(ZoneId.systemDefault()).toInstant()))
                 .compact();
@@ -147,7 +148,11 @@ public class JwtTokenProvider {
      * @throws InvalidTokenException 토큰이 유효하지 않은 경우 예외가 발생합니다.
      */
     public void validateAccessToken(String token) throws InvalidTokenException {
-        Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token.substring(7));
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token.substring(7));
+        } catch (Exception e) {
+            throw new InvalidTokenException();
+        }
     }
 
     /**
@@ -157,7 +162,11 @@ public class JwtTokenProvider {
      * @throws InvalidTokenException 토큰이 유효하지 않은 경우 예외가 발생합니다.
      */
     public void validateRefreshToken(String token) throws InvalidTokenException {
-        Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token);
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token);
+        } catch (Exception e) {
+            throw new InvalidTokenException();
+        }
     }
 
     /**
