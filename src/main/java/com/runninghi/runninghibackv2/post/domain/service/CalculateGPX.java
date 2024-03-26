@@ -53,8 +53,9 @@ public class CalculateGPX {
         doc.getDocumentElement().normalize();
 
         NodeList trkptList = doc.getElementsByTagName("trkpt");
+        int length = trkptList.getLength();
 
-        for (int i = 0; i < trkptList.getLength(); i++) {
+        for (int i = 0; i < length; i++) {
             Element trkptElement = (Element) trkptList.item(i);
             double lon = Double.parseDouble(trkptElement.getAttribute("lon"));
             double lat = Double.parseDouble(trkptElement.getAttribute("lat"));
