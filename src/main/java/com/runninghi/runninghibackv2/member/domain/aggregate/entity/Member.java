@@ -42,13 +42,13 @@ public class Member extends BaseTimeEntity {
     @Comment("신고된 횟수")
     private int reportCnt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
     @Comment("계정 활성화 상태")
-    private boolean isActive = true;
+    private boolean isActive;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     @Comment("블랙리스트 상태")
-    private boolean isBlacklisted = false;
+    private boolean isBlacklisted;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
