@@ -56,28 +56,28 @@ class FeedbackServiceTests {
     @BeforeEach
     void setup() {
         // 테스트 멤버 생성 및 저장
-        testMember1 = new Member.MemberBuilder()
+        testMember1 = Member.builder()
                 .nickname("testUser1")
                 .role(Role.USER)
                 .build();
 
-        testMember2 = new Member.MemberBuilder()
+        testMember2 = Member.builder()
                 .nickname("testUser2")
                 .role(Role.USER)
                 .build();
 
-        testAdmin = new Member.MemberBuilder()
+        testAdmin = Member.builder()
                 .nickname("testUser2")
                 .role(Role.ADMIN)
                 .build();
 
-        testFeedback = new Feedback.Builder()
+        testFeedback = Feedback.builder()
                 .feedbackWriter(testMember1)
                 .title("Old Title")
                 .content("Old Content")
                 .category(FeedbackCategory.INQUIRY)
                 .hasReply(false)
-                .builder();
+                .build();
 
         memberRepository.saveAndFlush(testMember1);
         memberRepository.saveAndFlush(testMember2);
