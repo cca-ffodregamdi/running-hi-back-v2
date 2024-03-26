@@ -156,11 +156,13 @@ public class KakaoLoginService {
      */
     private Map<String, String> loginWithKakaoCreateMember(KakaoProfileResponse kakaoProfile) {
         Member member = Member.builder()
-                    .kakaoId(kakaoProfile.getKakaoId().toString())
-                    .kakaoName(kakaoProfile.getNickname())
-                    .nickname("러너 " + generateRandomDigits())
-                    .role(Role.USER)
-                    .build();
+                .kakaoId(kakaoProfile.getKakaoId().toString())
+                .kakaoName(kakaoProfile.getNickname())
+                .nickname("러너 " + generateRandomDigits())
+                .isActive(true)
+                .isBlacklisted(false)
+                .role(Role.USER)
+                .build();
 
         // 리프레시 토큰 생성
         RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getKakaoId(), member.getRole());
