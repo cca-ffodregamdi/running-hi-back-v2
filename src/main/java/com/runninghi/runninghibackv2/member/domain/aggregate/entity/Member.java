@@ -55,6 +55,10 @@ public class Member extends BaseTimeEntity {
     @Comment("권한")
     private Role role;
 
+    @Column
+    @Comment("리프레시 토큰")
+    private String refreshToken;
+
     public Member(MemberBuilder memberBuilder) {
         this.memberNo = memberBuilder.memberNo;
         this.account = memberBuilder.account;
@@ -66,6 +70,7 @@ public class Member extends BaseTimeEntity {
         this.isActive = memberBuilder.isActive;
         this.isBlacklisted = memberBuilder.isBlacklisted;
         this.role = memberBuilder.role;
+        this.refreshToken = memberBuilder.refreshToken;
     }
 
     public static MemberBuilder builder() {
@@ -83,6 +88,7 @@ public class Member extends BaseTimeEntity {
         private boolean isActive;
         private boolean isBlacklisted;
         private Role role;
+        private String refreshToken;
 
         public MemberBuilder memberNo(Long memberNo) {
             this.memberNo = memberNo;
@@ -134,10 +140,19 @@ public class Member extends BaseTimeEntity {
             return this;
         }
 
+        public MemberBuilder refreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
+            return this;
+        }
+
         public Member build() {
             return new Member(this);
         }
 
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
 }

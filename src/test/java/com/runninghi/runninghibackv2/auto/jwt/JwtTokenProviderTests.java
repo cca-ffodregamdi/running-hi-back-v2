@@ -1,7 +1,8 @@
 package com.runninghi.runninghibackv2.auto.jwt;
 
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
-import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
+import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
+import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.entity.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,24 +26,26 @@ class JwtTokenProviderTests {
     public void setUp() {
         // 테스트에 사용될 JwtTokenProvider 인스턴스 생성
         String secretKey = "test_secret_key_12345_12345_12345_12345";
+        String kakaoId = "13245";
         long accessExpireMinutes = 30;
         long refreshExpireDays = 7;
         String issuer = "test_issuer";
         jwtTokenProvider = new JwtTokenProvider(secretKey, accessExpireMinutes, refreshExpireDays, issuer);
 
-        MemberJwtInfo memberJwtInfo = new MemberJwtInfo(1L, Role.USER);
-        testAccessToken = jwtTokenProvider.createAccessToken(memberJwtInfo);
-        testRefreshToken = jwtTokenProvider.createRefreshToken(memberJwtInfo);
+        AccessTokenInfo accessTokenInfo = new AccessTokenInfo(1L, Role.USER);
+        RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(kakaoId, Role.USER);
+        testAccessToken = jwtTokenProvider.createAccessToken(accessTokenInfo);
+        testRefreshToken = jwtTokenProvider.createRefreshToken(refreshTokenInfo);
     }
 
     @Test
     @DisplayName("액세스 토큰 생성 테스트")
     void testCreateAccessToken() {
         // 테스트에 사용될 MemberJwtInfo 객체 생성
-        MemberJwtInfo memberJwtInfo = new MemberJwtInfo(1L, Role.USER);
+        AccessTokenInfo accessTokenInfo = new AccessTokenInfo(1L, Role.USER);
 
         // 액세스 토큰 생성
-        String accessToken = jwtTokenProvider.createAccessToken(memberJwtInfo);
+        String accessToken = jwtTokenProvider.createAccessToken(accessTokenInfo);
 
         // 액세스 토큰이 null이 아닌지 확인
         assertNotNull(accessToken);
@@ -52,10 +55,10 @@ class JwtTokenProviderTests {
     @DisplayName("리프레시 토큰 생성 테스트")
     void testCreateRefreshToken() {
         // 테스트에 사용될 MemberJwtInfo 객체 생성
-        MemberJwtInfo memberJwtInfo = new MemberJwtInfo(1L, Role.USER);
+        RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo("12345", Role.USER);
 
         // 리프레시 토큰 생성
-        String refreshToken = jwtTokenProvider.createRefreshToken(memberJwtInfo);
+        String refreshToken = jwtTokenProvider.createRefreshToken(refreshTokenInfo);
 
         // 리프레시 토큰이 null이 아닌지 확인
         assertNotNull(refreshToken);
@@ -66,7 +69,7 @@ class JwtTokenProviderTests {
     @DisplayName("액세스 토큰 유효성 검사 테스트")
     void testValidateAccessToken() {
         // 액세스 토큰 생성
-        String accessToken = jwtTokenProvider.createAccessToken(new MemberJwtInfo(1L, Role.USER));
+        String accessToken = jwtTokenProvider.createAccessToken(new AccessTokenInfo(1L, Role.USER));
 
         // 액세스 토큰 유효성 검사
         assertDoesNotThrow(() -> jwtTokenProvider.validateAccessToken(accessToken));
@@ -76,7 +79,7 @@ class JwtTokenProviderTests {
     @DisplayName("리프레시 토큰 유효성 검사 테스트")
     void testValidateRefreshToken() {
         // 리프레시 토큰 생성
-        String refreshToken = jwtTokenProvider.createRefreshToken(new MemberJwtInfo(1L, Role.USER));
+        String refreshToken = jwtTokenProvider.createRefreshToken(new RefreshTokenInfo("12345", Role.USER));
 
         // 리프레시 토큰 유효성 검사
         assertDoesNotThrow(() -> jwtTokenProvider.validateRefreshToken(refreshToken));
@@ -86,7 +89,7 @@ class JwtTokenProviderTests {
     @DisplayName("액세스 토큰 갱신 테스트")
     void testRenewAccessToken() {
         // 리프레시 토큰 생성
-        String refreshToken = jwtTokenProvider.createRefreshToken(new MemberJwtInfo(1L, Role.USER));
+        String refreshToken = jwtTokenProvider.createRefreshToken(new RefreshTokenInfo("12345", Role.USER));
 
         // 액세스 토큰 갱신
         String renewedAccessToken = jwtTokenProvider.renewAccessToken(refreshToken);
@@ -99,7 +102,7 @@ class JwtTokenProviderTests {
     @DisplayName("액세스 토큰에서 memberNo 추출 테스트")
     void testGetMemberNoFromToken() {
         // 액세스 토큰 생성
-        String accessToken = jwtTokenProvider.createAccessToken(new MemberJwtInfo(1L, Role.USER));
+        String accessToken = jwtTokenProvider.createAccessToken(new AccessTokenInfo(1L, Role.USER));
 
         // memberNo 추출
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(accessToken);

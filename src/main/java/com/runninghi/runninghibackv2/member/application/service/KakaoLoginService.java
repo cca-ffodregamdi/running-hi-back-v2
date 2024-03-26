@@ -1,13 +1,12 @@
 package com.runninghi.runninghibackv2.member.application.service;
 
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
-import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
+import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
+import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.common.exception.custom.KakaoLoginException;
 import com.runninghi.runninghibackv2.member.application.dto.response.KakaoProfileResponse;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.MemberRefreshToken;
-import com.runninghi.runninghibackv2.member.domain.repository.MemberRefreshTokenRepository;
 import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +48,6 @@ public class KakaoLoginService {
     private final RestTemplate restTemplate;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
-    private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 
     private final SecureRandom random = new SecureRandom();
 
@@ -134,13 +132,14 @@ public class KakaoLoginService {
      * @return 액세스 토큰 및 리프레시 토큰
      */
     private Map<String, String> loginWithKakao(Member member) {
-        MemberJwtInfo memberJwtInfo = new MemberJwtInfo(member.getMemberNo(), member.getRole());
+        AccessTokenInfo accessTokenInfo = new AccessTokenInfo(member.getMemberNo(), member.getRole());
+        RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getKakaoId(), member.getRole());
 
-        String refreshToken = jwtTokenProvider.createRefreshToken(memberJwtInfo);
-        String accessToken = jwtTokenProvider.createAccessToken(memberJwtInfo);
+        String refreshToken = jwtTokenProvider.createRefreshToken(refreshTokenInfo);
+        String accessToken = jwtTokenProvider.createAccessToken(accessTokenInfo);
 
-        MemberRefreshToken memberRefreshToken = memberRefreshTokenRepository.findByMember(member);
-        memberRefreshToken.updateRefreshToken(refreshToken);
+        member.updateRefreshToken(refreshToken);
+        memberRepository.save(member);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
@@ -163,18 +162,16 @@ public class KakaoLoginService {
                     .role(Role.USER)
                     .build();
 
-        MemberJwtInfo memberJwtInfo = new MemberJwtInfo(member.getMemberNo(), member.getRole());
+        // 리프레시 토큰 생성
+        RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getKakaoId(), member.getRole());
+        String refreshToken = jwtTokenProvider.createRefreshToken(refreshTokenInfo);
 
-        // 리프레시 토큰, 액세스 토큰 생성
-        String refreshToken = jwtTokenProvider.createRefreshToken(memberJwtInfo);
-        String accessToken = jwtTokenProvider.createAccessToken(memberJwtInfo);
+        member.updateRefreshToken(refreshToken);
 
-        MemberRefreshToken refreshTokenEntity = MemberRefreshToken.builder()
-                .member(member)
-                .refreshToken(refreshToken)
-                .build();
-
-        memberRefreshTokenRepository.save(refreshTokenEntity);
+        // 멤버 저장, 액세스 토큰 생성
+        Member savedMember = memberRepository.saveAndFlush(member);
+        AccessTokenInfo accessTokenInfo = new AccessTokenInfo(savedMember.getMemberNo(), savedMember.getRole());
+        String accessToken = jwtTokenProvider.createAccessToken(accessTokenInfo);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);

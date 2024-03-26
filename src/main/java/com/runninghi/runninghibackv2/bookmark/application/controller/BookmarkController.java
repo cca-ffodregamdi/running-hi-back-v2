@@ -5,7 +5,7 @@ import com.runninghi.runninghibackv2.bookmark.application.dto.request.CreateBook
 import com.runninghi.runninghibackv2.bookmark.application.dto.response.BookmarkedPostListResponse;
 import com.runninghi.runninghibackv2.bookmark.application.dto.response.CreateBookmarkResponse;
 import com.runninghi.runninghibackv2.bookmark.application.service.BookmarkService;
-import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
+import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class BookmarkController {
     @GetMapping()
     public ResponseEntity<ApiResult> getBookmarkedPostList(@RequestHeader(name = "Authorization") String bearerToken) {
 
-        MemberJwtInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         List<BookmarkedPostListResponse> bookmarkedPostList = bookmarkService.getBookmarkedPostList(memberInfo.memberNo());
 
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", bookmarkedPostList));
@@ -41,8 +41,8 @@ public class BookmarkController {
     public ResponseEntity<ApiResult> createBookmark (@RequestHeader("Authorization") String bearerToken,
                                                     @RequestBody(required = true) Long postNo) {
 
-        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        CreateBookmarkRequest request = CreateBookmarkRequest.of(memberJwtInfo.memberNo(), postNo);
+        AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        CreateBookmarkRequest request = CreateBookmarkRequest.of(accessTokenInfo.memberNo(), postNo);
         CreateBookmarkResponse response = bookmarkService.createBookmark(request);
 
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 저장되었습니다.", response));
@@ -52,8 +52,8 @@ public class BookmarkController {
     public ResponseEntity<ApiResult> deleteBookmark (@RequestHeader("Authorization") String bearerToken,
                                                      @PathVariable(name = "postNo") Long postNo) {
 
-            MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-            bookmarkService.deleteBookmark(memberJwtInfo.memberNo(), postNo);
+            AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+            bookmarkService.deleteBookmark(accessTokenInfo.memberNo(), postNo);
 
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success("성공적으로 삭제되었습니다.", null)); // statusCode 204
     }
