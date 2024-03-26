@@ -2,7 +2,6 @@ package com.runninghi.runninghibackv2.reply.application.controller;
 
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
-import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.reply.application.dto.request.CreateReplyRequest;

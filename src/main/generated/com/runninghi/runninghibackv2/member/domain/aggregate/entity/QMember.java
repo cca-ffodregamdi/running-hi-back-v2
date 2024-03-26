@@ -40,6 +40,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath password = createString("password");
 
+    public final StringPath refreshToken = createString("refreshToken");
+
     public final NumberPath<Integer> reportCnt = createNumber("reportCnt", Integer.class);
 
     public final EnumPath<com.runninghi.runninghibackv2.common.entity.Role> role = createEnum("role", com.runninghi.runninghibackv2.common.entity.Role.class);
