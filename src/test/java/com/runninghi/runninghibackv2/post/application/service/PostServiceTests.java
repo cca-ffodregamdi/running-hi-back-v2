@@ -110,6 +110,7 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
@@ -156,6 +157,7 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
@@ -180,6 +182,7 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
@@ -204,6 +207,7 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
@@ -228,6 +232,7 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
@@ -264,6 +269,7 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
