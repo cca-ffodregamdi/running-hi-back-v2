@@ -26,12 +26,14 @@ public class ReplyController {
     private final ReplyService replyService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    private static final String GET_MAPPING_RESPONSE_MESSAGE = "성공적으로 조회되었습니다.";
+
     @GetMapping("/{postNo}")
     public ResponseEntity<ApiResult> getReplyList(@PathVariable(name = "postNo") Long postNo) {
 
         List<GetReplyListResponse> replyList =  replyService.getReplyList(postNo);
 
-        return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", replyList));
+        return ResponseEntity.ok().body(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, replyList));
     }
 
     @GetMapping("/byMember")
@@ -39,7 +41,7 @@ public class ReplyController {
 
         List<GetReplyListResponse> replyList = replyService.getReplyListByMemberNo(memberNo);
 
-        return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", replyList));
+        return ResponseEntity.ok().body(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, replyList));
     }
 
     // 신고된 댓글들 조회 API 필요
@@ -49,7 +51,7 @@ public class ReplyController {
 
         List<GetReplyListResponse> reportedReplyList = replyService.getReportedReplyList(memberNo);
 
-        return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", reportedReplyList));
+        return ResponseEntity.ok().body(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, reportedReplyList));
     }
 
 
