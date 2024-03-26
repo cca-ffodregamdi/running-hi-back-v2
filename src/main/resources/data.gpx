@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx creator="RUNNING HI - http://www.ramblr.com" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+    <metadata>
+        <author>
+            <name></name>
+        </author>
+        <time>2023-08-05T06:36:14Z</time>
+    </metadata>
+    <trk>
+        <name>경복궁 돌담길</name>
+        <trkseg>
+            <trkpt lon="126.978986" lat="37.575874"><ele>41.5</ele><time>2023-05-11T16:17:08.657Z</time></trkpt>
+            <trkpt lon="126.978952" lat="37.575851"><ele>41.2</ele><time>2023-05-11T16:17:09.657Z</time></trkpt>
+            <trkpt lon="126.978913" lat="37.575833"><ele>40.9</ele><time>2023-05-11T16:17:10.657Z</time></trkpt>
+            <trkpt lon="126.978866" lat="37.575824"><ele>40.8</ele><time>2023-05-11T16:17:11.657Z</time></trkpt>
+            <trkpt lon="126.97882" lat="37.575818"><ele>40.6</ele><time>2023-05-11T16:17:12.657Z</time></trkpt>
+        </trkseg>
+        <trkseg>
+            <trkpt lon="126.978774" lat="37.575813"><ele>40.5</ele><time>2023-05-11T16:17:13.657Z</time></trkpt>
+            <trkpt lon="126.978723" lat="37.575806"><ele>40.4</ele><time>2023-05-11T16:17:14.657Z</time></trkpt>
+            <trkpt lon="126.978676" lat="37.575794"><ele>40.3</ele><time>2023-05-11T16:17:15.657Z</time></trkpt>
+            <trkpt lon="126.978621" lat="37.575798"><ele>40.2</ele><time>2023-05-11T16:17:16.657Z</time></trkpt>
+            <trkpt lon="126.978565" lat="37.575803"><ele>40</ele><time>2023-05-11T16:17:17.657Z</time></trkpt>
+        </trkseg>
+    </trk>
+    <wpt lat="33.45377" lon="126.6538"><name>바농오름 제주</name><type>1</type></wpt>
+</gpx>

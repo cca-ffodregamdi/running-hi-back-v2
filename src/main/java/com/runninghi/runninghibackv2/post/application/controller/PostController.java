@@ -1,5 +1,8 @@
 package com.runninghi.runninghibackv2.post.application.controller;
 
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
+import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.post.application.dto.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
@@ -7,27 +10,38 @@ import com.runninghi.runninghibackv2.post.application.dto.response.CreatePostRes
 import com.runninghi.runninghibackv2.post.application.dto.response.GetPostResponse;
 import com.runninghi.runninghibackv2.post.application.dto.response.UpdatePostResponse;
 import com.runninghi.runninghibackv2.post.application.service.PostService;
+import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
+    private  final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/api/v1/posts")
-    public ResponseEntity<ApiResult> createRecordAndPost(@RequestBody CreatePostRequest request) {
-                                                        // @RequestParam("gpx") MultipartFile gpxFile) {
+    public ResponseEntity<ApiResult> createRecordAndPost(@RequestHeader(name = "Authorization") String bearerToken,
+                                                         @RequestParam("postTitle") String postTitle,
+                                                         @RequestParam("postContent") String postContent,
+                                                         @RequestParam("locationName") String locationName,
+                                                         @RequestParam("keywordList") List<String> keywordList,
+                                                         @RequestParam("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
 
-        System.out.println("request = " + request.toString());
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreatePostResponse response = postService.createRecordAndPost(request);
-//        CreatePostResponse response = postService.createRecordAndPost(request, gpxFile);
+        CreatePostRequest request = new CreatePostRequest(memberInfo.memberNo(), memberInfo.role(), postTitle, postContent, locationName, keywordList);
+
+        CreatePostResponse response = postService.createRecordAndPost(request, gpxFile.getResource());
 
         return ResponseEntity.ok(ApiResult.success("게시글이 성공적으로 등록되었습니다.", response));
     }

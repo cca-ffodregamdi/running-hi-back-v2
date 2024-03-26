@@ -18,8 +18,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +55,14 @@ public class PostServiceTests {
     @Autowired
     private KeywordRepository keywordRepository;
 
+    InputStream inputStream = getClass().getResourceAsStream("/data.gpx");
+    InputStreamResource inputStreamResource;
+
+    {
+        assert inputStream != null;
+        inputStreamResource = new InputStreamResource(inputStream);
+    }
+
     @BeforeEach
     @AfterEach
     void clear() {
@@ -57,7 +73,6 @@ public class PostServiceTests {
 
     Member member;
     Member admin;
-    Post post;
     Keyword keyword;
 
     @BeforeEach
@@ -82,7 +97,7 @@ public class PostServiceTests {
 
     @Test
     @DisplayName("게시글 생성 테스트 : success")
-    void testCreatePostSuccess() {
+    void testCreatePostSuccess() throws ParserConfigurationException, IOException, SAXException {
         // Given
         long beforeSize = postRepository.count();
         long keywordBeforeSize = keywordRepository.count();
@@ -95,13 +110,14 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
                 keywordList
         );
 
-        CreatePostResponse response = postService.createRecordAndPost(request);
+        CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
         long afterSize = postRepository.count();
         long keywordAfterSize= keywordRepository.count();
 
@@ -129,7 +145,7 @@ public class PostServiceTests {
 
     @Test
     @DisplayName("게시글 생성 테스트 : 존재하는 키워드는 저장하지 않음")
-    void testCreateKeywordThatAlreadyExists() {
+    void testCreateKeywordThatAlreadyExists() throws ParserConfigurationException, IOException, SAXException {
         // Given
         long keywordBeforeSize = keywordRepository.count();
 
@@ -141,13 +157,14 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
                 keywordList
         );
 
-        postService.createRecordAndPost(request);
+        postService.createRecordAndPost(request, inputStreamResource);
         long keywordAfterSize= keywordRepository.count();
 
         // Then
@@ -165,6 +182,7 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
@@ -173,7 +191,7 @@ public class PostServiceTests {
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> postService.createRecordAndPost(request));
+                () -> postService.createRecordAndPost(request, inputStreamResource));
 
         assertEquals("제목은 1글자 이상이어야 합니다.", exception.getMessage());
     }
@@ -189,6 +207,7 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
@@ -197,14 +216,14 @@ public class PostServiceTests {
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> postService.createRecordAndPost(request));
+                () -> postService.createRecordAndPost(request, inputStreamResource));
 
         assertEquals("내용은 1글자 이상이어야 합니다.", exception.getMessage());
     }
 
     @Test
     @DisplayName("게시글 삭제 테스트 : success")
-    void testDeletePostSuccess() {
+    void testDeletePostSuccess() throws ParserConfigurationException, IOException, SAXException {
         // Given
         String postTitle = "Test Post";
         String postContent = "Test Post Content 입니다.";
@@ -213,13 +232,14 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
                 keywordList
         );
 
-        CreatePostResponse response = postService.createRecordAndPost(request);
+        CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
 
         long beforeSize = postRepository.count();
         long postKeywordBefore = postKeywordRepository.count();
@@ -240,7 +260,7 @@ public class PostServiceTests {
 
     @Test
     @DisplayName("게시글 수정 테스트 : success")
-    void testUpdatePostSuccess() {
+    void testUpdatePostSuccess() throws ParserConfigurationException, IOException, SAXException {
         // Given
         String postTitle = "Test Post";
         String postContent = "Test Post Content 입니다.";
@@ -249,13 +269,14 @@ public class PostServiceTests {
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
+                member.getRole(),
                 postTitle,
                 postContent,
                 locationName,
                 keywordList
         );
 
-        CreatePostResponse response = postService.createRecordAndPost(request);
+        CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
 
         // When
         String updateTitle = "Test Post";

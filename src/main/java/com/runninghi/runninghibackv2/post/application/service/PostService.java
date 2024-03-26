@@ -17,7 +17,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.core.io.Resource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,11 +38,11 @@ public class PostService {
     private ApiPostService apiPostService;
 
     @Transactional
-    public CreatePostResponse createRecordAndPost(CreatePostRequest request) {
+    public CreatePostResponse createRecordAndPost(CreatePostRequest request, Resource gpxFile) throws ParserConfigurationException, IOException, SAXException {
 
         postChecker.checkPostValidation(request.postTitle(), request.postContent());
 
-        GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile();
+        GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxFile);
 
 //        Member member = apiPostService.getMemberById(request.memberNo());
 
