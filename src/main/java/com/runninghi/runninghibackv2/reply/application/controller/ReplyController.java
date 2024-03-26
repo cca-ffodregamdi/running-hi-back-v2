@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.reply.application.controller;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
+import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.reply.application.dto.request.CreateReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
@@ -68,8 +69,8 @@ public class ReplyController {
                                                  @PathVariable(name = "replyNo") Long replyNo,
                                                  @RequestBody(required = true) String replyContent) {
 
-        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        UpdateReplyRequest request = UpdateReplyRequest.of(memberJwtInfo.memberNo(), memberJwtInfo.role(), replyContent);
+        AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        UpdateReplyRequest request = UpdateReplyRequest.of(accessTokenInfo.memberNo(), accessTokenInfo.role(), replyContent);
         UpdateReplyResponse reply = replyService.updateReply(replyNo, request);
 
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 수정되었습니다.", reply));
@@ -78,8 +79,8 @@ public class ReplyController {
     @PutMapping("/delete/{replyNo}")
     public ResponseEntity<ApiResult> deleteReply(@PathVariable(name = "replyNo") Long replyNo,
                                                  @RequestHeader("Authorization") String bearerToken) {
-        MemberJwtInfo memberJwtInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, memberJwtInfo.role(), memberJwtInfo.memberNo());
+        AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, accessTokenInfo.role(), accessTokenInfo.memberNo());
         replyService.deleteReply(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success("성공적으로 삭제되었습니다.", null));
     }

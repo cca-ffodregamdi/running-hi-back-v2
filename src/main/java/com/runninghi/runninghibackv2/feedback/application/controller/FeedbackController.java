@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.feedback.application.controller;
 
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackReplyRequest;
@@ -23,12 +24,16 @@ import org.springframework.web.bind.annotation.*;
 public class FeedbackController {
 
     private final FeedbackService feedbackService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 피드백 작성
     @PostMapping("/api/v1/feedbacks")
-    public ResponseEntity<ApiResult> createFeedback(@RequestBody CreateFeedbackRequest request) {
+    public ResponseEntity<ApiResult> createFeedback(
+            @RequestHeader(value = "Authorization") String token,
+            @RequestBody CreateFeedbackRequest request
+    ) {
 
-        Long memberNo = 1L;
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
         CreateFeedbackResponse response = feedbackService.createFeedback(request, memberNo);
 
@@ -38,10 +43,11 @@ public class FeedbackController {
     // 피드백 상세 조회
     @GetMapping("/api/v1/feedbacks/{feedbackNo}")
     public ResponseEntity<ApiResult> getFeedback(
+            @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo
     ) {
 
-        Long memberNo = 1L;
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
         GetFeedbackResponse response = feedbackService.getFeedback(feedbackNo, memberNo);
 
@@ -51,12 +57,14 @@ public class FeedbackController {
     // 전체 피드백 리스트 조회
     @GetMapping("api/v1/feedbacks")
     public ResponseEntity<ApiResult> getFeedbackScroll(
+            @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
             @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
     ) {
 
-        Long memberNo = 1L;
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, memberNo);
@@ -66,9 +74,11 @@ public class FeedbackController {
 
     // 피드백 상세 조회 : 관리자
     @GetMapping("/api/v1/feedbacks/admin/{feedbackNo}")
-    public ResponseEntity<ApiResult> getFeedbackByAdmin(@PathVariable("feedbackNo") Long feedbackNo) {
+    public ResponseEntity<ApiResult> getFeedbackByAdmin(
+            @RequestHeader(value = "Authorization") String token,
+            @PathVariable("feedbackNo") Long feedbackNo) {
 
-        Long memberNo = 1L;
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
         GetFeedbackResponse response = feedbackService.getFeedbackByAdmin(feedbackNo, memberNo);
 
@@ -79,12 +89,14 @@ public class FeedbackController {
     // 전체 피드백 리스트 조회 : 관리자
     @GetMapping("api/v1/feedbacks/admin")
     public ResponseEntity<ApiResult> getFeedbackScrollByAdmin(
+            @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
             @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
     ) {
 
-        Long memberNo = 1L;
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
@@ -95,10 +107,11 @@ public class FeedbackController {
     // 피드백 삭제
     @DeleteMapping("/api/v1/feedbacks/{feedbackNo}")
     public ResponseEntity<ApiResult> deleteFeedback(
+            @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo
     ) {
 
-        Long memberNo = 1L;
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
         DeleteFeedbackResponse response = feedbackService.deleteFeedback(feedbackNo, memberNo);
 
@@ -108,11 +121,12 @@ public class FeedbackController {
     // 피드백 수정
     @PutMapping("/api/v1/feedbacks/{feedbackNo}")
     public ResponseEntity<ApiResult> updateFeedback(
+            @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo,
             UpdateFeedbackRequest request
     ) throws BadRequestException {
 
-        Long memberNo = 1L;
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
         UpdateFeedbackResponse response = feedbackService.updateFeedback(request, feedbackNo, memberNo);
 
@@ -122,11 +136,12 @@ public class FeedbackController {
     // 피드백 답변 작성 및 수정
     @PutMapping("api/v1/feedbacks/admin/{feedbackNo}")
     public ResponseEntity<ApiResult> updateFeedbackReply(
+            @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo,
             UpdateFeedbackReplyRequest request
     ) {
 
-        Long memberNo = 1L;
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
         UpdateFeedbackReplyResponse reponse = feedbackService.updateFeedbackReply(request, feedbackNo, memberNo);
 
