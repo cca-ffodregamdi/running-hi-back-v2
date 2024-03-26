@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.auth.jwt;
 
-import com.runninghi.runninghibackv2.common.dto.MemberJwtInfo;
+import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
+import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import io.jsonwebtoken.Claims;
@@ -46,17 +47,17 @@ public class JwtTokenProvider {
     /**
      * 액세스 토큰을 생성합니다.
      *
-     * @param memberJwtInfo 멤버 정보를 담고 있는 객체
+     * @param accessTokenInfo 멤버 정보를 담고 있는 객체
      * @return 생성된 액세스 토큰
      */
-    public String createAccessToken(MemberJwtInfo memberJwtInfo) {
+    public String createAccessToken(AccessTokenInfo accessTokenInfo) {
         LocalDateTime now = LocalDateTime.now();
 
         return "Bearer " +
                 Jwts.builder()
                 .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))
-                .setSubject(String.valueOf(memberJwtInfo.memberNo()))
-                .claim("role", memberJwtInfo.role())
+                .setSubject(String.valueOf(accessTokenInfo.memberNo()))
+                .claim("role", accessTokenInfo.role())
                 .setIssuer(issuer)
                 .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(Date.from(now.plusMinutes(accessExpireMinutes).atZone(ZoneId.systemDefault()).toInstant()))
@@ -69,13 +70,13 @@ public class JwtTokenProvider {
      * @param memberJwtInfo 멤버 정보를 담고 있는 객체
      * @return 생성된 리프레시 토큰
      */
-    public String createRefreshToken(MemberJwtInfo memberJwtInfo) {
+    public String createRefreshToken(RefreshTokenInfo refreshTokenInfo) {
         LocalDateTime now = LocalDateTime.now();
 
         return Jwts.builder()
                 .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))
-                .setSubject(String.valueOf(memberJwtInfo.memberNo()))
-                .claim("role", memberJwtInfo.role().name())
+                .setSubject(refreshTokenInfo.kakaoId())
+                .claim("role", refreshTokenInfo.role())
                 .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(Date.from(now.plusDays(refreshExpireDays).atZone(ZoneId.systemDefault()).toInstant()))
                 .setIssuer(issuer)
@@ -204,17 +205,17 @@ public class JwtTokenProvider {
     /**
      * Http 요청에서 JwtTokenProvider 내부 메소드들을 이용해 MemberInfo를 추출하는 메소드
      *
-     * @param bearerToken   Http 요청으로 받은 헤더 내 'Authorization' 토큰
+     * @param token   Http 요청으로 받은 헤더 내 'Authorization' 토큰
      * @return Key : Values 형태의 MemberInfo("memberNo", "roleName")
      */
-    public MemberJwtInfo getMemberInfoByBearerToken (String bearerToken) {
+    public AccessTokenInfo getMemberInfoByBearerToken (String token) {
 
-        if (bearerToken == null || bearerToken.startsWith("Bearer ")) throw new IllegalArgumentException("Invalid Authorization Header");
+        if (token == null) throw new IllegalArgumentException("Invalid Authorization Header");
 
-        String accessToken = bearerToken.substring(7); // "Bearer " 이후의 토큰 부분만 추출
+        String accessToken = token.substring(7); // "Bearer " 이후의 토큰 부분만 추출
         Long memberNo = getMemberNoFromToken(accessToken);
         String roleName = getRoleFromToken(accessToken);
 
-        return new MemberJwtInfo(memberNo, Role.valueOf(roleName));
+        return new AccessTokenInfo(memberNo, Role.valueOf(roleName));
     }
 }
