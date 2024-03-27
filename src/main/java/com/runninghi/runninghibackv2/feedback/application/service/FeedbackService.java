@@ -26,9 +26,6 @@ public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final FeedbackChecker feedbackChecker;
 
-    private static final String INVALID_MEMBER_ID_MESSAGE = "Invalid member Id";
-    private static final String INVALID_FEEDBACK_ID_MESSAGE = "Invalid feedback Id";
-
 
     @Transactional
     public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo) {
@@ -155,11 +152,11 @@ public class FeedbackService {
 
     private Member findMemberByNo(Long memberNo) {
         return memberRepository.findById(memberNo)
-                .orElseThrow(() -> new EntityNotFoundException(INVALID_MEMBER_ID_MESSAGE));
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     private Feedback findFeedbackByNo(Long feedbackNo) {
         return feedbackRepository.findById(feedbackNo)
-                .orElseThrow(() -> new EntityNotFoundException(INVALID_FEEDBACK_ID_MESSAGE));
+                .orElseThrow(EntityNotFoundException::new);
     }
 }
