@@ -55,7 +55,7 @@ public class FeedbackController {
     }
 
     // 전체 피드백 리스트 조회
-    @GetMapping("api/v1/feedbacks")
+    @GetMapping("/api/v1/feedbacks")
     public ResponseEntity<ApiResult> getFeedbackScroll(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
@@ -87,7 +87,7 @@ public class FeedbackController {
 
 
     // 전체 피드백 리스트 조회 : 관리자
-    @GetMapping("api/v1/feedbacks/admin")
+    @GetMapping("/api/v1/feedbacks/admin")
     public ResponseEntity<ApiResult> getFeedbackScrollByAdmin(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
@@ -134,7 +134,7 @@ public class FeedbackController {
     }
 
     // 피드백 답변 작성 및 수정
-    @PutMapping("api/v1/feedbacks/admin/{feedbackNo}")
+    @PutMapping("/api/v1/feedbacks/admin/{feedbackNo}")
     public ResponseEntity<ApiResult> updateFeedbackReply(
             @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo,
