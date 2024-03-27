@@ -61,12 +61,13 @@ public class FeedbackController {
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
-            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc", message = "Sort must be 'asc' or 'desc'") String sort
     ) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
+        Sort.Direction direction = sort.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createDate"));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, memberNo);
 
@@ -95,12 +96,13 @@ public class FeedbackController {
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
-            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc", message = "Sort must be 'asc' or 'desc'") String sort
     ) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
+        Sort.Direction direction = sort.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createDate"));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
 
