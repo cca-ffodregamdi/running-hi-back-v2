@@ -12,9 +12,9 @@ import com.runninghi.runninghibackv2.post.application.dto.response.UpdatePostRes
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.aggregate.vo.GpxDataVO;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.post.domain.service.ApiPostService;
 import com.runninghi.runninghibackv2.post.domain.service.CalculateGPX;
 import com.runninghi.runninghibackv2.post.domain.service.PostChecker;
+import com.runninghi.runninghibackv2.post.infrastructure.service.ApiPostServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,7 +38,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
     private final UpdateService updateService;
-    private ApiPostService apiPostService;
+    private final ApiPostServiceImpl apiPostServiceImpl;
 
 
     @Transactional(readOnly = true)
@@ -56,7 +56,7 @@ public class PostService {
 
         GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxFile);
 
-        Member member = apiPostService.getMemberById(request.memberNo());
+        Member member = apiPostServiceImpl.getMemberById(request.memberNo());
 
         Post createdPost = postRepository.save(Post.builder()
                 .member(member)
