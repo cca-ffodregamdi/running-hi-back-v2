@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.feedback.application.controller;
 
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackReplyRequest;
@@ -73,6 +74,7 @@ public class FeedbackController {
     }
 
     // 피드백 상세 조회 : 관리자
+    @HasAccess
     @GetMapping("/api/v1/feedbacks/admin/{feedbackNo}")
     public ResponseEntity<ApiResult> getFeedbackByAdmin(
             @RequestHeader(value = "Authorization") String token,
@@ -87,6 +89,7 @@ public class FeedbackController {
 
 
     // 전체 피드백 리스트 조회 : 관리자
+    @HasAccess
     @GetMapping("/api/v1/feedbacks/admin")
     public ResponseEntity<ApiResult> getFeedbackScrollByAdmin(
             @RequestHeader(value = "Authorization") String token,
@@ -133,7 +136,8 @@ public class FeedbackController {
         return ResponseEntity.ok(ApiResult.success("피드백 수정 성공", response));
     }
 
-    // 피드백 답변 작성 및 수정
+    // 피드백 답변 작성 및 수정 : 관리자
+    @HasAccess
     @PutMapping("/api/v1/feedbacks/admin/{feedbackNo}")
     public ResponseEntity<ApiResult> updateFeedbackReply(
             @RequestHeader(value = "Authorization") String token,
