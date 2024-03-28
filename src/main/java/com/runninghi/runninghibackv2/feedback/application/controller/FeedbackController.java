@@ -32,7 +32,7 @@ public class FeedbackController {
     public ResponseEntity<ApiResult> createFeedback(
             @RequestHeader(value = "Authorization") String token,
             @RequestBody CreateFeedbackRequest request
-    ) {
+    ) throws BadRequestException {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
@@ -128,7 +128,7 @@ public class FeedbackController {
     public ResponseEntity<ApiResult> updateFeedback(
             @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo,
-            UpdateFeedbackRequest request
+            @RequestBody UpdateFeedbackRequest request
     ) throws BadRequestException {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
@@ -144,14 +144,14 @@ public class FeedbackController {
     public ResponseEntity<ApiResult> updateFeedbackReply(
             @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo,
-            UpdateFeedbackReplyRequest request
-    ) {
+            @RequestBody UpdateFeedbackReplyRequest request
+    ) throws BadRequestException {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        UpdateFeedbackReplyResponse reponse = feedbackService.updateFeedbackReply(request, feedbackNo, memberNo);
+        UpdateFeedbackReplyResponse response = feedbackService.updateFeedbackReply(request, feedbackNo, memberNo);
 
-        return ResponseEntity.ok(ApiResult.success("피드백 답변 작성/수정 완료 : 관리자", reponse));
+        return ResponseEntity.ok(ApiResult.success("피드백 답변 작성/수정 완료 : 관리자", response));
 
     }
 }

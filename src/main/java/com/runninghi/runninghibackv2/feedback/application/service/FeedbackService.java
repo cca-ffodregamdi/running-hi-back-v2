@@ -28,7 +28,8 @@ public class FeedbackService {
 
 
     @Transactional
-    public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo) {
+    public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo
+    ) throws BadRequestException {
 
         Member member = findMemberByNo(memberNo);
 
@@ -128,10 +129,11 @@ public class FeedbackService {
     }
 
     @Transactional
-    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo) {
+    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo) throws BadRequestException {
 
         Member member = findMemberByNo(memberNo);
         feedbackChecker.isAdmin(member.getRole());
+        feedbackChecker.checkFeedbackReplyValidation(request.content());
 
         Feedback feedback = findFeedbackByNo(feedbackNo);
 
