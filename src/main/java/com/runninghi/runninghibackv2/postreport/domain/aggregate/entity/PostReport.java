@@ -3,7 +3,6 @@ package com.runninghi.runninghibackv2.postreport.domain.aggregate.entity;
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.postreport.application.dto.request.UpdatePostReportRequest;
 import jakarta.persistence.*;
@@ -36,34 +35,24 @@ public class PostReport extends BaseTimeEntity {
     @Comment("신고 처리 상태")
     private ProcessingStatus status;
 
-    @Column(nullable = false)
-    @Comment("연관된 게시글이 삭제되었는지 여부")
-    private boolean reportedPostDeleted;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reporter_no", nullable = false)
-    @Comment("신고자")
-    private Member reporter;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reported_member_no", nullable = false)
-    @Comment("피신고자")
-    private Member reportedMember;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_post_no", nullable = false)
     @Comment("신고된 게시글")
     private Post reportedPost;
+
+    // 신고된 게시글 내용
+
+    @Column(nullable = false)
+    @Comment("연관된 게시글이 삭제되었는지 여부")
+    private boolean isPostDeleted;
 
     public PostReport(Builder builder) {
         this.postReportNo = builder.postReportNo;
         this.category = builder.category;
         this.content = builder.content;
         this.status = builder.status;
-        this.reportedPostDeleted = builder.reportedPostDeleted;
-        this.reporter = builder.reporter;
-        this.reportedMember = builder.reportedMember;
         this.reportedPost = builder.reportedPost;
+        this.isPostDeleted = builder.isPostDeleted;
     }
 
     public static class Builder {
@@ -71,10 +60,8 @@ public class PostReport extends BaseTimeEntity {
         private ReportCategory category;
         private String content;
         private ProcessingStatus status;
-        private boolean reportedPostDeleted;
-        private Member reporter;
-        private Member reportedMember;
         private Post reportedPost;
+        private boolean isPostDeleted;
 
         public Builder reportNo(Long postReportNo) {
             this.postReportNo = postReportNo;
@@ -96,23 +83,13 @@ public class PostReport extends BaseTimeEntity {
             return this;
         }
 
-        public Builder reportedPostDeleted(boolean reportedPostDeleted) {
-            this.reportedPostDeleted = reportedPostDeleted;
-            return this;
-        }
-
-        public Builder reporter(Member reporter) {
-            this.reporter = reporter;
-            return this;
-        }
-
-        public Builder reportedMember(Member reportedMember) {
-            this.reportedMember = reportedMember;
-            return this;
-        }
-
         public Builder reportedPost(Post reportedPost) {
             this.reportedPost = reportedPost;
+            return this;
+        }
+
+        public Builder isPostDeleted(boolean isPostDeleted) {
+            this.isPostDeleted = isPostDeleted;
             return this;
         }
 
@@ -123,6 +100,6 @@ public class PostReport extends BaseTimeEntity {
 
     public void update(UpdatePostReportRequest request) {
         this.status = request.status();
-        this.reportedPostDeleted = request.reportedPostDeleted();
+        this.isPostDeleted = request.isPostDeleted();
     }
 }

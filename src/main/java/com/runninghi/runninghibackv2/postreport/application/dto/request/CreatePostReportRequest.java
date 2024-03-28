@@ -5,7 +5,6 @@ import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 public record CreatePostReportRequest(
         ReportCategory category,
         String content,
-        Long reportedMemberNo,
         Long reportedPostNo
 )
 {}
