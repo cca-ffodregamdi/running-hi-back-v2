@@ -37,13 +37,13 @@ public class FeedbackService {
 
         feedbackChecker.checkFeedbackValidation(request.title(), request.content());
 
-        Feedback feedback = new Feedback.Builder()
+        Feedback feedback = Feedback.builder()
                 .feedbackWriter(member)
                 .title(request.title())
                 .content(request.content())
                 .category(FeedbackCategory.getFeedbackCategoryFromValue(request.category()))
                 .hasReply(false)
-                .builder();
+                .build();
 
         feedbackRepository.save(feedback);
 
@@ -60,14 +60,14 @@ public class FeedbackService {
         feedbackChecker.checkReplyStatus(feedback.isHasReply());
         feedbackChecker.checkFeedbackValidation(request.title(), request.content());
 
-        Feedback updatedFeedback = new Feedback.Builder()
+        Feedback updatedFeedback = Feedback.builder()
                 .feedbackNo(feedbackNo)
                 .feedbackWriter(feedback.getFeedbackWriter())
                 .title(request.title())
                 .content(request.content())
                 .category(FeedbackCategory.getFeedbackCategoryFromValue(request.category()))
                 .hasReply(false)
-                .builder();
+                .build();
 
         feedbackRepository.save(updatedFeedback);
 
@@ -138,7 +138,7 @@ public class FeedbackService {
 
         Feedback feedback = findFeedbackByNo(feedbackNo);
 
-        Feedback updatedFeedback = new Feedback.Builder()
+        Feedback updatedFeedback = Feedback.builder()
                 .feedbackNo(feedbackNo)
                 .feedbackWriter(feedback.getFeedbackWriter())
                 .title(feedback.getTitle())
@@ -146,7 +146,7 @@ public class FeedbackService {
                 .category(feedback.getCategory())
                 .hasReply(true)
                 .reply(request.content())
-                .builder();
+                .build();
 
         feedbackRepository.save(updatedFeedback);
 

@@ -7,6 +7,7 @@ import java.util.List;
 
 public record CreatePostRequest(
         Long memberNo,
+        Role role,
         String postTitle,
         String postContent,
         String locationName,

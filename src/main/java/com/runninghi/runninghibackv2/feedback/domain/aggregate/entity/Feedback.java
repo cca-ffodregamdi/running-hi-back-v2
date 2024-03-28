@@ -45,17 +45,21 @@ public class Feedback extends BaseTimeEntity {
     private Member feedbackWriter;
 
 
-    public Feedback(Builder builder) {
-        this.feedbackNo = builder.feedbackNo;
-        this.title = builder.title;
-        this.content = builder.content;
-        this.hasReply = builder.hasReply;
-        this.reply = builder.reply;
-        this.category = builder.category;
-        this.feedbackWriter = builder.feedbackWriter;
+    public Feedback(FeedbackBuilder feedbackBuilder) {
+        this.feedbackNo = feedbackBuilder.feedbackNo;
+        this.title = feedbackBuilder.title;
+        this.content = feedbackBuilder.content;
+        this.hasReply = feedbackBuilder.hasReply;
+        this.reply = feedbackBuilder.reply;
+        this.category = feedbackBuilder.category;
+        this.feedbackWriter = feedbackBuilder.feedbackWriter;
     }
 
-    public static class Builder {
+    public static FeedbackBuilder builder() {
+        return new FeedbackBuilder();
+    }
+
+    public static class FeedbackBuilder {
         private Long feedbackNo;
         private String title;
         private String content;
@@ -64,42 +68,42 @@ public class Feedback extends BaseTimeEntity {
         private FeedbackCategory category;
         private Member feedbackWriter;
 
-        public Builder feedbackNo(Long feedbackNo) {
+        public FeedbackBuilder feedbackNo(Long feedbackNo) {
             this.feedbackNo = feedbackNo;
             return this;
         }
 
-        public Builder title(String title) {
+        public FeedbackBuilder title(String title) {
             this.title = title;
             return this;
         }
 
-        public Builder content(String content) {
+        public FeedbackBuilder content(String content) {
             this.content = content;
             return this;
         }
 
-        public Builder hasReply(boolean hasReply) {
+        public FeedbackBuilder hasReply(boolean hasReply) {
             this.hasReply = hasReply;
             return this;
         }
 
-        public Builder reply(String reply) {
+        public FeedbackBuilder reply(String reply) {
             this.reply = reply;
             return this;
         }
 
-        public Builder category(FeedbackCategory category) {
+        public FeedbackBuilder category(FeedbackCategory category) {
             this.category = category;
             return this;
         }
 
-        public Builder feedbackWriter(Member feedbackWriter) {
+        public FeedbackBuilder feedbackWriter(Member feedbackWriter) {
             this.feedbackWriter = feedbackWriter;
             return this;
         }
 
-        public Feedback builder() {
+        public Feedback build() {
             return new Feedback(this);
         }
     }
