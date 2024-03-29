@@ -11,11 +11,9 @@ import org.springframework.stereotype.Service;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private static final String INVALID_MEMBER_ID_MESSAGE = "Invalid member Id";
-
     public Member findMemberByNo(Long memberNo) {
         return memberRepository.findById(memberNo)
-                .orElseThrow(() -> new EntityNotFoundException(INVALID_MEMBER_ID_MESSAGE));
+                .orElseThrow(EntityNotFoundException::new);
     }
 
 }
