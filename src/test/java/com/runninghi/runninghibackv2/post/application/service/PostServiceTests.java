@@ -8,6 +8,7 @@ import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.post.application.dto.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.response.CreatePostResponse;
+import com.runninghi.runninghibackv2.post.application.dto.response.GetAllPostsResponse;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
@@ -18,10 +19,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-public class PostServiceTests {
+class PostServiceTests {
 
     @Autowired
     private PostService postService;
@@ -125,7 +126,7 @@ public class PostServiceTests {
 
         // Then
         assertEquals(beforeSize + 1, afterSize);
-//        assertEquals(member.getMemberNo(), post.get().getMember().getMemberNo());
+        assertEquals(member.getMemberNo(), post.get().getMember().getMemberNo());
         assertEquals(postTitle, post.get().getPostTitle());
         assertEquals(postContent, post.get().getPostContent());
         assertEquals(locationName, post.get().getLocationName());
@@ -304,5 +305,28 @@ public class PostServiceTests {
             assertTrue(updateList.contains(keywordName));
         }
 
+    }
+
+    @Test
+    void testPostScroll() {
+
+        //Given
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        Post post = postRepository.save(Post.builder()
+                .member(member)
+                .postTitle("테스트 게시글")
+                .postContent("테스트 게시글 내용입니다.")
+                .role(Role.USER)
+                .locationName("테스트 지역")
+                .build());
+
+        //When
+        Page<GetAllPostsResponse> posts = postService.getPostScroll(pageRequest);
+
+        //Then
+        assertNotNull(posts);
+        assertFalse(posts.isEmpty());
+        assertEquals(1, posts.getTotalElements());
     }
 }
