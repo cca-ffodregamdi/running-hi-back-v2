@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.postreport.domain.aggregate.entity;
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
+import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.postreport.application.dto.request.UpdatePostReportRequest;
 import jakarta.persistence.*;
@@ -36,11 +37,16 @@ public class PostReport extends BaseTimeEntity {
     private ProcessingStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_member_no", nullable = false)
+    @Comment("신고자")
+    private Member reporter;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_post_no", nullable = false)
     @Comment("신고된 게시글")
     private Post reportedPost;
 
-    // 신고된 게시글 내용
+    // TODO. 신고된 게시글 내용 컬럼
 
     @Column(nullable = false)
     @Comment("연관된 게시글이 삭제되었는지 여부")
@@ -51,6 +57,7 @@ public class PostReport extends BaseTimeEntity {
         this.category = builder.category;
         this.content = builder.content;
         this.status = builder.status;
+        this.reporter = builder.reporter;
         this.reportedPost = builder.reportedPost;
         this.isPostDeleted = builder.isPostDeleted;
     }
@@ -60,6 +67,7 @@ public class PostReport extends BaseTimeEntity {
         private ReportCategory category;
         private String content;
         private ProcessingStatus status;
+        private Member reporter;
         private Post reportedPost;
         private boolean isPostDeleted;
 
@@ -83,6 +91,11 @@ public class PostReport extends BaseTimeEntity {
             return this;
         }
 
+        public Builder reporter(Member reporter) {
+            this.reporter = reporter;
+            return this;
+        }
+
         public Builder reportedPost(Post reportedPost) {
             this.reportedPost = reportedPost;
             return this;
@@ -98,8 +111,8 @@ public class PostReport extends BaseTimeEntity {
         }
     }
 
-    public void update(UpdatePostReportRequest request) {
-        this.status = request.status();
-        this.isPostDeleted = request.isPostDeleted();
+    public void update(ProcessingStatus status, boolean isPostDeleted) {
+        this.status = status;
+        this.isPostDeleted = isPostDeleted;
     }
 }
