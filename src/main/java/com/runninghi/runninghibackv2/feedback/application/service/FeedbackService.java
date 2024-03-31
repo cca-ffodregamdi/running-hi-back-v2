@@ -26,12 +26,10 @@ public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final FeedbackChecker feedbackChecker;
 
-    private static final String INVALID_MEMBER_ID_MESSAGE = "Invalid member Id";
-    private static final String INVALID_FEEDBACK_ID_MESSAGE = "Invalid feedback Id";
-
 
     @Transactional
-    public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo) {
+    public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo
+    ) throws BadRequestException {
 
         Member member = findMemberByNo(memberNo);
 
@@ -131,10 +129,11 @@ public class FeedbackService {
     }
 
     @Transactional
-    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo) {
+    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo) throws BadRequestException {
 
         Member member = findMemberByNo(memberNo);
         feedbackChecker.isAdmin(member.getRole());
+        feedbackChecker.checkFeedbackReplyValidation(request.content());
 
         Feedback feedback = findFeedbackByNo(feedbackNo);
 
@@ -155,11 +154,11 @@ public class FeedbackService {
 
     private Member findMemberByNo(Long memberNo) {
         return memberRepository.findById(memberNo)
-                .orElseThrow(() -> new EntityNotFoundException(INVALID_MEMBER_ID_MESSAGE));
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     private Feedback findFeedbackByNo(Long feedbackNo) {
         return feedbackRepository.findById(feedbackNo)
-                .orElseThrow(() -> new EntityNotFoundException(INVALID_FEEDBACK_ID_MESSAGE));
+                .orElseThrow(EntityNotFoundException::new);
     }
 }

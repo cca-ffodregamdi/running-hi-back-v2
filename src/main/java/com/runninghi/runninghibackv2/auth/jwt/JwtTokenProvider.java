@@ -110,7 +110,7 @@ public class JwtTokenProvider {
                     .setExpiration(Date.from(now.plusMinutes(accessExpireMinutes).atZone(ZoneId.systemDefault()).toInstant()))
                     .compact();
         } else {
-            throw new InvalidTokenException("Invalid refresh token.");
+            throw new InvalidTokenException();
         }
     }
 
@@ -119,12 +119,12 @@ public class JwtTokenProvider {
      *
      * @param request HTTP 요청
      * @return 추출된 액세스 토큰
-     * @throws IllegalArgumentException Authorization 헤더가 잘못된 경우 예외가 발생합니다.
+     * @throws InvalidTokenException Authorization 헤더가 잘못된 경우 예외가 발생합니다.
      */
     public String extractAccessTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken == null) {
-            throw new IllegalArgumentException("Invalid Authorization Header");
+            throw new InvalidTokenException();
         }
 
         return bearerToken;
