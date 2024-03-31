@@ -66,8 +66,7 @@ public class FeedbackController {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        Sort.Direction direction = sort.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createDate"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, memberNo);
 
@@ -101,8 +100,7 @@ public class FeedbackController {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        Sort.Direction direction = sort.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createDate"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
 
