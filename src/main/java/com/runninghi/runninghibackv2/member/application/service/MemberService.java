@@ -21,7 +21,7 @@ public class MemberService {
     public void addReportedCount(Long memberNo) {
 
         Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> new EntityNotFoundException(INVALID_MEMBER_ID_MESSAGE));
+                .orElseThrow(EntityNotFoundException::new);
 
         member.addReportedCount();
     }
