@@ -110,6 +110,21 @@ public class PostService {
         return GetPostResponse.from(post, keywordList);
     }
 
+    @Transactional
+    public void addReportedCount(Long postNo) {
 
+        Post post = postRepository.findById(postNo)
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
 
+        post.addReportedCount();
+    }
+
+    @Transactional
+    public void resetReportedCount(Long postNo) {
+
+        Post post = postRepository.findById(postNo)
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+
+        post.resetReportedCount();
+    }
 }
