@@ -150,9 +150,13 @@ public class Member extends BaseTimeEntity {
         }
 
     }
-
+    
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
+    public boolean toggleIsActive() {
+        this.isActive = !this.isActive;
+        return this.isActive;
+    }
 }
