@@ -7,4 +7,8 @@ public interface ApiPostReportService {
 
     Member getMemberById(Long memberNo);
     Post getPostById(Long postNo);
+    void deletePostById(Long postNo);
+    void addReportedCountToMember(Long memberNo);
+    void addReportedCountToPost(Long postNo);
+    void resetReportedCountOfPost(Long postNo);
 }

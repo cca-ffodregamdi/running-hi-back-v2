@@ -19,15 +19,35 @@ public class ApiPostReportServiceImpl implements ApiPostReportService {
 
     @Override
     public Member getMemberById(Long memberNo) {
-        // TODO member 정보 가져오기
-        return null;
+
+        return memberService.findMemberByNo(memberNo);
     }
 
     @Override
     public Post getPostById(Long postNo) {
         GetPostResponse postResponse = postService.getPost(postNo);
         // TODO. response Post 엔티티로 변환 필요
-        Post post = Post.builder().build();
-        return post;
+
+        return null;
+    }
+
+    @Override
+    public void deletePostById(Long postNo) {
+        postService.deletePost(postNo);
+    }
+
+    @Override
+    public void addReportedCountToMember(Long memberNo) {
+        memberService.addReportedCount(memberNo);
+    }
+
+    @Override
+    public void addReportedCountToPost(Long postNo) {
+        postService.addReportedCount(postNo);
+    }
+
+    @Override
+    public void resetReportedCountOfPost(Long postNo) {
+        postService.resetReportedCount(postNo);
     }
 }
