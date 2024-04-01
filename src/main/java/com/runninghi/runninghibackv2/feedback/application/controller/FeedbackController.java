@@ -61,7 +61,7 @@ public class FeedbackController {
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
-            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc", message = "Sort must be 'asc' or 'desc'") String sort
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
     ) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
@@ -95,7 +95,7 @@ public class FeedbackController {
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
-            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc", message = "Sort must be 'asc' or 'desc'") String sort
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
     ) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
