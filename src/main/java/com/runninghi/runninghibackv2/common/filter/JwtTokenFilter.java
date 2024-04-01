@@ -1,7 +1,12 @@
 package com.runninghi.runninghibackv2.common.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
+import com.runninghi.runninghibackv2.common.response.ApiResult;
+import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -51,9 +56,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             handleExpiredAccessToken(request, response, filterChain);
         } catch (InvalidTokenException e) {
-            handleInvalidToken(response);
+            handleExceptionWithErrorCode(response, ErrorCode.INVALID_TOKEN);
         } catch (Exception e) {
-            handleInternalServerError(response);
+            handleExceptionWithErrorCode(response, ErrorCode.INTER_SERVER_ERROR);
         }
     }
 
@@ -63,10 +68,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
      *
      * @param request 현재 HTTP 요청
      * @return 필터가 적용되지 않아야 하는 경우 {@code true}, 그렇지 않으면 {@code false}
-     * @throws ServletException 서블릿 예외 발생 시
      */
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         String[] excludePath = {"/login/kakao"};
         String path = request.getRequestURI();
 
@@ -93,41 +97,31 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             response.setHeader("Authorization", "Bearer " + newAccessToken);
             filterChain.doFilter(request, response);
         } catch (InvalidTokenException ex) {
-            handleUnauthorizedResponse(response);
+            handleExceptionWithErrorCode(response, ErrorCode.INVALID_TOKEN);
         }
     }
 
     /**
-     * 유효하지 않은 토큰을 처리합니다.
-     * HTTP 응답에 401 상태 코드를 설정하고 메시지를 전송합니다.
+     * 주어진 ErrorCode에 해당하는 예외를 처리합니다.
+     * HTTP 응답에 해당 ErrorCode의 상태 코드를 설정하고 메시지를 전송합니다.
      *
      * @param response 현재 HTTP 응답
+     * @param errorCode 처리할 ErrorCode
      * @throws IOException 입출력 예외 발생 시
      */
-    private void handleInvalidToken(HttpServletResponse response) throws IOException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token");
-    }
+    private void handleExceptionWithErrorCode(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+        ApiResult apiResult = ApiResult.error(errorCode);
+        response.setStatus(apiResult.status().value());
+        // json 데이터 형식 지정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-    /**
-     * 내부 서버 오류를 처리합니다.
-     * HTTP 응답에 500 상태 코드를 설정하고 메시지를 전송합니다.
-     *
-     * @param response 현재 HTTP 응답
-     * @throws IOException 입출력 예외 발생 시
-     */
-    private void handleInternalServerError(HttpServletResponse response) throws IOException {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error");
-    }
-
-    /**
-     * 권한이 없는 응답을 처리합니다.
-     * HTTP 응답에 401 상태 코드를 설정하고 메시지를 전송합니다.
-     *
-     * @param response 현재 HTTP 응답
-     * @throws IOException 입출력 예외 발생 시
-     */
-    private void handleUnauthorizedResponse(HttpServletResponse response) throws IOException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Refresh token expired. Please log in again.");
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        // 날짜 및 시간을 ISO-8601 형식으로 설정
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        String jsonResult = objectMapper.writeValueAsString(apiResult);
+        response.getWriter().write(jsonResult);
     }
 
 }
