@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.post.infrastructure.service;
 
-import com.runninghi.runninghibackv2.common.entity.Role;
 import com.runninghi.runninghibackv2.member.application.service.MemberService;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.service.ApiPostService;
@@ -15,7 +14,6 @@ public class ApiPostServiceImpl implements ApiPostService {
 
     @Override
     public Member getMemberById(Long memberNo) {
-        // Member member = memberService.getMemberById(memberNo);
-        return null;
+        return memberService.findMemberByNo(memberNo);
     }
 }

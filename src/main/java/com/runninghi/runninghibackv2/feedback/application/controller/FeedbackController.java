@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.feedback.application.controller;
 
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackReplyRequest;
@@ -31,7 +32,7 @@ public class FeedbackController {
     public ResponseEntity<ApiResult> createFeedback(
             @RequestHeader(value = "Authorization") String token,
             @RequestBody CreateFeedbackRequest request
-    ) {
+    ) throws BadRequestException {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
@@ -55,7 +56,7 @@ public class FeedbackController {
     }
 
     // 전체 피드백 리스트 조회
-    @GetMapping("api/v1/feedbacks")
+    @GetMapping("/api/v1/feedbacks")
     public ResponseEntity<ApiResult> getFeedbackScroll(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
@@ -65,7 +66,7 @@ public class FeedbackController {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, memberNo);
 
@@ -73,6 +74,7 @@ public class FeedbackController {
     }
 
     // 피드백 상세 조회 : 관리자
+    @HasAccess
     @GetMapping("/api/v1/feedbacks/admin/{feedbackNo}")
     public ResponseEntity<ApiResult> getFeedbackByAdmin(
             @RequestHeader(value = "Authorization") String token,
@@ -87,7 +89,8 @@ public class FeedbackController {
 
 
     // 전체 피드백 리스트 조회 : 관리자
-    @GetMapping("api/v1/feedbacks/admin")
+    @HasAccess
+    @GetMapping("/api/v1/feedbacks/admin")
     public ResponseEntity<ApiResult> getFeedbackScrollByAdmin(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
@@ -97,7 +100,7 @@ public class FeedbackController {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate", sort));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
         Page<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
 
@@ -123,7 +126,7 @@ public class FeedbackController {
     public ResponseEntity<ApiResult> updateFeedback(
             @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo,
-            UpdateFeedbackRequest request
+            @RequestBody UpdateFeedbackRequest request
     ) throws BadRequestException {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
@@ -133,19 +136,20 @@ public class FeedbackController {
         return ResponseEntity.ok(ApiResult.success("피드백 수정 성공", response));
     }
 
-    // 피드백 답변 작성 및 수정
-    @PutMapping("api/v1/feedbacks/admin/{feedbackNo}")
+    // 피드백 답변 작성 및 수정 : 관리자
+    @HasAccess
+    @PutMapping("/api/v1/feedbacks/admin/{feedbackNo}")
     public ResponseEntity<ApiResult> updateFeedbackReply(
             @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo,
-            UpdateFeedbackReplyRequest request
-    ) {
+            @RequestBody UpdateFeedbackReplyRequest request
+    ) throws BadRequestException {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        UpdateFeedbackReplyResponse reponse = feedbackService.updateFeedbackReply(request, feedbackNo, memberNo);
+        UpdateFeedbackReplyResponse response = feedbackService.updateFeedbackReply(request, feedbackNo, memberNo);
 
-        return ResponseEntity.ok(ApiResult.success("피드백 답변 작성/수정 완료 : 관리자", reponse));
+        return ResponseEntity.ok(ApiResult.success("피드백 답변 작성/수정 완료 : 관리자", response));
 
     }
 }

@@ -87,7 +87,7 @@ class FeedbackServiceTests {
 
     @Test
     @DisplayName("피드백 생성")
-    void testCreateFeedback() {
+    void testCreateFeedback() throws BadRequestException {
 
         // 피드백 생성
         CreateFeedbackRequest request = new CreateFeedbackRequest("제목", "내용", 1);
