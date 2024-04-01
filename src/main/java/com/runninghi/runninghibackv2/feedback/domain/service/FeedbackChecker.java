@@ -35,20 +35,18 @@ public class FeedbackChecker {
     }
 
     // 피드백 작성 시 제한 사항 확인
-    public void checkFeedbackValidation(String title, String content) {
-
-        if (title.length() > 500) {
-            throw new IllegalArgumentException("제목은 500자를 넘을 수 없습니다.");
+    public void checkFeedbackValidation(String title, String content) throws BadRequestException {
+        if (title == null || content == null ||
+                title.length() > 500 || title.length() == 0 || content.length() == 0) {
+            throw new BadRequestException();
         }
+    }
 
-        if (title.length() == 0) {
-            throw new IllegalArgumentException("제목은 1글자 이상이어야 합니다.");
+
+    public void checkFeedbackReplyValidation(String content) throws BadRequestException {
+        if (content == null || content.length() == 0) {
+            throw new BadRequestException();
         }
-
-        if (content.length() == 0) {
-            throw new IllegalArgumentException("내용은 1글자 이상이어야 합니다.");
-        }
-
     }
 
 }

@@ -9,16 +9,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -31,19 +30,34 @@ class JwtTokenFilterTests {
     private JwtTokenProvider jwtTokenProvider;
 
     @Test
-    @DisplayName("필터 테스트 : 유효한 액세스 토큰")
+    @DisplayName("로그인 경로는 필터링하지 않음 : success")
+    void testShouldNotFilter_LoginPath() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/login/kakao");
+
+        assert jwtTokenFilter.shouldNotFilter(request);
+    }
+
+    @Test
+    @DisplayName("로그인 경로가 아닌 경우 필터링 : success")
+    void testShouldNotFilter_NonLoginPath() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/api/v1/resources");
+
+        assert !jwtTokenFilter.shouldNotFilter(request);
+    }
+
+    @Test
+    @DisplayName("유효한 액세스 토큰 : success")
     void testDoFilterInternal_ValidAccessToken() throws Exception {
         // Mock 객체 생성
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(MockHttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        // 유효한 경로 설정
+        // 유효한 경로 & 메소드 실행 시 반환값과 동작 설정
         when(request.getRequestURI()).thenReturn("/api/v1");
-
-        // 유효한 엑세스 토큰 설정
-        String validAccessToken = "valid_access_token";
-        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn(validAccessToken);
+        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn("access_token");
         doNothing().when(jwtTokenProvider).validateAccessToken(anyString());
 
         // 필터 실행
@@ -54,109 +68,85 @@ class JwtTokenFilterTests {
     }
 
     @Test
-    @DisplayName("필터 테스트 : 유효하지 않은 액세스 토큰")
-    void testDoFilterInternal_InvalidAccessToken() throws IOException, ServletException {
-        // Mock 객체 생성
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(MockHttpServletResponse.class);
-        FilterChain filterChain = mock(FilterChain.class);
-
-        // 유효한 경로 설정
-        when(request.getRequestURI()).thenReturn("/api/v1");
-
-        // 테스트에 필요한 요청 객체 생성 및 설정
-        String invalidAccessToken = "invalid_access_token";
-        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn(invalidAccessToken);
-        doThrow(InvalidTokenException.class).when(jwtTokenProvider).validateAccessToken(anyString());
-
-        // doFilterInternal 메소드 호출
-        jwtTokenFilter.doFilterInternal(request, response, filterChain);
-
-        // HttpServletResponse의 sendError 메소드가 호출되는지 확인하기 위해 ArgumentCaptor를 생성
-        ArgumentCaptor<Integer> statusCodeCaptor = ArgumentCaptor.forClass(Integer.class);
-        ArgumentCaptor<String> errorMessageCaptor = ArgumentCaptor.forClass(String.class);
-        verify(response).sendError(statusCodeCaptor.capture(), errorMessageCaptor.capture());
-
-        // sendError 메소드 호출 시 전달된 상태 코드와 에러 메시지 전달
-        int capturedStatusCode = statusCodeCaptor.getValue();
-        String capturedErrorMessage = errorMessageCaptor.getValue();
-
-        // 상태 코드와 에러 메시지 확인
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, capturedStatusCode);
-        assertEquals("Invalid Token", capturedErrorMessage);
-    }
-
-    @Test
-    @DisplayName("필터 테스트 : 만료된 액세스 토큰")
-    void testDoFilterInternal_ExpiredAccessToken() {
-        // Mock 객체 생성
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(MockHttpServletResponse.class);
-        FilterChain filterChain = mock(FilterChain.class);
-
-        // 만료된 엑세스 토큰을 설정, 예외를 던지도록 설정
-        String expiredAccessToken = "expired_access_token";
-        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn(expiredAccessToken);
-        doThrow(ExpiredJwtException.class).when(jwtTokenProvider).validateAccessToken(anyString());
-
-        // 필터 실행, 예외가 발생하지 않는지 확인
-        assertDoesNotThrow(() -> jwtTokenFilter.doFilterInternal(request, response, filterChain));
-    }
-
-    @Test
-    @DisplayName("필터 테스트 : 만료된 리프레시 토큰")
+    @DisplayName("만료된 리프레시 토큰 : error")
     void testDoFilterInternal_ExpiredRefreshToken() throws ServletException, IOException {
         // Mock 객체 생성
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(MockHttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        // 유효한 경로 설정
+        // 유효한 경로 & 메소드 실행 시 반환값과 동작 설정
         when(request.getRequestURI()).thenReturn("/api/v1");
+        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn("expired_access_token");
+        doThrow(ExpiredJwtException.class).when(jwtTokenProvider).validateAccessToken(anyString());
+        when(jwtTokenProvider.extractRefreshTokenFromRequest(any())).thenReturn("expired_refresh_token");
+        doThrow(InvalidTokenException.class).when(jwtTokenProvider).validateRefreshToken(anyString());
 
-        // 만료된 리프레시 토큰을 설정, 예외를 던지도록 설정
-        String expiredRefreshToken = "expired_refresh_token";
-        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn(null);
-        when(jwtTokenProvider.extractRefreshTokenFromRequest(any())).thenReturn(expiredRefreshToken);
-        doThrow(ExpiredJwtException.class).when(jwtTokenProvider).validateRefreshToken(anyString());
+        // PrintWriter를 mock으로 생성하여 반환하도록 설정
+        PrintWriter printWriter = mock(PrintWriter.class);
+        when(response.getWriter()).thenReturn(printWriter);
 
-        // 필터 실행, FilterChain이 호출되었는지 확인
-        assertDoesNotThrow(() -> jwtTokenFilter.doFilterInternal(request, response, filterChain));
-        verify(filterChain).doFilter(request, response);
+        // 필터 실행
+        jwtTokenFilter.doFilterInternal(request, response, filterChain);
+
+        // 호출 횟수 확인
+        verify(jwtTokenProvider, times(1)).validateAccessToken(anyString());
+        verify(jwtTokenProvider, times(1)).validateRefreshToken(anyString());
+        verify(response.getWriter(), times(1)).write(anyString());
     }
 
     @Test
-    @DisplayName("필터 테스트 : 서버 에러")
-    void testDoFilterInternal_InternalServerError() throws IOException, ServletException {
+    @DisplayName("유효하지 않은 액세스 토큰 : error")
+    void testDoFilterInternal_InvalidAccessToken() throws IOException, ServletException {
         // Mock 객체 생성
         HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(MockHttpServletResponse.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        // 테스트에 필요한 요청 객체 생성 및 설정
-        String accessToken = "valid_access_token";
-        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn(accessToken);
+        // 유효한 경로 & 메소드 실행 시 반환값과 동작 설정
+        when(request.getRequestURI()).thenReturn("/api/v1");
+        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn("invalid_access_token");
+        doThrow(new InvalidTokenException()).when(jwtTokenProvider).validateAccessToken(anyString());
 
-        // validateAccessToken 메소드가 체크된 예외를 던질 때 처리하기 위해 doAnswer 사용
-        doAnswer(invocation -> {
-            throw new ServletException("Error");
-        }).when(jwtTokenProvider).validateAccessToken(anyString());
+        // PrintWriter를 mock으로 생성하여 반환하도록 설정
+        PrintWriter printWriter = mock(PrintWriter.class);
+        when(response.getWriter()).thenReturn(printWriter);
 
-        // doFilterInternal 메소드 호출
+        // 필터 실행
         jwtTokenFilter.doFilterInternal(request, response, filterChain);
 
-        // HttpServletResponse의 sendError 메소드가 호출되는지 확인하기 위해 ArgumentCaptor를 생성
-        ArgumentCaptor<Integer> statusCodeCaptor = ArgumentCaptor.forClass(Integer.class);
-        ArgumentCaptor<String> errorMessageCaptor = ArgumentCaptor.forClass(String.class);
-        verify(response).sendError(statusCodeCaptor.capture(), errorMessageCaptor.capture());
+        // 호출 횟수 확인
+        verify(jwtTokenProvider, times(1)).validateAccessToken(anyString());
+        verify(response.getWriter(), times(1)).write(anyString());
+    }
 
-        // sendError 메소드 호출 시 전달된 상태 코드와 에러 메시지 전달
-        int capturedStatusCode = statusCodeCaptor.getValue();
-        String capturedErrorMessage = errorMessageCaptor.getValue();
+    @Test
+    @DisplayName("만료된 액세스 토큰 : success")
+    void testDoFilterInternal_ExpiredAccessToken() throws ServletException, IOException {
+        // Mock 객체 생성
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
 
-        // 상태 코드, 에러 메시지 확인
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, capturedStatusCode);
-        assertEquals("Internal Server Error", capturedErrorMessage);
+        // 유효한 경로 설정
+        when(request.getRequestURI()).thenReturn("/api/v1");
+
+        when(jwtTokenProvider.extractAccessTokenFromRequest(any())).thenReturn("expired_access_token");
+        when(jwtTokenProvider.extractRefreshTokenFromRequest(any())).thenReturn("refresh_token");
+        when(jwtTokenProvider.renewAccessToken(any())).thenReturn("new_access_token");
+        doThrow(ExpiredJwtException.class).when(jwtTokenProvider).validateAccessToken(anyString());
+
+        // PrintWriter를 mock으로 생성하여 반환하도록 설정
+        PrintWriter printWriter = mock(PrintWriter.class);
+        when(response.getWriter()).thenReturn(printWriter);
+
+        // 필터 실행
+        jwtTokenFilter.doFilterInternal(request, response, filterChain);
+
+        // 호출 횟수 확인
+        verify(jwtTokenProvider, times(1)).validateAccessToken(anyString());
+        verify(jwtTokenProvider, times(1)).validateRefreshToken(anyString());
+        verify(response.getWriter(), times(0)).write(anyString());
     }
 
 }

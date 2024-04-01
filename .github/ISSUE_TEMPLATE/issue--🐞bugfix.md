@@ -1,7 +1,7 @@
 ---
 name: "issue--\U0001F41Ebugfix"
 about: 버그 고치기 이슈 작성
-title: "[Feature - Mar 4th, 2024] - {도메인} 내용"
+title: "[Feature - Apr 1st, 2024] - {도메인} 내용"
 labels: "\U0001F41E BugFix"
 assignees: ''
 
