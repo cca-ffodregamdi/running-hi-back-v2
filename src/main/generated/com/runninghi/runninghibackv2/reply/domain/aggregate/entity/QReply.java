@@ -35,6 +35,8 @@ public class QReply extends EntityPathBase<Reply> {
 
     public final com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost post;
 
+    public final EnumPath<com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus> processingStatus = createEnum("processingStatus", com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus.class);
+
     public final StringPath replyContent = createString("replyContent");
 
     public final NumberPath<Long> replyNo = createNumber("replyNo", Long.class);

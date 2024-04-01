@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.reply.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
+import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
@@ -43,6 +44,10 @@ public class Reply extends BaseTimeEntity {
     @Comment("신고된 횟수")
     private int reportedCount;
 
+    @Column
+    @Comment("신고 상태")
+    private ProcessingStatus processingStatus;
+
     @ColumnDefault("FALSE")
     @Column(nullable = false)
     @Comment("삭제 여부")
@@ -63,6 +68,7 @@ public class Reply extends BaseTimeEntity {
         this.post = builder.post;
         this.replyContent = builder.replyContent;
         this.reportedCount = builder.reportedCount;
+        this.processingStatus = builder.processingStatus;
         this.isDeleted = builder.isDeleted;
         this.parent = builder.parent;
     }
@@ -97,10 +103,11 @@ public class Reply extends BaseTimeEntity {
         private Post post;
         private String replyContent;
         private int reportedCount;
+        private ProcessingStatus processingStatus;
         private boolean isDeleted;
         private Reply parent;
 
-        public ReplyBuilder commentNo(Long replyNo) {
+        public ReplyBuilder replyNo(Long replyNo) {
             this.replyNo = replyNo;
             return this;
         }
@@ -122,6 +129,11 @@ public class Reply extends BaseTimeEntity {
 
         public ReplyBuilder reportedCount(int reportedCount) {
             this.reportedCount = reportedCount;
+            return this;
+        }
+
+        public ReplyBuilder processingStatus(ProcessingStatus processingStatus) {
+            this.processingStatus = processingStatus;
             return this;
         }
 
