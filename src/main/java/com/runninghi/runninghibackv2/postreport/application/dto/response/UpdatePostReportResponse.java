@@ -11,10 +11,9 @@ public record UpdatePostReportResponse(
         ReportCategory category,
         String content,
         ProcessingStatus status,
-        boolean reportedPostDeleted,
-        Member reporter,
-        Member reportedMember,
-        Post reportedPost
+        Long reporterNo,
+        Long reportedPostNo,
+        boolean isPostDeleted
 ) {
     public static UpdatePostReportResponse from(PostReport postReport) {
 
@@ -23,9 +22,8 @@ public record UpdatePostReportResponse(
                 postReport.getCategory(),
                 postReport.getContent(),
                 postReport.getStatus(),
-                postReport.isReportedPostDeleted(),
-                postReport.getReporter(),
-                postReport.getReportedMember(),
-                postReport.getReportedPost());
+                postReport.getReporter().getMemberNo(),
+                postReport.getReportedPost().getPostNo(),
+                postReport.isPostDeleted());
     }
 }
