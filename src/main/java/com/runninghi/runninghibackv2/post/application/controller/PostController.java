@@ -10,6 +10,7 @@ import com.runninghi.runninghibackv2.post.application.dto.response.GetAllPostsRe
 import com.runninghi.runninghibackv2.post.application.dto.response.GetPostResponse;
 import com.runninghi.runninghibackv2.post.application.dto.response.UpdatePostResponse;
 import com.runninghi.runninghibackv2.post.application.service.PostService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.List;
 
+@Tag(name = "게시글 컨트롤러", description = "게시글 작성, 조회, 수정, 삭제 API")
 @RestController
 @RequiredArgsConstructor
 public class PostController {
