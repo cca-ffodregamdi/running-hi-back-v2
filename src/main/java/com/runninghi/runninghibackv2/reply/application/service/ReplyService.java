@@ -6,16 +6,19 @@ import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.reply.application.dto.request.CreateReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
+import com.runninghi.runninghibackv2.reply.application.dto.request.GetReportedReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.UpdateReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.reply.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.reply.domain.repository.ReplyQueryRepository;
 import com.runninghi.runninghibackv2.reply.domain.repository.ReplyRepository;
 import com.runninghi.runninghibackv2.reply.domain.service.ApiReplyService;
 import com.runninghi.runninghibackv2.reply.domain.service.ReplyChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,6 +31,7 @@ import java.util.List;
 public class ReplyService {
 
     private final ReplyRepository replyRepository;
+    private final ReplyQueryRepository replyQueryRepository;
     private final ApiReplyService apiReplyService;
     private final ReplyChecker replyChecker;
 
@@ -138,9 +142,10 @@ public class ReplyService {
 
     }
 
-    public List<GetReplyListResponse> getReportedReplyList(Long memberNo) {
-
-        return null;
+    @Transactional(readOnly = true)
+    public Page<GetReplyListResponse> getReportedReplyList(GetReportedReplyRequest request) {
+        replyChecker.checkSearchValid(request.search());
+        return  replyQueryRepository.findAllReportedByPageableAndSearch(request);
     }
 
     private Reply findReplyByReplyNo (Long replyNo) {
