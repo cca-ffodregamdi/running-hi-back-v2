@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -54,6 +55,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(KakaoLoginException.class)
     public ResponseEntity<ApiResult> handleKakaoLoginException() {
         ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_LOGIN_FAIL);
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ApiResult> handleHandlerMethodValidationException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.VALIDATION_FAIL);
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 }
