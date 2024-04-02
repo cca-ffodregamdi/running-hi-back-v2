@@ -155,4 +155,7 @@ public class Member extends BaseTimeEntity {
         this.refreshToken = refreshToken;
     }
 
+    public void addReportedCount() {
+        this.reportCnt += 1;
+    }
 }
