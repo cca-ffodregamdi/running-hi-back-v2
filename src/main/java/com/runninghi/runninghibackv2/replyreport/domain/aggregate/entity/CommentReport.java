@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.commentreport.domain.aggregate.entity;
+package com.runninghi.runninghibackv2.replyreport.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
@@ -40,9 +40,6 @@ public class CommentReport extends BaseTimeEntity {
     @JoinColumn(name = "reported_member_no", nullable = false)
     @Comment("피신고자")
     private Member reportedMember;
-
-    // reportedComment 연관관계
-
 
     public CommentReport(Builder builder) {
         this.commentReportNo = builder.commentReportNo;
