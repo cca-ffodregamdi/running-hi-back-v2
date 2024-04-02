@@ -6,7 +6,7 @@ import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.postreport.application.dto.request.CreatePostReportRequest;
 import com.runninghi.runninghibackv2.postreport.application.dto.response.CreatePostReportResponse;
 import com.runninghi.runninghibackv2.postreport.application.dto.response.GetPostReportResponse;
-import com.runninghi.runninghibackv2.postreport.application.dto.response.UpdatePostReportResponse;
+import com.runninghi.runninghibackv2.postreport.application.dto.response.HandlePostReportResponse;
 import com.runninghi.runninghibackv2.postreport.domain.aggregate.entity.PostReport;
 import com.runninghi.runninghibackv2.postreport.domain.repository.PostReportRepository;
 import com.runninghi.runninghibackv2.postreport.domain.service.ApiPostReportService;
@@ -88,7 +88,7 @@ public class PostReportService {
 
     // 게시글 신고 수락/거절 처리
     @Transactional
-    public List<UpdatePostReportResponse> handlePostReports(boolean isAccepted, Long postNo) {
+    public List<HandlePostReportResponse> handlePostReports(boolean isAccepted, Long postNo) {
 
         List<PostReport> postReportList = postReportRepository.findPostReportsByPostId(postNo);
         ProcessingStatus status;
@@ -98,17 +98,16 @@ public class PostReportService {
             apiPostReportService.addReportedCountToMember(reportedMemberNo);
             status = ProcessingStatus.ACCEPTED;
 
-            // TODO. post삭제가 아닌 isDeleted 필드 변경하는 방법으로 리팩토링
-            // apiPostReportService.deletePostById(postNo);
+            postReportList.forEach(postReport -> postReport.update(status, true, null));
+            apiPostReportService.deletePostById(postNo);
         } else {
             status = ProcessingStatus.REJECTED;
             apiPostReportService.resetReportedCountOfPost(postNo);
+            postReportList.forEach(postReport -> postReport.update(status));
         }
 
-        postReportList.forEach(postReport -> postReport.update(status, isAccepted));
-
         return postReportList.stream()
-                .map(UpdatePostReportResponse::from)
+                .map(HandlePostReportResponse::from)
                 .toList();
     }
 

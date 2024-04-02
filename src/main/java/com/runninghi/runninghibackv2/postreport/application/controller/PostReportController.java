@@ -8,7 +8,7 @@ import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.postreport.application.dto.request.CreatePostReportRequest;
 import com.runninghi.runninghibackv2.postreport.application.dto.response.CreatePostReportResponse;
 import com.runninghi.runninghibackv2.postreport.application.dto.response.GetPostReportResponse;
-import com.runninghi.runninghibackv2.postreport.application.dto.response.UpdatePostReportResponse;
+import com.runninghi.runninghibackv2.postreport.application.dto.response.HandlePostReportResponse;
 import com.runninghi.runninghibackv2.postreport.application.service.PostReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -92,7 +92,7 @@ public class PostReportController {
     public ResponseEntity<ApiResult> handlePostReports(@RequestParam boolean isAccepted,
                                                        @RequestParam Long postNo) {
 
-        List<UpdatePostReportResponse> response = postReportService.handlePostReports(isAccepted, postNo);
+        List<HandlePostReportResponse> response = postReportService.handlePostReports(isAccepted, postNo);
 
         return ResponseEntity.ok(ApiResult.success("게시글의 모든 신고 내역 처리 성공", response));
     }

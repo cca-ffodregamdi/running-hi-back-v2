@@ -5,7 +5,6 @@ import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
-import com.runninghi.runninghibackv2.postreport.application.dto.request.UpdatePostReportRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,12 +36,12 @@ public class PostReport extends BaseTimeEntity {
     private ProcessingStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reported_member_no", nullable = false)
+    @JoinColumn(name = "reporter_no")
     @Comment("신고자")
     private Member reporter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reported_post_no", nullable = false)
+    @JoinColumn(name = "reported_post_no")
     @Comment("신고된 게시글")
     private Post reportedPost;
 
@@ -111,8 +110,13 @@ public class PostReport extends BaseTimeEntity {
         }
     }
 
-    public void update(ProcessingStatus status, boolean isPostDeleted) {
+    public void update(ProcessingStatus status, boolean isPostDeleted, Post reportedPost) {
         this.status = status;
         this.isPostDeleted = isPostDeleted;
+        this.reportedPost = reportedPost;
+    }
+
+    public void update(ProcessingStatus status) {
+        this.status = status;
     }
 }
