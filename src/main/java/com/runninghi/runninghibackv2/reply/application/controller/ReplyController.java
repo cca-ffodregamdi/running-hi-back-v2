@@ -54,16 +54,14 @@ public class ReplyController {
         return ResponseEntity.ok().body(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, replyList));
     }
 
-    // 신고 처리 상태(?) 필요함. -> 미처리 분류
-    // 현재는 닉네임 검색만 되게 구현 -> 추후에 { 신고 상태 } 검색 필요
     @HasAccess
     @GetMapping(value = "/reported")
     public ResponseEntity<ApiResult> getReportedReplyList(@ModelAttribute GetReportedReplySearchRequest searchRequest) {
 
-        Sort sort = Sort.by( searchRequest.getSortDirection(), "createDate", searchRequest.getReportStatus().name() );
+        Sort sort = Sort.by( searchRequest.getSortDirection(), "createDate" );
         Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize(), sort);
         Page<GetReplyListResponse> reportedReplyPage = replyService.getReportedReplyList(
-                GetReportedReplyRequest.of(pageable, searchRequest.getSearch())
+                GetReportedReplyRequest.of(pageable, searchRequest.getSearch(), searchRequest.getReportStatus())
         );
 
         return ResponseEntity.ok().body(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, reportedReplyPage));

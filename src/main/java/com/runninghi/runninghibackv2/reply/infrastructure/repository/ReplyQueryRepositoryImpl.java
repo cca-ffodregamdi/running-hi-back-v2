@@ -7,6 +7,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.reply.application.dto.request.GetReportedReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.reply.domain.repository.ReplyQueryRepository;
@@ -32,18 +33,20 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     @Override
     public Page<GetReplyListResponse> findAllReportedByPageableAndSearch(GetReportedReplyRequest request) {
 
-        Long count = getCount(request.search());
+        Long count = getCount(request);
         List<GetReplyListResponse> content = getReportedReplyList(request);
 
         return new PageImpl<>(content, request.pageable(), count);
     }
 
-    private Long getCount(String search) {
+    private Long getCount(GetReportedReplyRequest request) {
 
         return jpaQueryFactory
                 .select(reply.count())
                 .from(reply)
-                .where(likeNickname(search))
+                .where(likeNickname(request.search()),
+                        eqReportStatus(request.reportStatus()),
+                        reply.reportedCount.goe(REPORTED_COUNT))
                 .fetchOne();
 
     }
@@ -62,6 +65,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                         ))
                 .from(reply)
                 .where(likeNickname(request.search()),
+                        eqReportStatus(request.reportStatus()),
                         reply.reportedCount.goe(REPORTED_COUNT) )
                 .orderBy(
                         getOrderSpecifierList(request.pageable().getSort())
@@ -75,6 +79,12 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
         if (!StringUtils.hasText(search)) return null;   // space bar까지 막아줌
         return reply.writer.nickname.like("%" + search + "%");
     }
+
+    private BooleanExpression eqReportStatus (ProcessingStatus reportStatus) {
+        if (!StringUtils.hasText(reportStatus.name())) return  null;
+        return reply.reportStatus.eq(reportStatus);
+    }
+
 
     private List<OrderSpecifier<?>> getOrderSpecifierList (Sort sort) {
 
