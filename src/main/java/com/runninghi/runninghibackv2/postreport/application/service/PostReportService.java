@@ -99,7 +99,7 @@ public class PostReportService {
             status = ProcessingStatus.ACCEPTED;
 
             postReportList.forEach(postReport -> postReport.update(status, true, null));
-            apiPostReportService.deletePostById(postNo);
+            apiPostReportService.deletePostById(reportedMemberNo,postNo);
         } else {
             status = ProcessingStatus.REJECTED;
             apiPostReportService.resetReportedCountOfPost(postNo);

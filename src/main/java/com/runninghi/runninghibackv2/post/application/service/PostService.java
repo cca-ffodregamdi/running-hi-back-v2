@@ -76,10 +76,11 @@ public class PostService {
     }
 
     @Transactional
-    public UpdatePostResponse updatePost(Long postNo, UpdatePostRequest request) {
+    public UpdatePostResponse updatePost(Long memberNo, Long postNo, UpdatePostRequest request) {
 
-        Post post = postRepository.findById(postNo)
-                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+        Post post = findPostByNo(postNo);
+
+        postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
         post.update(request);
 
@@ -89,7 +90,12 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long postNo) {
+    public void deletePost(Long memberNo, Long postNo) {
+
+        Post post = findPostByNo(postNo);
+
+        postChecker.isWriter(memberNo, post.getMember().getMemberNo());
+
         postKeywordService.deletePostKeyword(postNo);
         postRepository.deleteById(postNo);
     }
@@ -113,8 +119,7 @@ public class PostService {
     @Transactional
     public void addReportedCount(Long postNo) {
 
-        Post post = postRepository.findById(postNo)
-                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+        Post post = findPostByNo(postNo);
 
         post.addReportedCount();
     }
@@ -122,9 +127,13 @@ public class PostService {
     @Transactional
     public void resetReportedCount(Long postNo) {
 
-        Post post = postRepository.findById(postNo)
-                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+        Post post = findPostByNo(postNo);
 
         post.resetReportedCount();
+    }
+
+    private Post findPostByNo(Long postNo) {
+        return postRepository.findById(postNo)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }

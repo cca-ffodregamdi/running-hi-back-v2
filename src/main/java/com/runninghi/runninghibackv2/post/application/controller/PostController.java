@@ -63,9 +63,12 @@ public class PostController {
     }
 
     @PutMapping("/api/v1/posts/{postNo}")
-    public ResponseEntity<ApiResult> updatePost(@PathVariable Long postNo, @RequestBody UpdatePostRequest request) {
+    public ResponseEntity<ApiResult> updatePost(@RequestHeader(name = "Authorization") String bearerToken,
+                                                @PathVariable Long postNo, @RequestBody UpdatePostRequest request) {
 
-        UpdatePostResponse response = postService.updatePost(postNo, request);
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+
+        UpdatePostResponse response = postService.updatePost(memberInfo.memberNo(), postNo, request);
 
         return ResponseEntity.ok(ApiResult.success("게시글이 성공적으로 수정되었습니다.", response));
     }
@@ -79,9 +82,12 @@ public class PostController {
     }
 
     @DeleteMapping("/v1/posts/{postNo}")
-    public ResponseEntity<ApiResult> deletePost(@PathVariable Long postNo) {
+    public ResponseEntity<ApiResult> deletePost(@RequestHeader(name = "Authorization") String bearerToken,
+                                                @PathVariable Long postNo) {
 
-        postService.deletePost(postNo);
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+
+        postService.deletePost(memberInfo.memberNo(), postNo);
 
         return ResponseEntity.ok(ApiResult.success("게시글이 성공적으로 삭제되었습니다.", null));
     }
