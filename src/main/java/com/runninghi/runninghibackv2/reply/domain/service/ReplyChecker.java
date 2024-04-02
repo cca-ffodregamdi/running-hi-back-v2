@@ -5,9 +5,14 @@ import com.runninghi.runninghibackv2.common.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.regex.Pattern;
+
 @Service
 @RequiredArgsConstructor
 public class ReplyChecker {
+
+    private static final String NO_SPECIAL_SYMBOLS_REGULAR_EXPRESSION = "/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/";
+
 
     public boolean memberCheck(Long memberNo, Role role, Long writerNo) {
 
@@ -17,4 +22,8 @@ public class ReplyChecker {
         return isWriter || isAdmin;
     }
 
+    public void checkSearchValid(String search) {
+        if (!Pattern.matches(NO_SPECIAL_SYMBOLS_REGULAR_EXPRESSION, search)) throw new IllegalArgumentException();
+
+    }
 }
