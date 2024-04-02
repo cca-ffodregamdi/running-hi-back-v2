@@ -25,4 +25,11 @@ public enum ProcessingStatus {
             default -> throw new IllegalArgumentException("처리상태 번호가 올바르지 않습니다.");
         };
     }
+
+    public static ProcessingStatus fromValue (int value) {
+        for (ProcessingStatus status : ProcessingStatus.values()) {
+            if (status.value == value) return status;
+        }
+        throw new IllegalArgumentException("신고 처리 상태 번호가 올바르지 않습니다.");
+    }
 }
