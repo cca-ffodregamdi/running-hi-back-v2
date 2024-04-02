@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Table(name = "TBL_MEMBER")
@@ -59,6 +61,10 @@ public class Member extends BaseTimeEntity {
     @Comment("리프레시 토큰")
     private String refreshToken;
 
+    @Column
+    @Comment("탈퇴 신청 날짜")
+    private LocalDateTime deactivateDate;
+
     public Member(MemberBuilder memberBuilder) {
         this.memberNo = memberBuilder.memberNo;
         this.account = memberBuilder.account;
@@ -71,6 +77,7 @@ public class Member extends BaseTimeEntity {
         this.isBlacklisted = memberBuilder.isBlacklisted;
         this.role = memberBuilder.role;
         this.refreshToken = memberBuilder.refreshToken;
+        this.deactivateDate = memberBuilder.deactivateDate;
     }
 
     public static MemberBuilder builder() {
@@ -89,6 +96,7 @@ public class Member extends BaseTimeEntity {
         private boolean isBlacklisted;
         private Role role;
         private String refreshToken;
+        private LocalDateTime deactivateDate;
 
         public MemberBuilder memberNo(Long memberNo) {
             this.memberNo = memberNo;
@@ -145,6 +153,11 @@ public class Member extends BaseTimeEntity {
             return this;
         }
 
+        public MemberBuilder deactivateDate(LocalDateTime deactivateDate) {
+            this.deactivateDate = deactivateDate;
+            return this;
+        }
+
         public Member build() {
             return new Member(this);
         }
@@ -155,8 +168,13 @@ public class Member extends BaseTimeEntity {
         this.refreshToken = refreshToken;
     }
 
-    public boolean toggleIsActive() {
-        this.isActive = !this.isActive;
-        return this.isActive;
+    public void deactivateMember() {
+        this.isActive = false;
+        this.deactivateDate = LocalDateTime.now();
+    }
+
+    public void activateMember() {
+        this.isActive = true;
+        this.deactivateDate = null;
     }
 }

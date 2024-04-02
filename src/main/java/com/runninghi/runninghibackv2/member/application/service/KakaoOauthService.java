@@ -140,9 +140,7 @@ public class KakaoOauthService {
         String accessToken = jwtTokenProvider.createAccessToken(accessTokenInfo);
 
         member.updateRefreshToken(refreshToken);
-        if (!member.isActive()) {
-            member.toggleIsActive();
-        }
+        member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
         memberRepository.save(member);
 
         Map<String, String> tokens = new HashMap<>();
@@ -219,11 +217,9 @@ public class KakaoOauthService {
             throw new KakaoOauthException();
         }
 
-        // 멤버의 활성화 상태르 변경하고 저장
-        if (member.isActive()) {
-            member.toggleIsActive();
-            memberRepository.save(member);
-        }
+        // 멤버의 활성화 상태를 false로 변경, deactivateDate 설정
+        member.deactivateMember();
+        memberRepository.save(member);
 
         return member.isActive();
     }
