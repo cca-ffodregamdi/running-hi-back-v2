@@ -3,8 +3,8 @@ package com.runninghi.runninghibackv2.reply.application.controller;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
-import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
+import com.runninghi.runninghibackv2.reply.application.dto.request.GetReportedReplySearchRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.CreateReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
 import com.runninghi.runninghibackv2.reply.application.dto.request.GetReportedReplyRequest;
@@ -13,7 +13,6 @@ import com.runninghi.runninghibackv2.reply.application.dto.response.CreateReplyR
 import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.reply.application.dto.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.reply.application.service.ReplyService;
-import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,28 +58,12 @@ public class ReplyController {
     // 현재는 닉네임 검색만 되게 구현 -> 추후에 { 신고 상태 } 검색 필요
     @HasAccess
     @GetMapping(value = "/reported")
-    public ResponseEntity<ApiResult> getReportedReplyList(@RequestParam(defaultValue = "0")
-                                                              @PositiveOrZero(message = "0 또는 자연수만 입력이 가능합니다.")
-                                                              int page,
-                                                          @RequestParam(defaultValue = "10")
-                                                              @Positive(message = "자연수만 입력이 가능합니다.")
-                                                              int size,
-                                                          @RequestParam(defaultValue = "desc")
-                                                              @Pattern(regexp = "desc|asc", message = "정렬 조건이 맞지 않습니다.")
-                                                              String sortDirection,
-                                                          @RequestParam(defaultValue = "1")
-                                                              @Pattern(regexp = "^[0-2]$", message = "신고 상태 조건이 맞지 않습니다.")
-                                                              int reportStatus,
-                                                          @RequestParam()
-                                                              @Size(max = SEARCH_MAX_LENGTH, message = SEARCH_MAX_LENGTH + "자 이내로 검색해주세요.")
-                                                              @Pattern(regexp = "/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/")
-                                                              String search
-                                                          ) {
+    public ResponseEntity<ApiResult> getReportedReplyList(@ModelAttribute GetReportedReplySearchRequest searchRequest) {
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createDate", ProcessingStatus.fromValue(reportStatus).name());
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Sort sort = Sort.by( searchRequest.getSortDirection(), "createDate", searchRequest.getReportStatus().name() );
+        Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize(), sort);
         Page<GetReplyListResponse> reportedReplyPage = replyService.getReportedReplyList(
-                GetReportedReplyRequest.of(pageable, search, reportStatus)
+                GetReportedReplyRequest.of(pageable, searchRequest.getSearch())
         );
 
         return ResponseEntity.ok().body(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, reportedReplyPage));

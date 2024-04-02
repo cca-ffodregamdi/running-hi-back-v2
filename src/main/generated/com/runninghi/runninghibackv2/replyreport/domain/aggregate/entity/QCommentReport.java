@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.commentreport.domain.aggregate.entity;
+package com.runninghi.runninghibackv2.replyreport.domain.aggregate.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
