@@ -46,7 +46,7 @@ public class Reply extends BaseTimeEntity {
 
     @Column
     @Comment("신고 상태")
-    private ProcessingStatus processingStatus;
+    private ProcessingStatus reportStatus;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)
@@ -68,7 +68,7 @@ public class Reply extends BaseTimeEntity {
         this.post = builder.post;
         this.replyContent = builder.replyContent;
         this.reportedCount = builder.reportedCount;
-        this.processingStatus = builder.processingStatus;
+        this.reportStatus = builder.reportStatus;
         this.isDeleted = builder.isDeleted;
         this.parent = builder.parent;
     }
@@ -103,7 +103,7 @@ public class Reply extends BaseTimeEntity {
         private Post post;
         private String replyContent;
         private int reportedCount;
-        private ProcessingStatus processingStatus;
+        private ProcessingStatus reportStatus;
         private boolean isDeleted;
         private Reply parent;
 
@@ -132,8 +132,8 @@ public class Reply extends BaseTimeEntity {
             return this;
         }
 
-        public ReplyBuilder processingStatus(ProcessingStatus processingStatus) {
-            this.processingStatus = processingStatus;
+        public ReplyBuilder reportStatus(ProcessingStatus reportStatus) {
+            this.reportStatus = reportStatus;
             return this;
         }
 
