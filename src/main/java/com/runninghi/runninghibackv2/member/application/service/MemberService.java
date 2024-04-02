@@ -5,6 +5,7 @@ import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,4 +17,12 @@ public class MemberService {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
+    @Transactional
+    public void addReportedCount(Long memberNo) {
+
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(EntityNotFoundException::new);
+
+        member.addReportedCount();
+    }
 }

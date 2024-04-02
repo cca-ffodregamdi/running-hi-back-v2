@@ -6,24 +6,24 @@ import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.postreport.domain.aggregate.entity.PostReport;
 
-public record CreatePostReportResponse(
+public record GetPostReportResponse(
         Long postReportNo,
         ReportCategory category,
         String content,
         ProcessingStatus status,
-        Member reporter,
-        Post reportedPost,
+        Long reporterNo,
+        Long reportedPostNo,
         boolean isPostDeleted
 ) {
-    public static CreatePostReportResponse from(PostReport postReport) {
+    public static GetPostReportResponse from(PostReport postReport) {
 
-        return new CreatePostReportResponse(
+        return new GetPostReportResponse(
                 postReport.getPostReportNo(),
                 postReport.getCategory(),
                 postReport.getContent(),
                 postReport.getStatus(),
-                postReport.getReporter(),
-                postReport.getReportedPost(),
+                postReport.getReporter().getMemberNo(),
+                postReport.getReportedPost().getPostNo(),
                 postReport.isPostDeleted());
     }
 }
