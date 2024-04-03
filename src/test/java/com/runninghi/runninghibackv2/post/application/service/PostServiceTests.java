@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.keyword.domain.repository.KeywordRepository;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
@@ -13,6 +14,8 @@ import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
 import com.runninghi.runninghibackv2.post.domain.repository.PostKeywordRepository;
+import com.runninghi.runninghibackv2.postreport.application.dto.request.CreatePostReportRequest;
+import com.runninghi.runninghibackv2.postreport.application.service.PostReportService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
@@ -55,6 +59,9 @@ class PostServiceTests {
 
     @Autowired
     private KeywordRepository keywordRepository;
+
+    @Autowired
+    private PostReportService postReportService;
 
     InputStream inputStream = getClass().getResourceAsStream("/data.gpx");
     InputStreamResource inputStreamResource;
@@ -398,6 +405,40 @@ class PostServiceTests {
         Long adminMemberNo = admin.getMemberNo();
         assertThrows(AccessDeniedException.class, () -> postService.deletePost(adminMemberNo, response.postNo()));
 
+    }
+
+
+    @Test
+    @DisplayName("신고 게시글 조회 테스트 : SUCCESS")
+    void testReportedTestScroll() throws ParserConfigurationException, IOException, SAXException {
+
+        // Given
+        String postTitle = "Test Post";
+        String postContent = "Test Post Content 입니다.";
+        String locationName = "Location";
+        List<String> keywordList = List.of("기존 키워드", "새 키워드");
+
+        CreatePostRequest request = new CreatePostRequest(
+                member.getMemberNo(),
+                member.getRole(),
+                postTitle,
+                postContent,
+                locationName,
+                keywordList
+        );
+
+        CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
+
+
+        // When
+        Long postNo = response.postNo();
+        postService.addReportedCount(postNo);
+
+        //Then
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<GetAllPostsResponse> posts = postService.getReportedPostScroll(pageable);
+
+        assertEquals(1, posts.getTotalElements());
     }
 
 
