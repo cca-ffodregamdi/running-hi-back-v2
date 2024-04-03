@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
@@ -99,6 +100,16 @@ public class PostService {
         postKeywordService.deletePostKeyword(postNo);
         postRepository.deleteById(postNo);
     }
+
+
+    @Transactional
+    public void deleteReportedPost(Long postNo) {
+    // 관리자용 신고 게시글 삭제 메소드
+        postKeywordService.deletePostKeyword(postNo);
+        postRepository.deleteById(postNo);
+        
+    }
+
     @Transactional(readOnly = true)
     public GetPostResponse getPost(Long postNo) {
 

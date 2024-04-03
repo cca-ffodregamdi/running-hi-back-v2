@@ -31,13 +31,11 @@ public class QPostReport extends EntityPathBase<PostReport> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createDate = _super.createDate;
 
+    public final BooleanPath isPostDeleted = createBoolean("isPostDeleted");
+
     public final NumberPath<Long> postReportNo = createNumber("postReportNo", Long.class);
 
-    public final com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember reportedMember;
-
     public final com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost reportedPost;
-
-    public final BooleanPath reportedPostDeleted = createBoolean("reportedPostDeleted");
 
     public final com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember reporter;
 
@@ -64,7 +62,6 @@ public class QPostReport extends EntityPathBase<PostReport> {
 
     public QPostReport(Class<? extends PostReport> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.reportedMember = inits.isInitialized("reportedMember") ? new com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember(forProperty("reportedMember")) : null;
         this.reportedPost = inits.isInitialized("reportedPost") ? new com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost(forProperty("reportedPost"), inits.get("reportedPost")) : null;
         this.reporter = inits.isInitialized("reporter") ? new com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember(forProperty("reporter")) : null;
     }

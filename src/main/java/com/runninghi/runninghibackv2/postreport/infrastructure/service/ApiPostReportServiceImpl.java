@@ -32,8 +32,8 @@ public class ApiPostReportServiceImpl implements ApiPostReportService {
     }
 
     @Override
-    public void deletePostById(Long memberNo, Long postNo) {
-        postService.deletePost(memberNo,postNo);
+    public void deletePostById(Long postNo) {
+        postService.deleteReportedPost(postNo);
     }
 
     @Override
