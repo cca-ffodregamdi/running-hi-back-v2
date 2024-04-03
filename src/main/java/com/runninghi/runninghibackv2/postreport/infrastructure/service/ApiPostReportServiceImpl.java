@@ -33,7 +33,7 @@ public class ApiPostReportServiceImpl implements ApiPostReportService {
 
     @Override
     public void deletePostById(Long postNo) {
-        postService.deletePost(postNo);
+        postService.deleteReportedPost(postNo);
     }
 
     @Override
