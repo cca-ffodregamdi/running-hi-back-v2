@@ -45,4 +45,11 @@ public class MemberService {
         return GetMemberResponse.from(member);
     }
 
+    public void addReportedCount(Long memberNo) {
+
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(EntityNotFoundException::new);
+
+        member.addReportedCount();
+    }
 }

@@ -257,4 +257,8 @@ public class Member extends BaseTimeEntity {
         return result;
     }
 
+    public void addReportedCount() {
+        this.reportCnt += 1;
+    }
+
 }

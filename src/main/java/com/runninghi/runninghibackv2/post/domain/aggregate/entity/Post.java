@@ -114,8 +114,11 @@ public class Post extends BaseTimeEntity {
         this.postContent = request.postContent();
     }
 
-    public void addReportCnt() {
+    public void addReportedCount() {
         this.reportCnt += 1;
     }
 
+    public void resetReportedCount() {
+        this.reportCnt = 0;
+    }
 }

@@ -11,10 +11,9 @@ public record CreatePostReportResponse(
         ReportCategory category,
         String content,
         ProcessingStatus status,
-        boolean reportedPostDeleted,
         Member reporter,
-        Member reportedMember,
-        Post reportedPost
+        Post reportedPost,
+        boolean isPostDeleted
 ) {
     public static CreatePostReportResponse from(PostReport postReport) {
 
@@ -23,9 +22,8 @@ public record CreatePostReportResponse(
                 postReport.getCategory(),
                 postReport.getContent(),
                 postReport.getStatus(),
-                postReport.isReportedPostDeleted(),
                 postReport.getReporter(),
-                postReport.getReportedMember(),
-                postReport.getReportedPost());
+                postReport.getReportedPost(),
+                postReport.isPostDeleted());
     }
 }

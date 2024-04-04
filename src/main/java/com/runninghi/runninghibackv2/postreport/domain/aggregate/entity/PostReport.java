@@ -22,6 +22,7 @@ public class PostReport extends BaseTimeEntity {
     private Long postReportNo;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Comment("신고 사유 카테고리")
     private ReportCategory category;
 
@@ -30,37 +31,34 @@ public class PostReport extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Comment("신고 처리 상태")
     private ProcessingStatus status;
 
-    @Column(nullable = false)
-    @Comment("연관된 게시글이 삭제되었는지 여부")
-    private boolean reportedPostDeleted;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reporter_no", nullable = false)
+    @JoinColumn(name = "reporter_no")
     @Comment("신고자")
     private Member reporter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reported_member_no", nullable = false)
-    @Comment("피신고자")
-    private Member reportedMember;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reported_post_no", nullable = false)
+    @JoinColumn(name = "reported_post_no")
     @Comment("신고된 게시글")
     private Post reportedPost;
+
+    // TODO. 신고된 게시글 내용 컬럼
+
+    @Column(nullable = false)
+    @Comment("연관된 게시글이 삭제되었는지 여부")
+    private boolean isPostDeleted;
 
     public PostReport(Builder builder) {
         this.postReportNo = builder.postReportNo;
         this.category = builder.category;
         this.content = builder.content;
         this.status = builder.status;
-        this.reportedPostDeleted = builder.reportedPostDeleted;
         this.reporter = builder.reporter;
-        this.reportedMember = builder.reportedMember;
         this.reportedPost = builder.reportedPost;
+        this.isPostDeleted = builder.isPostDeleted;
     }
 
     public static class Builder {
@@ -68,10 +66,9 @@ public class PostReport extends BaseTimeEntity {
         private ReportCategory category;
         private String content;
         private ProcessingStatus status;
-        private boolean reportedPostDeleted;
         private Member reporter;
-        private Member reportedMember;
         private Post reportedPost;
+        private boolean isPostDeleted;
 
         public Builder reportNo(Long postReportNo) {
             this.postReportNo = postReportNo;
@@ -93,18 +90,8 @@ public class PostReport extends BaseTimeEntity {
             return this;
         }
 
-        public Builder reportedPostDeleted(boolean reportedPostDeleted) {
-            this.reportedPostDeleted = reportedPostDeleted;
-            return this;
-        }
-
         public Builder reporter(Member reporter) {
             this.reporter = reporter;
-            return this;
-        }
-
-        public Builder reportedMember(Member reportedMember) {
-            this.reportedMember = reportedMember;
             return this;
         }
 
@@ -113,8 +100,23 @@ public class PostReport extends BaseTimeEntity {
             return this;
         }
 
+        public Builder isPostDeleted(boolean isPostDeleted) {
+            this.isPostDeleted = isPostDeleted;
+            return this;
+        }
+
         public PostReport build() {
             return new PostReport(this);
         }
+    }
+
+    public void update(ProcessingStatus status, boolean isPostDeleted, Post reportedPost) {
+        this.status = status;
+        this.isPostDeleted = isPostDeleted;
+        this.reportedPost = reportedPost;
+    }
+
+    public void update(ProcessingStatus status) {
+        this.status = status;
     }
 }

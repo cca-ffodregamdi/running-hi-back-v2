@@ -22,11 +22,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -247,7 +247,7 @@ class PostServiceTests {
 
 
         // When
-        postService.deletePost(response.postNo());
+        postService.deletePost(member.getMemberNo(), response.postNo());
 
         long afterSize = postRepository.count();
         long postKeywordAfter= postKeywordRepository.count();
@@ -262,6 +262,81 @@ class PostServiceTests {
     @Test
     @DisplayName("게시글 수정 테스트 : success")
     void testUpdatePostSuccess() throws ParserConfigurationException, IOException, SAXException {
+        // Given
+        String postTitle = "Test Post";
+        String postContent = "Test Post Content 입니다.";
+        String locationName = "Location";
+        List<String> keywordList = List.of("기존 키워드", "새 키워드");
+
+        Long memberNo = member.getMemberNo();
+
+        CreatePostRequest request = new CreatePostRequest(
+                memberNo,
+                member.getRole(),
+                postTitle,
+                postContent,
+                locationName,
+                keywordList
+        );
+
+        CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
+
+        // When
+        String updateTitle = "Test Post";
+        String updateContent = "Test Post Content 입니다.";
+        List<String> updateList = List.of("기존 키워드", "새 키워드2");
+
+        UpdatePostRequest updateRequest = new UpdatePostRequest(
+                updateTitle,
+                updateContent,
+                updateList
+        );
+
+        postService.updatePost(memberNo, response.postNo(), updateRequest);
+
+        Optional<Post> post = postRepository.findById(response.postNo());
+
+        // Then
+        assertEquals(post.get().getPostTitle(), updateTitle);
+        assertEquals(post.get().getPostContent(), updateContent);
+
+        //Post_Keyword 확인
+        List<PostKeyword> keywords = postKeywordService.getKeywordsByPost(post.get());
+        for (PostKeyword postKeyword : keywords) {
+            String keywordName = postKeyword.getKeyword().getKeywordName();
+            assertTrue(updateList.contains(keywordName));
+        }
+
+    }
+
+    @Test
+    @DisplayName("게시글 전체 조회 테스트 : success")
+    void testPostScroll() {
+
+        //Given
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        Post post = postRepository.save(Post.builder()
+                .member(member)
+                .postTitle("테스트 게시글")
+                .postContent("테스트 게시글 내용입니다.")
+                .role(Role.USER)
+                .locationName("테스트 지역")
+                .build());
+
+        //When
+        Page<GetAllPostsResponse> posts = postService.getPostScroll(pageRequest);
+
+        //Then
+        assertNotNull(posts);
+        assertFalse(posts.isEmpty());
+        assertEquals(1, posts.getTotalElements());
+    }
+
+    @Test
+    @DisplayName("게시글 수정 테스트 : 작성자 불일치 예외처리")
+    void testUpdatePostAccessDeniedException() throws ParserConfigurationException, IOException, SAXException {
+
         // Given
         String postTitle = "Test Post";
         String postContent = "Test Post Content 입니다.";
@@ -290,43 +365,41 @@ class PostServiceTests {
                 updateList
         );
 
-        postService.updatePost(response.postNo(), updateRequest);
+        //Then
+        Long adminMemberNo = admin.getMemberNo();
 
-        Optional<Post> post = postRepository.findById(response.postNo());
-
-        // Then
-        assertEquals(post.get().getPostTitle(), updateTitle);
-        assertEquals(post.get().getPostContent(), updateContent);
-
-        //Post_Keyword 확인
-        List<PostKeyword> keywords = postKeywordService.getKeywordsByPost(post.get());
-        for (PostKeyword postKeyword : keywords) {
-            String keywordName = postKeyword.getKeyword().getKeywordName();
-            assertTrue(updateList.contains(keywordName));
-        }
+        assertThrows(AccessDeniedException.class,
+                () -> postService.updatePost(adminMemberNo, response.postNo(), updateRequest));
 
     }
 
     @Test
-    void testPostScroll() {
+    @DisplayName("게시글 삭제 테스트 : 작성자 불일치 예외처리")
+    void testDeletePostAccessDeniedException() throws ParserConfigurationException, IOException, SAXException {
 
-        //Given
-        PageRequest pageRequest = PageRequest.of(0, 10);
+        // Given
+        String postTitle = "Test Post";
+        String postContent = "Test Post Content 입니다.";
+        String locationName = "Location";
+        List<String> keywordList = List.of("기존 키워드", "새 키워드");
 
-        Post post = postRepository.save(Post.builder()
-                .member(member)
-                .postTitle("테스트 게시글")
-                .postContent("테스트 게시글 내용입니다.")
-                .role(Role.USER)
-                .locationName("테스트 지역")
-                .build());
+        CreatePostRequest request = new CreatePostRequest(
+                member.getMemberNo(),
+                member.getRole(),
+                postTitle,
+                postContent,
+                locationName,
+                keywordList
+        );
 
-        //When
-        Page<GetAllPostsResponse> posts = postService.getPostScroll(pageRequest);
+        CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
 
-        //Then
-        assertNotNull(posts);
-        assertFalse(posts.isEmpty());
-        assertEquals(1, posts.getTotalElements());
+        // When&Then
+        Long adminMemberNo = admin.getMemberNo();
+        assertThrows(AccessDeniedException.class, () -> postService.deletePost(adminMemberNo, response.postNo()));
+
     }
+
+
+
 }

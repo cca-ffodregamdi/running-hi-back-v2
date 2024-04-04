@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
@@ -76,10 +77,11 @@ public class PostService {
     }
 
     @Transactional
-    public UpdatePostResponse updatePost(Long postNo, UpdatePostRequest request) {
+    public UpdatePostResponse updatePost(Long memberNo, Long postNo, UpdatePostRequest request) {
 
-        Post post = postRepository.findById(postNo)
-                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+        Post post = findPostByNo(postNo);
+
+        postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
         post.update(request);
 
@@ -89,10 +91,25 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long postNo) {
+    public void deletePost(Long memberNo, Long postNo) {
+
+        Post post = findPostByNo(postNo);
+
+        postChecker.isWriter(memberNo, post.getMember().getMemberNo());
+
         postKeywordService.deletePostKeyword(postNo);
         postRepository.deleteById(postNo);
     }
+
+
+    @Transactional
+    public void deleteReportedPost(Long postNo) {
+    // 관리자용 신고 게시글 삭제 메소드
+        postKeywordService.deletePostKeyword(postNo);
+        postRepository.deleteById(postNo);
+        
+    }
+
     @Transactional(readOnly = true)
     public GetPostResponse getPost(Long postNo) {
 
@@ -110,6 +127,24 @@ public class PostService {
         return GetPostResponse.from(post, keywordList);
     }
 
+    @Transactional
+    public void addReportedCount(Long postNo) {
 
+        Post post = findPostByNo(postNo);
 
+        post.addReportedCount();
+    }
+
+    @Transactional
+    public void resetReportedCount(Long postNo) {
+
+        Post post = findPostByNo(postNo);
+
+        post.resetReportedCount();
+    }
+
+    private Post findPostByNo(Long postNo) {
+        return postRepository.findById(postNo)
+                .orElseThrow(EntityNotFoundException::new);
+    }
 }
