@@ -2,16 +2,17 @@ package com.runninghi.runninghibackv2.member.application.controller;
 
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
+import com.runninghi.runninghibackv2.member.application.dto.request.UpdateMemberInfoRequest;
+import com.runninghi.runninghibackv2.member.application.dto.response.GetMemberResponse;
+import com.runninghi.runninghibackv2.member.application.dto.response.UpdateMemberInfoResponse;
 import com.runninghi.runninghibackv2.member.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.member.application.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class MemberController {
      * @return member의 활성화 상태인 isActvie(boolean) 값를 포함하는 ResponseEntity 객체
      */
     @RequestMapping("/api/v1/logout/kakao")
-    public ResponseEntity<ApiResult> kakaoLogout(@RequestHeader(value = "Authorization")String token) {
+    public ResponseEntity<ApiResult> kakaoLogout(@RequestHeader(value = "Authorization") String token) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
@@ -73,5 +74,29 @@ public class MemberController {
 
         return ResponseEntity.ok()
                 .body(ApiResult.success("Success Kakao Unlink", isActive));
+    }
+
+    @PutMapping("/api/v1/members")
+    public ResponseEntity<ApiResult> updateMemberInfo(
+            @RequestHeader(value = "Authorization") String token,
+            @RequestBody UpdateMemberInfoRequest request
+    ) throws BadRequestException {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
+        UpdateMemberInfoResponse response = memberService.updateMemberInfo(memberNo, request);
+
+        return ResponseEntity.ok(ApiResult.success("회원 정보 업데이트 성공", response));
+    }
+
+    @GetMapping("/api/v1/members")
+    public ResponseEntity<ApiResult> getMemberInfo(@RequestHeader(value = "Authorization") String token) {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
+        GetMemberResponse response = memberService.getMemberInfo(memberNo);
+
+        return ResponseEntity.ok(ApiResult.success("회원 정보 조회 성공", response));
+
     }
 }
