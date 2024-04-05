@@ -12,12 +12,14 @@ import com.runninghi.runninghibackv2.post.application.dto.response.GetPostRespon
 import com.runninghi.runninghibackv2.post.application.dto.response.UpdatePostResponse;
 import com.runninghi.runninghibackv2.post.application.service.PostService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,11 +56,11 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<ApiResult> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
-                                                         @RequestParam("postTitle") String postTitle,
-                                                         @RequestParam("postContent") String postContent,
-                                                         @RequestParam("locationName") String locationName,
-                                                         @RequestParam("keywordList") List<String> keywordList,
-                                                         @RequestParam("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
+                                                         @RequestPart("title") String postTitle,
+                                                         @RequestPart("content") String postContent,
+                                                         @RequestPart("location") String locationName,
+                                                         @RequestPart("keyword") List<String> keywordList,
+                                                         @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
@@ -102,9 +104,10 @@ public class PostController {
     @HasAccess
     @GetMapping(value = "/reported")
     public ResponseEntity<ApiResult> getReportedPostList(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
-                                                         @RequestParam(defaultValue = "10") @Positive int size) {
+                                                         @RequestParam(defaultValue = "10") @Positive int size,
+                                                         @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
         Page<GetAllPostsResponse> response = postService.getReportedPostScroll(pageable);
 
