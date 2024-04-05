@@ -1,7 +1,7 @@
 package com.runninghi.runninghibackv2.common.exception;
 
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
-import com.runninghi.runninghibackv2.common.exception.custom.KakaoLoginException;
+import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthException;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
@@ -52,9 +52,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
-    @ExceptionHandler(KakaoLoginException.class)
+    @ExceptionHandler(KakaoOauthException.class)
     public ResponseEntity<ApiResult> handleKakaoLoginException() {
-        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_LOGIN_FAIL);
+        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_FAIL);
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 

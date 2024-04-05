@@ -4,15 +4,14 @@ import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.common.exception.custom.KakaoLoginException;
+import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthException;
 import com.runninghi.runninghibackv2.member.application.dto.response.KakaoProfileResponse;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,7 +27,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class KakaoLoginService {
+public class KakaoOauthService {
 
     private static final int NICKNAME_DIGIT_LENGTH = 8;
     private static final int RANDOM_NUMBER_RANGE = 10;
@@ -44,6 +43,9 @@ public class KakaoLoginService {
 
     @Value("${kakao.current-version-uri}")
     private String currentVersionUri;
+
+    @Value("${kakao.admin-key}")
+    private String adminKey;
 
     private final RestTemplate restTemplate;
     private final JwtTokenProvider jwtTokenProvider;
@@ -88,12 +90,12 @@ public class KakaoLoginService {
 
         String kakaoAccessToken = response != null ? response.get("access_token") : null;
         if (kakaoAccessToken == null) {
-            throw new KakaoLoginException();
+            throw new KakaoOauthException();
         }
 
         KakaoProfileResponse kakaoProfileResponse = getKakaoProfile(kakaoAccessToken);
         if (kakaoProfileResponse == null) {
-            throw new KakaoLoginException();
+            throw new KakaoOauthException();
         }
         Optional<Member> optionalMember = memberRepository.findByKakaoId(kakaoProfileResponse.getKakaoId().toString());
 
@@ -114,7 +116,6 @@ public class KakaoLoginService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", "Bearer " + kakaoAccessToken);
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         // 필요한 사용자 정보 가져오기
         MultiValueMapAdapter<String, String> body = new LinkedMultiValueMap<>();
@@ -139,6 +140,7 @@ public class KakaoLoginService {
         String accessToken = jwtTokenProvider.createAccessToken(accessTokenInfo);
 
         member.updateRefreshToken(refreshToken);
+        member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
         memberRepository.save(member);
 
         Map<String, String> tokens = new HashMap<>();
@@ -180,6 +182,46 @@ public class KakaoLoginService {
         tokens.put("refreshToken", refreshToken);
 
         return tokens;
+    }
+
+    /**
+     * 회원의 카카오 계정을 연결 해제하고 회원을 삭제합니다.
+     *
+     * @param memberNo 회원 번호
+     * @return 회원의 활성화 상태를 토글한 결과 (활성화되었으면 true, 비활성화되었으면 false)
+     * @throws EntityNotFoundException 요청된 회원 번호에 해당하는 회원을 찾을 수 없을 때 발생하는 예외
+     * @throws KakaoUnlinkException 카카오 API 호출이 실패한 경우 발생하는 예외
+     */
+    @Transactional
+    public boolean unlinkAndDeleteMember(Long memberNo) {
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(EntityNotFoundException::new);
+
+        // 연결을 끊는 kakao api url
+        String url = "https://kapi.kakao.com/v1/user/unlink";
+
+        // http header 설정 : access token 을 넣어서 user 정보에 접근할 수 있도록 한다.
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Authorization", "KakaoAK " + adminKey);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("target_id_type", "user_id");
+        body.add("target_id", member.getKakaoId());
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response =  restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new KakaoOauthException();
+        }
+
+        // 멤버의 활성화 상태를 false로 변경, deactivateDate 설정
+        member.deactivateMember();
+        memberRepository.save(member);
+
+        return member.isActive();
     }
 
     /**
