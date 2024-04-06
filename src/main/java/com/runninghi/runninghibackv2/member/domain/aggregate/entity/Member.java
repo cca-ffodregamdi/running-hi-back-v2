@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Table(name = "TBL_MEMBER")
@@ -59,6 +61,27 @@ public class Member extends BaseTimeEntity {
     @Comment("리프레시 토큰")
     private String refreshToken;
 
+    @Column
+    @Comment("탈퇴 신청 날짜")
+    private LocalDateTime deactivateDate;
+
+    @Column
+    @Comment("누적 거리")
+    private double totalDistance = 0;
+
+    @Column
+    @Comment("누적 칼로리")
+    private Long totalKcal = 0L;
+
+    @Column
+    @Comment("다음 레벨에 필요한 거리")
+    private int distanceToNextLevel = 10;
+
+    @Column
+    @Comment("누적거리에 따른 레벨")
+    private int level;
+
+
     public Member(MemberBuilder memberBuilder) {
         this.memberNo = memberBuilder.memberNo;
         this.account = memberBuilder.account;
@@ -71,6 +94,11 @@ public class Member extends BaseTimeEntity {
         this.isBlacklisted = memberBuilder.isBlacklisted;
         this.role = memberBuilder.role;
         this.refreshToken = memberBuilder.refreshToken;
+        this.deactivateDate = memberBuilder.deactivateDate;
+        this.totalDistance = memberBuilder.totalDistance;
+        this.totalKcal = memberBuilder.totalKcal;
+        this.distanceToNextLevel = memberBuilder.distanceToNextLevel;
+        this.level = memberBuilder.level;
     }
 
     public static MemberBuilder builder() {
@@ -89,6 +117,11 @@ public class Member extends BaseTimeEntity {
         private boolean isBlacklisted;
         private Role role;
         private String refreshToken;
+        private LocalDateTime deactivateDate;
+        private double totalDistance;
+        private Long totalKcal;
+        private int distanceToNextLevel;
+        private int level;
 
         public MemberBuilder memberNo(Long memberNo) {
             this.memberNo = memberNo;
@@ -145,17 +178,87 @@ public class Member extends BaseTimeEntity {
             return this;
         }
 
+        public MemberBuilder deactivateDate(LocalDateTime deactivateDate) {
+            this.deactivateDate = deactivateDate;
+            return this;
+        }
+
+        public MemberBuilder totalDistance(double totalDistance) {
+            this.totalDistance = totalDistance;
+            return this;
+        }
+
+        public MemberBuilder totalKcal(Long totalKcal) {
+            this.totalKcal = totalKcal;
+            return this;
+        }
+
+        public MemberBuilder distanceToNextLevel(int distanceToNextLevel) {
+            this.distanceToNextLevel = distanceToNextLevel;
+            return this;
+        }
+
+        public MemberBuilder level(int level) {
+            this.level = level;
+            return this;
+        }
+
         public Member build() {
             return new Member(this);
         }
 
     }
 
+    // 리프레시 토큰 업데이트
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    // 닉네임 업데이트
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    // 멤버 비활성화 (탈퇴 처리)
+    public void deactivateMember() {
+        this.isActive = false;
+        this.deactivateDate = LocalDateTime.now();
+    }
+
+    // 멤버 활성화
+    public void activateMember() {
+        this.isActive = true;
+        this.deactivateDate = null;
+    }
+
+    // 누적 거리 업데이트
+    public void updateTotalDistanceAndLevel(double distance) {
+        this.totalDistance += distance;
+        checkAndLevelUp();
+    }
+
+    // 레벨 업데이트를 확인하고 처리
+    private void checkAndLevelUp() {
+        while (this.totalDistance >= this.distanceToNextLevel) {
+            this.level++;
+            this.distanceToNextLevel = calculateDistanceForNextLevel();
+        }
+    }
+
+    // 다음 레벨까지의 거리 업데이트
+    // 이전 레벨업에 필요했던 거리의 1.5배로 계산하되, 10 단위로 떨어지지않을 경우 올림 처리
+    private int calculateDistanceForNextLevel() {
+        int result = (int)(distanceToNextLevel * 1.5);
+
+        if (result % 10 != 0) {
+            result = result + (10 - result % 10);
+        }
+
+        return result;
     }
 
     public void addReportedCount() {
         this.reportCnt += 1;
     }
+
 }

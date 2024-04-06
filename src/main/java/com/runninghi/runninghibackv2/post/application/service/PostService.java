@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
-import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
@@ -126,6 +125,16 @@ public class PostService {
 
         return GetPostResponse.from(post, keywordList);
     }
+
+
+    @Transactional(readOnly = true)
+    public Page<GetAllPostsResponse> getReportedPostScroll(Pageable pageable) {
+
+        Page<Post> posts = postRepository.findAllByReportCntIsGreaterThan(0, pageable);
+
+        return posts.map(GetAllPostsResponse::from);
+    }
+
 
     @Transactional
     public void addReportedCount(Long postNo) {
