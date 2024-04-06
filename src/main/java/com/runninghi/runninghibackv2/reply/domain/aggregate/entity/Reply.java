@@ -82,6 +82,10 @@ public class Reply extends BaseTimeEntity {
     }
     public void addReportedCount () {this.reportedCount++;}
 
+    public void resetReportedCount() {
+        this.reportedCount = 0;
+    }
+
     public void update (String replyContent) {
         this.replyContent = replyContent;
     }
@@ -93,8 +97,6 @@ public class Reply extends BaseTimeEntity {
     public static ReplyBuilder builder() {
         return new ReplyBuilder();
     }
-
-
 
     public static class ReplyBuilder {
 
