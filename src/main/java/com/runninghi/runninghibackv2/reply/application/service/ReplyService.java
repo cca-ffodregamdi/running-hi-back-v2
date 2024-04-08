@@ -130,6 +130,17 @@ public class ReplyService {
     }
 
     /**
+     * 댓글 삭제 메소드 - 댓글 엔티티의 isDeleted의 상태를 'true' 값으로 변경
+     * @param replyNo
+     */
+    @Transactional
+    public void deleteReplyById(Long replyNo) {
+
+        Reply reply = findReplyByReplyNo(replyNo);
+        reply.delete();
+    }
+
+    /**
      * 신고 도메인 측에서 요청하는 메소드.
      * 신고 횟수를 올리는 메소드입니다.
      * @param replyNo
@@ -139,7 +150,17 @@ public class ReplyService {
 
         Reply reply = findReplyByReplyNo(replyNo);
         reply.addReportedCount();
+    }
 
+    /**
+     * 신고 도메인 측에서 요청하는 메소드.
+     * 신고 횟수를 초기화하는 메소드입니다.
+     * @param replyNo
+     */
+    public void resetReportedCount(Long replyNo) {
+
+        Reply reply = findReplyByReplyNo(replyNo);
+        reply.resetReportedCount();
     }
 
     @Transactional(readOnly = true)
@@ -148,7 +169,7 @@ public class ReplyService {
         return  replyQueryRepository.findAllReportedByPageableAndSearch(request);
     }
 
-    private Reply findReplyByReplyNo (Long replyNo) {
+    public Reply findReplyByReplyNo (Long replyNo) {
 
         return replyRepository.findById(replyNo)
                 .orElseThrow(EntityNotFoundException::new);
@@ -162,6 +183,7 @@ public class ReplyService {
         if (!checkResult) throw new AccessDeniedException(ErrorCode.ACCESS_DENIED.getMessage());
 
     }
+
 
 
 }

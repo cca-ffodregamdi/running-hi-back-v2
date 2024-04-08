@@ -11,56 +11,60 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QCommentReport is a Querydsl query type for CommentReport
+ * QReplyReport is a Querydsl query type for ReplyReport
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QCommentReport extends EntityPathBase<CommentReport> {
+public class QReplyReport extends EntityPathBase<ReplyReport> {
 
-    private static final long serialVersionUID = -729692533L;
+    private static final long serialVersionUID = -1311195946L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QCommentReport commentReport = new QCommentReport("commentReport");
+    public static final QReplyReport replyReport = new QReplyReport("replyReport");
 
     public final com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity(this);
 
     public final EnumPath<com.runninghi.runninghibackv2.common.enumtype.ReportCategory> category = createEnum("category", com.runninghi.runninghibackv2.common.enumtype.ReportCategory.class);
-
-    public final NumberPath<Long> commentReportNo = createNumber("commentReportNo", Long.class);
 
     public final StringPath content = createString("content");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createDate = _super.createDate;
 
-    public final BooleanPath reportedCommentDeleted = createBoolean("reportedCommentDeleted");
+    public final BooleanPath isReplyDeleted = createBoolean("isReplyDeleted");
 
-    public final com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember reportedMember;
+    public final StringPath replyContent = createString("replyContent");
+
+    public final NumberPath<Long> replyReportNo = createNumber("replyReportNo", Long.class);
+
+    public final com.runninghi.runninghibackv2.reply.domain.aggregate.entity.QReply reportedReply;
 
     public final com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember reporter;
+
+    public final EnumPath<com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus> status = createEnum("status", com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;
 
-    public QCommentReport(String variable) {
-        this(CommentReport.class, forVariable(variable), INITS);
+    public QReplyReport(String variable) {
+        this(ReplyReport.class, forVariable(variable), INITS);
     }
 
-    public QCommentReport(Path<? extends CommentReport> path) {
+    public QReplyReport(Path<? extends ReplyReport> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QCommentReport(PathMetadata metadata) {
+    public QReplyReport(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QCommentReport(PathMetadata metadata, PathInits inits) {
-        this(CommentReport.class, metadata, inits);
+    public QReplyReport(PathMetadata metadata, PathInits inits) {
+        this(ReplyReport.class, metadata, inits);
     }
 
-    public QCommentReport(Class<? extends CommentReport> type, PathMetadata metadata, PathInits inits) {
+    public QReplyReport(Class<? extends ReplyReport> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.reportedMember = inits.isInitialized("reportedMember") ? new com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember(forProperty("reportedMember")) : null;
+        this.reportedReply = inits.isInitialized("reportedReply") ? new com.runninghi.runninghibackv2.reply.domain.aggregate.entity.QReply(forProperty("reportedReply"), inits.get("reportedReply")) : null;
         this.reporter = inits.isInitialized("reporter") ? new com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember(forProperty("reporter")) : null;
     }
 
