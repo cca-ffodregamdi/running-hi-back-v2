@@ -7,7 +7,7 @@ public record GetMemberResponse(
         int level,
         double totalDistance,
         int distanceToNextLevel,
-        Long totalKcal
+        double totalKcal
 ) {
     public static GetMemberResponse from(Member member) {
         return new GetMemberResponse(member.getNickname(), member.getLevel(),

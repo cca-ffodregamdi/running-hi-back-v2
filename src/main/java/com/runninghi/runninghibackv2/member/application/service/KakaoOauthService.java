@@ -165,7 +165,7 @@ public class KakaoOauthService {
                 .isBlacklisted(false)
                 .role(Role.USER)
                 .distanceToNextLevel(0)
-                .totalKcal(0L)
+                .totalKcal(0.0)
                 .totalDistance(0.0)
                 .level(0)
                 .build();

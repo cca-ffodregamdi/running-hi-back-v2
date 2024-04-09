@@ -71,7 +71,7 @@ public class Member extends BaseTimeEntity {
 
     @Column(nullable = false)
     @Comment("누적 칼로리")
-    private Long totalKcal = 0L;
+    private double totalKcal = 0.0;
 
     @Column(nullable = false)
     @Comment("다음 레벨에 필요한 거리")
@@ -119,7 +119,7 @@ public class Member extends BaseTimeEntity {
         private String refreshToken;
         private LocalDateTime deactivateDate;
         private double totalDistance;
-        private Long totalKcal;
+        private double totalKcal;
         private int distanceToNextLevel;
         private int level;
 
@@ -188,7 +188,7 @@ public class Member extends BaseTimeEntity {
             return this;
         }
 
-        public MemberBuilder totalKcal(Long totalKcal) {
+        public MemberBuilder totalKcal(double totalKcal) {
             this.totalKcal = totalKcal;
             return this;
         }
