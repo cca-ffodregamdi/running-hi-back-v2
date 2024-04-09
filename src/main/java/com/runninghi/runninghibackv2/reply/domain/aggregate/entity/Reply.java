@@ -5,10 +5,7 @@ import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
@@ -94,66 +91,17 @@ public class Reply extends BaseTimeEntity {
         this.isDeleted = true;
     }
 
-    public static ReplyBuilder builder() {
-        return new ReplyBuilder();
-    }
 
-    public static class ReplyBuilder {
-
-        private Long replyNo;
-        private Member writer;
-        private Post post;
-        private String replyContent;
-        private int reportedCount;
-        private ProcessingStatus reportStatus;
-        private boolean isDeleted;
-        private Reply parent;
-
-        public ReplyBuilder replyNo(Long replyNo) {
-            this.replyNo = replyNo;
-            return this;
-        }
-
-        public ReplyBuilder writer(Member writer) {
-            this.writer = writer;
-            return this;
-        }
-
-        public ReplyBuilder post(Post post) {
-            this.post = post;
-            return this;
-        }
-
-        public ReplyBuilder replyContent(String replyContent) {
-            this.replyContent = replyContent;
-            return this;
-        }
-
-        public ReplyBuilder reportedCount(int reportedCount) {
-            this.reportedCount = reportedCount;
-            return this;
-        }
-
-        public ReplyBuilder reportStatus(ProcessingStatus reportStatus) {
-            this.reportStatus = reportStatus;
-            return this;
-        }
-
-        public ReplyBuilder isDeleted(Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
-        public ReplyBuilder parent(Reply parent) {
-            this.parent = parent;
-            return this;
-        }
-
-        public Reply build() {
-            return new Reply(this);
-        }
-
-
+    @Builder
+    public Reply(Long replyNo, Member writer, Post post, String replyContent, int reportedCount, ProcessingStatus reportStatus, boolean isDeleted, Reply parent) {
+        this.replyNo = replyNo;
+        this.writer = writer;
+        this.post = post;
+        this.replyContent = replyContent;
+        this.reportedCount = reportedCount;
+        this.reportStatus = reportStatus;
+        this.isDeleted = isDeleted;
+        this.parent = parent;
     }
 
 }

@@ -39,3 +39,5 @@ out/
 application.yml
 
 
+### firebase
+**/firebase/runninghi-firebase-adminsdk.json
