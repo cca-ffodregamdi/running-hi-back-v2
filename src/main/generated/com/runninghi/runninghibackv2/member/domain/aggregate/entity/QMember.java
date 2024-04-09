@@ -26,6 +26,10 @@ public class QMember extends EntityPathBase<Member> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createDate = _super.createDate;
 
+    public final DateTimePath<java.time.LocalDateTime> deactivateDate = createDateTime("deactivateDate", java.time.LocalDateTime.class);
+
+    public final NumberPath<Integer> distanceToNextLevel = createNumber("distanceToNextLevel", Integer.class);
+
     public final BooleanPath isActive = createBoolean("isActive");
 
     public final BooleanPath isBlacklisted = createBoolean("isBlacklisted");
@@ -33,6 +37,8 @@ public class QMember extends EntityPathBase<Member> {
     public final StringPath kakaoId = createString("kakaoId");
 
     public final StringPath kakaoName = createString("kakaoName");
+
+    public final NumberPath<Integer> level = createNumber("level", Integer.class);
 
     public final NumberPath<Long> memberNo = createNumber("memberNo", Long.class);
 
@@ -45,6 +51,10 @@ public class QMember extends EntityPathBase<Member> {
     public final NumberPath<Integer> reportCnt = createNumber("reportCnt", Integer.class);
 
     public final EnumPath<com.runninghi.runninghibackv2.common.entity.Role> role = createEnum("role", com.runninghi.runninghibackv2.common.entity.Role.class);
+
+    public final NumberPath<Double> totalDistance = createNumber("totalDistance", Double.class);
+
+    public final NumberPath<Double> totalKcal = createNumber("totalKcal", Double.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;

@@ -164,6 +164,10 @@ public class KakaoOauthService {
                 .isActive(true)
                 .isBlacklisted(false)
                 .role(Role.USER)
+                .distanceToNextLevel(0)
+                .totalKcal(0.0)
+                .totalDistance(0.0)
+                .level(0)
                 .build();
 
         // 리프레시 토큰 생성
