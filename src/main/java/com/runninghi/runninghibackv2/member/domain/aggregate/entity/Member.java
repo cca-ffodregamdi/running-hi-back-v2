@@ -44,13 +44,13 @@ public class Member extends BaseTimeEntity {
     @Comment("신고된 횟수")
     private int reportCnt;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
+    @Column(nullable = false)
     @Comment("계정 활성화 상태")
-    private boolean isActive;
+    private boolean isActive = true;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    @Column(nullable = false)
     @Comment("블랙리스트 상태")
-    private boolean isBlacklisted;
+    private boolean isBlacklisted = false;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -65,21 +65,21 @@ public class Member extends BaseTimeEntity {
     @Comment("탈퇴 신청 날짜")
     private LocalDateTime deactivateDate;
 
-    @Column
+    @Column(nullable = false)
     @Comment("누적 거리")
-    private double totalDistance = 0;
+    private double totalDistance = 0.0;
 
-    @Column
+    @Column(nullable = false)
     @Comment("누적 칼로리")
-    private Long totalKcal = 0L;
+    private double totalKcal = 0.0;
 
-    @Column
+    @Column(nullable = false)
     @Comment("다음 레벨에 필요한 거리")
     private int distanceToNextLevel = 10;
 
     @Column
     @Comment("누적거리에 따른 레벨")
-    private int level;
+    private int level = 0;
 
 
     public Member(MemberBuilder memberBuilder) {
@@ -119,7 +119,7 @@ public class Member extends BaseTimeEntity {
         private String refreshToken;
         private LocalDateTime deactivateDate;
         private double totalDistance;
-        private Long totalKcal;
+        private double totalKcal;
         private int distanceToNextLevel;
         private int level;
 
@@ -188,7 +188,7 @@ public class Member extends BaseTimeEntity {
             return this;
         }
 
-        public MemberBuilder totalKcal(Long totalKcal) {
+        public MemberBuilder totalKcal(double totalKcal) {
             this.totalKcal = totalKcal;
             return this;
         }

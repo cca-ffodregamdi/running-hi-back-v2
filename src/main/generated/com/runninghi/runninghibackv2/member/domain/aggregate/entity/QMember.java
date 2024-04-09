@@ -54,7 +54,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Double> totalDistance = createNumber("totalDistance", Double.class);
 
-    public final NumberPath<Long> totalKcal = createNumber("totalKcal", Long.class);
+    public final NumberPath<Double> totalKcal = createNumber("totalKcal", Double.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;
