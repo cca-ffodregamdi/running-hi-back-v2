@@ -87,7 +87,7 @@ public class FeedbackController {
 
         GetFeedbackResponse response = feedbackService.getFeedbackByAdmin(feedbackNo, memberNo);
 
-        return ResponseEntity.ok(ApiResult.success("", response));
+        return ResponseEntity.ok(ApiResult.success("피드백 조회 성공 : 관리자", response));
     }
 
     @HasAccess
