@@ -1,11 +1,10 @@
 package com.runninghi.runninghibackv2.post.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
 import com.runninghi.runninghibackv2.keyword.domain.repository.KeywordRepository;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.repository.MemberRepository;
 import com.runninghi.runninghibackv2.post.application.dto.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.response.CreatePostResponse;
@@ -14,7 +13,6 @@ import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;
 import com.runninghi.runninghibackv2.post.domain.repository.PostKeywordRepository;
-import com.runninghi.runninghibackv2.postreport.application.dto.request.CreatePostReportRequest;
 import com.runninghi.runninghibackv2.postreport.application.service.PostReportService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

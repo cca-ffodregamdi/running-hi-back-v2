@@ -1,9 +1,8 @@
 package com.runninghi.runninghibackv2.reply.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.common.response.ErrorCode;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.repository.MemberRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
