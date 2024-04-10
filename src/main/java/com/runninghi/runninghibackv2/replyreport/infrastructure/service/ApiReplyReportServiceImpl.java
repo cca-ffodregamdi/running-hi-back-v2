@@ -1,9 +1,9 @@
 package com.runninghi.runninghibackv2.replyreport.infrastructure.service;
 
-import com.runninghi.runninghibackv2.service.MemberService;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.reply.application.service.ReplyService;
-import com.runninghi.runninghibackv2.reply.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.application.service.MemberService;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.application.service.ReplyService;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
 import com.runninghi.runninghibackv2.replyreport.domain.service.ApiReplyReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

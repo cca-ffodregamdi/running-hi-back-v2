@@ -1,16 +1,16 @@
 package com.runninghi.runninghibackv2.feedback.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.runninghi.runninghibackv2.application.dto.feedback.response.*;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
-import com.runninghi.runninghibackv2.controller.FeedbackController;
-import com.runninghi.runninghibackv2.dto.request.CreateFeedbackRequest;
-import com.runninghi.runninghibackv2.dto.request.UpdateFeedbackReplyRequest;
-import com.runninghi.runninghibackv2.dto.request.UpdateFeedbackRequest;
-import com.runninghi.runninghibackv2.dto.response.*;
+import com.runninghi.runninghibackv2.application.controller.FeedbackController;
+import com.runninghi.runninghibackv2.application.dto.feedback.request.CreateFeedbackRequest;
+import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackReplyRequest;
+import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.*;
-import com.runninghi.runninghibackv2.service.FeedbackService;
-import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
+import com.runninghi.runninghibackv2.application.service.FeedbackService;
+import com.runninghi.runninghibackv2.domain.aggregate.enumtype.FeedbackCategory;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;

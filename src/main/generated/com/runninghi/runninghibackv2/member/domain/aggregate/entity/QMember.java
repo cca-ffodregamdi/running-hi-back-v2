@@ -7,7 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
 
 
 /**

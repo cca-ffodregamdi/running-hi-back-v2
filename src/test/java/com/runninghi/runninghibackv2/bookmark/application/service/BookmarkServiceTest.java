@@ -1,12 +1,13 @@
 package com.runninghi.runninghibackv2.bookmark.application.service;
 
-import com.runninghi.runninghibackv2.bookmark.application.dto.response.BookmarkedPostListResponse;
-import com.runninghi.runninghibackv2.bookmark.domain.aggregate.entity.Bookmark;
-import com.runninghi.runninghibackv2.bookmark.domain.aggregate.vo.BookmarkId;
-import com.runninghi.runninghibackv2.bookmark.domain.repository.BookmarkRepository;
+import com.runninghi.runninghibackv2.application.dto.bookmark.response.BookmarkedPostListResponse;
+import com.runninghi.runninghibackv2.application.service.BookmarkService;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Bookmark;
+import com.runninghi.runninghibackv2.domain.aggregate.vo.BookmarkId;
+import com.runninghi.runninghibackv2.domain.repository.BookmarkRepository;
 import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.aggregate.vo.GpxDataVO;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;

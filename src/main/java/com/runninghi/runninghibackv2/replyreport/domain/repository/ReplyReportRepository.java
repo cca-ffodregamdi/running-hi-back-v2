@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.replyreport.domain.repository;
 
-import com.runninghi.runninghibackv2.reply.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
 import com.runninghi.runninghibackv2.replyreport.domain.aggregate.entity.ReplyReport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

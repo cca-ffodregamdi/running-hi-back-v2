@@ -1,16 +1,17 @@
 package com.runninghi.runninghibackv2.reply.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.reply.application.dto.request.DeleteReplyRequest;
-import com.runninghi.runninghibackv2.reply.application.dto.request.UpdateReplyRequest;
-import com.runninghi.runninghibackv2.reply.application.dto.response.GetReplyListResponse;
-import com.runninghi.runninghibackv2.reply.application.dto.response.UpdateReplyResponse;
-import com.runninghi.runninghibackv2.reply.domain.aggregate.entity.Reply;
-import com.runninghi.runninghibackv2.reply.domain.repository.ReplyRepository;
+import com.runninghi.runninghibackv2.application.dto.reply.request.DeleteReplyRequest;
+import com.runninghi.runninghibackv2.application.dto.reply.request.UpdateReplyRequest;
+import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
+import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
+import com.runninghi.runninghibackv2.application.service.ReplyService;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
