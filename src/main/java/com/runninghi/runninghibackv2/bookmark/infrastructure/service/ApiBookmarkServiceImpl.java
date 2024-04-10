@@ -1,8 +1,8 @@
 package com.runninghi.runninghibackv2.bookmark.infrastructure.service;
 
 import com.runninghi.runninghibackv2.bookmark.domain.service.ApiBookmarkService;
-import com.runninghi.runninghibackv2.member.application.service.MemberService;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.service.MemberService;
+import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
