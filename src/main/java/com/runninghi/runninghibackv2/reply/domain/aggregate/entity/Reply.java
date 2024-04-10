@@ -2,7 +2,7 @@ package com.runninghi.runninghibackv2.reply.domain.aggregate.entity;
 
 import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

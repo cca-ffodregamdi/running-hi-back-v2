@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.post.application.dto.response;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 

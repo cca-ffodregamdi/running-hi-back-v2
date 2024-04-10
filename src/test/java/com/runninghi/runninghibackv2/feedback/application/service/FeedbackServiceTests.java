@@ -1,15 +1,17 @@
 package com.runninghi.runninghibackv2.feedback.application.service;
 
 import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.feedback.application.dto.request.CreateFeedbackRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackReplyRequest;
-import com.runninghi.runninghibackv2.feedback.application.dto.request.UpdateFeedbackRequest;
+import com.runninghi.runninghibackv2.dto.request.CreateFeedbackRequest;
+import com.runninghi.runninghibackv2.dto.request.UpdateFeedbackReplyRequest;
+import com.runninghi.runninghibackv2.dto.request.UpdateFeedbackRequest;
+import com.runninghi.runninghibackv2.dto.response.*;
 import com.runninghi.runninghibackv2.feedback.application.dto.response.*;
-import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.Feedback;
-import com.runninghi.runninghibackv2.feedback.domain.aggregate.entity.FeedbackCategory;
-import com.runninghi.runninghibackv2.feedback.domain.repository.FeedbackRepository;
-import com.runninghi.runninghibackv2.member.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.member.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.entity.Feedback;
+import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
+import com.runninghi.runninghibackv2.repository.FeedbackRepository;
+import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.repository.MemberRepository;
+import com.runninghi.runninghibackv2.service.FeedbackService;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.AfterEach;
