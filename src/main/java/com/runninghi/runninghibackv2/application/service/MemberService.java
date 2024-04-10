@@ -5,7 +5,7 @@ import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberRe
 import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
 import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
-import com.runninghi.runninghibackv2.domain.utils.MemberChecker;
+import com.runninghi.runninghibackv2.domain.service.MemberChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;

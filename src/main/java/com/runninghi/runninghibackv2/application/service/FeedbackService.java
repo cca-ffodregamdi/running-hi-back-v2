@@ -9,7 +9,7 @@ import com.runninghi.runninghibackv2.domain.aggregate.enumtype.FeedbackCategory;
 import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.FeedbackRepository;
-import com.runninghi.runninghibackv2.domain.utils.FeedbackChecker;
+import com.runninghi.runninghibackv2.domain.service.FeedbackChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;

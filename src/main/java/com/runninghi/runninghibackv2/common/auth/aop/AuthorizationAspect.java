@@ -1,6 +1,6 @@
-package com.runninghi.runninghibackv2.auth.aop;
+package com.runninghi.runninghibackv2.common.auth.aop;
 
-import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.entity.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

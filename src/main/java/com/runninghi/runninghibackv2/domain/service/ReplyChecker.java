@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.domain.utils;
+package com.runninghi.runninghibackv2.domain.service;
 
 
 import com.runninghi.runninghibackv2.common.entity.Role;

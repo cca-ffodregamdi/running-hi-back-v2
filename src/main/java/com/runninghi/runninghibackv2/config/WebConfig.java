@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.config;
 
-import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.filter.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;

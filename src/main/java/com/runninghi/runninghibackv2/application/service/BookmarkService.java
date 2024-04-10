@@ -4,11 +4,12 @@ import com.runninghi.runninghibackv2.application.dto.bookmark.request.CreateBook
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.BookmarkedPostListResponse;
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.CreateBookmarkResponse;
 import com.runninghi.runninghibackv2.domain.aggregate.entity.Bookmark;
+import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
 import com.runninghi.runninghibackv2.domain.aggregate.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.repository.BookmarkRepository;
-import com.runninghi.runninghibackv2.bookmark.domain.service.ApiBookmarkService;
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
+import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,9 @@ import java.util.List;
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
-    private ApiBookmarkService apiBookmarkService;
 
+    private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
     public  List<BookmarkedPostListResponse> getBookmarkedPostList(Long memberNo) {
@@ -37,9 +39,9 @@ public class BookmarkService {
 
         BookmarkId bookmarkId = BookmarkId.of(request.memberNo(), request.postNo());
 
-        Member member = apiBookmarkService.getMemberById(request.memberNo());
-        Post post = apiBookmarkService.getPostById(request.postNo());
-
+        Member member = memberRepository.findByMemberNo(request.memberNo());
+        Post post = postRepository.findById(request.postNo())
+                .orElseThrow(EntityNotFoundException::new);
 
         Bookmark bookmark = Bookmark.builder()
                                 .bookmarkId(bookmarkId)

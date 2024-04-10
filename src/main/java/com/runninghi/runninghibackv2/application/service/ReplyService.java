@@ -14,7 +14,7 @@ import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
-import com.runninghi.runninghibackv2.domain.utils.ReplyChecker;
+import com.runninghi.runninghibackv2.domain.service.ReplyChecker;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -187,8 +187,6 @@ public class ReplyService {
         if (!checkResult) throw new AccessDeniedException(ErrorCode.ACCESS_DENIED.getMessage());
 
     }
-
-
 
 }
 

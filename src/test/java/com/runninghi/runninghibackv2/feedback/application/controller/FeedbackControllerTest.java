@@ -2,7 +2,7 @@ package com.runninghi.runninghibackv2.feedback.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runninghi.runninghibackv2.application.dto.feedback.response.*;
-import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import com.runninghi.runninghibackv2.application.controller.FeedbackController;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.CreateFeedbackRequest;

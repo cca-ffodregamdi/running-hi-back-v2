@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.domain.utils;
+package com.runninghi.runninghibackv2.domain.service;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.auth.jwt;
+package com.runninghi.runninghibackv2.common.auth.jwt;
 
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
