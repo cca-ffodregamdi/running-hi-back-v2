@@ -8,6 +8,7 @@ import com.runninghi.runninghibackv2.member.application.dto.response.UpdateMembe
 import com.runninghi.runninghibackv2.member.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.member.application.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "회원 API", description = "회원 관련 API")
 public class MemberController {
 
     private final MemberService memberService;
@@ -32,7 +34,7 @@ public class MemberController {
      *
      * @return 카카오 로그인 페이지로 리다이렉트
      */
-    @RequestMapping("/api/v1/login/kakao")
+    @GetMapping("/api/v1/login/kakao")
     @Operation(summary = "카카오 로그인/회원가입", description = "카카오 OAuth 서비스를 이용하여 로그인/회원가입을 진행합니다.")
     public ResponseEntity<Void> kakaoLogin() {
 
@@ -68,7 +70,7 @@ public class MemberController {
      * @param token 인증 토큰
      * @return member의 활성화 상태인 isActvie(boolean) 값를 포함하는 ResponseEntity 객체
      */
-    @RequestMapping("/api/v1/unlink/kakao")
+    @PutMapping("/api/v1/unlink/kakao")
     @Operation(summary = "카카오 회원 탈퇴", description = "카카오 서비스와 연결을 끊고 회원 탈퇴를 진행합니다.")
     public ResponseEntity<ApiResult<Boolean>> kakaoLogout(@RequestHeader(value = "Authorization") String token) {
 
