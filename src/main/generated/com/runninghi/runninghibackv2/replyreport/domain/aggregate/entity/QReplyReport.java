@@ -8,8 +8,6 @@ import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
-import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
-import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 
 
 /**
@@ -24,9 +22,9 @@ public class QReplyReport extends EntityPathBase<ReplyReport> {
 
     public static final QReplyReport replyReport = new QReplyReport("replyReport");
 
-    public final com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity(this);
+    public final com.runninghi.runninghibackv2.domain.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.domain.entity.QBaseTimeEntity(this);
 
-    public final EnumPath<ReportCategory> category = createEnum("category", ReportCategory.class);
+    public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.ReportCategory> category = createEnum("category", com.runninghi.runninghibackv2.domain.enumtype.ReportCategory.class);
 
     public final StringPath content = createString("content");
 
@@ -43,7 +41,7 @@ public class QReplyReport extends EntityPathBase<ReplyReport> {
 
     public final com.runninghi.runninghibackv2.domain.entity.QMember reporter;
 
-    public final EnumPath<ProcessingStatus> status = createEnum("status", ProcessingStatus.class);
+    public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus> status = createEnum("status", com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;

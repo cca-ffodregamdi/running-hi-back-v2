@@ -8,7 +8,6 @@ import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
-import com.runninghi.runninghibackv2.domain.enumtype.Role;
 
 
 /**
@@ -23,7 +22,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public static final QPost post = new QPost("post");
 
-    public final com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity(this);
+    public final com.runninghi.runninghibackv2.domain.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.domain.entity.QBaseTimeEntity(this);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createDate = _super.createDate;
@@ -42,7 +41,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Integer> reportCnt = createNumber("reportCnt", Integer.class);
 
-    public final EnumPath<Role> role = createEnum("role", Role.class);
+    public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.Role> role = createEnum("role", com.runninghi.runninghibackv2.domain.enumtype.Role.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;

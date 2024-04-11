@@ -22,7 +22,7 @@ public class QFeedback extends EntityPathBase<Feedback> {
 
     public static final QFeedback feedback = new QFeedback("feedback");
 
-    public final com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity(this);
+    public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
 
     public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory> category = createEnum("category", com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory.class);
 

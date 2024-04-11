@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.common.entity;
+package com.runninghi.runninghibackv2.domain.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.runninghi.runninghibackv2.domain.entity.BaseTimeEntity;
 
 
 /**
@@ -16,7 +15,7 @@ import com.runninghi.runninghibackv2.domain.entity.BaseTimeEntity;
 @Generated("com.querydsl.codegen.DefaultSupertypeSerializer")
 public class QBaseTimeEntity extends EntityPathBase<BaseTimeEntity> {
 
-    private static final long serialVersionUID = 679243055L;
+    private static final long serialVersionUID = -16744632L;
 
     public static final QBaseTimeEntity baseTimeEntity = new QBaseTimeEntity("baseTimeEntity");
 
