@@ -1,9 +1,9 @@
 package com.runninghi.runninghibackv2.auto.jwt;
 
-import com.runninghi.runninghibackv2.common.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

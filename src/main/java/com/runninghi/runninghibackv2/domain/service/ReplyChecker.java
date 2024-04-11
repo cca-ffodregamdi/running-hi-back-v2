@@ -1,7 +1,7 @@
 package com.runninghi.runninghibackv2.domain.service;
 
 
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

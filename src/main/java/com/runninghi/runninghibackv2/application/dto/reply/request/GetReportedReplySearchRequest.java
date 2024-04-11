@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.reply.request;
 
-import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;

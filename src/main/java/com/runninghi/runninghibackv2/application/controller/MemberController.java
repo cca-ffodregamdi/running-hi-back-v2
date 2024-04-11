@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.common.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;

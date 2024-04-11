@@ -1,7 +1,7 @@
 package com.runninghi.runninghibackv2.replyreport.domain.service;
 
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Reply;
 
 public interface ApiReplyReportService {
     Member getMemberById(Long memberNo);

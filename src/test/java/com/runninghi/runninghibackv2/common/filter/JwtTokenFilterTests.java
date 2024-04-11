@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.common.filter;
 
-import com.runninghi.runninghibackv2.common.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;

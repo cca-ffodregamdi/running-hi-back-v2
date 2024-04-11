@@ -3,7 +3,7 @@ package com.runninghi.runninghibackv2.application.service;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.service.MemberChecker;
 import jakarta.persistence.EntityNotFoundException;

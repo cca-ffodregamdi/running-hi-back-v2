@@ -1,9 +1,9 @@
 package com.runninghi.runninghibackv2.replyreport.application.dto.response;
 
-import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
-import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
+import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
+import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.replyreport.domain.aggregate.entity.ReplyReport;
 
 public record CreateReplyReportResponse(

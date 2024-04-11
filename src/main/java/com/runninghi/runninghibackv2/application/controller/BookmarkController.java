@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.common.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.application.dto.bookmark.request.CreateBookmarkRequest;
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.BookmarkedPostListResponse;
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.CreateBookmarkResponse;
@@ -50,7 +50,7 @@ public class BookmarkController {
 
     @DeleteMapping(value = "/{postNo}")
     public ResponseEntity<ApiResult> deleteBookmark (@RequestHeader("Authorization") String bearerToken,
-                                                     @PathVariable(name = "postNo") Long postNo) {
+                                                    @PathVariable(name = "postNo") Long postNo) {
 
             AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
             bookmarkService.deleteBookmark(accessTokenInfo.memberNo(), postNo);

@@ -1,12 +1,12 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.runninghi.runninghibackv2.common.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthException;
 import com.runninghi.runninghibackv2.application.dto.member.response.KakaoProfileResponse;
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

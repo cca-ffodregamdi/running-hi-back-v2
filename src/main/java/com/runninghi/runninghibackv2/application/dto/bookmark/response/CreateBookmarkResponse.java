@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.bookmark.response;
 
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Bookmark;
+import com.runninghi.runninghibackv2.domain.entity.Bookmark;
 
 public record CreateBookmarkResponse(
         Long memberNo,

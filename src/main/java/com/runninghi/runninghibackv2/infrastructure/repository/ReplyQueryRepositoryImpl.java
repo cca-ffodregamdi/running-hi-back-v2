@@ -7,9 +7,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.runninghi.runninghibackv2.reply.domain.aggregate.entity.QReply.reply;
+import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 
 @Repository
 @RequiredArgsConstructor

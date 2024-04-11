@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.reply.request;
 
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 
 public record DeleteReplyRequest(
         Long replyNo,

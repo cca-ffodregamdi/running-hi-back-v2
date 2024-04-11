@@ -1,7 +1,7 @@
 package com.runninghi.runninghibackv2.application.dto.feedback.response;
 
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Feedback;
-import com.runninghi.runninghibackv2.domain.aggregate.enumtype.FeedbackCategory;
+import com.runninghi.runninghibackv2.domain.entity.Feedback;
+import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;

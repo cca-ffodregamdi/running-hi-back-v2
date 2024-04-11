@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.domain.repository;
 
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.domain.entity.Reply;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

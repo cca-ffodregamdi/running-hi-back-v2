@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.post.application.dto.request;
 
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

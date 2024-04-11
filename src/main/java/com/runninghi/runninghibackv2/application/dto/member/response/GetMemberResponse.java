@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.member.response;
 
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Member;
 
 public record GetMemberResponse(
         String nickname,

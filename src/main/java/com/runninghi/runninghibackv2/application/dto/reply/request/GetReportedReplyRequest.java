@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.reply.request;
 
-import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import org.springframework.data.domain.Pageable;
 
 public record GetReportedReplyRequest (

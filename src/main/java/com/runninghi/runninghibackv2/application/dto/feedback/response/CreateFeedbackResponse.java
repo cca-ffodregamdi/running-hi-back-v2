@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.feedback.response;
 
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Feedback;
+import com.runninghi.runninghibackv2.domain.entity.Feedback;
 import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "피드백 작성")
 public record CreateFeedbackResponse(

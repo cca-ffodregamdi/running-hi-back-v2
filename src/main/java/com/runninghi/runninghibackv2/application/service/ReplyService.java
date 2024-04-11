@@ -7,10 +7,10 @@ import com.runninghi.runninghibackv2.application.dto.reply.request.UpdateReplyRe
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Member;
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;

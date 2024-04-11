@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.reply.response;
 
-import com.runninghi.runninghibackv2.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.domain.entity.Reply;
 
 import java.time.LocalDateTime;
 
