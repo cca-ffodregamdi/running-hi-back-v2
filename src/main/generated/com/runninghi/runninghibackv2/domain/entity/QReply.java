@@ -33,7 +33,7 @@ public class QReply extends EntityPathBase<Reply> {
 
     public final QReply parent;
 
-    public final com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost post;
+    public final QPost post;
 
     public final StringPath replyContent = createString("replyContent");
 
@@ -67,7 +67,7 @@ public class QReply extends EntityPathBase<Reply> {
     public QReply(Class<? extends Reply> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.parent = inits.isInitialized("parent") ? new QReply(forProperty("parent"), inits.get("parent")) : null;
-        this.post = inits.isInitialized("post") ? new com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost(forProperty("post"), inits.get("post")) : null;
+        this.post = inits.isInitialized("post") ? new QPost(forProperty("post"), inits.get("post")) : null;
         this.writer = inits.isInitialized("writer") ? new QMember(forProperty("writer")) : null;
     }
 

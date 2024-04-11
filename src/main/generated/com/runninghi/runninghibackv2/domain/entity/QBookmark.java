@@ -26,7 +26,7 @@ public class QBookmark extends EntityPathBase<Bookmark> {
 
     public final QMember member;
 
-    public final com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost post;
+    public final QPost post;
 
     public QBookmark(String variable) {
         this(Bookmark.class, forVariable(variable), INITS);
@@ -48,7 +48,7 @@ public class QBookmark extends EntityPathBase<Bookmark> {
         super(type, metadata, inits);
         this.bookmarkId = inits.isInitialized("bookmarkId") ? new com.runninghi.runninghibackv2.domain.entity.vo.QBookmarkId(forProperty("bookmarkId")) : null;
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
-        this.post = inits.isInitialized("post") ? new com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost(forProperty("post"), inits.get("post")) : null;
+        this.post = inits.isInitialized("post") ? new QPost(forProperty("post"), inits.get("post")) : null;
     }
 
 }

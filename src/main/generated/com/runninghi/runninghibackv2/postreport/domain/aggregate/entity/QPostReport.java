@@ -35,7 +35,7 @@ public class QPostReport extends EntityPathBase<PostReport> {
 
     public final NumberPath<Long> postReportNo = createNumber("postReportNo", Long.class);
 
-    public final com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost reportedPost;
+    public final com.runninghi.runninghibackv2.domain.entity.QPost reportedPost;
 
     public final com.runninghi.runninghibackv2.domain.entity.QMember reporter;
 
@@ -62,7 +62,7 @@ public class QPostReport extends EntityPathBase<PostReport> {
 
     public QPostReport(Class<? extends PostReport> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.reportedPost = inits.isInitialized("reportedPost") ? new com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost(forProperty("reportedPost"), inits.get("reportedPost")) : null;
+        this.reportedPost = inits.isInitialized("reportedPost") ? new com.runninghi.runninghibackv2.domain.entity.QPost(forProperty("reportedPost"), inits.get("reportedPost")) : null;
         this.reporter = inits.isInitialized("reporter") ? new com.runninghi.runninghibackv2.domain.entity.QMember(forProperty("reporter")) : null;
     }
 
