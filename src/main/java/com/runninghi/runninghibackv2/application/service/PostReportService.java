@@ -1,16 +1,18 @@
-package com.runninghi.runninghibackv2.postreport.application.service;
+package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.postreport.response.DeletePostReportResponse;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.postreport.application.dto.request.CreatePostReportRequest;
-import com.runninghi.runninghibackv2.postreport.application.dto.response.CreatePostReportResponse;
-import com.runninghi.runninghibackv2.postreport.application.dto.response.GetPostReportResponse;
-import com.runninghi.runninghibackv2.postreport.application.dto.response.HandlePostReportResponse;
-import com.runninghi.runninghibackv2.postreport.domain.aggregate.entity.PostReport;
-import com.runninghi.runninghibackv2.postreport.domain.repository.PostReportRepository;
-import com.runninghi.runninghibackv2.postreport.domain.service.ApiPostReportService;
-import com.runninghi.runninghibackv2.postreport.domain.service.PostReportChecker;
+import com.runninghi.runninghibackv2.application.dto.postreport.request.CreatePostReportRequest;
+import com.runninghi.runninghibackv2.application.dto.postreport.response.CreatePostReportResponse;
+import com.runninghi.runninghibackv2.application.dto.postreport.response.GetPostReportResponse;
+import com.runninghi.runninghibackv2.application.dto.postreport.response.HandlePostReportResponse;
+import com.runninghi.runninghibackv2.domain.entity.PostReport;
+import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostReportRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostRepository;
+import com.runninghi.runninghibackv2.domain.service.PostReportChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,8 +27,9 @@ import java.util.List;
 public class PostReportService {
 
     private final PostReportRepository postReportRepository;
+    private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
     private final PostReportChecker postReportChecker;
-    private final ApiPostReportService apiPostReportService;
 
     // 게시글 신고 저장
     @Transactional
@@ -34,22 +37,24 @@ public class PostReportService {
 
         postReportChecker.checkPostReportValidation(request);
 
-        Member reporter = apiPostReportService.getMemberById(memberNo);
-        Post reportedPost = apiPostReportService.getPostById(request.reportedPostNo());
+        Member reporter = memberRepository.findByMemberNo(memberNo);
+        Post reportedPost = postRepository.findById(request.reportedPostNo())
+                .orElseThrow(EntityNotFoundException::new);
 
-        PostReport postReport = new PostReport.Builder()
+        PostReport postReport = PostReport.builder()
                 .category(request.category())
                 .content(request.content())
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(reporter)
                 .reportedPost(reportedPost)
+                .postContent(reportedPost.getPostContent())
                 .isPostDeleted(false)
                 .build();
 
-        PostReport insertedPostReport = postReportRepository.save(postReport);
-        apiPostReportService.addReportedCountToPost(reportedPost.getPostNo());
+        postReportRepository.save(postReport);
+        reportedPost.addReportedCount();
 
-        return CreatePostReportResponse.from(insertedPostReport);
+        return CreatePostReportResponse.from(postReport);
     }
 
     // 게시글 신고 전체 조회
@@ -75,14 +80,16 @@ public class PostReportService {
     @Transactional(readOnly = true)
     public List<Post> getReportedPostsByStatus(ProcessingStatus status) {
 
-        return postReportRepository.findReportedPostsByStatus(status);
+        return postReportRepository.findAllByStatus(status);
     }
 
     // 신고된 게시글의 모든 신고 내역 조회
     @Transactional(readOnly = true)
     public Page<GetPostReportResponse> getPostReportScrollByPostId(Long postNo, Pageable pageable) {
 
-        return postReportRepository.findPostReportScrollByPostId(postNo, pageable)
+        Post reportedPost = postRepository.findById(postNo).orElseThrow(EntityNotFoundException::new);
+
+        return postReportRepository.findAllByReportedPost(reportedPost, pageable)
                 .map(GetPostReportResponse::from);
     }
 
@@ -90,19 +97,20 @@ public class PostReportService {
     @Transactional
     public List<HandlePostReportResponse> handlePostReports(boolean isAccepted, Long postNo) {
 
-        List<PostReport> postReportList = postReportRepository.findPostReportsByPostId(postNo);
+        Post reportedPost = postRepository.findById(postNo).orElseThrow(EntityNotFoundException::new);
+        List<PostReport> postReportList = postReportRepository.findAllByReportedPost(reportedPost);
         ProcessingStatus status;
 
         if(isAccepted) {
-            Long reportedMemberNo = apiPostReportService.getPostById(postNo).getMember().getMemberNo();
-            apiPostReportService.addReportedCountToMember(reportedMemberNo);
+            Member reportedMember = reportedPost.getMember();
+            reportedMember.addReportedCount();
             status = ProcessingStatus.ACCEPTED;
 
             postReportList.forEach(postReport -> postReport.update(status, true, null));
-            apiPostReportService.deletePostById(postNo);
+            postRepository.deleteById(postNo);
         } else {
             status = ProcessingStatus.REJECTED;
-            apiPostReportService.resetReportedCountOfPost(postNo);
+            reportedPost.resetReportedCount();
             postReportList.forEach(postReport -> postReport.update(status));
         }
 
@@ -113,11 +121,10 @@ public class PostReportService {
 
     // 게시글 신고 삭제
     @Transactional
-    public void deletePostReport(Long postReportNo) {
-
-        postReportRepository.findById(postReportNo)
-                .orElseThrow(EntityNotFoundException::new);
+    public DeletePostReportResponse deletePostReport(Long postReportNo) {
 
         postReportRepository.deleteById(postReportNo);
+
+        return DeletePostReportResponse.from(postReportNo);
     }
 }
