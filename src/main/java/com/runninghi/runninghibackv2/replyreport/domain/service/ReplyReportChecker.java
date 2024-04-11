@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.replyreport.domain.service;
 
-import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
+import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.replyreport.application.dto.request.CreateReplyReportRequest;
 import org.springframework.stereotype.Service;
 

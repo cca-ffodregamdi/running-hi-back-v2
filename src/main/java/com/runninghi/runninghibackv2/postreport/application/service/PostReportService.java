@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.postreport.application.service;
 
-import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.postreport.application.dto.request.CreatePostReportRequest;

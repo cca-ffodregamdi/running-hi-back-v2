@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.post.infrastructure.service;
 
-import com.runninghi.runninghibackv2.service.MemberService;
+import com.runninghi.runninghibackv2.application.service.MemberService;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.post.domain.service.ApiPostService;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.common.dto;
 
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 
 public record RefreshTokenInfo(

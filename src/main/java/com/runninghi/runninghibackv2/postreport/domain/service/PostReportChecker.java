@@ -1,7 +1,7 @@
 package com.runninghi.runninghibackv2.postreport.domain.service;
 
-import com.runninghi.runninghibackv2.common.entity.Role;
-import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.postreport.application.dto.request.CreatePostReportRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;

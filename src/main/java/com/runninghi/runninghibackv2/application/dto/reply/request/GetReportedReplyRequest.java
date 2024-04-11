@@ -1,0 +1,15 @@
+package com.runninghi.runninghibackv2.application.dto.reply.request;
+
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
+import org.springframework.data.domain.Pageable;
+
+public record GetReportedReplyRequest (
+        Pageable pageable,
+        String search,
+
+        ProcessingStatus reportStatus
+) {
+    public static GetReportedReplyRequest of (Pageable pageable, String search, ProcessingStatus reportStatus) {
+        return new GetReportedReplyRequest(pageable, search, reportStatus);
+    }
+}

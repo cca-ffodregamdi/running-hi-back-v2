@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
-import com.runninghi.runninghibackv2.common.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

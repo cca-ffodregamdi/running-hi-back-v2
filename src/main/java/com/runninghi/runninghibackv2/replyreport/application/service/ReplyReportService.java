@@ -1,8 +1,8 @@
 package com.runninghi.runninghibackv2.replyreport.application.service;
 
-import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.reply.domain.aggregate.entity.Reply;
+import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.replyreport.application.dto.request.CreateReplyReportRequest;
 import com.runninghi.runninghibackv2.replyreport.application.dto.response.CreateReplyReportResponse;
 import com.runninghi.runninghibackv2.replyreport.application.dto.response.GetReplyReportResponse;

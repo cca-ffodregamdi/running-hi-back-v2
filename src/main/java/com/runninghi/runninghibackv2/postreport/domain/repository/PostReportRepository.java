@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.postreport.domain.repository;
 
-import com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus;
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.postreport.domain.aggregate.entity.PostReport;
 import org.springframework.data.domain.Page;

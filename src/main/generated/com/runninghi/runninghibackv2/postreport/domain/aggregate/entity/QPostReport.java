@@ -8,6 +8,8 @@ import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
+import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
+import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 
 
 /**
@@ -24,7 +26,7 @@ public class QPostReport extends EntityPathBase<PostReport> {
 
     public final com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity(this);
 
-    public final EnumPath<com.runninghi.runninghibackv2.common.enumtype.ReportCategory> category = createEnum("category", com.runninghi.runninghibackv2.common.enumtype.ReportCategory.class);
+    public final EnumPath<ReportCategory> category = createEnum("category", ReportCategory.class);
 
     public final StringPath content = createString("content");
 
@@ -37,9 +39,9 @@ public class QPostReport extends EntityPathBase<PostReport> {
 
     public final com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost reportedPost;
 
-    public final com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember reporter;
+    public final com.runninghi.runninghibackv2.domain.entity.QMember reporter;
 
-    public final EnumPath<com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus> status = createEnum("status", com.runninghi.runninghibackv2.common.enumtype.ProcessingStatus.class);
+    public final EnumPath<ProcessingStatus> status = createEnum("status", ProcessingStatus.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;
@@ -63,7 +65,7 @@ public class QPostReport extends EntityPathBase<PostReport> {
     public QPostReport(Class<? extends PostReport> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.reportedPost = inits.isInitialized("reportedPost") ? new com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost(forProperty("reportedPost"), inits.get("reportedPost")) : null;
-        this.reporter = inits.isInitialized("reporter") ? new com.runninghi.runninghibackv2.member.domain.aggregate.entity.QMember(forProperty("reporter")) : null;
+        this.reporter = inits.isInitialized("reporter") ? new com.runninghi.runninghibackv2.domain.entity.QMember(forProperty("reporter")) : null;
     }
 
 }

@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.postreport.application.dto.request;
 
-import com.runninghi.runninghibackv2.common.enumtype.ReportCategory;
+import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record CreatePostReportRequest(
