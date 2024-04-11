@@ -9,8 +9,7 @@ name: Java CI with Gradle
 
 on:
   pull_request:
-    branches:
-      - '*'
+    branches: [ "*" ]
 
 permissions:
   contents: read
