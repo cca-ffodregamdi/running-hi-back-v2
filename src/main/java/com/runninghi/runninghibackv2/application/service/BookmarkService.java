@@ -59,4 +59,5 @@ public class BookmarkService {
                         .orElseThrow(EntityNotFoundException::new);
         bookmarkRepository.delete(bookmark);
     }
+
 }

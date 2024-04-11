@@ -149,7 +149,7 @@ public class ReplyService {
      * 신고 횟수를 올리는 메소드입니다.
      * @param replyNo
      */
-    @Transactional(propagation = Propagation.MANDATORY) // 부모 트랜잭션이 없으면 exception 발생
+    @Transactional // 부모 트랜잭션이 없으면 exception 발생
     public void plusReportedCount (Long replyNo) {
 
         Reply reply = findReplyByReplyNo(replyNo);
