@@ -1,6 +1,5 @@
-package com.runninghi.runninghibackv2.auto.jwt;
+package com.runninghi.runninghibackv2.auth.jwt;
 
-import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;

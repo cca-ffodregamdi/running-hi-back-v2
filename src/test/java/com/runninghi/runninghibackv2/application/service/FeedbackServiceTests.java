@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.feedback.application.service;
+package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.application.dto.feedback.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackReplyRequest;

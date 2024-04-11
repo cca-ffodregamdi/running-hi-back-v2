@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.post.application.service;
+package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
@@ -9,6 +9,8 @@ import com.runninghi.runninghibackv2.post.application.dto.request.CreatePostRequ
 import com.runninghi.runninghibackv2.post.application.dto.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.post.application.dto.response.CreatePostResponse;
 import com.runninghi.runninghibackv2.post.application.dto.response.GetAllPostsResponse;
+import com.runninghi.runninghibackv2.post.application.service.PostKeywordService;
+import com.runninghi.runninghibackv2.post.application.service.PostService;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.post.domain.aggregate.entity.PostKeyword;

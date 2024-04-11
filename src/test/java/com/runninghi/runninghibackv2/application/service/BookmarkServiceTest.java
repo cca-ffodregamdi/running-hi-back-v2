@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.bookmark.application.service;
+package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.BookmarkedPostListResponse;
 import com.runninghi.runninghibackv2.application.service.BookmarkService;

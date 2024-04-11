@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.feedback.application.controller;
+package com.runninghi.runninghibackv2.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runninghi.runninghibackv2.application.controller.FeedbackController;

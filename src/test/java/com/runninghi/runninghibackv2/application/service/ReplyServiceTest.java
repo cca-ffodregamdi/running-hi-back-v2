@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.reply.application.service;
+package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Member;
