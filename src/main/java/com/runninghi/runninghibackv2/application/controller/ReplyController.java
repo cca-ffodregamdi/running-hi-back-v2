@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
+import com.runninghi.runninghibackv2.application.service.NotificationService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
@@ -29,8 +30,9 @@ import java.util.List;
 @RequestMapping("api/v1/reply")
 public class ReplyController {
 
-    private final ReplyService replyService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ReplyService replyService;
+    private final NotificationService notificationService;
 
     private static final String GET_MAPPING_RESPONSE_MESSAGE = "성공적으로 조회되었습니다.";
     private static final String CREATE_RESPONSE_MESSAGE = "성공적으로 생성되었습니다.";

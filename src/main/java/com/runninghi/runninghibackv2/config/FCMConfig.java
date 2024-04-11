@@ -18,7 +18,7 @@ public class FCMConfig {
     public FirebaseMessaging firebaseMessaging() throws IOException {
 
         ClassPathResource resource =
-                new ClassPathResource("/firebase/runninghi-firebase-adminsdk.json");
+                new ClassPathResource("firebase/runninghi-firebase-adminsdk.json");
         InputStream serviceAccount = resource.getInputStream();
 
         FirebaseOptions options = FirebaseOptions.builder()
