@@ -145,7 +145,6 @@ public class ReplyService {
     }
 
     /**
-     * 신고 도메인 측에서 요청하는 메소드.
      * 신고 횟수를 올리는 메소드입니다.
      * @param replyNo
      */
@@ -157,7 +156,6 @@ public class ReplyService {
     }
 
     /**
-     * 신고 도메인 측에서 요청하는 메소드.
      * 신고 횟수를 초기화하는 메소드입니다.
      * @param replyNo
      */
