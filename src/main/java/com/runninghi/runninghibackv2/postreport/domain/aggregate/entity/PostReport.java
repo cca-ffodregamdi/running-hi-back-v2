@@ -4,7 +4,7 @@ import com.runninghi.runninghibackv2.domain.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
+import com.runninghi.runninghibackv2.domain.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,17 +1,13 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.runninghi.runninghibackv2.keyword.application.dto.request.KeywordRequest;
-import com.runninghi.runninghibackv2.keyword.application.dto.response.KeywordResponse;
-import com.runninghi.runninghibackv2.keyword.application.service.KeywordService;
-import com.runninghi.runninghibackv2.keyword.domain.aggregate.entity.Keyword;
-import com.runninghi.runninghibackv2.keyword.domain.repository.KeywordRepository;
+import com.runninghi.runninghibackv2.application.dto.keyword.request.KeywordRequest;
+import com.runninghi.runninghibackv2.application.dto.keyword.response.KeywordResponse;
+import com.runninghi.runninghibackv2.domain.repository.KeywordRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.runninghi.runninghibackv2.domain.enumtype.Role;
 
 
 /**
@@ -20,7 +19,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
-    public final com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity(this);
+    public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
 
     public final StringPath account = createString("account");
 
@@ -51,7 +50,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Integer> reportCnt = createNumber("reportCnt", Integer.class);
 
-    public final EnumPath<Role> role = createEnum("role", Role.class);
+    public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.Role> role = createEnum("role", com.runninghi.runninghibackv2.domain.enumtype.Role.class);
 
     public final NumberPath<Double> totalDistance = createNumber("totalDistance", Double.class);
 

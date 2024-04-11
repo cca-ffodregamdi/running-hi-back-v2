@@ -1,16 +1,15 @@
 package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.BookmarkedPostListResponse;
-import com.runninghi.runninghibackv2.application.service.BookmarkService;
 import com.runninghi.runninghibackv2.domain.entity.Bookmark;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.repository.BookmarkRepository;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
-import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
-import com.runninghi.runninghibackv2.post.domain.aggregate.vo.GpxDataVO;
-import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
+import com.runninghi.runninghibackv2.domain.entity.Post;
+import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
+import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;

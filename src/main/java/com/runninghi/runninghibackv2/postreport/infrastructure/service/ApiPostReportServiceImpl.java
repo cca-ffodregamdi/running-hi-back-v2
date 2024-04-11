@@ -2,9 +2,9 @@ package com.runninghi.runninghibackv2.postreport.infrastructure.service;
 
 import com.runninghi.runninghibackv2.application.service.MemberService;
 import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.post.application.dto.response.GetPostResponse;
-import com.runninghi.runninghibackv2.post.application.service.PostService;
-import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
+import com.runninghi.runninghibackv2.application.dto.post.response.GetPostResponse;
+import com.runninghi.runninghibackv2.application.service.PostService;
+import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.postreport.domain.service.ApiPostReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

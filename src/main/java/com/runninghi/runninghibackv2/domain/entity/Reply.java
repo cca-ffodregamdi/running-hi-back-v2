@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
-import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;

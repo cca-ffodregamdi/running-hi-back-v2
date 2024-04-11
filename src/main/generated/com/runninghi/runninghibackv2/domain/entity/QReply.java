@@ -8,7 +8,6 @@ import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
-import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 
 
 /**
@@ -23,7 +22,7 @@ public class QReply extends EntityPathBase<Reply> {
 
     public static final QReply reply = new QReply("reply");
 
-    public final com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity _super = new com.runninghi.runninghibackv2.common.entity.QBaseTimeEntity(this);
+    public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
 
     public final ListPath<Reply, QReply> children = this.<Reply, QReply>createList("children", Reply.class, QReply.class, PathInits.DIRECT2);
 
@@ -34,7 +33,7 @@ public class QReply extends EntityPathBase<Reply> {
 
     public final QReply parent;
 
-    public final com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost post;
+    public final QPost post;
 
     public final StringPath replyContent = createString("replyContent");
 
@@ -42,7 +41,7 @@ public class QReply extends EntityPathBase<Reply> {
 
     public final NumberPath<Integer> reportedCount = createNumber("reportedCount", Integer.class);
 
-    public final EnumPath<ProcessingStatus> reportStatus = createEnum("reportStatus", ProcessingStatus.class);
+    public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus> reportStatus = createEnum("reportStatus", com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;
@@ -68,7 +67,7 @@ public class QReply extends EntityPathBase<Reply> {
     public QReply(Class<? extends Reply> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.parent = inits.isInitialized("parent") ? new QReply(forProperty("parent"), inits.get("parent")) : null;
-        this.post = inits.isInitialized("post") ? new com.runninghi.runninghibackv2.post.domain.aggregate.entity.QPost(forProperty("post"), inits.get("post")) : null;
+        this.post = inits.isInitialized("post") ? new QPost(forProperty("post"), inits.get("post")) : null;
         this.writer = inits.isInitialized("writer") ? new QMember(forProperty("writer")) : null;
     }
 

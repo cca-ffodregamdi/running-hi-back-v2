@@ -15,14 +15,13 @@ import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
 import com.runninghi.runninghibackv2.domain.service.ReplyChecker;
-import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
-import com.runninghi.runninghibackv2.post.domain.repository.PostRepository;
+import com.runninghi.runninghibackv2.domain.entity.Post;
+import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
