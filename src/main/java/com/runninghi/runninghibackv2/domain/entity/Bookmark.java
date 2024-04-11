@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
-import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

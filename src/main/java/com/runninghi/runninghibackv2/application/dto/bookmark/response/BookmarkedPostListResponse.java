@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.bookmark.response;
 
-import com.runninghi.runninghibackv2.post.domain.aggregate.entity.Post;
+import com.runninghi.runninghibackv2.domain.entity.Post;
 
 public record BookmarkedPostListResponse(
         Long postNo,
