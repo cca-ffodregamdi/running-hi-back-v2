@@ -1,29 +1,25 @@
-package com.runninghi.runninghibackv2.postreport.application.dto.response;
+package com.runninghi.runninghibackv2.application.dto.postreport.response;
 
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.postreport.domain.aggregate.entity.PostReport;
+import com.runninghi.runninghibackv2.domain.entity.PostReport;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record CreatePostReportResponse(
+        @Schema(description = "게시글 신고 Id", example = "1")
         Long postReportNo,
+        @Schema(description = "신고 카테고리", example = "SPAM")
         ReportCategory category,
-        String content,
-        ProcessingStatus status,
-        Member reporter,
-        Post reportedPost,
-        boolean isPostDeleted
+        @Schema(description = "기타 신고 사유", example = "공백 제외 10자 이상의 사유")
+        String content
 ) {
     public static CreatePostReportResponse from(PostReport postReport) {
 
         return new CreatePostReportResponse(
                 postReport.getPostReportNo(),
                 postReport.getCategory(),
-                postReport.getContent(),
-                postReport.getStatus(),
-                postReport.getReporter(),
-                postReport.getReportedPost(),
-                postReport.isPostDeleted());
+                postReport.getContent());
     }
 }
