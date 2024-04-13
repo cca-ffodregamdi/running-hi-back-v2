@@ -69,16 +69,6 @@ public class PostReportController {
     }
 
     @HasAccess
-    @Operation(summary = "신고 처리상태로 신고된 게시글 리스트 조회")
-    @GetMapping("/post/status")
-    public ResponseEntity<ApiResult<List<Post>>> getReportedPostsByStatus(@RequestParam ProcessingStatus status) {
-
-        List<Post> response = postReportService.getReportedPostsByStatus(status);
-
-        return ResponseEntity.ok(ApiResult.success("신고된 게시글 조회 성공", response));
-    }
-
-    @HasAccess
     @Operation(summary = "게시글의 모든 신고 내역 조회")
     @GetMapping("/post")
     public ResponseEntity<ApiResult<Page<GetPostReportResponse>>> getPostReportsByPostId(
