@@ -7,6 +7,8 @@ import com.runninghi.runninghibackv2.member.application.dto.response.GetMemberRe
 import com.runninghi.runninghibackv2.member.application.dto.response.UpdateMemberInfoResponse;
 import com.runninghi.runninghibackv2.member.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.member.application.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "회원 API", description = "회원 관련 API")
 public class MemberController {
 
     private final MemberService memberService;
@@ -31,7 +34,8 @@ public class MemberController {
      *
      * @return 카카오 로그인 페이지로 리다이렉트
      */
-    @RequestMapping("/api/v1/login/kakao")
+    @GetMapping("/api/v1/login/kakao")
+    @Operation(summary = "카카오 로그인/회원가입", description = "카카오 OAuth 서비스를 이용하여 로그인/회원가입을 진행합니다.")
     public ResponseEntity<Void> kakaoLogin() {
 
         URI kakaoUri = URI.create(kakaoOauthService.getKakaoUri());
@@ -46,7 +50,8 @@ public class MemberController {
      * @return 로그인 성공 여부 및 인증 토큰 정보
      */
     @RequestMapping("/api/v1/login/kakao/callback")
-    public ResponseEntity<ApiResult> kakaoCallback(@RequestParam("code") String code) {
+    @Operation(hidden = true)
+    public ResponseEntity<ApiResult<Void>> kakaoCallback(@RequestParam("code") String code) {
 
         Map<String, String> tokens = kakaoOauthService.kakaoOauth(code);
 
@@ -60,13 +65,14 @@ public class MemberController {
     }
 
     /**
-     * 카카오 로그아웃 엔드포인트입니다. 토큰을 제공하여 로그인된 회원의 카카오 계정을 연결 해제하고 로그아웃합니다.
+     * 카카오 Unlink 엔드포인트입니다. 토큰을 제공하여 로그인된 회원의 카카오 계정을 연결 해제하고 탈퇴합니다.
      *
      * @param token 인증 토큰
      * @return member의 활성화 상태인 isActvie(boolean) 값를 포함하는 ResponseEntity 객체
      */
-    @RequestMapping("/api/v1/logout/kakao")
-    public ResponseEntity<ApiResult> kakaoLogout(@RequestHeader(value = "Authorization") String token) {
+    @PutMapping("/api/v1/unlink/kakao")
+    @Operation(summary = "카카오 회원 탈퇴", description = "카카오 서비스와 연결을 끊고 회원 탈퇴를 진행합니다.")
+    public ResponseEntity<ApiResult<Boolean>> kakaoLogout(@RequestHeader(value = "Authorization") String token) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
@@ -77,7 +83,8 @@ public class MemberController {
     }
 
     @PutMapping("/api/v1/members")
-    public ResponseEntity<ApiResult> updateMemberInfo(
+    @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다.")
+    public ResponseEntity<ApiResult<UpdateMemberInfoResponse>> updateMemberInfo(
             @RequestHeader(value = "Authorization") String token,
             @RequestBody UpdateMemberInfoRequest request
     ) throws BadRequestException {
@@ -90,7 +97,8 @@ public class MemberController {
     }
 
     @GetMapping("/api/v1/members")
-    public ResponseEntity<ApiResult> getMemberInfo(@RequestHeader(value = "Authorization") String token) {
+    @Operation(summary = "회원 정보 조회", description = "회원 정보를 조회합니다.")
+    public ResponseEntity<ApiResult<GetMemberResponse>> getMemberInfo(@RequestHeader(value = "Authorization") String token) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
