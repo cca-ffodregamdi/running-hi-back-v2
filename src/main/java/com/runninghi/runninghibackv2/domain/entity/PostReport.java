@@ -1,10 +1,7 @@
-package com.runninghi.runninghibackv2.postreport.domain.aggregate.entity;
+package com.runninghi.runninghibackv2.domain.entity;
 
-import com.runninghi.runninghibackv2.domain.entity.BaseTimeEntity;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.domain.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,10 +42,12 @@ public class PostReport extends BaseTimeEntity {
     @Comment("신고된 게시글")
     private Post reportedPost;
 
-    // TODO. 신고된 게시글 내용 컬럼
+    @Column(nullable = false)
+    @Comment("용")
+    private String postContent;
 
     @Column(nullable = false)
-    @Comment("연관된 게시글이 삭제되었는지 여부")
+    @Comment("연관된 게시글 삭제 여부")
     private boolean isPostDeleted;
 
     public PostReport(Builder builder) {
@@ -58,7 +57,12 @@ public class PostReport extends BaseTimeEntity {
         this.status = builder.status;
         this.reporter = builder.reporter;
         this.reportedPost = builder.reportedPost;
+        this.postContent = builder.postContent;
         this.isPostDeleted = builder.isPostDeleted;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
@@ -68,6 +72,7 @@ public class PostReport extends BaseTimeEntity {
         private ProcessingStatus status;
         private Member reporter;
         private Post reportedPost;
+        private String postContent;
         private boolean isPostDeleted;
 
         public Builder reportNo(Long postReportNo) {
@@ -97,6 +102,11 @@ public class PostReport extends BaseTimeEntity {
 
         public Builder reportedPost(Post reportedPost) {
             this.reportedPost = reportedPost;
+            return this;
+        }
+
+        public Builder postContent(String postContent) {
+            this.postContent = postContent;
             return this;
         }
 
