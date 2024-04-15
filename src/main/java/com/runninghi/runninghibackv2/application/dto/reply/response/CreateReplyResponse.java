@@ -6,19 +6,12 @@ import java.time.LocalDateTime;
 
 public record CreateReplyResponse (
         Long replyNo,
-
         String memberName,
-
         Long postNo,
-
         String replyContent,
-
         boolean isDeleted,
-
         Long parentReplyNo,
-
         LocalDateTime createDate,
-
         LocalDateTime updateDate
 )
 {

@@ -14,17 +14,17 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "TBL_NOTIFICATION")
-public class Notification {
+@Table(name = "tbl_alarm")
+public class Alarm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_no")
+    @Column(name = "alarm_no")
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_NO")
-    @Comment("회원 번호")
+    @Comment("알림 대상자")
     private Member member;
 
     @Column(name = "title", length = 100)
@@ -50,12 +50,12 @@ public class Notification {
     private LocalDateTime readDate;
 
     @Builder
-    public Notification(Long id, Member member, String title, String content, boolean isRead, LocalDateTime createDate, LocalDateTime readDate) {
+    public Alarm(Long id, Member member, String title, String content, boolean isRead, LocalDateTime createDate, LocalDateTime readDate) {
         this.id = id;
         this.member = member;
         this.title = title;
         this.content = content;
-        this.isRead = isRead;
+        this.isRead = false;
         this.createDate = createDate;
         this.readDate = readDate;
     }

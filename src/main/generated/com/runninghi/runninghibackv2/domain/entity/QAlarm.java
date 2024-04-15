@@ -11,16 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QNotification is a Querydsl query type for Notification
+ * QAlarm is a Querydsl query type for Alarm
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QNotification extends EntityPathBase<Notification> {
+public class QAlarm extends EntityPathBase<Alarm> {
 
-    private static final long serialVersionUID = 1236145970L;
+    private static final long serialVersionUID = -462135830L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QNotification notification = new QNotification("notification");
+    public static final QAlarm alarm = new QAlarm("alarm");
 
     public final StringPath content = createString("content");
 
@@ -36,23 +36,23 @@ public class QNotification extends EntityPathBase<Notification> {
 
     public final StringPath title = createString("title");
 
-    public QNotification(String variable) {
-        this(Notification.class, forVariable(variable), INITS);
+    public QAlarm(String variable) {
+        this(Alarm.class, forVariable(variable), INITS);
     }
 
-    public QNotification(Path<? extends Notification> path) {
+    public QAlarm(Path<? extends Alarm> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QNotification(PathMetadata metadata) {
+    public QAlarm(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QNotification(PathMetadata metadata, PathInits inits) {
-        this(Notification.class, metadata, inits);
+    public QAlarm(PathMetadata metadata, PathInits inits) {
+        this(Alarm.class, metadata, inits);
     }
 
-    public QNotification(Class<? extends Notification> type, PathMetadata metadata, PathInits inits) {
+    public QAlarm(Class<? extends Alarm> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }

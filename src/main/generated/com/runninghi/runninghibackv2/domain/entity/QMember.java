@@ -30,6 +30,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Integer> distanceToNextLevel = createNumber("distanceToNextLevel", Integer.class);
 
+    public final StringPath fcmToken = createString("fcmToken");
+
     public final BooleanPath isActive = createBoolean("isActive");
 
     public final BooleanPath isBlacklisted = createBoolean("isBlacklisted");

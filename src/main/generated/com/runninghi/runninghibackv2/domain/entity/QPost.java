@@ -41,7 +41,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Integer> reportCnt = createNumber("reportCnt", Integer.class);
 
-    public final EnumPath<Role> role = createEnum("role", Role.class);
+    public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.Role> role = createEnum("role", com.runninghi.runninghibackv2.domain.enumtype.Role.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;
