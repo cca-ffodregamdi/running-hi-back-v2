@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
 import java.time.LocalDateTime;
@@ -64,6 +65,11 @@ public class Member extends BaseTimeEntity {
     @Comment("FCM 기기 고유 토큰")
     private String fcmToken;
 
+    @Column(nullable = false)
+    @ColumnDefault(value = "false")
+    @Comment("알림 수신 동의 여부")
+    private boolean alarmConsent;
+
     @Column
     @Comment("탈퇴 신청 날짜")
     private LocalDateTime deactivateDate;
@@ -98,6 +104,7 @@ public class Member extends BaseTimeEntity {
         this.role = memberBuilder.role;
         this.refreshToken = memberBuilder.refreshToken;
         this.fcmToken = memberBuilder.fcmToken;
+        this.alarmConsent = memberBuilder.alarmConsent;
         this.deactivateDate = memberBuilder.deactivateDate;
         this.totalDistance = memberBuilder.totalDistance;
         this.totalKcal = memberBuilder.totalKcal;
@@ -122,6 +129,7 @@ public class Member extends BaseTimeEntity {
         private Role role;
         private String refreshToken;
         public String fcmToken;
+        public boolean alarmConsent;
         private LocalDateTime deactivateDate;
         private double totalDistance;
         private double totalKcal;
@@ -185,6 +193,11 @@ public class Member extends BaseTimeEntity {
 
         public MemberBuilder fcmToken(String fcmToken) {
             this.fcmToken = fcmToken;
+            return this;
+        }
+
+        public MemberBuilder alarmConsent(boolean alarmConset) {
+            this.alarmConsent = alarmConset;
             return this;
         }
 
@@ -270,5 +283,9 @@ public class Member extends BaseTimeEntity {
     public void addReportedCount() {
         this.reportCnt += 1;
     }
+
+    public void updateFCMToken(String fcmToken) {this.fcmToken = fcmToken; }
+
+    public void updateAlarmConsent(boolean alarmConsent) {this.alarmConsent = alarmConsent;}
 
 }
