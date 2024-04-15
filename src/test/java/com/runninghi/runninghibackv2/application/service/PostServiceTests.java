@@ -13,7 +13,6 @@ import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.entity.PostKeyword;
 import com.runninghi.runninghibackv2.domain.repository.PostKeywordRepository;
-import com.runninghi.runninghibackv2.postreport.application.service.PostReportService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
