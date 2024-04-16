@@ -23,12 +23,16 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath account = createString("account");
 
+    public final BooleanPath alarmConsent = createBoolean("alarmConsent");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createDate = _super.createDate;
 
     public final DateTimePath<java.time.LocalDateTime> deactivateDate = createDateTime("deactivateDate", java.time.LocalDateTime.class);
 
     public final NumberPath<Integer> distanceToNextLevel = createNumber("distanceToNextLevel", Integer.class);
+
+    public final StringPath fcmToken = createString("fcmToken");
 
     public final BooleanPath isActive = createBoolean("isActive");
 

@@ -52,4 +52,14 @@ public class MemberService {
 
         member.addReportedCount();
     }
+
+    public void saveFCMToken(Long memberNo, String fcmToken, boolean alarmConsent) {
+
+        Member member = findMemberByNo(memberNo);
+
+        member.updateFCMToken(fcmToken);
+        member.updateAlarmConsent(alarmConsent);
+
+    }
+
 }

@@ -99,4 +99,17 @@ public class MemberController {
         return ResponseEntity.ok(ApiResult.success("회원 정보 조회 성공", response));
 
     }
+
+    @PutMapping("/api/v1/member/fcmToken/{alarmConsent}")
+    public ResponseEntity<ApiResult> saveFCMToken(@RequestHeader(value = "Authorization") String token,
+                                                  @RequestHeader(value = "FcmToken") String fcmToken,
+                                                  @PathVariable(value = "alarmConsent") boolean alarmConsent) {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
+        memberService.saveFCMToken(memberNo, fcmToken, alarmConsent);
+
+        return ResponseEntity.ok().body(ApiResult.success("FCM 토큰 저장 성공", null));
+    }
+
 }

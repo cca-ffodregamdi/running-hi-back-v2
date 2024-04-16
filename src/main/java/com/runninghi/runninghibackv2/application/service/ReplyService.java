@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.notification.request.ReplyFCMRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.CreateReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.DeleteReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedReplyRequest;
@@ -7,6 +8,7 @@ import com.runninghi.runninghibackv2.application.dto.reply.request.UpdateReplyRe
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
+import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import com.runninghi.runninghibackv2.domain.entity.Member;
@@ -24,6 +26,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,6 +39,8 @@ public class ReplyService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+
+    private final AlarmService alarmService;
 
     /**
      * 게시글 조회 시 해당 게시글에 대한 댓글들 조회 메소드
@@ -81,6 +86,8 @@ public class ReplyService {
     @Transactional
     public CreateReplyResponse createReply(CreateReplyRequest request) {
 
+        ReplyFCMRequest replyFCMRequest = new ReplyFCMRequest();
+
         Member member = memberRepository.findByMemberNo(request.memberNo());
         Post post = postRepository.findById(request.postNo())
                 .orElseThrow(EntityNotFoundException::new);
@@ -97,9 +104,16 @@ public class ReplyService {
 
             parentReply.addChildrenReply(reply);
             reply.addParentReply(parentReply);
+
+            // 부모 댓글 작성자에게 푸쉬 알림
+            replyFCMRequest.setParentReply(parentReply);
         }
 
         Reply savedReply = replyRepository.save(reply);
+
+        // 게시물 작성자에게 푸쉬 알림
+        replyFCMRequest.setSavedReply(savedReply);
+        alarmService.sendReplyPushNotification(replyFCMRequest);
 
         return CreateReplyResponse.fromEntity(savedReply);
     }
@@ -147,7 +161,7 @@ public class ReplyService {
      * 신고 횟수를 올리는 메소드입니다.
      * @param replyNo
      */
-    @Transactional // 부모 트랜잭션이 없으면 exception 발생
+    @Transactional
     public void plusReportedCount (Long replyNo) {
 
         Reply reply = findReplyByReplyNo(replyNo);

@@ -1,5 +1,7 @@
 package com.runninghi.runninghibackv2.application.controller;
 
+import com.runninghi.runninghibackv2.application.dto.notification.request.ReplyFCMRequest;
+import com.runninghi.runninghibackv2.application.service.AlarmService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
@@ -29,8 +31,9 @@ import java.util.List;
 @RequestMapping("api/v1/reply")
 public class ReplyController {
 
-    private final ReplyService replyService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ReplyService replyService;
+    private final AlarmService notificationService;
 
     private static final String GET_MAPPING_RESPONSE_MESSAGE = "성공적으로 조회되었습니다.";
     private static final String CREATE_RESPONSE_MESSAGE = "성공적으로 생성되었습니다.";
@@ -71,9 +74,9 @@ public class ReplyController {
     @PostMapping
     public ResponseEntity<ApiResult> createReply(@RequestBody CreateReplyRequest request) {
 
-        CreateReplyResponse reply = replyService.createReply(request);
+        CreateReplyResponse response = replyService.createReply(request);
 
-        return ResponseEntity.ok().body(ApiResult.success(CREATE_RESPONSE_MESSAGE, reply));
+        return ResponseEntity.ok().body(ApiResult.success(CREATE_RESPONSE_MESSAGE, response));
     }
 
     @PutMapping("/update/{replyNo}")
@@ -96,8 +99,5 @@ public class ReplyController {
         replyService.deleteReply(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success(DELETE_RESPONSE_MESSAGE, null));
     }
-
-
-
 
 }
