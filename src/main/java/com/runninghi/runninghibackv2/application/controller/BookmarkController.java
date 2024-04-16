@@ -7,6 +7,8 @@ import com.runninghi.runninghibackv2.application.dto.bookmark.response.CreateBoo
 import com.runninghi.runninghibackv2.application.service.BookmarkService;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "북마크 API", description = "게시글 북마크 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/bookmark")
@@ -28,6 +31,7 @@ public class BookmarkController {
      * @param bearerToken HttpServletRequest Header에 담긴 Authorization
      * @return Bookmark 테이블에서 조회된 Posts
      */
+    @Operation(summary = "")
     @GetMapping()
     public ResponseEntity<ApiResult> getBookmarkedPostList(@RequestHeader(name = "Authorization") String bearerToken) {
 
