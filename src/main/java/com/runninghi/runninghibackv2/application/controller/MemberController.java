@@ -108,7 +108,7 @@ public class MemberController {
     }
 
     @PutMapping("/api/v1/member/fcmToken/{alarmConsent}")
-    @Operation(summary = "FCM 토큰 저장", description = "FCM 토큰과 알림 수신 동의 여부르 저장합니다.")
+    @Operation(summary = "FCM 토큰 저장", description = "FCM 토큰과 알림 수신 동의 여부를 저장합니다.")
     public ResponseEntity<ApiResult> saveFCMToken(@RequestHeader(value = "Authorization") String token,
                                                   @RequestHeader(value = "FcmToken") String fcmToken,
                                                   @PathVariable(value = "alarmConsent") boolean alarmConsent) {

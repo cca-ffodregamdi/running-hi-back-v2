@@ -4,7 +4,6 @@ import com.runninghi.runninghibackv2.application.dto.reply.request.*;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
-import com.runninghi.runninghibackv2.application.service.AlarmService;
 import com.runninghi.runninghibackv2.application.service.ReplyService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
@@ -36,7 +35,6 @@ public class ReplyController {
     private static final String CREATE_RESPONSE_MESSAGE = "성공적으로 생성되었습니다.";
     private static final String UPDATE_RESPONSE_MESSAGE = "성공적으로 수정되었습니다.";
     private static final String DELETE_RESPONSE_MESSAGE = "성공적으로 삭제되었습니다.";
-    private static final int SEARCH_MAX_LENGTH = 20;
 
     @GetMapping("/{postNo}")
     @Operation(summary = "댓글 리스트 조회", description = "특정 게시물에 대한 댓글들 리스트를 조회합니다." )
