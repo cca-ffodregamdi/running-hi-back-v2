@@ -50,6 +50,7 @@ jobs:
           mkdir -p ./src/main/resources/firebase
           touch ./src/main/resources/firebase/runninghi-firebase-adminsdk.json
           echo "${{ secrets.FIREBASE_SDK }}" > ./src/main/resources/firebase/runninghi-firebase-adminsdk.json
+        shell: bash
 
       - name: Add permission
         run: chmod +x gradlew
