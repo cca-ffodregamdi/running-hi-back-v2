@@ -1,19 +1,14 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
-import com.runninghi.runninghibackv2.common.response.ApiResult;
-import com.runninghi.runninghibackv2.member.application.dto.request.UpdateMemberInfoRequest;
-import com.runninghi.runninghibackv2.member.application.dto.response.GetMemberResponse;
-import com.runninghi.runninghibackv2.member.application.dto.response.UpdateMemberInfoResponse;
-import com.runninghi.runninghibackv2.member.application.service.KakaoOauthService;
-import com.runninghi.runninghibackv2.member.application.service.MemberService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
 import com.runninghi.runninghibackv2.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.application.service.MemberService;
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.response.ApiResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
@@ -113,6 +108,7 @@ public class MemberController {
     }
 
     @PutMapping("/api/v1/member/fcmToken/{alarmConsent}")
+    @Operation(summary = "FCM 토큰 저장", description = "FCM 토큰과 알림 수신 동의 여부르 저장합니다.")
     public ResponseEntity<ApiResult> saveFCMToken(@RequestHeader(value = "Authorization") String token,
                                                   @RequestHeader(value = "FcmToken") String fcmToken,
                                                   @PathVariable(value = "alarmConsent") boolean alarmConsent) {
