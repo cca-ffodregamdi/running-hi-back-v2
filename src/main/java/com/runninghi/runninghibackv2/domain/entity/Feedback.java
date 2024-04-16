@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.domain.entity;
 import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -43,68 +44,16 @@ public class Feedback extends BaseTimeEntity {
     @Comment("피드백 작성자")
     private Member feedbackWriter;
 
-
-    public Feedback(FeedbackBuilder feedbackBuilder) {
-        this.feedbackNo = feedbackBuilder.feedbackNo;
-        this.title = feedbackBuilder.title;
-        this.content = feedbackBuilder.content;
-        this.hasReply = feedbackBuilder.hasReply;
-        this.reply = feedbackBuilder.reply;
-        this.category = feedbackBuilder.category;
-        this.feedbackWriter = feedbackBuilder.feedbackWriter;
-    }
-
-    public static FeedbackBuilder builder() {
-        return new FeedbackBuilder();
-    }
-
-    public static class FeedbackBuilder {
-        private Long feedbackNo;
-        private String title;
-        private String content;
-        private boolean hasReply;
-        private String reply;
-        private FeedbackCategory category;
-        private Member feedbackWriter;
-
-        public FeedbackBuilder feedbackNo(Long feedbackNo) {
-            this.feedbackNo = feedbackNo;
-            return this;
-        }
-
-        public FeedbackBuilder title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        public FeedbackBuilder content(String content) {
-            this.content = content;
-            return this;
-        }
-
-        public FeedbackBuilder hasReply(boolean hasReply) {
-            this.hasReply = hasReply;
-            return this;
-        }
-
-        public FeedbackBuilder reply(String reply) {
-            this.reply = reply;
-            return this;
-        }
-
-        public FeedbackBuilder category(FeedbackCategory category) {
-            this.category = category;
-            return this;
-        }
-
-        public FeedbackBuilder feedbackWriter(Member feedbackWriter) {
-            this.feedbackWriter = feedbackWriter;
-            return this;
-        }
-
-        public Feedback build() {
-            return new Feedback(this);
-        }
+    @Builder
+    public Feedback(Long feedbackNo, String title, String content, boolean hasReply, String reply,
+                    FeedbackCategory category, Member feedbackWriter) {
+        this.feedbackNo = feedbackNo;
+        this.title = title;
+        this.content = content;
+        this.hasReply = hasReply;
+        this.reply = reply;
+        this.category = category;
+        this.feedbackWriter = feedbackWriter;
     }
 
 }

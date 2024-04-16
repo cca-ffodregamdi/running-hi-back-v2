@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.domain.entity;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -90,146 +91,29 @@ public class Member extends BaseTimeEntity {
     @Comment("누적거리에 따른 레벨")
     private int level = 0;
 
-
-    public Member(MemberBuilder memberBuilder) {
-        this.memberNo = memberBuilder.memberNo;
-        this.account = memberBuilder.account;
-        this.password = memberBuilder.password;
-        this.nickname = memberBuilder.nickname;
-        this.kakaoId = memberBuilder.kakaoId;
-        this.kakaoName = memberBuilder.kakaoName;
-        this.reportCnt = memberBuilder.reportCnt;
-        this.isActive = memberBuilder.isActive;
-        this.isBlacklisted = memberBuilder.isBlacklisted;
-        this.role = memberBuilder.role;
-        this.refreshToken = memberBuilder.refreshToken;
-        this.fcmToken = memberBuilder.fcmToken;
-        this.alarmConsent = memberBuilder.alarmConsent;
-        this.deactivateDate = memberBuilder.deactivateDate;
-        this.totalDistance = memberBuilder.totalDistance;
-        this.totalKcal = memberBuilder.totalKcal;
-        this.distanceToNextLevel = memberBuilder.distanceToNextLevel;
-        this.level = memberBuilder.level;
-    }
-
-    public static MemberBuilder builder() {
-        return new MemberBuilder();
-    }
-
-    public static class MemberBuilder {
-        private Long memberNo;
-        private String account;
-        private String password;
-        private String nickname;
-        private String kakaoId;
-        private String kakaoName;
-        private int reportCnt;
-        private boolean isActive;
-        private boolean isBlacklisted;
-        private Role role;
-        private String refreshToken;
-        public String fcmToken;
-        public boolean alarmConsent;
-        private LocalDateTime deactivateDate;
-        private double totalDistance;
-        private double totalKcal;
-        private int distanceToNextLevel;
-        private int level;
-
-        public MemberBuilder memberNo(Long memberNo) {
-            this.memberNo = memberNo;
-            return this;
-        }
-
-        public MemberBuilder account(String account) {
-            this.account = account;
-            return this;
-        }
-
-        public MemberBuilder password(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public MemberBuilder nickname(String nickname) {
-            this.nickname = nickname;
-            return this;
-        }
-
-        public MemberBuilder kakaoId(String kakaoId) {
-            this.kakaoId = kakaoId;
-            return this;
-        }
-
-        public MemberBuilder kakaoName(String kakaoName) {
-            this.kakaoName = kakaoName;
-            return this;
-        }
-
-        public MemberBuilder reportCnt(int reportCnt) {
-            this.reportCnt = reportCnt;
-            return this;
-        }
-
-        public MemberBuilder isActive(boolean isActive) {
-            this.isActive = isActive;
-            return this;
-        }
-
-        public MemberBuilder isBlacklisted(boolean isBlacklisted) {
-            this.isBlacklisted = isBlacklisted;
-            return this;
-        }
-
-        public MemberBuilder role(Role role) {
-            this.role = role;
-            return this;
-        }
-
-        public MemberBuilder refreshToken(String refreshToken) {
-            this.refreshToken = refreshToken;
-            return this;
-        }
-
-        public MemberBuilder fcmToken(String fcmToken) {
-            this.fcmToken = fcmToken;
-            return this;
-        }
-
-        public MemberBuilder alarmConsent(boolean alarmConset) {
-            this.alarmConsent = alarmConset;
-            return this;
-        }
-
-        public MemberBuilder deactivateDate(LocalDateTime deactivateDate) {
-            this.deactivateDate = deactivateDate;
-            return this;
-        }
-
-        public MemberBuilder totalDistance(double totalDistance) {
-            this.totalDistance = totalDistance;
-            return this;
-        }
-
-        public MemberBuilder totalKcal(double totalKcal) {
-            this.totalKcal = totalKcal;
-            return this;
-        }
-
-        public MemberBuilder distanceToNextLevel(int distanceToNextLevel) {
-            this.distanceToNextLevel = distanceToNextLevel;
-            return this;
-        }
-
-        public MemberBuilder level(int level) {
-            this.level = level;
-            return this;
-        }
-
-        public Member build() {
-            return new Member(this);
-        }
-
+    @Builder
+    public Member(Long memberNo, String account, String password, String nickname, String kakaoId, String kakaoName,
+                  int reportCnt, boolean isActive, boolean isBlacklisted, Role role, String refreshToken,
+                  String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate, double totalDistance,
+                  double totalKcal, int distanceToNextLevel, int level) {
+        this.memberNo = memberNo;
+        this.account = account;
+        this.password = password;
+        this.nickname = nickname;
+        this.kakaoId = kakaoId;
+        this.kakaoName = kakaoName;
+        this.reportCnt = reportCnt;
+        this.isActive = isActive;
+        this.isBlacklisted = isBlacklisted;
+        this.role = role;
+        this.refreshToken = refreshToken;
+        this.fcmToken = fcmToken;
+        this.alarmConsent = alarmConsent;
+        this.deactivateDate = deactivateDate;
+        this.totalDistance = totalDistance;
+        this.totalKcal = totalKcal;
+        this.distanceToNextLevel = distanceToNextLevel;
+        this.level = level;
     }
 
     // 리프레시 토큰 업데이트
