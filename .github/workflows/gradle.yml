@@ -51,7 +51,12 @@ jobs:
         with:
           name: "runninghi-firebase-adminsdk.json"
           json: ${{ secrets.FIREBASE_SDK }}
-          dir: './src/main/resources/firebase/'
+      
+      ## firebase 디렉토리 생성 및 JSON 파일 이동
+      - name: Setup Firebase Directory and Move JSON
+        run: |
+          mkdir -p ./src/main/resources/firebase
+          mv ./runninghi-firebase-adminsdk.json ./src/main/resources/firebase/
 
 
       - name: Add permission
