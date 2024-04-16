@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "북마크 API", description = "게시글 북마크 API")
+@Tag(name = "북마크 컨트롤러", description = "게시글 북마크 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/bookmark")
@@ -31,7 +31,7 @@ public class BookmarkController {
      * @param bearerToken HttpServletRequest Header에 담긴 Authorization
      * @return Bookmark 테이블에서 조회된 Posts
      */
-    @Operation(summary = "")
+    @Operation(summary = "북마크된 게시물 리스트 조회", description = "사용자의 북마크된 게시글들을 조회합니다.")
     @GetMapping()
     public ResponseEntity<ApiResult> getBookmarkedPostList(@RequestHeader(name = "Authorization") String bearerToken) {
 
@@ -41,6 +41,7 @@ public class BookmarkController {
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", bookmarkedPostList));
     }
 
+    @Operation(summary = "북마크 생성", description = "특정 게시물을 북마크합니다.")
     @PostMapping()
     public ResponseEntity<ApiResult> createBookmark (@RequestHeader("Authorization") String bearerToken,
                                                     @RequestBody(required = true) Long postNo) {
@@ -52,6 +53,7 @@ public class BookmarkController {
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 저장되었습니다.", response));
     }
 
+    @Operation(summary = "북마크 삭제", description = "특정 게시물의 북마크를 취소합니다.")
     @DeleteMapping(value = "/{postNo}")
     public ResponseEntity<ApiResult> deleteBookmark (@RequestHeader("Authorization") String bearerToken,
                                                     @PathVariable(name = "postNo") Long postNo) {
