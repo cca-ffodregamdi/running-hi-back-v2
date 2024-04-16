@@ -5,12 +5,14 @@ import jakarta.persistence.Embeddable;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 
+import java.io.Serializable;
+
 @Getter
 @EqualsAndHashCode
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class   BookmarkId {
+public class BookmarkId implements Serializable {
 
     @Comment("멤버 번호")
     private Long memberNo;
