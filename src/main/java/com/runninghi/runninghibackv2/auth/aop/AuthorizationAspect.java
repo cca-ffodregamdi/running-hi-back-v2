@@ -1,7 +1,7 @@
 package com.runninghi.runninghibackv2.auth.aop;
 
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
