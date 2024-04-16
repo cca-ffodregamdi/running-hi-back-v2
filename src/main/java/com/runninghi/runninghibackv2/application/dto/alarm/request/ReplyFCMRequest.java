@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.application.dto.notification.request;
+package com.runninghi.runninghibackv2.application.dto.alarm.request;
 
 import com.runninghi.runninghibackv2.domain.entity.Reply;
 import lombok.AllArgsConstructor;

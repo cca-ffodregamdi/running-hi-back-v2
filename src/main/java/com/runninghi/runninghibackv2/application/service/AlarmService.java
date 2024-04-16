@@ -4,7 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.runninghi.runninghibackv2.application.dto.notification.request.ReplyFCMRequest;
+import com.runninghi.runninghibackv2.application.dto.alarm.request.ReplyFCMRequest;
 import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.repository.AlarmRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
