@@ -82,13 +82,13 @@ class PostServiceTests {
 
     @BeforeEach
     void setup() {
-        member = new Member.MemberBuilder()
+        member = Member.builder()
                 .nickname("member")
                 .role(Role.USER)
                 .build();
 
 
-        admin = new Member.MemberBuilder()
+        admin = Member.builder()
                 .nickname("admin")
                 .role(Role.ADMIN)
                 .build();
