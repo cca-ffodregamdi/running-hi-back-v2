@@ -47,14 +47,15 @@ jobs:
       ## firebase sdk 설정
       - name: create-json
         id: create-json
-        uses: jsdaniell/create-json@1.1.2
+        uses: jsdaniell/create-json@v1.2.3
         with:
           name: "runninghi-firebase-adminsdk.json"
           json: ${{ secrets.FIREBASE_SDK }}
+          dir: 'src/main/resoures/firebase'
 
-      - name: move-json-file
-        run: |
-          mv runninghi-firebase-adminsdk.json ./src/main/resources/firebase
+      # - name: move-json-file
+      #   run: |
+      #     mv runninghi-firebase-adminsdk.json ./src/main/resources/firebase
 
       - name: Add permission
         run: chmod +x gradlew
