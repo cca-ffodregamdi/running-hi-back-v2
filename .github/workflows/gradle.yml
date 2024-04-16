@@ -51,7 +51,7 @@ jobs:
         with:
           name: "runninghi-firebase-adminsdk.json"
           json: ${{ secrets.FIREBASE_SDK }}
-          dir: 'src/main/resources/firebase/'
+          dir: './src/main/resources/firebase/'
 
 
       - name: Add permission
