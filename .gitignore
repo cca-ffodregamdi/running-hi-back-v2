@@ -38,5 +38,8 @@ out/
 *.yml
 application.yml
 
+## firebase
+src/main/resources/firebase/runninghi-firebase-adminsdk.json
 
-runninghi-firebase-adminsdk.json
+## QClass
+runninghi-firebase-adminsdk.jsongenerated/
