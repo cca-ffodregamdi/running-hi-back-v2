@@ -44,6 +44,13 @@ jobs:
           echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
         shell: bash
 
+      ## firebase sdk 설정
+      - name: Setup firebase
+        run: |
+          mkdir -p ./src/main/resources/firebase
+          touch ./src/main/resources/firebase/runninghi-firebase-adminsdk.json
+          echo "${{ secrets.FIREBASE_SDK }}" > ./src/main/resources/firebase/runninghi-firebase-adminsdk.json
+
       - name: Add permission
         run: chmod +x gradlew
 
