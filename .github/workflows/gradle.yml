@@ -9,7 +9,7 @@ name: Java CI with Gradle
 
 on:
   pull_request:
-    branches: [ "*" ]
+    branches: [ "dev" ]
 
 permissions:
   contents: read
@@ -45,12 +45,16 @@ jobs:
         shell: bash
 
       ## firebase sdk 설정
-      - name: Setup firebase
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "runninghi-firebase-adminsdk.json"
+          json: ${{ secrets.FIREBASE_SDK }}
+
+      - name: move-json-file
         run: |
-          mkdir -p ./src/main/resources/firebase
-          touch ./src/main/resources/firebase/runninghi-firebase-adminsdk.json
-          echo "${{ secrets.FIREBASE_SDK }}" > ./src/main/resources/firebase/runninghi-firebase-adminsdk.json
-        shell: bash
+          mv runninghi-firebase-adminsdk.json ./src/main/resources/firebase
 
       - name: Add permission
         run: chmod +x gradlew
@@ -64,4 +68,3 @@ jobs:
           arguments: build
 
 
-      
