@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.application.dto.notification.request;
+package com.runninghi.runninghibackv2.application.dto.alarm;
 
 import com.runninghi.runninghibackv2.domain.entity.Reply;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReplyFCMRequest {
+public class ReplyFCMDTO {
 
         Reply savedReply;
         Reply parentReply;

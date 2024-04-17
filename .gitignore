@@ -42,4 +42,4 @@ application.yml
 src/main/resources/firebase/runninghi-firebase-adminsdk.json
 
 ## QClass
-runninghi-firebase-adminsdk.jsongenerated/
+generated/

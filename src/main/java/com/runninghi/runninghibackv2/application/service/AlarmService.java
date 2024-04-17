@@ -4,7 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.runninghi.runninghibackv2.application.dto.notification.request.ReplyFCMRequest;
+import com.runninghi.runninghibackv2.application.dto.alarm.ReplyFCMDTO;
 import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.repository.AlarmRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
@@ -32,9 +32,9 @@ public class AlarmService {
      * 댓글 관련 푸쉬 알림 발송 메소드
      * 댓글 작성 시, 게시글 작성자에게 알림 발송.
      * 대댓글 작성 시, 게시글 작성자, 부모 댓글 작성자에게 알림 발송.
-     * @param replyFCMRequest 저장된 댓글, 부모 댓글
+     * @param replyFCMDTO 저장된 댓글, 부모 댓글
      */
-    public void sendReplyPushNotification(ReplyFCMRequest replyFCMRequest) {
+    public void sendReplyPushNotification(ReplyFCMDTO replyFCMDTO) {
 
         List<Alarm> alarmList = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class AlarmService {
                 .build();
 
         Message message = Message.builder()
-                .setToken(replyFCMRequest.getSavedReply().getWriter().getFcmToken())
+                .setToken(replyFCMDTO.getSavedReply().getWriter().getFcmToken())
                 .setNotification(notification)
                 .build();
 
@@ -54,31 +54,31 @@ public class AlarmService {
         // 게시글 알림 추가
         alarmList.add(
                 Alarm.builder()
-                        .member(replyFCMRequest.getSavedReply().getPost().getMember())
+                        .member(replyFCMDTO.getSavedReply().getPost().getMember())
                         .title(POST_FCM_TITLE)
                         .content(POST_FCM_MESSAGE)
                         .build()
         );
 
         // 부모 댓글 대댓글 작성 시
-        if (replyFCMRequest.getParentReply() != null) {
+        if (replyFCMDTO.getParentReply() != null) {
 
             Notification childReplyNotification = Notification.builder()
-                    .setTitle(replyFCMRequest.getSavedReply().getWriter().getNickname())
-                    .setBody(replyFCMRequest.getParentReply().getReplyContent())
+                    .setTitle(replyFCMDTO.getSavedReply().getWriter().getNickname())
+                    .setBody(replyFCMDTO.getParentReply().getReplyContent())
                     .build();
 
             Message childReplyMessage = Message.builder()
-                    .setToken(replyFCMRequest.getParentReply().getWriter().getFcmToken())
+                    .setToken(replyFCMDTO.getParentReply().getWriter().getFcmToken())
                     .setNotification(childReplyNotification)
                     .build();
 
             firebaseMessaging.sendAsync(childReplyMessage);
             alarmList.add(
                     Alarm.builder()
-                            .member(replyFCMRequest.getParentReply().getWriter())
-                            .title(replyFCMRequest.getSavedReply().getWriter().getNickname())
-                            .content(replyFCMRequest.getSavedReply().getReplyContent())
+                            .member(replyFCMDTO.getParentReply().getWriter())
+                            .title(replyFCMDTO.getSavedReply().getWriter().getNickname())
+                            .content(replyFCMDTO.getSavedReply().getReplyContent())
                             .build()
             );
         }
