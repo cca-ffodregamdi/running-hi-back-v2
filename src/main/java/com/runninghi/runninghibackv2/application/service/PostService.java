@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.post.request.CreateRecordRequest;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.entity.Member;
@@ -28,6 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +48,9 @@ public class PostService {
         Page<Post> posts = postRepository.findAllByOrderByCreateDateDesc(pageable);
 
         return posts.map(GetAllPostsResponse::from);
+
+        //키워드 필터링
+
     }
 
     @Transactional
@@ -64,6 +69,7 @@ public class PostService {
                 .postContent(request.postContent())
                 .locationName(request.locationName())
                 .gpxDataVO(gpxDataVO)
+                .status(true)
                 .build());
 
         postKeywordService.createPostKeyword(createdPost, request.keywordList());
@@ -73,6 +79,30 @@ public class PostService {
         return new CreatePostResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
                 postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
     }
+
+    @Transactional
+    public CreatePostResponse createRecord(CreateRecordRequest request, Resource gpxFile) throws ParserConfigurationException, IOException, SAXException {
+
+        GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxFile);
+
+        Member member = memberRepository.findByMemberNo(request.memberNo());
+
+        Post createdPost = postRepository.save(Post.builder()
+                .member(member)
+                .role(member.getRole())
+                .locationName(request.locationName())
+                .gpxDataVO(gpxDataVO)
+                .status(false)
+                .build());
+
+        GpxDataVO postGpxVO = createdPost.getGpxDataVO();
+
+
+
+        return new CreatePostResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
+                postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
+    }
+
 
     @Transactional
     public UpdatePostResponse updatePost(Long memberNo, Long postNo, UpdatePostRequest request) {

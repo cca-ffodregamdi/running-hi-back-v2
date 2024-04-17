@@ -1,5 +1,8 @@
 package com.runninghi.runninghibackv2.application.controller;
 
+import com.runninghi.runninghibackv2.application.dto.feedback.response.CreateFeedbackResponse;
+import com.runninghi.runninghibackv2.application.dto.post.request.CreateRecordRequest;
+import com.runninghi.runninghibackv2.application.dto.post.request.PostKeywordRequest;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,24 +59,40 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResult> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
-                                                         @RequestPart("title") String postTitle,
-                                                         @RequestPart("content") String postContent,
+    public ResponseEntity<ApiResult<CreatePostResponse>> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
+                                    @RequestPart("title") String postTitle,
+                                    @RequestPart("content") String postContent,
+                                    @RequestPart("location") String locationName,
+                                    @RequestPart("keyword")PostKeywordRequest keywordList,
+                                    @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
+
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+
+        CreatePostRequest request = new CreatePostRequest(memberInfo.memberNo(), memberInfo.role(), postTitle, postContent, locationName, keywordList.keywordList());
+
+        CreatePostResponse response = postService.createRecordAndPost(request, gpxFile.getResource());
+
+
+        return ResponseEntity.ok(ApiResult.success(CREATE_RESPONSE_MESSAGE, response));
+    }
+
+    @PostMapping("/only-record")
+    public ResponseEntity<ApiResult<CreatePostResponse>> createRecord(@RequestHeader("Authorization") String bearerToken,
                                                          @RequestPart("location") String locationName,
-                                                         @RequestPart("keyword") List<String> keywordList,
                                                          @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreatePostRequest request = new CreatePostRequest(memberInfo.memberNo(), memberInfo.role(), postTitle, postContent, locationName, keywordList);
+        CreateRecordRequest request = new CreateRecordRequest(memberInfo.memberNo(), memberInfo.role(),locationName);
 
-        CreatePostResponse response = postService.createRecordAndPost(request, gpxFile.getResource());
+        CreatePostResponse response = postService.createRecord(request, gpxFile.getResource());
+
 
         return ResponseEntity.ok(ApiResult.success(CREATE_RESPONSE_MESSAGE, response));
     }
 
     @PutMapping("/{postNo}")
-    public ResponseEntity<ApiResult> updatePost(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<ApiResult<UpdatePostResponse>> updatePost(@RequestHeader(name = "Authorization") String bearerToken,
                                                 @PathVariable Long postNo, @RequestBody UpdatePostRequest request) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
@@ -83,7 +103,7 @@ public class PostController {
     }
 
     @GetMapping("/{postNo}")
-    public ResponseEntity<ApiResult> getPost(@PathVariable Long postNo) {
+    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
 
         GetPostResponse response = postService.getPost(postNo);
 
@@ -91,7 +111,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postNo}")
-    public ResponseEntity<ApiResult> deletePost(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<ApiResult<Void>> deletePost(@RequestHeader(name = "Authorization") String bearerToken,
                                                 @PathVariable Long postNo) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
@@ -103,7 +123,7 @@ public class PostController {
 
     @HasAccess
     @GetMapping(value = "/reported")
-    public ResponseEntity<ApiResult> getReportedPostList(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
+    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getReportedPostList(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
                                                          @RequestParam(defaultValue = "10") @Positive int size,
                                                          @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
 
