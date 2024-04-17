@@ -172,4 +172,22 @@ public class Member extends BaseTimeEntity {
 
     public void updateAlarmConsent(boolean alarmConsent) {this.alarmConsent = alarmConsent;}
 
+    public void cleanupDeactivateMemberData() {
+        this.account = null;
+        this.password = null;
+        this.nickname = null;
+        this.kakaoId = null;
+        this.kakaoName = null;
+        this.reportCnt = 0;
+        this.isActive = false;
+        this.isBlacklisted = false;
+        this.refreshToken = null;
+        this.fcmToken = null;
+        this.alarmConsent = false;
+        this.totalDistance = 0;
+        this.totalKcal = 0;
+        this.distanceToNextLevel = 0;
+        this.level = 0;
+    }
+
 }
