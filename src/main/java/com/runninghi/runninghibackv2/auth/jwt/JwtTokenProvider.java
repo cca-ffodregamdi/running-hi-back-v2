@@ -2,7 +2,7 @@ package com.runninghi.runninghibackv2.auth.jwt;
 
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
-import com.runninghi.runninghibackv2.common.entity.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

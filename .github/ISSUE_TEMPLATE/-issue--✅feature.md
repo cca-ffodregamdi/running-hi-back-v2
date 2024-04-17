@@ -1,7 +1,7 @@
 ---
 name: " issue--✅feature"
 about: 기능 개발 시 이슈 작성
-title: "[Feature - Apr 1st, 2024] - {도메인} 내용"
+title: "[Feature - Apr 3rd, 2024] - {도메인} 내용"
 labels: "✨ Feature"
 assignees: ''
 

@@ -44,6 +44,21 @@ jobs:
           echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
         shell: bash
 
+      ## firebase sdk 설정
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "runninghi-firebase-adminsdk.json"
+          json: ${{ secrets.FIREBASE_SDK }}
+      
+      ## firebase 디렉토리 생성 및 JSON 파일 이동
+      - name: Setup Firebase Directory and Move JSON
+        run: |
+          mkdir -p ./src/main/resources/firebase
+          mv ./runninghi-firebase-adminsdk.json ./src/main/resources/firebase/
+
+
       - name: Add permission
         run: chmod +x gradlew
 
@@ -55,5 +70,3 @@ jobs:
         with:
           arguments: build
 
-
-      
