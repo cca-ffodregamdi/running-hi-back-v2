@@ -52,7 +52,7 @@ public class Reply extends BaseTimeEntity {
     @Comment("부모 댓글")
     private Reply parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)   // cascade 설정! 부모 댓글 삭제 시 자식 댓글 삭제
+    @OneToMany(mappedBy = "parent", orphanRemoval = true, cascade = CascadeType.REMOVE)   // cascade 설정! 부모 댓글 삭제 시 자식 댓글 삭제
     @Comment("하위 댓글들")
     private final List<Reply> children = new ArrayList<>();
 

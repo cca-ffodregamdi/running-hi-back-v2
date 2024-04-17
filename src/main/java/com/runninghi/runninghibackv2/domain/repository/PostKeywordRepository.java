@@ -15,4 +15,6 @@ public interface PostKeywordRepository extends JpaRepository<PostKeyword, PostKe
 
     List<PostKeyword> findAllByPost(Post post);
     Optional<List<PostKeyword>> deleteAllByPostKeywordId_PostNo(@Param(("postNo")) Long postNo);
+
+    void deleteAllByPost(Post post);
 }

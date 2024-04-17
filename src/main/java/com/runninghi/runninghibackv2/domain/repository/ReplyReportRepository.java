@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.repository;
 
+import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.domain.entity.ReplyReport;
 import org.springframework.data.domain.Page;
@@ -14,4 +15,6 @@ public interface ReplyReportRepository extends JpaRepository<ReplyReport, Long> 
 
     Page<ReplyReport> findAllByReportedReply(Reply reply, Pageable pageable);
     List<ReplyReport> findAllByReportedReply(Reply reply);
+
+    void deleteAllByReportedReply_Post(Post post);
 }
