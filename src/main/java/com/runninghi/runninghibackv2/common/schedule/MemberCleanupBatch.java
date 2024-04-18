@@ -42,7 +42,7 @@ public class MemberCleanupBatch {
     @Transactional
     public void cleanupDeactivateMember() {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
-        List<Member> deactivateMembers = memberRepository.findByDeactivateDate(thirtyDaysAgo);
+        List<Member> deactivateMembers = memberRepository.findAllByDeactivateDate(thirtyDaysAgo);
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 

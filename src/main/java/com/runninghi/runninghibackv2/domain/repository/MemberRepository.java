@@ -16,6 +16,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByKakaoId(String kakaoId);
 
-    List<Member> findByDeactivateDate(LocalDateTime deactivateDate);
+    List<Member> findAllByDeactivateDate(LocalDateTime deactivateDate);
 
 }
