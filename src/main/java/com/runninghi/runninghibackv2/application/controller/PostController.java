@@ -1,14 +1,11 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.feedback.response.CreateFeedbackResponse;
-import com.runninghi.runninghibackv2.application.dto.post.request.CreateRecordRequest;
-import com.runninghi.runninghibackv2.application.dto.post.request.PostKeywordRequest;
+import com.runninghi.runninghibackv2.application.dto.post.request.*;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
-import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
-import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.CreatePostResponse;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetPostResponse;
@@ -48,12 +45,11 @@ public class PostController {
     private static final String DELETE_RESPONSE_MESSAGE = "성공적으로 삭제되었습니다.";
 
     @GetMapping
-    public ResponseEntity<ApiResult> getAllPosts(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
-                                                 @RequestParam(defaultValue = "10") @Positive int size) {
+    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getAllPosts(@ModelAttribute PostKeywordCriteria criteria) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(criteria.page(), criteria.size());
 
-        Page<GetAllPostsResponse> response = postService.getPostScroll(pageable);
+        Page<GetAllPostsResponse> response = postService.getPostScroll(pageable, criteria.keyword());
 
         return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
     }
@@ -105,7 +101,7 @@ public class PostController {
     @GetMapping("/{postNo}")
     public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
 
-        GetPostResponse response = postService.getPost(postNo);
+        GetPostResponse response = postService.getPostByPostNo(postNo);
 
         return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
     }

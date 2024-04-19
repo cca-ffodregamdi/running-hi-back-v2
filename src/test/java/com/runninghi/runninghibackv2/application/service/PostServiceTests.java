@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.post.request.PostKeywordCriteria;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.repository.KeywordRepository;
@@ -329,7 +330,7 @@ class PostServiceTests {
                 .build());
 
         //When
-        Page<GetAllPostsResponse> posts = postService.getPostScroll(pageRequest);
+        Page<GetAllPostsResponse> posts = postService.getPostScroll(pageRequest, null);
 
         //Then
         assertNotNull(posts);

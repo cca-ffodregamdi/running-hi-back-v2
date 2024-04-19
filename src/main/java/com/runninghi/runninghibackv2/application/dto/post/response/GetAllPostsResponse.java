@@ -5,6 +5,9 @@ import com.runninghi.runninghibackv2.domain.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record GetAllPostsResponse(
+
+          @Schema(description = "게시글 번호", example = "1")
+          Long postNo,
           @Schema(description = "작성자 닉네임", example = "러너1")
           String nickname,
           @Schema(description = "게시글 제목", example = "제목 예시")
@@ -18,6 +21,7 @@ public record GetAllPostsResponse(
 ) {
     public static GetAllPostsResponse from(Post post) {
         return new GetAllPostsResponse(
+                post.getPostNo(),
                 post.getMember().getNickname(),
                 post.getPostTitle(),
                 post.getPostContent(),
