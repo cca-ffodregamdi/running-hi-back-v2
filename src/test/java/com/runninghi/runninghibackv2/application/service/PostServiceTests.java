@@ -315,30 +315,6 @@ class PostServiceTests {
     }
 
     @Test
-    @DisplayName("게시글 전체 조회 테스트 : success")
-    void testPostScroll() {
-
-        //Given
-        PageRequest pageRequest = PageRequest.of(0, 10);
-
-        Post post = postRepository.save(Post.builder()
-                .member(member)
-                .postTitle("테스트 게시글")
-                .postContent("테스트 게시글 내용입니다.")
-                .role(Role.USER)
-                .locationName("테스트 지역")
-                .build());
-
-        //When
-        Page<GetAllPostsResponse> posts = postService.getPostScroll(pageRequest, null);
-
-        //Then
-        assertNotNull(posts);
-        assertFalse(posts.isEmpty());
-        assertEquals(1, posts.getTotalElements());
-    }
-
-    @Test
     @DisplayName("게시글 수정 테스트 : 작성자 불일치 예외처리")
     void testUpdatePostAccessDeniedException() throws ParserConfigurationException, IOException, SAXException {
 

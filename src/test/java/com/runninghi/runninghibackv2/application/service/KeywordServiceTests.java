@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.application.service;
 import com.runninghi.runninghibackv2.application.dto.keyword.request.KeywordRequest;
 import com.runninghi.runninghibackv2.application.dto.keyword.response.KeywordResponse;
 import com.runninghi.runninghibackv2.domain.repository.KeywordRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostKeywordRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,12 @@ class KeywordServiceTests {
 
     @Autowired
     private KeywordRepository keywordRepository;
+    @Autowired
+    private PostKeywordRepository postKeywordRepository;
 
     @BeforeEach
     void clear() {
+        postKeywordRepository.deleteAllInBatch();
         keywordRepository.deleteAllInBatch();
     }
 
