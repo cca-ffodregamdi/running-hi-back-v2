@@ -11,19 +11,27 @@ public class ImageChecker {
 
     private final static int IMAGE_MAX_LENGTH = 6;
 
-    public boolean checkImageFile(String fileName) {
+    public String checkImageFile(String fileName) {
 
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+        if (fileName == null || fileName.isBlank()) {
+            throw new IllegalArgumentException("파일 이름이 유효하지 않습니다.");
+        }
+
+        int dotIndex = fileName.lastIndexOf(".");
+        if (dotIndex == -1) {
+            throw new IllegalArgumentException("파일 이름에 확장자가 없습니다.");
+        }
+
+        String extension = fileName.substring(dotIndex + 1);
 
         // 이미지 확장자 목록
         String[] imageExtension = {"jpg", "jpeg", "png", "gif", "bmp"};
-//        List<String> imageExtension = Arrays.asList("jpg", "jpeg", "png", "gif", "bmp");
 
         for (String ext : imageExtension) {
-            if(extension.equalsIgnoreCase(ext)) return true;
+            if(extension.equalsIgnoreCase(ext)) return extension;
         }
-//        imageExtension.contains()
-        return false;
+
+        throw new IllegalArgumentException("이미지 파일이 아닙니다.");
     }
 
     public int checkMaxLength(List<MultipartFile> imageFiles) {
