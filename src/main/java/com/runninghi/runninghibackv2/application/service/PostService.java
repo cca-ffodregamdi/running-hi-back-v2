@@ -1,6 +1,8 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreateRecordRequest;
+import com.runninghi.runninghibackv2.application.dto.post.request.PostKeywordCriteria;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.entity.Member;
@@ -19,6 +21,7 @@ import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
+import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
+import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeyword;
 
 @Service
 @RequiredArgsConstructor
@@ -41,16 +49,24 @@ public class PostService {
     private final PostKeywordService postKeywordService;
     private final UpdatePostService updateService;
     private final MemberRepository memberRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Transactional(readOnly = true)
-    public Page<GetAllPostsResponse> getPostScroll(Pageable pageable) {
+    public Page<GetAllPostsResponse> getPostScroll(Pageable pageable, List<String> keywordList) {
 
-        Page<Post> posts = postRepository.findAllByOrderByCreateDateDesc(pageable);
+        List<Long> keywordNos = jpaQueryFactory.select(keyword.keywordNo)
+                .from(keyword)
+                .where(keyword.keywordName.in(keywordList))
+                .fetch();
+        System.out.println("keywordNos = " + keywordNos.get(0));
 
-        return posts.map(GetAllPostsResponse::from);
+        List<Post> posts = jpaQueryFactory.select(post)
+                .leftJoin(postKeyword)
+                .where(postKeyword.keyword.keywordNo.in(keywordNos))
+                .fetch();
+        System.out.println("posts = " + posts.get(0));
 
-        //키워드 필터링
-
+        return new PageImpl<>(posts.stream().map(GetAllPostsResponse::from).toList(), pageable, posts.size());
     }
 
     @Transactional
@@ -139,7 +155,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public GetPostResponse getPost(Long postNo) {
+    public GetPostResponse getPostByPostNo(Long postNo) {
 
         Post post = postRepository.findById(postNo)
                 .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));

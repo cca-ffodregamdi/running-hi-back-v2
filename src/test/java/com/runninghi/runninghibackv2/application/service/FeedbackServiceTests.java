@@ -11,6 +11,8 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
 import com.runninghi.runninghibackv2.domain.repository.FeedbackRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostKeywordRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.AfterEach;
@@ -41,6 +43,12 @@ class FeedbackServiceTests {
     @Autowired
     private FeedbackRepository feedbackRepository;
 
+    @Autowired
+    private PostKeywordRepository postKeywordRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
     private Member testMember1;
     private Member testMember2;
     private Member testAdmin;
@@ -49,8 +57,10 @@ class FeedbackServiceTests {
     @BeforeEach
     @AfterEach
     void clear() {
-        feedbackRepository.deleteAll();
-        memberRepository.deleteAll();
+        postKeywordRepository.deleteAllInBatch();
+        postRepository.deleteAllInBatch();
+        feedbackRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     // 테스트 멤버 생성 메서드
