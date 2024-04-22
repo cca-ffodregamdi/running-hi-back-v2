@@ -12,26 +12,17 @@ public class ImageChecker {
     private final static int IMAGE_MAX_LENGTH = 6;
 
     public String checkImageFile(String fileName) {
-
-        if (fileName == null || fileName.isBlank()) {
+        if (isFileNameInvalid(fileName)) {
             throw new IllegalArgumentException("파일 이름이 유효하지 않습니다.");
         }
 
-        int dotIndex = fileName.lastIndexOf(".");
-        if (dotIndex == -1) {
-            throw new IllegalArgumentException("파일 이름에 확장자가 없습니다.");
+        String extension = getFileExtension(fileName);
+
+        if (isImageExtension(extension)) {
+            return extension;
+        } else {
+            throw new IllegalArgumentException("이미지 파일이 아닙니다.");
         }
-
-        String extension = fileName.substring(dotIndex + 1);
-
-        // 이미지 확장자 목록
-        String[] imageExtension = {"jpg", "jpeg", "png", "gif", "bmp"};
-
-        for (String ext : imageExtension) {
-            if(extension.equalsIgnoreCase(ext)) return extension;
-        }
-
-        throw new IllegalArgumentException("이미지 파일이 아닙니다.");
     }
 
     public int checkMaxLength(List<MultipartFile> imageFiles) {
@@ -40,5 +31,27 @@ public class ImageChecker {
         if (IMAGE_MAX_LENGTH < requestListLength) throw new IllegalArgumentException("이미지 업로드 개수는 " + IMAGE_MAX_LENGTH + "개 이하 입니다.");
 
         return requestListLength;
+    }
+
+    private boolean isFileNameInvalid(String fileName) {
+        return fileName == null || fileName.isBlank() || !fileName.contains(".");
+    }
+
+    private String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf(".");
+        return fileName.substring(dotIndex + 1);
+    }
+
+    private boolean isImageExtension(String extension) {
+
+        String[] imageExtensions = {"jpg", "jpeg", "png", "gif", "bmp"};
+
+        for (String ext : imageExtensions) {
+            if (extension.equalsIgnoreCase(ext)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
