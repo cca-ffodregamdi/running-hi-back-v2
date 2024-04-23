@@ -8,6 +8,7 @@ import com.runninghi.runninghibackv2.domain.service.ImageChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public class ImageService {
 
     // 이미지 일단 업로드 -> memberNo / UUID + 업로드 시간.jpg
 
+    @Transactional
     public List<CreateImageResponse> saveImages(List<MultipartFile> imageFiles, Long memberNo) {
 
         imageChecker.checkMaxLength(imageFiles); // 이미지 길이 제한 검사
