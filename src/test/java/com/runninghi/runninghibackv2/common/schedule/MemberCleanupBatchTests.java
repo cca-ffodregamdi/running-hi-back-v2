@@ -3,12 +3,15 @@ package com.runninghi.runninghibackv2.common.schedule;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
+import com.runninghi.runninghibackv2.domain.entity.vo.PostKeywordId;
 import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.repository.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,22 +60,45 @@ class MemberCleanupBatchTests {
     @Autowired
     private KeywordRepository keywordRepository;
 
-    static Member member1;
-    static Member member2;
-    static LocalDateTime dateTime;
+    private LocalDateTime dateTime;
+
+    @BeforeEach
+    @AfterEach
+    public void tearDown() {
+        memberRepository.deleteAllInBatch();
+        alarmRepository.deleteAllInBatch();
+        bookmarkRepository.deleteAllInBatch();
+        feedbackRepository.deleteAllInBatch();
+        postKeywordRepository.deleteAllInBatch();
+        postReportRepository.deleteAllInBatch();
+        postRepository.deleteAllInBatch();
+        replyReportRepository.deleteAllInBatch();
+        replyRepository.deleteAllInBatch();
+        keywordRepository.deleteAllInBatch();
+    }
 
     @BeforeEach
     void setUp() {
         List<Member> members = new ArrayList<>();
-        dateTime = LocalDateTime.now().minusDays(30);
+        dateTime = LocalDateTime.now().minusDays(31);
 
-        member1 = Member.builder()
+        Member member1 = Member.builder()
                 .deactivateDate(dateTime)
+                .alarmConsent(true)
+                .kakaoName("kakaoName")
+                .level(1)
+                .isActive(false)
+                .totalDistance(1000)
                 .build();
         members.add(member1);
 
-        member2 = Member.builder()
-                .deactivateDate(LocalDateTime.now().minusDays(33))
+        Member member2 = Member.builder()
+                .deactivateDate(LocalDateTime.now().minusDays(15))
+                .alarmConsent(true)
+                .kakaoName("nyam")
+                .level(1)
+                .isActive(true)
+                .totalDistance(1000)
                 .build();
         members.add(member2);
 
@@ -82,7 +108,6 @@ class MemberCleanupBatchTests {
         List<Alarm> alarms = new ArrayList<>();
 
         Alarm alarm1 = Alarm.builder()
-                .id(1L)
                 .member(member1)
                 .title("테스트 알림 1")
                 .content("테스트 알림 내용 1")
@@ -92,7 +117,6 @@ class MemberCleanupBatchTests {
         alarms.add(alarm1);
 
         Alarm alarm2 = Alarm.builder()
-                .id(2L)
                 .member(member1)
                 .title("테스트 알림 2")
                 .content("테스트 알림 내용 2")
@@ -103,10 +127,9 @@ class MemberCleanupBatchTests {
         alarms.add(alarm2);
 
         Alarm alarm3 = Alarm.builder()
-                .id(2L)
                 .member(member2)
                 .title("테스트 알림 3")
-                .content("테스트 알림 내용 3")
+                .content("테스트 알림 내용 3 : 남아있는 테스트 알림입니다.")
                 .isRead(true)
                 .createDate(LocalDateTime.now().minusDays(2))
                 .readDate(LocalDateTime.now().minusDays(1))
@@ -114,7 +137,6 @@ class MemberCleanupBatchTests {
         alarms.add(alarm3);
 
         alarmRepository.saveAllAndFlush(alarms);
-
 
         List<Post> posts = new ArrayList<>();
 
@@ -132,7 +154,7 @@ class MemberCleanupBatchTests {
         Post post2 = Post.builder()
                 .member(member2)
                 .postTitle("두 번째 게시글")
-                .postContent("두 번째 게시글 내용입니다.")
+                .postContent("두 번째 게시글 내용입니다. : 남아있는 게시글 입니다.")
                 .role(Role.ADMIN)
                 .locationName("부산")
                 .gpxDataVO(new GpxDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500f, 250f, 4f, 5f, 2f))
@@ -191,7 +213,7 @@ class MemberCleanupBatchTests {
         Reply reply1 = Reply.builder()
                 .writer(member1)
                 .post(post1)
-                .replyContent("첫 번째 댓글 내용입니다.")
+                .replyContent("첫 번째 댓글 내용입니다. : member1")
                 .reportedCount(0)
                 .reportStatus(null)
                 .isDeleted(false)
@@ -202,7 +224,7 @@ class MemberCleanupBatchTests {
         Reply reply2 = Reply.builder()
                 .writer(member2)
                 .post(post2)
-                .replyContent("두 번째 댓글 내용입니다.")
+                .replyContent("두 번째 댓글 내용입니다. : 남아있는 댓글입니다.")
                 .reportedCount(0)
                 .reportStatus(null)
                 .isDeleted(false)
@@ -212,7 +234,7 @@ class MemberCleanupBatchTests {
         Reply reply3 = Reply.builder()
                 .writer(member2)
                 .post(post1)
-                .replyContent("두 번째 댓글 내용입니다.")
+                .replyContent("첫 번째 댓글 내용입니다. : member2")
                 .reportedCount(0)
                 .reportStatus(null)
                 .isDeleted(false)
@@ -263,7 +285,7 @@ class MemberCleanupBatchTests {
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member1)
                 .reportedReply(reply2)
-                .replyContent("첫 번째 댓글 내용입니다.")
+                .replyContent(reply2.getReplyContent())
                 .isReplyDeleted(false)
                 .build();
         replyReports.add(report1);
@@ -274,7 +296,7 @@ class MemberCleanupBatchTests {
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member2)
                 .reportedReply(reply1)
-                .replyContent("두 번째 댓글 내용입니다.")
+                .replyContent(reply1.getReplyContent())
                 .isReplyDeleted(false)
                 .build();
         replyReports.add(report2);
@@ -285,7 +307,7 @@ class MemberCleanupBatchTests {
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member2)
                 .reportedReply(childReply1)
-                .replyContent("두 번째 댓글 내용입니다.")
+                .replyContent(childReply1.getReplyContent())
                 .isReplyDeleted(false)
                 .build();
         replyReports.add(report3);
@@ -301,7 +323,7 @@ class MemberCleanupBatchTests {
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member2)
                 .reportedPost(post1)
-                .postContent("첫 번째 게시글 내용입니다.")
+                .postContent(post1.getPostContent())
                 .isPostDeleted(false)
                 .build();
         postReports.add(postReport1);
@@ -313,51 +335,61 @@ class MemberCleanupBatchTests {
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member1)
                 .reportedPost(post2)
-                .postContent("두 번째 게시글 내용입니다.")
+                .postContent(post2.getPostContent())
                 .isPostDeleted(false)
                 .build();
         postReports.add(postReport2);
 
+        // 남아있는 게시물 신고
         PostReport postReport3 = PostReport.builder()
                 .category(ReportCategory.ILLEGALITY)
                 .content("부적절한 내용이 포함된 게시글입니다.")
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member2)
                 .reportedPost(post2)
-                .postContent("두 번째 게시글 내용입니다.")
+                .postContent(post2.getPostContent())
                 .isPostDeleted(false)
                 .build();
         postReports.add(postReport3);
 
         postReportRepository.saveAllAndFlush(postReports);
-//
-//
-//        List<Keyword> keywords = new ArrayList<>();
-//        Keyword keyword1 = new Keyword("Hello");
-//        keywords.add(keyword1);
-//        Keyword keyword2 = new Keyword("World");
-//        keywords.add(keyword2);
-//        Keyword keyword3 = new Keyword("Nice");
-//        keywords.add(keyword3);
-//
-//        keywordRepository.saveAllAndFlush(keywords);
 
 
-//        List<PostKeyword> postKeywords = new ArrayList<>();
-//
-//        PostKeyword postKeyword1 = PostKeyword.builder()
-//                .keyword(keyword1)
-//                .post(post1)
-//                .build();
-//        postKeywords.add(postKeyword1);
-//
-//        PostKeyword postKeyword2 = PostKeyword.builder()
-//                .keyword(keyword2)
-//                .post(post2)
-//                .build();
-//        postKeywords.add(postKeyword2);
-//
-//        postKeywordRepository.saveAllAndFlush(postKeywords);
+        List<Keyword> keywords = new ArrayList<>();
+        Keyword keyword1 = new Keyword("Hello");
+        keywords.add(keyword1);
+        Keyword keyword2 = new Keyword("World");
+        keywords.add(keyword2);
+        Keyword keyword3 = new Keyword("Nice");
+        keywords.add(keyword3);
+
+        keywordRepository.saveAllAndFlush(keywords);
+
+
+        List<PostKeyword> postKeywords = new ArrayList<>();
+
+        PostKeyword postKeyword1 = PostKeyword.builder()
+                .postKeywordId(PostKeywordId.builder()
+                        .keywordNo(keyword1.getKeywordNo())
+                        .postNo(post1.getPostNo())
+                        .build())
+                .keyword(keyword1)
+                .post(post1)
+                .build();
+        postKeywords.add(postKeyword1);
+
+        PostKeyword postKeyword2 = PostKeyword.builder()
+                .postKeywordId(PostKeywordId.builder()
+                        .keywordNo(keyword2.getKeywordNo())
+                        .postNo(post2.getPostNo())
+                        .build())
+                .keyword(keyword2)
+                .post(post2)
+                .build();
+        postKeywords.add(postKeyword2);
+
+        postKeywordRepository.saveAllAndFlush(postKeywords);
+
 
         List<Feedback> feedbacks = new ArrayList<>();
 
@@ -382,11 +414,10 @@ class MemberCleanupBatchTests {
         feedbacks.add(feedback2);
 
         feedbackRepository.saveAllAndFlush(feedbacks);
-
-
     }
 
     @Test
+    @DisplayName("회원 탈퇴 : Scheduling 테스트")
     void cleanupDeactivateMemberTest() {
         int beforePost = postRepository.findAll().size();
         int beforeAlarm = alarmRepository.findAll().size();
@@ -394,13 +425,21 @@ class MemberCleanupBatchTests {
         int beforeReply = replyRepository.findAll().size();
         int beforeReplyReport = replyReportRepository.findAll().size();
         int beforePostReport = postReportRepository.findAll().size();
-//        int beforePostKeyword = postKeywordRepository.findAll().size();
+        int beforePostKeyword = postKeywordRepository.findAll().size();
         int beforeFeedback = feedbackRepository.findAll().size();
 
         List<Member> deactivatedMembers = memberRepository.findAllByDeactivateDate(dateTime);
-        CompletableFuture<Void> cleanupFuture = CompletableFuture.runAsync(() -> memberCleanupBatch.cleanupDeactivateMember());
-        // cleanupDeactivateMember() 메서드의 작업이 모두 완료된 후 실행되도록 설정
-        cleanupFuture.thenRun(() -> {
+
+        if (!deactivatedMembers.isEmpty()) {
+            // cleanupDeactivateMember() 메서드 실행
+            CompletableFuture<Void> cleanupFuture = CompletableFuture.runAsync(
+                    () -> memberCleanupBatch.cleanupDeactivateMember()
+            );
+
+            // cleanupDeactivateMember() 메서드의 비동기 작업 완료 대기
+            cleanupFuture.join();
+
+            // cleanupFuture가 완료된 후에 실행되는 코드
             List<Post> afterPosts = postRepository.findAll();
             List<Alarm> afterAlarms = alarmRepository.findAll();
             List<Bookmark> afterBookmarks = bookmarkRepository.findAll();
@@ -410,13 +449,14 @@ class MemberCleanupBatchTests {
             List<PostKeyword> afterPostKeyword = postKeywordRepository.findAll();
             List<Feedback> afterFeedback = feedbackRepository.findAll();
 
+            // 결과 확인 및 검증하는 코드
             assertEquals(3, beforePost);
             assertEquals(3, beforeAlarm);
             assertEquals(4, beforeBookmark);
             assertEquals(6, beforeReply);
             assertEquals(3, beforeReplyReport);
             assertEquals(3, beforePostReport);
-//            assertEquals(2, beforePostKeyword);
+            assertEquals(2, beforePostKeyword);
             assertEquals(2, beforeFeedback);
             assertEquals(1, deactivatedMembers.size());
             assertEquals(1, afterPosts.size());
@@ -424,9 +464,10 @@ class MemberCleanupBatchTests {
             assertEquals(1, afterBookmarks.size());
             assertEquals(1, afterReplies.size());
             assertEquals(1, afterReplyReport.size());
-            assertEquals(1, afterPostReport.size());
-//            assertEquals(1, afterPostKeyword.size());
+            assertEquals(2, afterPostReport.size());
+            assertEquals(1, afterPostKeyword.size());
             assertEquals(1, afterFeedback.size());
-        });
+        }
     }
+
 }
