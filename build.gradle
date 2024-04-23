@@ -59,6 +59,9 @@ dependencies {
     // Firbase
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
+    // aws
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+
 }
 
 tasks.named('test') {
