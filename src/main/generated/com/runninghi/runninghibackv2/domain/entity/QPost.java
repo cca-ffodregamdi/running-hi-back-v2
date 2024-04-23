@@ -29,6 +29,8 @@ public class QPost extends EntityPathBase<Post> {
 
     public final com.runninghi.runninghibackv2.domain.entity.vo.QGpxDataVO gpxDataVO;
 
+    public final ListPath<Keyword, QKeyword> keywordList = this.<Keyword, QKeyword>createList("keywordList", Keyword.class, QKeyword.class, PathInits.DIRECT2);
+
     public final StringPath locationName = createString("locationName");
 
     public final QMember member;
@@ -42,6 +44,8 @@ public class QPost extends EntityPathBase<Post> {
     public final NumberPath<Integer> reportCnt = createNumber("reportCnt", Integer.class);
 
     public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.Role> role = createEnum("role", com.runninghi.runninghibackv2.domain.enumtype.Role.class);
+
+    public final BooleanPath status = createBoolean("status");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;

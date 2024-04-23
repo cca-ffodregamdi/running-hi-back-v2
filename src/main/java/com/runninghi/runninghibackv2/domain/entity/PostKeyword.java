@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 
@@ -20,11 +22,13 @@ public class PostKeyword implements Serializable {
 
     @MapsId(value = "keywordNo")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "KEYWORD_NO")
     private Keyword keyword;
 
     @MapsId(value = "postNo")
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "POST_NO")
     private Post post;
 
