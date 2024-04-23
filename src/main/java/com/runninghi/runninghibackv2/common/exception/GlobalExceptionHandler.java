@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import java.io.IOException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -63,4 +65,11 @@ public class GlobalExceptionHandler {
         ApiResult apiResult = ApiResult.error(ErrorCode.VALIDATION_FAIL);
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ApiResult> handleIOException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.INTER_SERVER_ERROR);
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
 }

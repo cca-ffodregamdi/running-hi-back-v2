@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.image.response.CreateImageResponse;
+import com.runninghi.runninghibackv2.application.dto.image.response.DownloadImageResponse;
 import com.runninghi.runninghibackv2.application.service.ImageService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
@@ -10,10 +11,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "이미지 API", description = "이미지 관련 API")
@@ -37,9 +40,13 @@ public class ImageController {
 
     @Operation(summary = "이미지 다운로드", description = "이미지를 다운로드 요청합니다.")
     @GetMapping("download")
-    public ResponseEntity<ApiResult> downloadImage(@RequestParam(value = "filename") String fileName) {
-        imageService.downloadImage(fileName);
-        return null;
+    public ResponseEntity<byte[]> downloadImage(@RequestParam(value = "filename") String fileName) throws IOException {
+
+        DownloadImageResponse response = imageService.downloadImage(fileName);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.imageFileName() + "\"")
+                .body(response.imageByte());
+
     }
 
 }

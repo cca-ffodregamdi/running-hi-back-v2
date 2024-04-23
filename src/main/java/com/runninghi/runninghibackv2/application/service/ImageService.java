@@ -2,7 +2,11 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
 import com.runninghi.runninghibackv2.application.dto.image.response.CreateImageResponse;
+import com.runninghi.runninghibackv2.application.dto.image.response.DownloadImageResponse;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
 import com.runninghi.runninghibackv2.domain.service.ImageChecker;
@@ -19,6 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -59,7 +65,15 @@ public class ImageService {
         return imageRepository.saveAll(imageList).stream().map(CreateImageResponse::fromEntity).toList();
     }
 
-    public void downloadImage(String fileName) {
+    public DownloadImageResponse downloadImage(String key) throws IOException {
+        S3Object s3Object = amazonS3Client.getObject(bucketName, key);
+        S3ObjectInputStream out = s3Object.getObjectContent();  // S3ObjectInputStream은 Java로 동작하는 InputStream 객체이다
+        byte[] bytesFile = IOUtils.toByteArray(out);
+
+        // 사진 명 인코딩 작업
+        String fileName = URLEncoder.encode(key, StandardCharsets.UTF_8).replaceAll("\\+", "%20");  // URI에서 공백을 '%20'으로 표현함
+
+        return new DownloadImageResponse(bytesFile, fileName);
     }
 
     private List<String> uploadImages(List<MultipartFile> imageFiles, String dirName){
