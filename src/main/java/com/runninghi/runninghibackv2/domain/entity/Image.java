@@ -18,18 +18,18 @@ public class Image extends BaseTimeEntity{
     private Long id;
 
     @Column(name = "image_url", nullable = false)
-    @Comment("이미지 URL")
+    @Comment(value = "이미지 URL")
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_no")
-    @Comment("관련 게시글")
-    private Post post;
+    @Column
+    @Comment(value = "관련 게시글")
+    private Long postNo;
+
 
     @Builder
-    public Image(Long id, String imageUrl, Post post) {
+    public Image(Long id, String imageUrl, Long postNo) {
         this.id = id;
         this.imageUrl = imageUrl;
-        this.post = post;
+        this.postNo = postNo;
     }
 }

@@ -25,12 +25,11 @@ public class ImageChecker {
         }
     }
 
-    public int checkMaxLength(List<MultipartFile> imageFiles) {
+    public void checkMaxLength(List<MultipartFile> imageFiles) {
 
         int requestListLength = imageFiles.size();
         if (IMAGE_MAX_LENGTH < requestListLength) throw new IllegalArgumentException("이미지 업로드 개수는 " + IMAGE_MAX_LENGTH + "개 이하 입니다.");
 
-        return requestListLength;
     }
 
     private boolean isFileNameInvalid(String fileName) {
