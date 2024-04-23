@@ -2,6 +2,7 @@ package com.runninghi.runninghibackv2.common.exception;
 
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthException;
+import com.runninghi.runninghibackv2.common.exception.custom.SchedulingException;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
@@ -61,6 +62,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ApiResult> handleHandlerMethodValidationException() {
         ApiResult apiResult = ApiResult.error(ErrorCode.VALIDATION_FAIL);
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(SchedulingException.class)
+    public ResponseEntity<ApiResult> handleSchedulingException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.SCHEDULING_FAIL);
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 }
