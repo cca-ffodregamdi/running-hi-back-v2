@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.post.request.PostKeywordCriteria;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.repository.KeywordRepository;
@@ -311,30 +312,6 @@ class PostServiceTests {
             assertTrue(updateList.contains(keywordName));
         }
 
-    }
-
-    @Test
-    @DisplayName("게시글 전체 조회 테스트 : success")
-    void testPostScroll() {
-
-        //Given
-        PageRequest pageRequest = PageRequest.of(0, 10);
-
-        Post post = postRepository.save(Post.builder()
-                .member(member)
-                .postTitle("테스트 게시글")
-                .postContent("테스트 게시글 내용입니다.")
-                .role(Role.USER)
-                .locationName("테스트 지역")
-                .build());
-
-        //When
-        Page<GetAllPostsResponse> posts = postService.getPostScroll(pageRequest);
-
-        //Then
-        assertNotNull(posts);
-        assertFalse(posts.isEmpty());
-        assertEquals(1, posts.getTotalElements());
     }
 
     @Test
