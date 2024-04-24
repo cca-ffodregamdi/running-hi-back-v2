@@ -182,7 +182,6 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token.substring(7))
                 .getBody();
-
         return Long.parseLong(claims.getSubject());
     }
 
@@ -211,10 +210,8 @@ public class JwtTokenProvider {
     public AccessTokenInfo getMemberInfoByBearerToken (String token) {
 
         if (token == null) throw new IllegalArgumentException("Invalid Authorization Header");
-
-        String accessToken = token.substring(7); // "Bearer " 이후의 토큰 부분만 추출
-        Long memberNo = getMemberNoFromToken(accessToken);
-        String roleName = getRoleFromToken(accessToken);
+        Long memberNo = getMemberNoFromToken(token);
+        String roleName = getRoleFromToken(token);
 
         return new AccessTokenInfo(memberNo, Role.valueOf(roleName));
     }
