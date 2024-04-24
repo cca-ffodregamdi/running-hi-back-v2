@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.application.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
@@ -63,6 +64,11 @@ public class ImageService {
         }
 
         return imageRepository.saveAll(imageList).stream().map(CreateImageResponse::fromEntity).toList();
+    }
+
+    public void moveDirectOnS3(String key, String targetKey) {
+        copyFile(key, targetKey);
+        deleteFile(key);
     }
 
     public DownloadImageResponse downloadImage(String key) throws IOException {
@@ -159,5 +165,15 @@ public class ImageService {
         byte[] resizedImageByte = outputStream.toByteArray();
 
         return new ByteArrayInputStream(resizedImageByte);
+    }
+
+    private void deleteFile(String key) {
+        amazonS3Client.deleteObject(bucketName, key);
+//        log.info("아마존 S3 객체 삭제에 성공하였습니다.");
+    }
+
+    private void copyFile(String key, String targetKey) {
+        amazonS3Client.copyObject(new CopyObjectRequest(bucketName, key, bucketName, targetKey));
+        //        log.info("아마존 S3 객체 복사에 성공하였습니다.");
     }
 }
