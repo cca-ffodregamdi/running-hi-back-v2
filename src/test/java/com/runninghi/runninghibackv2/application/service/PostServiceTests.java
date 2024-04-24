@@ -1,19 +1,14 @@
 package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.application.dto.post.request.PostKeywordCriteria;
+import com.runninghi.runninghibackv2.application.model.ImageTestModel;
+import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
-import com.runninghi.runninghibackv2.domain.entity.Keyword;
-import com.runninghi.runninghibackv2.domain.repository.KeywordRepository;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.repository.*;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.CreatePostResponse;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
-import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.domain.entity.PostKeyword;
-import com.runninghi.runninghibackv2.domain.repository.PostKeywordRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,6 +56,9 @@ class PostServiceTests {
     @Autowired
     private PostReportService postReportService;
 
+    @Autowired
+    private ImageRepository imageRepository;
+
     InputStream inputStream = getClass().getResourceAsStream("/data.gpx");
     InputStreamResource inputStreamResource;
 
@@ -96,9 +94,12 @@ class PostServiceTests {
 
         keyword = new Keyword("기존 키워드");
 
+        List<Image> imageList = ImageTestModel.create(2);
+
         memberRepository.saveAndFlush(member);
         memberRepository.saveAndFlush(admin);
         keywordRepository.saveAndFlush(keyword);
+        imageRepository.saveAll(imageList);
     }
 
     @Test
@@ -113,6 +114,8 @@ class PostServiceTests {
         String postContent = "Test Post Content 입니다.";
         String locationName = "Location";
         List<String> keywordList = List.of("새 키워드");
+        List<String> imageUrlList = ImageTestModel.createImageUrl(2);
+
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
@@ -120,7 +123,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
@@ -160,6 +164,7 @@ class PostServiceTests {
         String postContent = "Test Post Content 입니다.";
         String locationName = "Location";
         List<String> keywordList = List.of("기존 키워드", "새 키워드");
+        List<String> imageUrlList = ImageTestModel.createImageUrl(2);
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
@@ -167,7 +172,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         postService.createRecordAndPost(request, inputStreamResource);
@@ -185,6 +191,7 @@ class PostServiceTests {
         String postContent = "Test Post Content 입니다.";
         String locationName = "Location";
         List<String> keywordList = List.of("테스트");
+        List<String> imageUrlList = List.of("테스트.jpg", "테스트2.png");
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
@@ -192,7 +199,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         // When & Then
@@ -210,6 +218,7 @@ class PostServiceTests {
         String postContent = "   ";
         String locationName = "Location";
         List<String> keywordList = List.of("테스트");
+        List<String> imageUrlList = List.of("테스트.jpg", "테스트2.png");
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
@@ -217,7 +226,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         // When & Then
@@ -235,6 +245,7 @@ class PostServiceTests {
         String postContent = "Test Post Content 입니다.";
         String locationName = "Location";
         List<String> keywordList = List.of("기존 키워드", "새 키워드");
+        List<String> imageUrlList = ImageTestModel.createImageUrl(2);
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
@@ -242,7 +253,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
@@ -272,6 +284,7 @@ class PostServiceTests {
         String postContent = "Test Post Content 입니다.";
         String locationName = "Location";
         List<String> keywordList = List.of("기존 키워드", "새 키워드");
+        List<String> imageUrlList = ImageTestModel.createImageUrl(2);
 
         Long memberNo = member.getMemberNo();
 
@@ -281,7 +294,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
@@ -323,6 +337,7 @@ class PostServiceTests {
         String postContent = "Test Post Content 입니다.";
         String locationName = "Location";
         List<String> keywordList = List.of("기존 키워드", "새 키워드");
+        List<String> imageUrlList = ImageTestModel.createImageUrl(2);
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
@@ -330,7 +345,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
@@ -363,6 +379,7 @@ class PostServiceTests {
         String postContent = "Test Post Content 입니다.";
         String locationName = "Location";
         List<String> keywordList = List.of("기존 키워드", "새 키워드");
+        List<String> imageUrlList = ImageTestModel.createImageUrl(2);
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
@@ -370,7 +387,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
@@ -391,6 +409,7 @@ class PostServiceTests {
         String postContent = "Test Post Content 입니다.";
         String locationName = "Location";
         List<String> keywordList = List.of("기존 키워드", "새 키워드");
+        List<String> imageUrlList = ImageTestModel.createImageUrl(2);
 
         CreatePostRequest request = new CreatePostRequest(
                 member.getMemberNo(),
@@ -398,7 +417,8 @@ class PostServiceTests {
                 postTitle,
                 postContent,
                 locationName,
-                keywordList
+                keywordList,
+                imageUrlList
         );
 
         CreatePostResponse response = postService.createRecordAndPost(request, inputStreamResource);
