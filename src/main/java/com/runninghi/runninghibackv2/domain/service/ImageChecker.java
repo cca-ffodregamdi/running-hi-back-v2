@@ -32,13 +32,13 @@ public class ImageChecker {
 
     }
 
-    private boolean isFileNameInvalid(String fileName) {
-        return fileName == null || fileName.isBlank() || !fileName.contains(".");
-    }
-
-    private String getFileExtension(String fileName) {
+    public String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf(".");
         return fileName.substring(dotIndex + 1);
+    }
+
+    private boolean isFileNameInvalid(String fileName) {
+        return fileName == null || fileName.isBlank() || !fileName.contains(".");
     }
 
     private boolean isImageExtension(String extension) {

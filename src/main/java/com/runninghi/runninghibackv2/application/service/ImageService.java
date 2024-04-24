@@ -106,7 +106,7 @@ public class ImageService {
     private String uploadImage(MultipartFile imageFile, String dirName) throws IOException {
 
         String key = buildKey(dirName, Objects.requireNonNull(imageFile.getOriginalFilename()));
-        InputStream convertedImg = resizeImage(imageFile, IMAGE_RESIZE_TARGET_WIDTH);
+        byte[] convertedImg = resizeImage(imageFile);
 
         try {
             return putImageToS3(key, convertedImg);
@@ -115,12 +115,13 @@ public class ImageService {
         }
     }
 
-    private String putImageToS3(String key, InputStream convertedImg) {
+    private String putImageToS3(String key, byte[] convertedImg) throws IOException {
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        objectMetadata.setContentLength(convertedImg.length);
 
-        amazonS3Client.putObject(bucketName, key, convertedImg, objectMetadata);
+        amazonS3Client.putObject(bucketName, key, new ByteArrayInputStream(convertedImg), objectMetadata);
 
         return amazonS3Client.getUrl(bucketName, key).toString();
 
@@ -142,7 +143,7 @@ public class ImageService {
 
         String newFileName = UUID.randomUUID() + "_" + now;
 
-        return dirName + "/" + newFileName + extension;
+        return dirName + "/" + newFileName + "." + extension;
     }
 
     /**
@@ -165,16 +166,18 @@ public class ImageService {
         return Optional.empty();
     }
 
-    private InputStream resizeImage(MultipartFile multipartFile, int targetWidth) throws IOException {
+    private byte[] resizeImage(MultipartFile multipartFile) throws IOException {
 
         BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
-        BufferedImage resizedImage = Scalr.resize(originalImage, targetWidth);
+        BufferedImage resizedImage =
+                Scalr.resize(originalImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_TO_WIDTH, IMAGE_RESIZE_TARGET_WIDTH, Scalr.THRESHOLD_QUALITY_BALANCED);
+        String fileExtension = imageChecker.getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, "jpg", outputStream);
-        byte[] resizedImageByte = outputStream.toByteArray();
+        ImageIO.write(resizedImage, fileExtension, outputStream);
 
-        return new ByteArrayInputStream(resizedImageByte);
+        return outputStream.toByteArray();
     }
 
     private void deleteFile(String key) {
@@ -186,4 +189,5 @@ public class ImageService {
         amazonS3Client.copyObject(new CopyObjectRequest(bucketName, key, bucketName, targetKey));
         //        log.info("아마존 S3 객체 복사에 성공하였습니다.");
     }
+
 }

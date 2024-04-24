@@ -32,7 +32,7 @@ public class ImageController {
     @Operation(summary = "이미지 업로드 요청", description = "이미지를 전달받아 업로드합니다.")
     @PostMapping()
     public ResponseEntity<ApiResult<List<CreateImageResponse>>> saveImages(@RequestHeader("Authorization") String token,
-                                                  @RequestPart @Max(6) List<MultipartFile> imageFiles) {
+                                                  @RequestPart("images") List<MultipartFile> imageFiles) {
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(token);
         List<CreateImageResponse> imageResponseList = imageService.saveImages(imageFiles, memberInfo.memberNo());
         return ResponseEntity.ok().body(ApiResult.success("업로드 완료", imageResponseList));
