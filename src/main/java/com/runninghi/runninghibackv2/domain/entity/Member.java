@@ -29,7 +29,7 @@ public class Member extends BaseTimeEntity {
     @Comment("계정 비밀번호")
     private String password;
 
-    @Column(nullable = false)
+    @Column
     @Comment("닉네임")
     private String nickname;
 
@@ -45,15 +45,15 @@ public class Member extends BaseTimeEntity {
     @Comment("신고된 횟수")
     private int reportCnt;
 
-    @Column(nullable = false)
+    @Column
     @Comment("계정 활성화 상태")
     private boolean isActive = true;
 
-    @Column(nullable = false)
+    @Column
     @Comment("블랙리스트 상태")
     private boolean isBlacklisted = false;
 
-    @Column(nullable = false)
+    @Column
     @Enumerated(EnumType.STRING)
     @Comment("권한")
     private Role role;
@@ -66,7 +66,7 @@ public class Member extends BaseTimeEntity {
     @Comment("FCM 기기 고유 토큰")
     private String fcmToken;
 
-    @Column(nullable = false)
+    @Column
     @ColumnDefault(value = "false")
     @Comment("알림 수신 동의 여부")
     private boolean alarmConsent;
@@ -75,15 +75,15 @@ public class Member extends BaseTimeEntity {
     @Comment("탈퇴 신청 날짜")
     private LocalDateTime deactivateDate;
 
-    @Column(nullable = false)
+    @Column
     @Comment("누적 거리")
     private double totalDistance = 0.0;
 
-    @Column(nullable = false)
+    @Column
     @Comment("누적 칼로리")
     private double totalKcal = 0.0;
 
-    @Column(nullable = false)
+    @Column
     @Comment("다음 레벨에 필요한 거리")
     private int distanceToNextLevel = 10;
 
@@ -171,5 +171,23 @@ public class Member extends BaseTimeEntity {
     public void updateFCMToken(String fcmToken) {this.fcmToken = fcmToken; }
 
     public void updateAlarmConsent(boolean alarmConsent) {this.alarmConsent = alarmConsent;}
+
+    public void cleanupDeactivateMemberData() {
+        this.account = null;
+        this.password = null;
+        this.nickname = null;
+        this.kakaoId = null;
+        this.kakaoName = null;
+        this.reportCnt = 0;
+        this.isActive = false;
+        this.isBlacklisted = false;
+        this.refreshToken = null;
+        this.fcmToken = null;
+        this.alarmConsent = false;
+        this.totalDistance = 0;
+        this.totalKcal = 0;
+        this.distanceToNextLevel = 0;
+        this.level = 0;
+    }
 
 }

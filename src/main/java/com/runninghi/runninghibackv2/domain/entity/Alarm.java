@@ -1,13 +1,12 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +23,7 @@ public class Alarm {
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_NO")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Comment("알림 대상자")
     private Member member;
 

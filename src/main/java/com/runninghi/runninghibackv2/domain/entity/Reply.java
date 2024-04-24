@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +24,12 @@ public class Reply extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_NO")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Comment("작성자")
     private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "POST_NO")
     @Comment("게시글")
     private Post post;
@@ -48,11 +52,12 @@ public class Reply extends BaseTimeEntity {
     private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "PARENT_NO")
     @Comment("부모 댓글")
     private Reply parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)   // cascade 설정! 부모 댓글 삭제 시 자식 댓글 삭제
+    @OneToMany(mappedBy = "parent", orphanRemoval = true, cascade = CascadeType.REMOVE)   // cascade 설정! 부모 댓글 삭제 시 자식 댓글 삭제
     @Comment("하위 댓글들")
     private final List<Reply> children = new ArrayList<>();
 
