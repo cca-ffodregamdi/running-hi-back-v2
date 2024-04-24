@@ -48,6 +48,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
     private final UpdatePostService updateService;
+    private final ImageService imageService;
     private final MemberRepository memberRepository;
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -89,6 +90,7 @@ public class PostService {
                 .build());
 
         postKeywordService.createPostKeyword(createdPost, request.keywordList());
+        savePostImages(request.imageUrlList(), createdPost.getPostNo());
 
         GpxDataVO postGpxVO = createdPost.getGpxDataVO();
 
@@ -200,5 +202,9 @@ public class PostService {
     private Post findPostByNo(Long postNo) {
         return postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private void savePostImages(List<String> imageUrlList, Long postNo) {
+        imageService.savePostNo(imageUrlList, postNo);
     }
 }

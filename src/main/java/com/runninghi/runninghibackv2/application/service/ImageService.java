@@ -11,6 +11,7 @@ import com.runninghi.runninghibackv2.application.dto.image.response.DownloadImag
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
 import com.runninghi.runninghibackv2.domain.service.ImageChecker;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,6 +65,15 @@ public class ImageService {
         }
 
         return imageRepository.saveAll(imageList).stream().map(CreateImageResponse::fromEntity).toList();
+    }
+
+    @Transactional
+    public void savePostNo(List<String> imageUrlList, Long postNo) {
+
+        for (String imageUrl : imageUrlList)
+            imageRepository.findImageByImageUrl(imageUrl)
+                    .orElseThrow(EntityNotFoundException::new)
+                    .updatePostNo(postNo);
     }
 
     public void moveDirectOnS3(String key, String targetKey) {
