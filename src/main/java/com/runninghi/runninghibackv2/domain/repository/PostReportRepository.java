@@ -17,4 +17,6 @@ public interface PostReportRepository extends JpaRepository<PostReport, Long> {
     List<Post> findAllByStatus(ProcessingStatus status);
     Page<PostReport> findAllByReportedPost(Post post, Pageable pageable);
     List<PostReport> findAllByReportedPost(Post post);
+
+    void deleteAllByReportedPost(Post post);
 }

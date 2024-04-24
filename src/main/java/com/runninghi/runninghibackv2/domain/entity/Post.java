@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class Post extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_NO")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Comment("작성자 계정 아이디")
     private Member member;
 

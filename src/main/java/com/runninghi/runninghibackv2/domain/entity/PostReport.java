@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -34,11 +36,13 @@ public class PostReport extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_no")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Comment("신고자")
     private Member reporter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_post_no")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Comment("신고된 게시글")
     private Post reportedPost;
 
