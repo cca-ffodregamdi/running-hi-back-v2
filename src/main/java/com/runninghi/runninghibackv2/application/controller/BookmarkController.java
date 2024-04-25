@@ -31,6 +31,7 @@ public class BookmarkController {
      * @param bearerToken HttpServletRequest Header에 담긴 Authorization
      * @return Bookmark 테이블에서 조회된 Posts
      */
+    // 변화구
     @Operation(summary = "북마크된 게시물 리스트 조회", description = "사용자의 북마크된 게시글들을 조회합니다.")
     @GetMapping()
     public ResponseEntity<ApiResult> getBookmarkedPostList(@RequestHeader(name = "Authorization") String bearerToken) {
