@@ -22,7 +22,6 @@ public class AWSS3Config {
     private String region;
 
     @Bean
-    @Primary
     public BasicAWSCredentials awsCredentialsProvider() {
         BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
         return basicAWSCredentials;
