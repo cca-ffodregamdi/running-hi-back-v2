@@ -60,11 +60,12 @@ public class PostController {
                                                                              @RequestPart("content") String postContent,
                                                                              @RequestPart("location") String locationName,
                                                                              @RequestPart("keyword")PostKeywordRequest keywordList,
+                                                                             @RequestPart("image")PostImageRequest imageUrlList,
                                                                              @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreatePostRequest request = new CreatePostRequest(memberInfo.memberNo(), memberInfo.role(), postTitle, postContent, locationName, keywordList.keywordList());
+        CreatePostRequest request = new CreatePostRequest(memberInfo.memberNo(), memberInfo.role(), postTitle, postContent, locationName, keywordList.keywordList(), imageUrlList.imageUrlList());
 
         CreatePostResponse response = postService.createRecordAndPost(request, gpxFile.getResource());
 
