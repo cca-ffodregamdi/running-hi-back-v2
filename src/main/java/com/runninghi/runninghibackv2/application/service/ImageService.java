@@ -34,7 +34,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ImageService {
 
-    private AmazonS3Client amazonS3Client;
+    private final AmazonS3Client amazonS3Client;
 
     private final ImageChecker imageChecker;
 
