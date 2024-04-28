@@ -1,39 +1,36 @@
 package com.runninghi.runninghibackv2.application.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.runninghi.runninghibackv2.application.dto.post.request.CreateRecordRequest;
-import com.runninghi.runninghibackv2.application.dto.post.request.PostKeywordCriteria;
-import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
-import com.runninghi.runninghibackv2.domain.entity.Keyword;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.domain.entity.PostKeyword;
-import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
+import com.runninghi.runninghibackv2.application.dto.post.request.CreateRecordRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.CreatePostResponse;
+import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetPostResponse;
 import com.runninghi.runninghibackv2.application.dto.post.response.UpdatePostResponse;
+import com.runninghi.runninghibackv2.domain.entity.Keyword;
+import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
+import com.runninghi.runninghibackv2.domain.entity.PostKeyword;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
+import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.service.CalculateGPX;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.core.io.Resource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
@@ -48,6 +45,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
     private final UpdatePostService updateService;
+    private final ImageService imageService;
     private final MemberRepository memberRepository;
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -89,6 +87,7 @@ public class PostService {
                 .build());
 
         postKeywordService.createPostKeyword(createdPost, request.keywordList());
+        savePostImages(request.imageUrlList(), createdPost.getPostNo());
 
         GpxDataVO postGpxVO = createdPost.getGpxDataVO();
 
@@ -148,10 +147,10 @@ public class PostService {
 
     @Transactional
     public void deleteReportedPost(Long postNo) {
-    // 관리자용 신고 게시글 삭제 메소드
+        // 관리자용 신고 게시글 삭제 메소드
         postKeywordService.deletePostKeyword(postNo);
         postRepository.deleteById(postNo);
-        
+
     }
 
     @Transactional(readOnly = true)
@@ -200,5 +199,9 @@ public class PostService {
     private Post findPostByNo(Long postNo) {
         return postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private void savePostImages(List<String> imageUrlList, Long postNo) {
+        imageService.savePostNo(imageUrlList, postNo);
     }
 }

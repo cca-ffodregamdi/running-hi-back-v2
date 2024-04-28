@@ -17,7 +17,9 @@ public record CreatePostRequest(
         @Schema(description = "코스 위치", example = "서울특별시 성북구")
         String locationName,
         @Schema(description = "키워드 목록", example = "보통,강아지랑,경사없음")
-        List<String> keywordList
+        List<String> keywordList,
+        @Schema(description = "이미지 목록", example = "test.jpg, test2.jpg2")
+        List<String> imageUrlList
 ) {
 
 }
