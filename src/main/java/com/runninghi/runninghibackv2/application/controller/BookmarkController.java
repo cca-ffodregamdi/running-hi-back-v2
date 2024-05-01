@@ -8,6 +8,7 @@ import com.runninghi.runninghibackv2.application.service.BookmarkService;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "북마크 컨트롤러", description = "게시글 북마크 API")
 @RestController
@@ -33,7 +35,7 @@ public class BookmarkController {
      */
     @Operation(summary = "북마크된 게시물 리스트 조회", description = "사용자의 북마크된 게시글들을 조회합니다.")
     @GetMapping()
-    public ResponseEntity<ApiResult> getBookmarkedPostList(@RequestHeader(name = "Authorization") String bearerToken) {
+    public ResponseEntity<ApiResult<List<BookmarkedPostListResponse>>> getBookmarkedPostList(@RequestHeader(name = "Authorization") String bearerToken) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         List<BookmarkedPostListResponse> bookmarkedPostList = bookmarkService.getBookmarkedPostList(memberInfo.memberNo());
@@ -43,11 +45,11 @@ public class BookmarkController {
 
     @Operation(summary = "북마크 생성", description = "특정 게시물을 북마크합니다.")
     @PostMapping()
-    public ResponseEntity<ApiResult> createBookmark (@RequestHeader("Authorization") String bearerToken,
-                                                    @RequestBody(required = true) Long postNo) {
+    public ResponseEntity<ApiResult<CreateBookmarkResponse>> createBookmark (@RequestHeader("Authorization") String bearerToken,
+                                                    @RequestBody(required = true) @Schema(description = "post key 값", example = "{\"postNo\" : 1}") Map<String, Long> body) {
 
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        CreateBookmarkRequest request = CreateBookmarkRequest.of(accessTokenInfo.memberNo(), postNo);
+        CreateBookmarkRequest request = CreateBookmarkRequest.of(accessTokenInfo.memberNo(), body.get("postNo"));
         CreateBookmarkResponse response = bookmarkService.createBookmark(request);
 
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 저장되었습니다.", response));
