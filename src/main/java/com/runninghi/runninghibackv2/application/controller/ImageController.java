@@ -27,7 +27,7 @@ public class ImageController {
 
     private final ImageService imageService;
 
-    @Operation(summary = "이미지 업로드 요청", description = "이미지를 전달받아 업로드합니다.")
+    @Operation(summary = "이미지 업로드 요청", description = "이미지를 전달받아 업로드합니다. <br /> 이미지 개수 제한은 6개이며, 리스트 형태(MultipartFile)로 전달 받아 Storage에 저장하고 url을 반환합니다.")
     @PostMapping()
     public ResponseEntity<ApiResult<List<CreateImageResponse>>> saveImages(@RequestHeader("Authorization") String token,
                                                                            @RequestPart("images") List<MultipartFile> imageFiles) {
@@ -36,7 +36,7 @@ public class ImageController {
         return ResponseEntity.ok().body(ApiResult.success("업로드 완료", imageResponseList));
     }
 
-    @Operation(summary = "이미지 다운로드", description = "이미지를 다운로드 요청합니다.")
+    @Operation(summary = "이미지 다운로드", description = "이미지를 다운로드 요청합니다. <br /> 보내진 byte 형태의 파일을 반환하여 다운로드 받게 합니다.")
     @GetMapping("download")
     public ResponseEntity<byte[]> downloadImage(@RequestParam(value = "filename") String fileName) throws IOException {
 
