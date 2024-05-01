@@ -1,10 +1,10 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.application.dto.bookmark.request.CreateBookmarkRequest;
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.BookmarkedPostListResponse;
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.CreateBookmarkResponse;
 import com.runninghi.runninghibackv2.application.service.BookmarkService;
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@Tag(name = "북마크 컨트롤러", description = "게시글 북마크 API")
+@Tag(name = "북마크 API", description = "게시글 북마크 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/bookmark")
@@ -33,7 +33,7 @@ public class BookmarkController {
      * @param bearerToken HttpServletRequest Header에 담긴 Authorization
      * @return Bookmark 테이블에서 조회된 Posts
      */
-    @Operation(summary = "북마크된 게시물 리스트 조회", description = "사용자의 북마크된 게시글들을 조회합니다.")
+    @Operation(summary = "북마크된 게시물 리스트 조회", description = "사용자의 북마크된 게시글들을 조회합니다. <br /> 사용자의 북마크 게시물의 리스트를 반환합니다. ")
     @GetMapping()
     public ResponseEntity<ApiResult<List<BookmarkedPostListResponse>>> getBookmarkedPostList(@RequestHeader(name = "Authorization") String bearerToken) {
 
@@ -43,7 +43,7 @@ public class BookmarkController {
         return ResponseEntity.ok().body(ApiResult.success("성공적으로 조회되었습니다.", bookmarkedPostList));
     }
 
-    @Operation(summary = "북마크 생성", description = "특정 게시물을 북마크합니다.")
+    @Operation(summary = "북마크 생성", description = "특정 게시물을 북마크합니다. <br /> 사용자 요청으로 '사용자 번호'와 '게시글 번호'를 입력 받아 북마크 정보를 저장하고 저장 정보를 반환합니다.")
     @PostMapping()
     public ResponseEntity<ApiResult<CreateBookmarkResponse>> createBookmark (@RequestHeader("Authorization") String bearerToken,
                                                     @RequestBody(required = true) @Schema(description = "post key 값", example = "{\"postNo\" : 1}") Map<String, Long> body) {
