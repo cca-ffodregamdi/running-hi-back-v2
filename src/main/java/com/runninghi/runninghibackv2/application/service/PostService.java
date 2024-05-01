@@ -8,16 +8,17 @@ import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequ
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
+import com.runninghi.runninghibackv2.domain.entity.Score;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
+import com.runninghi.runninghibackv2.domain.repository.ScoreRepository;
 import com.runninghi.runninghibackv2.domain.service.GpxCalculator;
 import com.runninghi.runninghibackv2.domain.service.GpxCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +50,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final GpxCoordinateExtractor gpxCoordinateExtractor;
+    private final ScoreRepository scoreRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -125,6 +127,7 @@ public class PostService {
                 .status(false)
                 .build());
 
+        createOrUpdateScore(member, gpxDataVO);
         GpxDataVO postGpxVO = createdPost.getGpxDataVO();
 
         return new CreateRecordResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
@@ -266,5 +269,18 @@ public class PostService {
         try (InputStream inputStream = url.openStream()) {
             return new GpxDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
         }
+    }
+
+    public void createOrUpdateScore(Member member, GpxDataVO gpxDataVO) {
+        Optional<Score> score = scoreRepository.findByMember(member);
+
+        if (scoreRepository.findByMember(member).isEmpty()) {
+            scoreRepository.save(Score.builder()
+                    .distance(gpxDataVO.getDistance())
+                    .member(member)
+                    .build());
+            return;
+        }
+        score.get().addDistance(gpxDataVO.getDistance());
     }
 }
