@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "댓글 신고 컨트롤러", description = "댓글 신고 API")
+@Tag(name = "댓글 신고 API", description = "댓글 신고 관련 API")
 @RestController
 @RequestMapping("/api/v1/reply-reports")
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class ReplyReportController {
     private final ReplyReportService replyReportService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Operation(summary = "댓글 신고 저장")
+    @Operation(summary = "댓글 신고 저장", description = "댓글 신고를 저장합니다.")
     @PostMapping()
     public ResponseEntity<ApiResult> createReplyReport(@RequestHeader(name = "Authorization") String bearerToken,
                                                        @RequestBody CreateReplyReportRequest request) {
@@ -45,7 +45,7 @@ public class ReplyReportController {
     }
 
     @HasAccess
-    @Operation(summary = "댓글 신고 전체 조회")
+    @Operation(summary = "댓글 신고 전체 조회", description = "저장된 모든 댓글 신고를 조회합니다.")
     @GetMapping()
     public ResponseEntity<ApiResult> getReplyReports() {
 
@@ -55,7 +55,7 @@ public class ReplyReportController {
     }
 
     @HasAccess
-    @Operation(summary = "댓글 신고 상세 조회")
+    @Operation(summary = "댓글 신고 상세 조회", description = "특정 댓글 신고의 상세 정보를 조회합니다.")
     @GetMapping("/{replyReportNo}")
     public ResponseEntity<ApiResult> getReplyReportById(@PathVariable Long replyReportNo) {
 
@@ -65,7 +65,7 @@ public class ReplyReportController {
     }
 
     @HasAccess
-    @Operation(summary = "댓글의 모든 신고 내역 조회")
+    @Operation(summary = "댓글의 모든 신고 내역 조회", description = "특정 댓글의 모든 신고 내역을 페이지 형태로 조회합니다.")
     @GetMapping("/reply")
     public ResponseEntity<ApiResult> getReplyReportsByReplyId(@RequestParam Long replyNo,
                                                               @RequestParam(defaultValue = "0") @PositiveOrZero int page,
@@ -79,7 +79,8 @@ public class ReplyReportController {
     }
 
     @HasAccess
-    @Operation(summary = "댓글의 모든 신고 내역 처리")
+    @Operation(summary = "댓글의 모든 신고 내역 처리",
+            description = "특정 댓글의 모든 신고를 수락/거절 처리합니다. 신고 수락 시 해당 댓글을 삭제합니다.")
     @PutMapping("/reply")
     public ResponseEntity<ApiResult> handleReplyReports(@RequestParam Long replyNo,
                                                         @RequestParam boolean isAccepted) {
@@ -90,7 +91,7 @@ public class ReplyReportController {
     }
 
     @HasAccess
-    @Operation(summary = "댓글 신고 삭제")
+    @Operation(summary = "댓글 신고 삭제", description = "특정 댓글 신고를 삭제합니다.")
     @DeleteMapping("/{replyReportNo}")
     public ResponseEntity<ApiResult<DeleteReplyReportResponse>> deleteReplyReport(@PathVariable Long replyReportNo) {
 

@@ -1,16 +1,14 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.application.dto.postreport.response.DeletePostReportResponse;
-import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
-import com.runninghi.runninghibackv2.common.annotations.HasAccess;
-import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
-import com.runninghi.runninghibackv2.common.response.ApiResult;
-import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.application.dto.postreport.request.CreatePostReportRequest;
 import com.runninghi.runninghibackv2.application.dto.postreport.response.CreatePostReportResponse;
+import com.runninghi.runninghibackv2.application.dto.postreport.response.DeletePostReportResponse;
 import com.runninghi.runninghibackv2.application.dto.postreport.response.GetPostReportResponse;
 import com.runninghi.runninghibackv2.application.dto.postreport.response.HandlePostReportResponse;
 import com.runninghi.runninghibackv2.application.service.PostReportService;
+import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
+import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
@@ -26,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "게시글 신고 컨트롤러", description = "게시글 신고 API")
+@Tag(name = "게시글 신고 API", description = "게시글 신고 관련 API")
 @RestController
 @RequestMapping("/api/v1/post-reports")
 @RequiredArgsConstructor
@@ -36,7 +34,7 @@ public class PostReportController {
     private final JwtTokenProvider jwtTokenProvider;
 
 
-    @Operation(summary = "게시글 신고 저장")
+    @Operation(summary = "게시글 신고 저장", description = "게시글 신고를 저장합니다.")
     @PostMapping()
     public ResponseEntity<ApiResult<CreatePostReportResponse>> createPostReport(
             @RequestHeader(name = "Authorization") String bearerToken,
@@ -49,7 +47,7 @@ public class PostReportController {
     }
 
     @HasAccess
-    @Operation(summary = "게시글 신고 전체 조회")
+    @Operation(summary = "게시글 신고 전체 조회", description = "저장된 모든 게시글 신고를 조회합니다.")
     @GetMapping()
     public ResponseEntity<ApiResult<List<GetPostReportResponse>>> getPostReports() {
 
@@ -59,7 +57,7 @@ public class PostReportController {
     }
 
     @HasAccess
-    @Operation(summary = "게시글 신고 상세 조회")
+    @Operation(summary = "게시글 신고 상세 조회", description = "특정 게시글 신고의 상세 정보를 조회합니다.")
     @GetMapping("/{postReportNo}")
     public ResponseEntity<ApiResult<GetPostReportResponse>> getPostReportById(@PathVariable Long postReportNo) {
 
@@ -69,7 +67,7 @@ public class PostReportController {
     }
 
     @HasAccess
-    @Operation(summary = "게시글의 모든 신고 내역 조회")
+    @Operation(summary = "게시글의 모든 신고 내역 조회", description = "특정 게시글의 모든 신고 내역을 페이지 형태로 조회합니다.")
     @GetMapping("/post")
     public ResponseEntity<ApiResult<Page<GetPostReportResponse>>> getPostReportsByPostId(
             @RequestParam Long postNo,
@@ -84,7 +82,8 @@ public class PostReportController {
     }
 
     @HasAccess
-    @Operation(summary = "게시글의 모든 신고 내역 처리")
+    @Operation(summary = "게시글의 모든 신고 내역 처리",
+            description = "특정 게시글의 모든 신고를 수락/거절 처리합니다. 신고 수락 시 해당 게시글을 삭제합니다.")
     @PutMapping("/post")
     public ResponseEntity<ApiResult<List<HandlePostReportResponse>>> handlePostReports(
             @RequestParam Long postNo,
@@ -96,7 +95,7 @@ public class PostReportController {
     }
 
     @HasAccess
-    @Operation(summary = "게시글 신고 삭제")
+    @Operation(summary = "게시글 신고 삭제", description = "특정 게시글 신고를 삭제합니다.")
     @DeleteMapping("/{postReportNo}")
     public ResponseEntity<ApiResult<DeletePostReportResponse>> deletePostReport(@PathVariable Long postReportNo) {
 
