@@ -56,6 +56,7 @@ public class MemberController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", tokens.get("accessToken"));
+        System.out.println(tokens.get("accessToken"));
         headers.add("Refresh-Token", tokens.get("refreshToken"));
 
         return ResponseEntity.ok()
