@@ -182,7 +182,7 @@ class FeedbackControllerTest {
     @DisplayName("피드백 상세 조회")
     void testGetFeedback() throws Exception {
         String responseMessage = "피드백 조회 성공";
-        GetFeedbackResponse response = new GetFeedbackResponse(title, content, category, LocalDateTime.now(), LocalDateTime.now(), false, null, nickname);
+        GetFeedbackResponse response = new GetFeedbackResponse(1L, title, content, category, LocalDateTime.now(), LocalDateTime.now(), false, null, nickname);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
@@ -225,7 +225,7 @@ class FeedbackControllerTest {
     void testGetFeedbackScroll() throws Exception {
         String responseMessage = "피드백 페이지 조회 성공";
         Page<GetFeedbackResponse> pageResponse = new PageImpl<>(Collections.singletonList(
-                new GetFeedbackResponse(title, content, category,
+                new GetFeedbackResponse(1L, title, content, category,
                         LocalDateTime.now(), LocalDateTime.now(), false, null, nickname)
         ));
 
@@ -251,7 +251,7 @@ class FeedbackControllerTest {
     @DisplayName("피드백 상세 조회 : 관리자")
     void testGetFeedbackByAdmin() throws Exception {
         String responseMessage = "피드백 조회 성공 : 관리자";
-        GetFeedbackResponse response = new GetFeedbackResponse(title, content, category, LocalDateTime.now(), LocalDateTime.now(), false, null, nickname);
+        GetFeedbackResponse response = new GetFeedbackResponse(1L, title, content, category, LocalDateTime.now(), LocalDateTime.now(), false, null, nickname);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
@@ -472,7 +472,7 @@ class FeedbackControllerTest {
         boolean hasReply = true;
         String responseMessage = "피드백 답변 작성/수정 완료 : 관리자";
         UpdateFeedbackReplyRequest request = new UpdateFeedbackReplyRequest(reply);
-        UpdateFeedbackReplyResponse response = new UpdateFeedbackReplyResponse(title, content, category,
+        UpdateFeedbackReplyResponse response = new UpdateFeedbackReplyResponse(1L, title, content, category,
                 LocalDateTime.now(), LocalDateTime.now(), hasReply, reply, nickname);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
