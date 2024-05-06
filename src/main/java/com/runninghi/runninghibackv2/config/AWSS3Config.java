@@ -22,8 +22,7 @@ public class AWSS3Config {
 
     @Bean
     public BasicAWSCredentials awsCredentialsProvider() {
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
-        return basicAWSCredentials;
+        return new BasicAWSCredentials(accessKey, secretKey);
     }
 
     @Bean

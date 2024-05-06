@@ -1,13 +1,13 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreateRecordRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
-import com.runninghi.runninghibackv2.application.dto.post.response.CreatePostResponse;
-import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
-import com.runninghi.runninghibackv2.application.dto.post.response.GetPostResponse;
-import com.runninghi.runninghibackv2.application.dto.post.response.UpdatePostResponse;
+import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
@@ -15,10 +15,12 @@ import com.runninghi.runninghibackv2.domain.entity.PostKeyword;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.domain.service.CalculateGPX;
+import com.runninghi.runninghibackv2.domain.service.GpxCalculator;
+import com.runninghi.runninghibackv2.domain.service.GpxCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,9 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
@@ -40,7 +43,7 @@ import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeywo
 @RequiredArgsConstructor
 public class PostService {
 
-    private final CalculateGPX calculateGPX;
+    private final GpxCalculator calculateGPX;
     private final PostChecker postChecker;
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
@@ -48,6 +51,36 @@ public class PostService {
     private final ImageService imageService;
     private final MemberRepository memberRepository;
     private final JPAQueryFactory jpaQueryFactory;
+    private final GpxCoordinateExtractor gpxCoordinateExtractor;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
+
+    private final AmazonS3Client amazonS3Client;
+
+    private String buildKey(String dirName) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String now = sdf.format(new Date());
+
+        String newFileName = UUID.randomUUID() + "_" + now;
+
+        return dirName + "/" + newFileName + ".gpx";
+    }
+
+
+    private String uploadGpxToS3(Resource gpxFile, String dirName) throws IOException {
+
+        InputStream inputStream = gpxFile.getInputStream();
+        String key = buildKey(dirName);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(URLConnection.guessContentTypeFromStream(inputStream));
+        metadata.setContentLength(gpxFile.contentLength());
+        amazonS3Client.putObject(bucketName, key, inputStream, metadata);
+
+        return amazonS3Client.getUrl(bucketName, key).toString();
+    }
 
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getPostScroll(Pageable pageable, List<String> keywordList) {
@@ -56,13 +89,11 @@ public class PostService {
                 .from(keyword)
                 .where(keyword.keywordName.in(keywordList))
                 .fetch();
-        System.out.println("keywordNos = " + keywordNos.get(0));
 
         List<Post> posts = jpaQueryFactory.select(post)
                 .leftJoin(postKeyword)
                 .where(postKeyword.keyword.keywordNo.in(keywordNos))
                 .fetch();
-        System.out.println("posts = " + posts.get(0));
 
         return new PageImpl<>(posts.stream().map(GetAllPostsResponse::from).toList(), pageable, posts.size());
     }
@@ -72,9 +103,12 @@ public class PostService {
 
         postChecker.checkPostValidation(request.postTitle(), request.postContent());
 
+        //GPX 저장
         GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxFile);
 
         Member member = memberRepository.findByMemberNo(request.memberNo());
+
+        String gpxUrl = uploadGpxToS3(gpxFile, member.getMemberNo().toString());
 
         Post createdPost = postRepository.save(Post.builder()
                 .member(member)
@@ -83,6 +117,7 @@ public class PostService {
                 .postContent(request.postContent())
                 .locationName(request.locationName())
                 .gpxDataVO(gpxDataVO)
+                .gpxUrl(gpxUrl)
                 .status(true)
                 .build());
 
@@ -102,11 +137,14 @@ public class PostService {
 
         Member member = memberRepository.findByMemberNo(request.memberNo());
 
+        String gpxUrl = uploadGpxToS3(gpxFile, member.getMemberNo().toString());
+
         Post createdPost = postRepository.save(Post.builder()
                 .member(member)
                 .role(member.getRole())
                 .locationName(request.locationName())
                 .gpxDataVO(gpxDataVO)
+                .gpxUrl(gpxUrl)
                 .status(false)
                 .build());
 
@@ -170,6 +208,10 @@ public class PostService {
         return GetPostResponse.from(post, keywordList);
     }
 
+    private Post findPostByNo(Long postNo) {
+        return postRepository.findById(postNo)
+                .orElseThrow(EntityNotFoundException::new);
+    }
 
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getReportedPostScroll(Pageable pageable) {
@@ -196,12 +238,21 @@ public class PostService {
         post.resetReportedCount();
     }
 
-    private Post findPostByNo(Long postNo) {
-        return postRepository.findById(postNo)
-                .orElseThrow(EntityNotFoundException::new);
-    }
-
     private void savePostImages(List<String> imageUrlList, Long postNo) {
         imageService.savePostNo(imageUrlList, postNo);
+    }
+
+
+    public GpxDataResponse getGpxLonLatData(Long postNo) throws ParserConfigurationException, IOException, SAXException {
+
+        Post post = findPostByNo(postNo);
+        String gpxUrl = post.getGpxUrl();
+
+//        S3Object s3Object = amazonS3Client.getObject(bucketName, gpxUrl);
+//        InputStream inputStream = s3Object.getObjectContent();
+
+        InputStream inputStream = getClass().getResourceAsStream("/test.gpx");
+
+        return new GpxDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
     }
 }

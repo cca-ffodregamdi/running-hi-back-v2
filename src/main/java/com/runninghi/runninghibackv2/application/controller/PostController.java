@@ -1,14 +1,11 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.post.request.*;
+import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
-import com.runninghi.runninghibackv2.application.dto.post.response.CreatePostResponse;
-import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
-import com.runninghi.runninghibackv2.application.dto.post.response.GetPostResponse;
-import com.runninghi.runninghibackv2.application.dto.post.response.UpdatePostResponse;
 import com.runninghi.runninghibackv2.application.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +25,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
-@Tag(name = "게시글 컨트롤러", description = "게시글 작성, 조회, 수정, 삭제 API")
+@Tag(name = "게시글/러닝코스 API", description = "게시글 작성, 조회, 수정, 삭제와 해당 게시글의 러닝코스 데이터를 조회하는 API 입니다.")
 @RestController
 @RequestMapping("api/v1/posts")
 @RequiredArgsConstructor
@@ -43,29 +40,41 @@ public class PostController {
     private static final String DELETE_RESPONSE_MESSAGE = "성공적으로 삭제되었습니다.";
 
     @GetMapping
-    @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다. 키워드로 필터링 가능")
+    @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 특정 키워드들로 필터링이 가능합니다.")
     public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getAllPosts(@ModelAttribute PostKeywordCriteria criteria) {
 
         Pageable pageable = PageRequest.of(criteria.page(), criteria.size());
 
         Page<GetAllPostsResponse> response = postService.getPostScroll(pageable, criteria.keyword());
 
-        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
+        return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
+    @GetMapping("/coordinate/{postNo}")
+    @Operation(summary = "GPX 경도, 위도 조회", description = " '나도 이 코스 달리기' 선택시 반환되는 데이터입니다. \n 지도 상 표기를 위해 경도-위도 값이 튜플 형태로 반환됩니다.")
+    public ResponseEntity<ApiResult<GpxDataResponse>> getGPXData(@PathVariable Long postNo) throws ParserConfigurationException, IOException, SAXException {
+
+
+        System.out.println("postNo = " + postNo);
+        GpxDataResponse response = postService.getGpxLonLatData(postNo);
+
+        return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
+    }
+
+
     @PostMapping
-    @Operation(summary = "게시글 작성", description = "러닝 기록과 게시글 작성합니다.")
+    @Operation(summary = "게시글 작성", description = "러닝 기록에 대한 게시글을 작성합니다. \n 제목과 내용, 키워드, 이미지를 저장합니다.")
     public ResponseEntity<ApiResult<CreatePostResponse>> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
                                                                              @RequestPart("title") String postTitle,
                                                                              @RequestPart("content") String postContent,
                                                                              @RequestPart("location") String locationName,
                                                                              @RequestPart("keyword")PostKeywordRequest keywordList,
-                                                                             @RequestPart("image")PostImageRequest imageUrlList,
+//                                                                             @RequestPart("image")PostImageRequest imageUrlList,
                                                                              @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreatePostRequest request = new CreatePostRequest(memberInfo.memberNo(), memberInfo.role(), postTitle, postContent, locationName, keywordList.keywordList(), imageUrlList.imageUrlList());
+        CreatePostRequest request = new CreatePostRequest(memberInfo.memberNo(), memberInfo.role(), postTitle, postContent, locationName, keywordList.keywordList(), null);
 
         CreatePostResponse response = postService.createRecordAndPost(request, gpxFile.getResource());
 
@@ -74,7 +83,7 @@ public class PostController {
     }
 
     @PostMapping("/only-record")
-    @Operation(summary = "기록만 저장", description = "게시글 공유 없이 기록만 저장합니다.")
+    @Operation(summary = "기록만 저장", description = "게시글 공유 없이 러닝 기록만 저장합니다. \n 지역명과 gpx 파일만 저장합니다.")
     public ResponseEntity<ApiResult<CreatePostResponse>> createRecord(@RequestHeader("Authorization") String bearerToken,
                                                                       @RequestPart("location") String locationName,
                                                                       @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
@@ -90,7 +99,7 @@ public class PostController {
     }
 
     @PutMapping("/{postNo}")
-    @Operation(summary = "게시글 수정", description = "공유된 게시글 제목/내용을 수정합니다.")
+    @Operation(summary = "게시글 수정", description = "공유된 게시글의 제목/내용을 수정합니다. \n 러닝기록은 수정이 불가능합니다.")
     public ResponseEntity<ApiResult<UpdatePostResponse>> updatePost(@RequestHeader(name = "Authorization") String bearerToken,
                                                                     @PathVariable Long postNo, @RequestBody UpdatePostRequest request) {
 

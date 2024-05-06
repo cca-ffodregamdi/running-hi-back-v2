@@ -29,6 +29,8 @@ public class QPost extends EntityPathBase<Post> {
 
     public final com.runninghi.runninghibackv2.domain.entity.vo.QGpxDataVO gpxDataVO;
 
+    public final StringPath gpxUrl = createString("gpxUrl");
+
     public final ListPath<Keyword, QKeyword> keywordList = this.<Keyword, QKeyword>createList("keywordList", Keyword.class, QKeyword.class, PathInits.DIRECT2);
 
     public final StringPath locationName = createString("locationName");
