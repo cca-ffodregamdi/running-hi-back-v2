@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,50 +51,45 @@ public class PostController {
         return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
+//    @GetMapping("/{postNo}")
+//    @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
+//    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
+//
+//        GetPostResponse response = postService.getPostByPostNo(postNo);
+//
+//        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
+//    }
+
     @GetMapping("/coordinate/{postNo}")
     @Operation(summary = "GPX 경도, 위도 조회", description = " '나도 이 코스 달리기' 선택시 반환되는 데이터입니다. \n 지도 상 표기를 위해 경도-위도 값이 튜플 형태로 반환됩니다.")
     public ResponseEntity<ApiResult<GpxDataResponse>> getGPXData(@PathVariable Long postNo) throws ParserConfigurationException, IOException, SAXException {
 
-
-        System.out.println("postNo = " + postNo);
         GpxDataResponse response = postService.getGpxLonLatData(postNo);
 
         return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
 
-    @PostMapping
-    @Operation(summary = "게시글 작성", description = "러닝 기록에 대한 게시글을 작성합니다. \n 제목과 내용, 키워드, 이미지를 저장합니다.")
-    public ResponseEntity<ApiResult<CreatePostResponse>> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
-                                                                             @RequestPart("title") String postTitle,
-                                                                             @RequestPart("content") String postContent,
-                                                                             @RequestPart("location") String locationName,
-                                                                             @RequestPart("keyword")PostKeywordRequest keywordList,
-//                                                                             @RequestPart("image")PostImageRequest imageUrlList,
-                                                                             @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
+    @PostMapping(value = "/gpx", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "러닝 데이터 저장", description = "러닝이 끝난 직후 gpx 파일을 저장하고 데이터 (거리, 속도, 시간, 등) 을 반환합니다. ")
+    public ResponseEntity<ApiResult<CreateRecordResponse>> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
+                                                                               @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreatePostRequest request = new CreatePostRequest(memberInfo.memberNo(), memberInfo.role(), postTitle, postContent, locationName, keywordList.keywordList(), null);
-
-        CreatePostResponse response = postService.createRecordAndPost(request, gpxFile.getResource());
-
+        CreateRecordResponse response = postService.createRecord(memberInfo.memberNo(), gpxFile.getResource());
 
         return ResponseEntity.ok(ApiResult.success(CREATE_RESPONSE_MESSAGE, response));
     }
 
-    @PostMapping("/only-record")
-    @Operation(summary = "기록만 저장", description = "게시글 공유 없이 러닝 기록만 저장합니다. \n 지역명과 gpx 파일만 저장합니다.")
+    @PutMapping
+    @Operation(summary = "게시글 공유", description = "러닝 데이터를 게시글로 공유합니다. \n 게시글 제목, 내용, 사진url을 추가로 받습니다.")
     public ResponseEntity<ApiResult<CreatePostResponse>> createRecord(@RequestHeader("Authorization") String bearerToken,
-                                                                      @RequestPart("location") String locationName,
-                                                                      @RequestPart("gpx") MultipartFile gpxFile) throws ParserConfigurationException, IOException, SAXException {
+                                                                        @RequestBody CreatePostRequest request) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreateRecordRequest request = new CreateRecordRequest(memberInfo.memberNo(), memberInfo.role(),locationName);
-
-        CreatePostResponse response = postService.createRecord(request, gpxFile.getResource());
-
+        CreatePostResponse response = postService.createPost(memberInfo.memberNo(), request);
 
         return ResponseEntity.ok(ApiResult.success(CREATE_RESPONSE_MESSAGE, response));
     }
@@ -110,25 +106,16 @@ public class PostController {
         return ResponseEntity.ok(ApiResult.success(UPDATE_RESPONSE_MESSAGE, response));
     }
 
-    @GetMapping("/{postNo}")
-    @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
-    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
-
-        GetPostResponse response = postService.getPostByPostNo(postNo);
-
-        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
-    }
-
     @DeleteMapping("/{postNo}")
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
-    public ResponseEntity<ApiResult<Void>> deletePost(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<ApiResult<DeletePostResponse>> deletePost(@RequestHeader(name = "Authorization") String bearerToken,
                                                       @PathVariable Long postNo) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        postService.deletePost(memberInfo.memberNo(), postNo);
+        DeletePostResponse response = postService.deletePost(memberInfo.memberNo(), postNo);
 
-        return ResponseEntity.ok(ApiResult.success(DELETE_RESPONSE_MESSAGE, null));
+        return ResponseEntity.ok(ApiResult.success(DELETE_RESPONSE_MESSAGE, response));
     }
 
     @HasAccess
