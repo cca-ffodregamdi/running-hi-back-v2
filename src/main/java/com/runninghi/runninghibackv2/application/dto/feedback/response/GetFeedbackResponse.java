@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 
 @Schema(description = "피드백 조회")
 public record GetFeedbackResponse(
+        @Schema(description = "피드백 번호", example = "1")
+        Long feedbackNo,
         @Schema(description = "제목", example = "서비스 개선 요청 / 문의사항")
         String title,
         @Schema(description = "내용", example = "서비스 이용 중 발견한 문제 / 문의사항에 대한 상세 설명 수정")
@@ -26,7 +28,7 @@ public record GetFeedbackResponse(
         String nickname
 ) {
     public static GetFeedbackResponse from(Feedback feedback) {
-        return new GetFeedbackResponse(feedback.getTitle(), feedback.getContent(),
+        return new GetFeedbackResponse(feedback.getFeedbackNo(), feedback.getTitle(), feedback.getContent(),
                 feedback.getCategory(), feedback.getCreateDate(), feedback.getUpdateDate(),
                 feedback.isHasReply(), feedback.getReply(), feedback.getFeedbackWriter().getNickname());
     }
