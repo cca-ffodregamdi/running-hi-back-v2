@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "댓글 컨트롤러", description = "댓글 관련 API")
+@Tag(name = "댓글 API", description = "댓글 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/reply")
