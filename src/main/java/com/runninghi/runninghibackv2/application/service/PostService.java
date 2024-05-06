@@ -2,16 +2,12 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
-import com.runninghi.runninghibackv2.application.dto.post.request.CreateRecordRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
-import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.entity.PostKeyword;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
@@ -31,7 +27,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.net.URLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -75,7 +71,7 @@ public class PostService {
         String key = buildKey(dirName);
 
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(URLConnection.guessContentTypeFromStream(inputStream));
+        metadata.setContentType("application/gpx+xml");
         metadata.setContentLength(gpxFile.contentLength());
         amazonS3Client.putObject(bucketName, key, inputStream, metadata);
 
@@ -99,50 +95,18 @@ public class PostService {
     }
 
     @Transactional
-    public CreatePostResponse createRecordAndPost(CreatePostRequest request, Resource gpxFile) throws ParserConfigurationException, IOException, SAXException {
-
-        postChecker.checkPostValidation(request.postTitle(), request.postContent());
+    public CreateRecordResponse createRecord(Long memberNo, Resource gpxFile) throws ParserConfigurationException, IOException, SAXException {
 
         //GPX 저장
         GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxFile);
 
-        Member member = memberRepository.findByMemberNo(request.memberNo());
+        Member member = memberRepository.findByMemberNo(memberNo);
 
         String gpxUrl = uploadGpxToS3(gpxFile, member.getMemberNo().toString());
 
         Post createdPost = postRepository.save(Post.builder()
                 .member(member)
                 .role(member.getRole())
-                .postTitle(request.postTitle())
-                .postContent(request.postContent())
-                .locationName(request.locationName())
-                .gpxDataVO(gpxDataVO)
-                .gpxUrl(gpxUrl)
-                .status(true)
-                .build());
-
-        postKeywordService.createPostKeyword(createdPost, request.keywordList());
-        savePostImages(request.imageUrlList(), createdPost.getPostNo());
-
-        GpxDataVO postGpxVO = createdPost.getGpxDataVO();
-
-        return new CreatePostResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
-                postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
-    }
-
-    @Transactional
-    public CreatePostResponse createRecord(CreateRecordRequest request, Resource gpxFile) throws ParserConfigurationException, IOException, SAXException {
-
-        GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxFile);
-
-        Member member = memberRepository.findByMemberNo(request.memberNo());
-
-        String gpxUrl = uploadGpxToS3(gpxFile, member.getMemberNo().toString());
-
-        Post createdPost = postRepository.save(Post.builder()
-                .member(member)
-                .role(member.getRole())
-                .locationName(request.locationName())
                 .gpxDataVO(gpxDataVO)
                 .gpxUrl(gpxUrl)
                 .status(false)
@@ -150,10 +114,27 @@ public class PostService {
 
         GpxDataVO postGpxVO = createdPost.getGpxDataVO();
 
-
-
-        return new CreatePostResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
+        return new CreateRecordResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
                 postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
+    }
+
+    @Transactional
+    public CreatePostResponse createPost(Long memberNo, CreatePostRequest request) {
+
+        postChecker.checkPostValidation(request.postTitle(), request.postContent());
+
+        Post post = postRepository.findById(request.postNo())
+                        .orElseThrow(EntityNotFoundException::new);
+
+        postChecker.isWriter(memberNo, post.getMember().getMemberNo());
+
+        postKeywordService.createPostKeyword(post, request.keywordList());
+        savePostImages(request.imageUrlList(), post.getPostNo());
+
+        post.shareToPost(request);
+
+        return new CreatePostResponse(post.getPostNo());
+
     }
 
 
@@ -172,7 +153,7 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long memberNo, Long postNo) {
+    public DeletePostResponse deletePost(Long memberNo, Long postNo) {
 
         Post post = findPostByNo(postNo);
 
@@ -180,6 +161,8 @@ public class PostService {
 
         postKeywordService.deletePostKeyword(postNo);
         postRepository.deleteById(postNo);
+
+        return DeletePostResponse.from(postNo);
     }
 
 
@@ -191,22 +174,22 @@ public class PostService {
 
     }
 
-    @Transactional(readOnly = true)
-    public GetPostResponse getPostByPostNo(Long postNo) {
-
-        Post post = postRepository.findById(postNo)
-                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
-
-        List<PostKeyword> list = postKeywordService.getKeywordsByPost(post);
-
-        List<Keyword> keywordList = new ArrayList<>();
-
-        for (PostKeyword postKeyword : list) {
-            keywordList.add(postKeyword.getKeyword());
-        }
-
-        return GetPostResponse.from(post, keywordList);
-    }
+//    @Transactional(readOnly = true)
+//    public GetPostResponse getPostByPostNo(Long postNo) {
+//
+//        Post post = postRepository.findById(postNo)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+//
+//        List<PostKeyword> list = postKeywordService.getKeywordsByPost(post);
+//
+//        List<Keyword> keywordList = new ArrayList<>();
+//
+//        for (PostKeyword postKeyword : list) {
+//            keywordList.add(postKeyword.getKeyword());
+//        }
+//
+//        return GetPostResponse.from(post, keywordList);
+//    }
 
     private Post findPostByNo(Long postNo) {
         return postRepository.findById(postNo)
@@ -244,15 +227,13 @@ public class PostService {
 
 
     public GpxDataResponse getGpxLonLatData(Long postNo) throws ParserConfigurationException, IOException, SAXException {
-
         Post post = findPostByNo(postNo);
         String gpxUrl = post.getGpxUrl();
 
-//        S3Object s3Object = amazonS3Client.getObject(bucketName, gpxUrl);
-//        InputStream inputStream = s3Object.getObjectContent();
+        URL url = new URL(gpxUrl);
 
-        InputStream inputStream = getClass().getResourceAsStream("/test.gpx");
-
-        return new GpxDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
+        try (InputStream inputStream = url.openStream()) {
+            return new GpxDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
+        }
     }
 }
