@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
+import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
@@ -78,6 +79,13 @@ public class Post extends BaseTimeEntity {
         this.status = status;
         this.gpxUrl = gpxUrl;
         this.gpxDataVO = gpxDataVO;
+    }
+
+    public void shareToPost(CreatePostRequest request) {
+        this.postTitle = request.postTitle();
+        this.postContent = request.postContent();
+        this.locationName = request.locationName();
+        this.status = true;
     }
 
     public void update(UpdatePostRequest request) {
