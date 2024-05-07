@@ -35,7 +35,7 @@ public class TestData {
     private final KeywordRepository keywordRepository;
 
     @PostMapping("/test-data")
-    public ResponseEntity<ApiResult> setUp() {
+    public ResponseEntity<ApiResult<Void>> setUp() {
         List<Member> members = new ArrayList<>();
         LocalDateTime dateTime = LocalDateTime.now().minusDays(31);
 
