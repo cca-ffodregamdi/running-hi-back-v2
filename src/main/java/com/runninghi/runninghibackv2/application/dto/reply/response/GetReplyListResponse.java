@@ -36,7 +36,7 @@ public record GetReplyListResponse (
                 reply.getPost().getPostNo(),
                 reply.getReplyContent(),
                 reply.isDeleted(),
-                reply.getParent().getReplyNo(),
+                reply.getParent() != null ? reply.getParent().getReplyNo() : null ,
                 reply.getChildren(),
                 reply.getCreateDate(),
                 reply.getUpdateDate()
