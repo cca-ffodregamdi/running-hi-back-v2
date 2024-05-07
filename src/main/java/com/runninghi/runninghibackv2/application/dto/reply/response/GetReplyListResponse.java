@@ -19,7 +19,7 @@ public record GetReplyListResponse (
         @Schema(description = "댓글 삭제 여부", example = "false")
         boolean isDeleted,
         @Schema(description = "부모 댓글", example = "")
-        Reply parent,
+        Long parentReplyNo,
         @Schema(description = "자식 댓글 리스트", example = "")
         List<Reply> children,
 
@@ -36,7 +36,7 @@ public record GetReplyListResponse (
                 reply.getPost().getPostNo(),
                 reply.getReplyContent(),
                 reply.isDeleted(),
-                reply.getParent(),
+                reply.getParent().getReplyNo(),
                 reply.getChildren(),
                 reply.getCreateDate(),
                 reply.getUpdateDate()

@@ -82,11 +82,11 @@ public class ReplyService {
      * @return 댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 부모 댓글 번호, 생성 일, 수정 일
      */
     @Transactional
-    public CreateReplyResponse createReply(CreateReplyRequest request) {
+    public CreateReplyResponse createReply(CreateReplyRequest request, Long memberNo) {
 
         ReplyFCMDTO replyFCMDTO = new ReplyFCMDTO();
 
-        Member member = memberRepository.findByMemberNo(request.memberNo());
+        Member member = memberRepository.findByMemberNo(memberNo);
         Post post = postRepository.findById(request.postNo())
                 .orElseThrow(EntityNotFoundException::new);
 
