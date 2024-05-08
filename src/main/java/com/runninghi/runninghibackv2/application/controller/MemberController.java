@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +44,7 @@ public class MemberController {
      * 이 인가 코드를 통해 서버는 카카오 서버로부터 사용자의 회원 정보를 받아와 회원가입 또는 로그인 처리를 진행합니다.
      * 처리가 완료되면, 사용자에게 로그인 성공 여부와 함께 액세스 토큰 및 리프레시 토큰이 반환됩니다.</p>
      */
-    @GetMapping("/api/v1/login/kakao")
+    @GetMapping(value = "/api/v1/login/kakao", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "카카오 회원가입/로그인",
             description = "카카오 로그인 페이지로 리다이렉트합니다. 사용자가 카카오 계정으로 로그인하면, 서버는 리다이렉트하여 인가 코드를 처리합니다. " +
                     "회원 가입 처리가 완료되면 최종적으로 헤더에 엑세스 토큰과 리프레시 토큰 정보를 넣어서 클라이언트에 반환합니다.",
@@ -87,7 +88,6 @@ public class MemberController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", tokens.get("accessToken"));
-        System.out.println(tokens.get("accessToken"));
         headers.add("Refresh-Token", tokens.get("refreshToken"));
 
         return ResponseEntity.ok()
@@ -106,7 +106,7 @@ public class MemberController {
      * @return ResponseEntity 객체에 담긴 ApiResult, 성공 여부를 Boolean 값으로 반환.
      * @apiNote 이 API는 카카오와의 연결 해제 및 회원 탈퇴를 위해 사용자 인증이 필요합니다. 성공적으로 연결 해제 및 탈퇴가 완료되면, "Success Kakao Unlink" 메시지와 함께 성공 여부가 반환됩니다.
      */
-    @PutMapping("/api/v1/unlink/kakao")
+    @PutMapping(value = "/api/v1/unlink/kakao", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "카카오 회원 탈퇴", description = "카카오 서비스와 연결을 끊고 회원 탈퇴를 진행합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
@@ -134,7 +134,7 @@ public class MemberController {
      * @return ResponseEntity 객체를 통해 ApiResult<UpdateMemberInfoResponse> 타입의 응답을 반환합니다.
      *      응답 본문에는 회원 정보 수정 성공 메시지와 함께, 수정된 정보가 포함됩니다.
      */
-    @PutMapping("/api/v1/members")
+    @PutMapping(value = "/api/v1/members", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다. 현재는 닉네임만 수정할 수 있습니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true)
@@ -165,7 +165,7 @@ public class MemberController {
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
      */
-    @GetMapping("/api/v1/members")
+    @GetMapping(value = "/api/v1/members", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "회원 정보 조회", description = "사용자 정보를 조회합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true)
@@ -195,9 +195,9 @@ public class MemberController {
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰과 FcmToken이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
      */
-    @PutMapping("/api/v1/member/fcmToken/{alarmConsent}")
+    @PutMapping(value = "/api/v1/member/fcmToken/{alarmConsent}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "FCM 토큰 저장", description = "FCM 토큰과 알림 수신 동의 여부를 저장합니다.")
-    public ResponseEntity<ApiResult> saveFCMToken(@RequestHeader(value = "Authorization") String token,
+    public ResponseEntity<ApiResult<Void>> saveFCMToken(@RequestHeader(value = "Authorization") String token,
                                                   @RequestHeader(value = "FcmToken") String fcmToken,
                                                   @PathVariable(value = "alarmConsent") boolean alarmConsent) {
 

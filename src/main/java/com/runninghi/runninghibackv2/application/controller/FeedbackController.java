@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,7 @@ public class FeedbackController {
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 존재하지 않을 경우 접근이 거부됩니다.
      */
-    @PostMapping("/api/v1/feedbacks")
+    @PostMapping(value = "/api/v1/feedbacks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "피드백/문의사항 작성", description = "사용자가 피드백/문의사항을 작성하고 등록합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true)
@@ -80,7 +81,7 @@ public class FeedbackController {
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 존재하지 않을 경우 접근이 거부됩니다.
      */
-    @GetMapping("/api/v1/feedbacks/{feedbackNo}")
+    @GetMapping(value = "/api/v1/feedbacks/{feedbackNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "특정 피드백 상세 조회",
             description = "사용자가 제출한 특정 피드백이나 문의사항의 상세 정보를 조회합니다. 사용자가 자신이 제출한 피드백의 상태나 내용을 확인하고 수정할 수 있습니다.",
@@ -123,7 +124,7 @@ public class FeedbackController {
      *          이들 파라미터는 각각 기본값을 가지고 있어, 요청 시 명시적으로 지정하지 않아도 됩니다.
      *          정렬 순서는 'asc' 또는 'desc' 중 하나를 선택하여 지정할 수 있으며, 정렬 기준은 생성 날짜입니다.
      */
-    @GetMapping("/api/v1/feedbacks")
+    @GetMapping(value = "/api/v1/feedbacks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "사용자가 작성한 피드백 리스트 조회", description = "사용자 본인이 작성한 전체 피드백/문의사항 리스트를 조회합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
@@ -165,7 +166,7 @@ public class FeedbackController {
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 존재하지 않을 경우 접근이 거부됩니다.
      */
     @HasAccess
-    @GetMapping("/api/v1/feedbacks/admin/{feedbackNo}")
+    @GetMapping(value = "/api/v1/feedbacks/admin/{feedbackNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "특정 피드백 상세 조회 (관리자)", description = "특정 피드백/문의사항을 관리자가 조회합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
@@ -205,7 +206,7 @@ public class FeedbackController {
      *          정렬 순서는 'asc' 또는 'desc' 중 하나를 선택하여 지정할 수 있으며, 정렬 기준은 생성 날짜입니다.
      */
     @HasAccess
-    @GetMapping("/api/v1/feedbacks/admin")
+    @GetMapping(value = "/api/v1/feedbacks/admin", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "전체 피드백 리스트 조회 (관리자)", description = "관리자가 전체 피드백/문의사항 리스트를 조회합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
@@ -245,7 +246,7 @@ public class FeedbackController {
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 존재하지 않을 경우, 또는 사용자 본인의 피드백이 아닐 경우 접근이 거부됩니다.
      */
-    @DeleteMapping("/api/v1/feedbacks/{feedbackNo}")
+    @DeleteMapping(value = "/api/v1/feedbacks/{feedbackNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "피드백 삭제", description = "특정 피드백/문의사항을 삭제합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
@@ -282,7 +283,7 @@ public class FeedbackController {
      *          또한, 사용자는 본인의 피드백만 수정할 수 있습니다.
      * @throws BadRequestException 요청된 피드백 번호가 유효하지 않거나, 수정 요청 본문이 올바르지 않을 때 발생하는 예외입니다.
      */
-    @PutMapping("/api/v1/feedbacks/{feedbackNo}")
+    @PutMapping(value = "/api/v1/feedbacks/{feedbackNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "피드백 수정", description = "특정 피드백/문의사항을 수정합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
@@ -319,7 +320,7 @@ public class FeedbackController {
      * @throws BadRequestException 요청 본문이 올바르지 않거나 필요한 정보가 누락되었을 때 발생하는 예외입니다.
      */
     @HasAccess
-    @PutMapping("/api/v1/feedbacks/admin/{feedbackNo}")
+    @PutMapping(value = "/api/v1/feedbacks/admin/{feedbackNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "피드백 답변 작성/수정 (관리자)", description = "관리자가 피드백 답변을 작성 또는 수정합니다.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
