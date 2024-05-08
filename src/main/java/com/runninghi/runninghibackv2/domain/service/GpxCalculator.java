@@ -2,6 +2,7 @@ package com.runninghi.runninghibackv2.domain.service;
 
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import org.w3c.dom.Document;
@@ -20,8 +21,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-public class CalculateGPX {
+@Component
+public class GpxCalculator {
 
     private final List<TrackPoint> trackPoints = new ArrayList<>();
     private float totalDistance = 0.0f;
