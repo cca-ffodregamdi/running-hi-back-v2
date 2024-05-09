@@ -110,8 +110,8 @@ public class ReplyService {
         Reply savedReply = replyRepository.save(reply);
 
         // 게시물 작성자에게 푸쉬 알림
-        replyFCMDTO.setSavedReply(savedReply);
-        alarmService.sendReplyPushNotification(replyFCMDTO);
+//        replyFCMDTO.setSavedReply(savedReply);
+//        alarmService.sendReplyPushNotification(replyFCMDTO);
 
         return CreateReplyResponse.fromEntity(savedReply);
     }
