@@ -29,8 +29,6 @@ public class QGpxDataVO extends BeanPath<GpxDataVO> {
 
     public final NumberPath<Float> meanPace = createNumber("meanPace", Float.class);
 
-    public final NumberPath<Float> meanSlope = createNumber("meanSlope", Float.class);
-
     public final NumberPath<Float> speed = createNumber("speed", Float.class);
 
     public final NumberPath<Float> startLatitude = createNumber("startLatitude", Float.class);

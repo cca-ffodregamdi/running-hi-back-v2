@@ -49,11 +49,7 @@ public class GpxDataVO implements Serializable {
     @Comment("평균 페이스 (분/km)")
     private float meanPace;
 
-    @Column
-    @Comment("평균 경사도")
-    private float meanSlope;
-
-    public GpxDataVO(float startLatitude, float startLongitude, float endLatitude, float endLongitude, float distance, float time, float kcal, float speed, float meanPace, float meanSlope) {
+    public GpxDataVO(float startLatitude, float startLongitude, float endLatitude, float endLongitude, float distance, float time, float kcal, float speed, float meanPace) {
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;
         this.endLatitude = endLatitude;
@@ -63,7 +59,6 @@ public class GpxDataVO implements Serializable {
         this.kcal = kcal;
         this.speed = speed;
         this.meanPace = meanPace;
-        this.meanSlope = meanSlope;
     }
 
 
