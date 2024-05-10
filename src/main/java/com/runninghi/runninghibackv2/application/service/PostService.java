@@ -30,6 +30,7 @@ import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
@@ -61,21 +62,30 @@ public class PostService {
 
         String newFileName = UUID.randomUUID() + "_" + now;
 
-        return dirName + "/" + newFileName + ".gpx";
+        return dirName + "/" + newFileName + ".txt";
     }
 
+    private String uploadGpxToS3(String gpxData, String dirName) throws IOException {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(gpxData.getBytes());
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             BufferedInputStream bis = new BufferedInputStream(inputStream);
+             BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
 
-    private String uploadGpxToS3(Resource gpxFile, String dirName) throws IOException {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = bis.read(buffer)) != -1) {
+                bos.write(buffer, 0, bytesRead);
+            }
+            bos.flush();
 
-        InputStream inputStream = gpxFile.getInputStream();
-        String key = buildKey(dirName);
+            String key = buildKey(dirName);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType("text/plain");
+            metadata.setContentLength(outputStream.size());
+            amazonS3Client.putObject(bucketName, key, new ByteArrayInputStream(outputStream.toByteArray()), metadata);
 
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("application/gpx+xml");
-        metadata.setContentLength(gpxFile.contentLength());
-        amazonS3Client.putObject(bucketName, key, inputStream, metadata);
-
-        return amazonS3Client.getUrl(bucketName, key).toString();
+            return amazonS3Client.getUrl(bucketName, key).toString();
+        }
     }
 
     @Transactional(readOnly = true)
@@ -95,14 +105,17 @@ public class PostService {
     }
 
     @Transactional
-    public CreateRecordResponse createRecord(Long memberNo, Resource gpxFile) throws ParserConfigurationException, IOException, SAXException {
+    public CreateRecordResponse createRecord(Long memberNo, String gpxFile) throws Exception {
+
+        byte[] compressedData = Base64.getDecoder().decode(gpxFile);
+        String gpxData = decompress(compressedData);
 
         //GPX 저장
-        GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxFile);
+        GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxData);
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
-        String gpxUrl = uploadGpxToS3(gpxFile, member.getMemberNo().toString());
+        String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
 
         Post createdPost = postRepository.save(Post.builder()
                 .member(member)
@@ -116,6 +129,24 @@ public class PostService {
 
         return new CreateRecordResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
                 postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
+    }
+
+
+    private String decompress(byte[] value) throws Exception {
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        GZIPInputStream gzipInStream = new GZIPInputStream(new ByteArrayInputStream(value));
+
+        int size = 0;
+        byte[] buffer = new byte[1024];
+        while ( (size = gzipInStream.read(buffer)) > 0 ) {
+            outStream.write(buffer, 0, size);
+        }
+        outStream.flush();
+        outStream.close();
+
+        return new String(outStream.toByteArray());
     }
 
     @Transactional
