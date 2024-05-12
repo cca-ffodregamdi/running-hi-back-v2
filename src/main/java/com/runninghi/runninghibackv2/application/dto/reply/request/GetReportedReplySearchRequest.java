@@ -7,9 +7,11 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.domain.Sort;
 
 @Getter
+@ToString
 public class GetReportedReplySearchRequest {
 
         @PositiveOrZero(message = "0 또는 자연수만 입력 가능합니다.")
@@ -29,16 +31,16 @@ public class GetReportedReplySearchRequest {
         ProcessingStatus reportStatus;
 
         @Size(max = 10, message = "10자 이내로 입력해주세요.")
-        @Pattern(regexp = "/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/") // 특수문자 입력 방지
-        @Schema(description = "닉네임 검색 내용", example = "러너1")
+        @Pattern(regexp = "^[ ㄱ-ㅎ가-힣a-zA-Z0-9]*$") // 특수문자 입력 방지, 빈 문자, 공백 허용
+        @Schema(description = "닉네임 검색 내용", example = " ")
         String search;
 
-        public GetReportedReplySearchRequest (Integer page, Integer size, Sort.Direction sortDirection,
+        public GetReportedReplySearchRequest (Integer page, Integer size, String sortDirection,
                                               ProcessingStatus reportStatus, String search) {
                 this.page = page == null ? 0 : page;
                 this.size = size == null ? 10 : size;
-                this.sortDirection = sortDirection == null ? Sort.Direction.DESC : Sort.Direction.ASC;
-                this.reportStatus = reportStatus == null ? ProcessingStatus.INPROGRESS : reportStatus;
+                this.sortDirection = Sort.Direction.fromString(sortDirection);
+                this.reportStatus = reportStatus;
                 this.search = search;
 
 
