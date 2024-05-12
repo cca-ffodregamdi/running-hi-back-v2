@@ -41,8 +41,6 @@ public class QReply extends EntityPathBase<Reply> {
 
     public final NumberPath<Integer> reportedCount = createNumber("reportedCount", Integer.class);
 
-    public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus> reportStatus = createEnum("reportStatus", com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus.class);
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;
 
