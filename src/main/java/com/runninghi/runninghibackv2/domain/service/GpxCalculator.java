@@ -1,76 +1,71 @@
 package com.runninghi.runninghibackv2.domain.service;
 
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
-@Component
+@Service
 public class GpxCalculator {
 
-    private final List<TrackPoint> trackPoints = new ArrayList<>();
-    private float totalDistance = 0.0f;
-    private float totalTimeInMinutes = 0.0f;
-
-    static class TrackPoint {
+    private static class TrackPoint {
         double lon;
         double lat;
-        double ele;
         LocalDateTime time;
 
-        public TrackPoint(double lon, double lat, double ele, LocalDateTime time) {
+        public TrackPoint(double lon, double lat, LocalDateTime time) {
             this.lon = lon;
             this.lat = lat;
-            this.ele = ele;
             this.time = time;
         }
     }
 
-    private void documentBuilder (Resource gpxFile) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc;
+    private List<TrackPoint> trackPoints = new ArrayList<>();
+    private float totalDistance = 0.0f;
+    private float totalTimeInMinutes = 0.0f;
 
-        try (InputStream inputStream = gpxFile.getInputStream()) {
-            doc = dBuilder.parse(inputStream);
+    public String decompress(byte[] value) throws Exception {
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        GZIPInputStream gzipInStream = new GZIPInputStream(
+                new BufferedInputStream(new ByteArrayInputStream(value)));
+
+        int size = 0;
+        byte[] buffer = new byte[1024];
+        while ( (size = gzipInStream.read(buffer)) > 0 ) {
+            outStream.write(buffer, 0, size);
         }
+        outStream.flush();
+        outStream.close();
 
-        doc.getDocumentElement().normalize();
-
-        NodeList trkptList = doc.getElementsByTagName("trkpt");
-        int length = trkptList.getLength();
-
-        for (int i = 0; i < length; i++) {
-            Element trkptElement = (Element) trkptList.item(i);
-            double lon = Double.parseDouble(trkptElement.getAttribute("lon"));
-            double lat = Double.parseDouble(trkptElement.getAttribute("lat"));
-            double ele = Double.parseDouble(trkptElement.getElementsByTagName("ele").item(0).getTextContent());
-            LocalDateTime time = LocalDateTime.parse(trkptElement.getElementsByTagName("time").item(0).getTextContent(),
-                    DateTimeFormatter.ISO_DATE_TIME);
-            trackPoints.add(new TrackPoint(lon, lat, ele, time));
-        }
-
+        return new String(outStream.toByteArray());
     }
 
-    public GpxDataVO getDataFromGpxFile(Resource gpxFile) throws ParserConfigurationException, IOException, SAXException {
+    private void processJson(String gpxData) {
+        JSONArray trkptList = new JSONArray(gpxData);
 
-        documentBuilder(gpxFile);
+        for (int i = 0; i < trkptList.length(); i++) {
+            JSONObject trkptElement = trkptList.getJSONObject(i);
+            double lon = trkptElement.getDouble("lon");
+            double lat = trkptElement.getDouble("lat");
+            LocalDateTime time = LocalDateTime.parse(trkptElement.getString("time"), DateTimeFormatter.ISO_DATE_TIME);
+            trackPoints.add(new TrackPoint(lon, lat, time));
+        }
+    }
+    public GpxDataVO getDataFromGpxFile(String gpxData) {
+
+        processJson(gpxData);
 
         float startLatitude = getStartLatitude();
         float startLongitude = getStartLongitude();
@@ -81,9 +76,8 @@ public class GpxCalculator {
         float kcal = calculateKcal();
         float speed = calculateSpeed();
         float meanPace = calculateMeanPace();
-        float meanSlope = calculateMeanSlope();
 
-        return new GpxDataVO(startLatitude, startLongitude, endLatitude, endLongitude, distance, time, kcal, speed, meanPace, meanSlope);
+        return new GpxDataVO(startLatitude, startLongitude, endLatitude, endLongitude, distance, time, kcal, speed, meanPace);
     }
 
     private float getStartLatitude() {
@@ -154,28 +148,28 @@ public class GpxCalculator {
         return totalTimeInMinutes / totalDistance;
     }
 
-    private float calculateMeanSlope() {
-        double totalElevationChange = 0.0;
-
-        // 경로의 각 위치점에 대해 반복
-        for (int i = 0; i < trackPoints.size() - 1; i++) {
-            TrackPoint p1 = trackPoints.get(i);
-            TrackPoint p2 = trackPoints.get(i + 1);
-
-            // p1에서 p2로의 고도 변화 계산 및 총 고도 변화에 더하기
-            totalElevationChange += p2.ele - p1.ele;
-        }
-
-        // 경로의 평균 고도 변화 계산
-        double meanElevationChange = totalElevationChange / (trackPoints.size() - 1);
-
-        // 경사도가 1% 미만일 시 0 리턴
-        if (Math.abs(meanElevationChange) < 1) {
-            return 0;
-        }
-
-        // 고도 변화를 백분율로 변환하여 반환
-        return (float) ((meanElevationChange / trackPoints.size()) * 100.0);
-    }
+//    private float calculateMeanSlope() {
+//        double totalElevationChange = 0.0;
+//
+//        // 경로의 각 위치점에 대해 반복
+//        for (int i = 0; i < trackPoints.size() - 1; i++) {
+//            TrackPoint p1 = trackPoints.get(i);
+//            TrackPoint p2 = trackPoints.get(i + 1);
+//
+//            // p1에서 p2로의 고도 변화 계산 및 총 고도 변화에 더하기
+//            totalElevationChange += p2.ele - p1.ele;
+//        }
+//
+//        // 경로의 평균 고도 변화 계산
+//        double meanElevationChange = totalElevationChange / (trackPoints.size() - 1);
+//
+//        // 경사도가 1% 미만일 시 0 리턴
+//        if (Math.abs(meanElevationChange) < 1) {
+//            return 0;
+//        }
+//
+//        // 고도 변화를 백분율로 변환하여 반환
+//        return (float) ((meanElevationChange / trackPoints.size()) * 100.0);
+//    }
 
 }
