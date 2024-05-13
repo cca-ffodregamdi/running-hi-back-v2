@@ -42,10 +42,6 @@ public class Reply extends BaseTimeEntity {
     @Comment("신고된 횟수")
     private int reportedCount;
 
-    @Column
-    @Comment("신고 상태")
-    private ProcessingStatus reportStatus;
-
     @ColumnDefault("FALSE")
     @Column(nullable = false)
     @Comment("삭제 여부")
@@ -61,22 +57,25 @@ public class Reply extends BaseTimeEntity {
     @Comment("하위 댓글들")
     private final List<Reply> children = new ArrayList<>();
 
+    @OneToMany(mappedBy = "reportedReply", orphanRemoval = true, cascade = CascadeType.REMOVE)
+    @Comment("댓글 신고 리스트")
+    private final List<ReplyReport> reportList = new ArrayList<>();
+
     private Reply(ReplyBuilder builder) {
         this.replyNo = builder.replyNo;
         this.writer = builder.writer;
         this.post = builder.post;
         this.replyContent = builder.replyContent;
         this.reportedCount = builder.reportedCount;
-        this.reportStatus = builder.reportStatus;
         this.isDeleted = builder.isDeleted;
         this.parent = builder.parent;
     }
 
-    public void addChildrenReply (Reply reply) {
+    public void addChildrenReply(Reply reply) {
         this.children.add(reply);
     }
 
-    public void addParentReply (Reply reply) {
+    public void addParentReply(Reply reply) {
         this.parent = reply;
     }
     public void addReportedCount () {this.reportedCount++;}
@@ -93,15 +92,16 @@ public class Reply extends BaseTimeEntity {
         this.isDeleted = true;
     }
 
+    public void addReplyReport(ReplyReport replyReport) { this.reportList.add(replyReport);}
+
 
     @Builder
-    public Reply(Long replyNo, Member writer, Post post, String replyContent, int reportedCount, ProcessingStatus reportStatus, boolean isDeleted, Reply parent) {
+    public Reply(Long replyNo, Member writer, Post post, String replyContent, int reportedCount, boolean isDeleted, Reply parent) {
         this.replyNo = replyNo;
         this.writer = writer;
         this.post = post;
         this.replyContent = replyContent;
         this.reportedCount = reportedCount;
-        this.reportStatus = reportStatus;
         this.isDeleted = isDeleted;
         this.parent = parent;
     }

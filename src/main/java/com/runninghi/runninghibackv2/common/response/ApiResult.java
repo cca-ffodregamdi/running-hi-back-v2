@@ -25,5 +25,9 @@ public record ApiResult<T>(
         return new ApiResult<>(LocalDateTime.now(), errorCode.getStatus(), errorMessage, null);
     }
 
+    public static <T> ApiResult<T> error(HttpStatus httpStatus, String errorMessage) {
+        return new ApiResult<>(LocalDateTime.now(), httpStatus, errorMessage, null);
+    }
+
 }
 

@@ -215,7 +215,6 @@ class MemberCleanupBatchTests {
                 .post(post1)
                 .replyContent("첫 번째 댓글 내용입니다. : member1")
                 .reportedCount(0)
-                .reportStatus(null)
                 .isDeleted(false)
                 .build();
         replies.add(reply1);
@@ -226,7 +225,6 @@ class MemberCleanupBatchTests {
                 .post(post2)
                 .replyContent("두 번째 댓글 내용입니다. : 남아있는 댓글입니다.")
                 .reportedCount(0)
-                .reportStatus(null)
                 .isDeleted(false)
                 .build();
         replies.add(reply2);
@@ -236,7 +234,6 @@ class MemberCleanupBatchTests {
                 .post(post1)
                 .replyContent("첫 번째 댓글 내용입니다. : member2")
                 .reportedCount(0)
-                .reportStatus(null)
                 .isDeleted(false)
                 .build();
         replies.add(reply3);
@@ -246,7 +243,6 @@ class MemberCleanupBatchTests {
                 .post(post2)
                 .replyContent("부모 댓글입니다.")
                 .reportedCount(0)
-                .reportStatus(null)
                 .isDeleted(false)
                 .build();
         replies.add(parentReply);
@@ -256,7 +252,6 @@ class MemberCleanupBatchTests {
                 .post(post2)
                 .replyContent("자식 댓글입니다.")
                 .reportedCount(0)
-                .reportStatus(null)
                 .isDeleted(false)
                 .parent(parentReply)
                 .build();
@@ -267,7 +262,6 @@ class MemberCleanupBatchTests {
                 .post(post2)
                 .replyContent("또 다른 자식 댓글입니다.")
                 .reportedCount(0)
-                .reportStatus(null)
                 .isDeleted(false)
                 .parent(parentReply)
                 .build();

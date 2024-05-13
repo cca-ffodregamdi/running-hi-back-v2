@@ -8,10 +8,6 @@ import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.enums.ParameterStyle;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
@@ -46,7 +42,7 @@ public class ImageController {
     public ResponseEntity<ApiResult<List<CreateImageResponse>>> saveImages(@Parameter(description = "사용자 인증을 위한 BearerToken")
                                                                            @RequestHeader("Authorization") String token,
                                                                            @Parameter(description = "피드에 업로드할 이미지 리스트")
-                                                                           @RequestPart("images") @NotBlank List<MultipartFile> imageFiles) {
+                                                                           @RequestPart("images") List<MultipartFile> imageFiles) {
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(token);
         List<CreateImageResponse> imageResponseList = imageService.saveImages(imageFiles, memberInfo.memberNo());
         return ResponseEntity.ok().body(ApiResult.success(UPLOAD_IMAGE_RESPONSE_MESSAGE, imageResponseList));

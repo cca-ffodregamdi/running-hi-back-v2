@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ReplyChecker {
 
-    private static final String NO_SPECIAL_SYMBOLS_REGULAR_EXPRESSION = "/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/";
+    private static final String NO_SPECIAL_SYMBOLS_REGULAR_EXPRESSION = "^[ ㄱ-ㅎ가-힣a-zA-Z0-9]*$";
 
 
     public boolean memberCheck(Long memberNo, Role role, Long writerNo) {
@@ -23,7 +23,10 @@ public class ReplyChecker {
     }
 
     public void checkSearchValid(String search) {
-        if (!Pattern.matches(NO_SPECIAL_SYMBOLS_REGULAR_EXPRESSION, search)) throw new IllegalArgumentException();
+        if (!Pattern.matches(NO_SPECIAL_SYMBOLS_REGULAR_EXPRESSION, search)) {
+            System.out.println("밸리드 체크 실패");
+            throw new IllegalArgumentException();
+        }
 
     }
 }

@@ -7,6 +7,7 @@ import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedRe
 import com.runninghi.runninghibackv2.application.dto.reply.request.UpdateReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
+import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
@@ -110,8 +111,8 @@ public class ReplyService {
         Reply savedReply = replyRepository.save(reply);
 
         // 게시물 작성자에게 푸쉬 알림
-        replyFCMDTO.setSavedReply(savedReply);
-        alarmService.sendReplyPushNotification(replyFCMDTO);
+//        replyFCMDTO.setSavedReply(savedReply);
+//        alarmService.sendReplyPushNotification(replyFCMDTO);
 
         return CreateReplyResponse.fromEntity(savedReply);
     }
@@ -177,7 +178,7 @@ public class ReplyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GetReplyListResponse> getReportedReplyList(GetReportedReplyRequest request) {
+    public Page<GetReportedReplyResponse> getReportedReplyList(GetReportedReplyRequest request) {
         replyChecker.checkSearchValid(request.search());
         return  replyQueryRepository.findAllReportedByPageableAndSearch(request);
     }

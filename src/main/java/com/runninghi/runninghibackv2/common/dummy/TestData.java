@@ -171,8 +171,7 @@ public class TestData {
                 .writer(member1)
                 .post(post1)
                 .replyContent("첫 번째 댓글 내용입니다. : member1")
-                .reportedCount(0)
-                .reportStatus(null)
+                .reportedCount(1)
                 .isDeleted(false)
                 .build();
         replies.add(reply1);
@@ -182,8 +181,7 @@ public class TestData {
                 .writer(member2)
                 .post(post2)
                 .replyContent("두 번째 댓글 내용입니다. : 남아있는 댓글입니다.")
-                .reportedCount(0)
-                .reportStatus(null)
+                .reportedCount(1)
                 .isDeleted(false)
                 .build();
         replies.add(reply2);
@@ -192,8 +190,7 @@ public class TestData {
                 .writer(member2)
                 .post(post1)
                 .replyContent("첫 번째 댓글 내용입니다. : member2")
-                .reportedCount(0)
-                .reportStatus(null)
+                .reportedCount(1)
                 .isDeleted(false)
                 .build();
         replies.add(reply3);
@@ -202,8 +199,7 @@ public class TestData {
                 .writer(member1)
                 .post(post2)
                 .replyContent("부모 댓글입니다.")
-                .reportedCount(0)
-                .reportStatus(null)
+                .reportedCount(2)
                 .isDeleted(false)
                 .build();
         replies.add(parentReply);
@@ -212,8 +208,7 @@ public class TestData {
                 .writer(member2)
                 .post(post2)
                 .replyContent("자식 댓글입니다.")
-                .reportedCount(0)
-                .reportStatus(null)
+                .reportedCount(1)
                 .isDeleted(false)
                 .parent(parentReply)
                 .build();
@@ -223,8 +218,7 @@ public class TestData {
                 .writer(member1)
                 .post(post2)
                 .replyContent("또 다른 자식 댓글입니다.")
-                .reportedCount(0)
-                .reportStatus(null)
+                .reportedCount(1)
                 .isDeleted(false)
                 .parent(parentReply)
                 .build();
@@ -246,6 +240,7 @@ public class TestData {
                 .isReplyDeleted(false)
                 .build();
         replyReports.add(report1);
+        reply2.addReplyReport(report1);
 
         ReplyReport report2 = ReplyReport.builder()
                 .category(ReportCategory.ILLEGALITY)
@@ -257,6 +252,7 @@ public class TestData {
                 .isReplyDeleted(false)
                 .build();
         replyReports.add(report2);
+        reply1.addReplyReport(report2);
 
         ReplyReport report3 = ReplyReport.builder()
                 .category(ReportCategory.ILLEGALITY)
@@ -268,6 +264,7 @@ public class TestData {
                 .isReplyDeleted(false)
                 .build();
         replyReports.add(report3);
+        childReply1.addReplyReport(report3);
 
         replyReportRepository.saveAllAndFlush(replyReports);
 
