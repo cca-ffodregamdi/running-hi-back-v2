@@ -24,7 +24,7 @@ public class GetReportedReplySearchRequest {
 
         @Pattern(regexp = "desc|asc", message = "정렬 조건이 맞지 않습니다.")
         @Schema(description = "정렬 조건", example = "desc")
-        Sort.Direction sortDirection;
+        String sortDirection;
 
         @Pattern(regexp = "ALL|INPROGRESS|ACCEPTED|REJECTED", message = "신고 상태 조건이 맞지 않습니다.")
         @Schema(description = "신고 상태", example = "INPROGRESS")
@@ -38,7 +38,7 @@ public class GetReportedReplySearchRequest {
         public GetReportedReplySearchRequest (Integer page, Integer size, String sortDirection, String reportStatus, String search) {
                 this.page = page == null ? 0 : page;
                 this.size = size == null ? 10 : size;
-                this.sortDirection = Sort.Direction.fromString(sortDirection);
+                this.sortDirection = sortDirection;
                 this.reportStatus = reportStatus;
                 this.search = search;
 
