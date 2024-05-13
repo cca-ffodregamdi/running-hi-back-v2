@@ -8,8 +8,10 @@ import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -77,6 +79,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResult> handleIOException() {
         ApiResult apiResult = ApiResult.error(ErrorCode.INTER_SERVER_ERROR);
         return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResult<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+
+        String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResult.error(ErrorCode.BAD_REQUEST.getStatus(), errorMessage));
     }
 
 }
