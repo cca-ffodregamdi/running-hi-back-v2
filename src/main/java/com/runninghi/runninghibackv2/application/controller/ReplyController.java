@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +40,7 @@ public class ReplyController {
     private static final String CREATE_RESPONSE_MESSAGE = "댓글 작성 성공";
     private static final String UPDATE_RESPONSE_MESSAGE = "댓글 수정 성공";
     private static final String DELETE_RESPONSE_MESSAGE = "댓글 삭제 성공";
+    private static final String NO_CONTENT_RESPONSE_MESSAGE = "검색 결과가 없습니다.";
 
     @GetMapping(value = "/{postNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "댓글 리스트 조회", description = "특정 게시물에 대한 댓글들 리스트를 조회합니다.", responses = @ApiResponse(description = GET_RESPONSE_MESSAGE))
@@ -61,15 +63,14 @@ public class ReplyController {
     @HasAccess
     @GetMapping(value = "/reported", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "신고된 댓글 리스트 조회", description = "신고된 댓글 리스트를 조회합니다.", responses = @ApiResponse(description = GET_RESPONSE_MESSAGE))
-    public ResponseEntity<ApiResult<Page<GetReportedReplyResponse>>> getReportedReplyList(@ModelAttribute GetReportedReplySearchRequest searchRequest) {
+    public ResponseEntity<ApiResult<Page<GetReportedReplyResponse>>> getReportedReplyList(@Valid @ModelAttribute GetReportedReplySearchRequest searchRequest) {
 
-        System.out.println("ㅇㄴㅁㄹㄴㅇㄹ");
-        Sort sort = Sort.by( searchRequest.getSortDirection(), "createDate" );
+        Sort sort = Sort.by( Sort.Direction.fromString(searchRequest.getSortDirection()), "createDate" );
         Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize(), sort);
         Page<GetReportedReplyResponse> reportedReplyPage = replyService.getReportedReplyList(
                 GetReportedReplyRequest.of(pageable, searchRequest.getSearch(), searchRequest.getReportStatus())
         );
-        System.out.println(reportedReplyPage);
+        if (reportedReplyPage == null) return ResponseEntity.ok().body(ApiResult.success(NO_CONTENT_RESPONSE_MESSAGE, null));
 
         return ResponseEntity.ok().body(ApiResult.success(GET_RESPONSE_MESSAGE, reportedReplyPage));
     }
@@ -84,7 +85,6 @@ public class ReplyController {
     public ResponseEntity<ApiResult<CreateReplyResponse>> createReply(@Parameter(description = "사용자 인증을 위한 Bearer Token")
                                                                         @RequestHeader("Authorization") String bearerToken,
                                                                       @RequestBody CreateReplyRequest request) {
-        System.out.println("testest");
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         CreateReplyResponse response = replyService.createReply(request, accessTokenInfo.memberNo());
 

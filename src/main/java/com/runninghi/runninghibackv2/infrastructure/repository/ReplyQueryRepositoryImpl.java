@@ -36,8 +36,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     public Page<GetReportedReplyResponse> findAllReportedByPageableAndSearch(GetReportedReplyRequest request) {
 
         Long count = getCount(request);
-        if (count == null) throw new NullPointerException();
-        System.out.println("getCount : " + count);
+        if (count < 1) return null;
         List<GetReportedReplyResponse> content = getReportedReplyList(request);
         System.out.println("content : " + content);
 
@@ -45,23 +44,22 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     }
 
     private Long getCount(GetReportedReplyRequest request) {
+        System.out.println("reportStatus : " + request.reportStatus());
         System.out.println("getCount 입니다.");
         return jpaQueryFactory
                 .select(reply.replyNo.count())
                 .from(reply)
                 .join(reply.writer, member)
-//                .join(reply, replyReport.reportedReply)
+                .join(reply.reportList, replyReport)
                 .where(
                         likeNickname(request.search()),
-//                        eqReportStatus(request.reportStatus()),
+                        eqReportStatus(request.reportStatus()),
                         reply.reportedCount.goe(REPORTED_COUNT))
                 .fetchOne();
 
     }
 
     private List<GetReportedReplyResponse> getReportedReplyList (GetReportedReplyRequest request) {
-        System.out.println(request.pageable().getPageSize());
-        System.out.println(request.offset());
         // request.reportStatus로 정렬
         return jpaQueryFactory
                 .select(Projections.constructor(GetReportedReplyResponse.class,
@@ -77,9 +75,9 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 ))
                 .from(reply)
                 .join(reply.writer, member)
-//                .join(reply, replyReport.reportedReply)
+                .join(reply.reportList, replyReport)
                 .where(likeNickname(request.search()),
-//                        eqReportStatus(request.reportStatus()),
+                        eqReportStatus(request.reportStatus()),
                         reply.reportedCount.goe(REPORTED_COUNT))
                 .orderBy(
                         getOrderSpecifierList(request.pageable().getSort())
@@ -96,11 +94,9 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     }
 
     private BooleanExpression eqReportStatus (ProcessingStatus reportStatus) {
-        if (!StringUtils.hasText(reportStatus.getDescription())) {
-            System.out.println(reportStatus);
-            return  null;
-        }
-        System.out.println("리포트 스테이터스");
+
+        if (reportStatus == null || !StringUtils.hasText(reportStatus.name())) return  null;
+
         return replyReport.status.eq(reportStatus);
     }
 
