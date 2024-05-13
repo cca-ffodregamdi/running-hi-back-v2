@@ -10,12 +10,13 @@ public record GetReportedReplyRequest (
         String search,
         ProcessingStatus reportStatus
 ) {
-    public static GetReportedReplyRequest of (Pageable pageable, String search, ProcessingStatus reportStatus) {
+    public static GetReportedReplyRequest of (Pageable pageable, String search, String reportStatus) {
         return new GetReportedReplyRequest(
                 pageable,
                 (long) (pageable.getPageNumber() - 1)* pageable.getPageSize(),
                 search,
-                reportStatus
+                reportStatus == null ? null : ProcessingStatus.valueOf(reportStatus)
         );
     }
+
 }
