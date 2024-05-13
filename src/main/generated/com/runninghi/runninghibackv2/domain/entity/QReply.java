@@ -41,6 +41,8 @@ public class QReply extends EntityPathBase<Reply> {
 
     public final NumberPath<Integer> reportedCount = createNumber("reportedCount", Integer.class);
 
+    public final ListPath<ReplyReport, QReplyReport> reportList = this.<ReplyReport, QReplyReport>createList("reportList", ReplyReport.class, QReplyReport.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateDate = _super.updateDate;
 
