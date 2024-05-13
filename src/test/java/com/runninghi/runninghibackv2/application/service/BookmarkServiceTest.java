@@ -62,7 +62,7 @@ class BookmarkServiceTest {
                 .role(Role.USER)
                 .build();
 
-        GpxDataVO gpxDataVO = new GpxDataVO(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f);
+        GpxDataVO gpxDataVO = new GpxDataVO(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f);
         post1 = Post.builder()
                 .member(member1)
                 .postTitle("게시글 제목1")

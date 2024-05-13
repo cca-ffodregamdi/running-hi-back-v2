@@ -103,7 +103,7 @@ public class TestData {
                 .postContent("첫 번째 게시글 내용입니다.")
                 .role(Role.USER)
                 .locationName("서울")
-                .gpxDataVO(new GpxDataVO(37.1234f, 127.5678f, 37.9876f, 126.5432f, 10.5f, 3600f, 200f, 5f, 6f, 3f))
+                .gpxDataVO(new GpxDataVO(37.1234f, 127.5678f, 37.9876f, 126.5432f, 10.5f, 3600f, 200f, 5f, 6f))
                 .build();
         posts.add(post1);
 
@@ -114,7 +114,7 @@ public class TestData {
                 .postContent("두 번째 게시글 내용입니다. : 남아있는 게시글 입니다.")
                 .role(Role.ADMIN)
                 .locationName("부산")
-                .gpxDataVO(new GpxDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500f, 250f, 4f, 5f, 2f))
+                .gpxDataVO(new GpxDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500f, 250f, 4f, 5f))
                 .build();
         posts.add(post2);
 
@@ -124,7 +124,7 @@ public class TestData {
                 .postContent("세 번째 게시글 내용입니다.")
                 .role(Role.USER)
                 .locationName("대구")
-                .gpxDataVO(new GpxDataVO(35.6789f, 128.9876f, 35.4321f, 129.8765f, 8.7f, 3000f, 180f, 6f, 7f, 4f))
+                .gpxDataVO(new GpxDataVO(35.6789f, 128.9876f, 35.4321f, 129.8765f, 8.7f, 3000f, 180f, 6f, 7f))
                 .build();
         posts.add(post3);
 

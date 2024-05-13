@@ -18,7 +18,6 @@ public record BookmarkedPostListResponse(
         float kcal,
         float speed,
         float meanPace,
-        float meanSlope,
         boolean isBookmarked
 
 ) {
@@ -40,7 +39,6 @@ public record BookmarkedPostListResponse(
                 post.getGpxDataVO().getKcal(),
                 post.getGpxDataVO().getSpeed(),
                 post.getGpxDataVO().getMeanPace(),
-                post.getGpxDataVO().getMeanSlope(),
                 true
                 );
     }
