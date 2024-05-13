@@ -15,7 +15,7 @@ public record GetReportedReplyRequest (
                 pageable,
                 (long) (pageable.getPageNumber() - 1)* pageable.getPageSize(),
                 search,
-                reportStatus == null ? null : ProcessingStatus.valueOf(reportStatus)
+                reportStatus.equals("ALL") ? null : ProcessingStatus.valueOf(reportStatus)
         );
     }
 
