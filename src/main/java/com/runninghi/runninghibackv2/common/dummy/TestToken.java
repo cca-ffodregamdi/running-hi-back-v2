@@ -28,8 +28,8 @@ public class TestToken {
 
         Member member1 = Member.builder()
                 .alarmConsent(true)
-                .kakaoName("관리자 : 카카오 이름")
-                .nickname("관리자 : 테스트용 관리자입니다.")
+                .name("관리자 : 이름")
+                .nickname("관리자 : 테스트용 관리자 닉네임")
                 .level(0)
                 .isActive(true)
                 .totalDistance(0)
@@ -40,8 +40,8 @@ public class TestToken {
 
         Member member2 = Member.builder()
                 .alarmConsent(true)
-                .kakaoName("유저 : 카카오 이름")
-                .nickname("유저 : 테스트용 유저입니다.")
+                .name("유저 : 이름")
+                .nickname("유저 : 테스트용 유저 닉네임")
                 .level(1)
                 .isActive(true)
                 .totalDistance(0)

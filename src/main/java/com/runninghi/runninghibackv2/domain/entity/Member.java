@@ -182,7 +182,7 @@ public class Member extends BaseTimeEntity {
         this.password = null;
         this.nickname = null;
         this.kakaoId = null;
-        this.kakaoName = null;
+        this.name = null;
         this.reportCnt = 0;
         this.isActive = false;
         this.isBlacklisted = false;
