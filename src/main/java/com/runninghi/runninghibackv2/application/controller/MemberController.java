@@ -1,6 +1,8 @@
 package com.runninghi.runninghibackv2.application.controller;
 
+import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
+import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
 import com.runninghi.runninghibackv2.application.service.AppleOauthService;
@@ -9,9 +11,6 @@ import com.runninghi.runninghibackv2.application.service.MemberService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -29,7 +28,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.security.PublicKey;
 import java.util.Map;
 
 @RestController
@@ -41,31 +39,6 @@ public class MemberController {
     private final KakaoOauthService kakaoOauthService;
     private final AppleOauthService appleOauthService;
     private final JwtTokenProvider jwtTokenProvider;
-
-    private final ApplePublicKeyFetcher applePublicKeyFetcher;
-
-
-    @GetMapping("/api/v1/login/apple")
-    public String verifyAppleToken(@RequestHeader("Authorization") String authorizationHeader) {
-        try {
-            // "Bearer "을 제거하여 순수 토큰 값만 추출합니다.
-            String idToken = authorizationHeader.substring("Bearer ".length());
-
-            String kid = "from-id-token-header"; // 실제로는 idToken의 헤더로부터 kid를 추출해야 합니다.
-            PublicKey publicKey = applePublicKeyFetcher.getApplePublicKey(kid);
-
-            Jws<Claims> tokenClaims = Jwts.parserBuilder()
-                    .setSigningKey(publicKey)
-                    .build()
-                    .parseClaimsJws(idToken);
-
-            // idToken 검증 후 추가 로직 구현
-            return "Apple 로그인 검증 성공: " + tokenClaims.getBody().getSubject();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Apple 로그인 검증 실패";
-        }
-    }
 
     /**
      * 카카오 로그인 페이지로 리다이렉트합니다.
@@ -178,6 +151,24 @@ public class MemberController {
         UpdateMemberInfoResponse response = memberService.updateMemberInfo(memberNo, request);
 
         return ResponseEntity.ok(ApiResult.success("회원 정보 업데이트 성공", response));
+    }
+
+    @GetMapping("/api/v1/login/apple")
+    public ResponseEntity<ApiResult<Void>> appleLogin(@RequestBody AppleLoginRequest request) {
+
+        String clientSecret = appleOauthService.createClientSecret();
+
+        AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
+
+        Map<String, String> tokens = appleOauthService.appleOauth(appleTokenResponse.idToken(), request.nonce());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", tokens.get("accessToken"));
+        headers.add("Refresh-Token", tokens.get("refreshToken"));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(ApiResult.success("Success Apple Login", null));
     }
 
     /**

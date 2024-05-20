@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @EnableScheduling
 @EnableJpaAuditing
-@EnableFeignClients
 @SpringBootApplication
+@EnableFeignClients(basePackages = "com.runninghi.runninghibackv2")
 public class Application {
 
     public static void main(String[] args) {

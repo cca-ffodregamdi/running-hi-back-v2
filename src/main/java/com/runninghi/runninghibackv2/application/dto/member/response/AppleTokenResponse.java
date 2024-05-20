@@ -1,13 +1,12 @@
 package com.runninghi.runninghibackv2.application.dto.member.response;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Getter
 public record AppleTokenResponse(
-        String accessToken,
-        String idToken,
-        String refreshToken,
-        Long expiresIn,
-        String tokenType
+        @JsonProperty("access_token") String accessToken,
+        @JsonProperty("id_token") String idToken,
+        @JsonProperty("refresh_token") String refreshToken,
+        @JsonProperty("expires_in") Long expiresIn,
+        @JsonProperty("token_type") String tokenType
 ) {
 }
