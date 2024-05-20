@@ -62,9 +62,9 @@ public class AppleOauthService {
     }
 
     // apple user 생성
-    public Map<String, String> appleOauth(String idToken, String nonce) {
+    public Map<String, String> appleOauth(AppleTokenResponse appleTokenResponse, String nonce) {
         // id_token의 header를 추출
-        Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(idToken);
+        Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(appleTokenResponse.idToken());
 
         // it_token을 검증하기 위해 애플의 publicKey list 요청
         ApplePublicKeys applePublicKeys = appleClient.getApplePublicKeys();
@@ -74,7 +74,7 @@ public class AppleOauthService {
         PublicKey publicKey = applePublicKeyGenerator.generate(appleTokenHeader, applePublicKeys);
 
         // id_token을 publicKey로 검증하여 claim 추출 : 서명 검증
-        Claims claims = appleTokenParser.extractClaims(idToken, publicKey);
+        Claims claims = appleTokenParser.extractClaims(appleTokenResponse.idToken(), publicKey);
 
         // iss, aud, exp, nonce 검증
         if (!appleClaimsValidator.isValid(claims, nonce)) {
@@ -85,7 +85,8 @@ public class AppleOauthService {
 
         Optional<Member> optionalMember = memberRepository.findByAppleId(appleResponse.get("sub"));
 
-        return optionalMember.map(this::loginWithApple).orElseGet(() -> loginWithAppleCreateMember(appleResponse));
+        return optionalMember.map(this::loginWithApple)
+                .orElseGet(() -> loginWithAppleCreateMember(appleResponse, appleTokenResponse.refreshToken()));
     }
 
     public Map<String, String> extractAppleResponse(Claims claims) {
@@ -121,10 +122,11 @@ public class AppleOauthService {
     }
 
     // 회원 생성 및 로그인 메서드
-    private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse) {
+    private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToekn) {
         Member member = Member.builder()
                 .appleId(appleResponse.get("sub"))
                 .name(appleResponse.get("name"))
+                .appleRefreshToken(appleRefreshToekn)
                 .nickname("러너 " + generateRandomDigits())
                 .isActive(true)
                 .isBlacklisted(false)

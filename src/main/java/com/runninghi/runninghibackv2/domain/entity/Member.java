@@ -67,6 +67,10 @@ public class Member extends BaseTimeEntity {
     private String refreshToken;
 
     @Column
+    @Comment("애플 리프레시 토큰")
+    private String appleRefreshToken;
+
+    @Column
     @Comment("FCM 기기 고유 토큰")
     private String fcmToken;
 
@@ -98,8 +102,8 @@ public class Member extends BaseTimeEntity {
     @Builder
     public Member(Long memberNo, String account, String password, String nickname, String kakaoId, String name,
                   String appleId, int reportCnt, boolean isActive, boolean isBlacklisted, Role role, String refreshToken,
-                  String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate, double totalDistance,
-                  double totalKcal, int distanceToNextLevel, int level) {
+                  String appleRefreshToken, String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate,
+                  double totalDistance, double totalKcal, int distanceToNextLevel, int level) {
         this.memberNo = memberNo;
         this.account = account;
         this.password = password;
@@ -112,6 +116,7 @@ public class Member extends BaseTimeEntity {
         this.isBlacklisted = isBlacklisted;
         this.role = role;
         this.refreshToken = refreshToken;
+        this.appleRefreshToken = appleRefreshToken;
         this.fcmToken = fcmToken;
         this.alarmConsent = alarmConsent;
         this.deactivateDate = deactivateDate;

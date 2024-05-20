@@ -113,7 +113,7 @@ public class MemberController {
             },
             responses = { @ApiResponse(responseCode = "200", description = "Success Kakao Unlink") }
     )
-    public ResponseEntity<ApiResult<Boolean>> kakaoLogout(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<ApiResult<Boolean>> kakaoUnlink(@RequestHeader(value = "Authorization") String token) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
@@ -160,7 +160,7 @@ public class MemberController {
 
         AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
 
-        Map<String, String> tokens = appleOauthService.appleOauth(appleTokenResponse.idToken(), request.nonce());
+        Map<String, String> tokens = appleOauthService.appleOauth(appleTokenResponse, request.nonce());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", tokens.get("accessToken"));
@@ -169,6 +169,15 @@ public class MemberController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(ApiResult.success("Success Apple Login", null));
+    }
+
+
+    @PutMapping("/api/v1/unlink/apple")
+    public ResponseEntity<ApiResult<Void>> appleUnlink() {
+
+
+
+        return ResponseEntity.ok(ApiResult.success("Success Apple Unlink", null));
     }
 
     /**
