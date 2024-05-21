@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
+import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
@@ -17,7 +18,6 @@ import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +30,10 @@ import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
 import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeyword;
@@ -91,17 +93,41 @@ public class PostService {
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getPostScroll(Pageable pageable, List<String> keywordList) {
 
-        List<Long> keywordNos = jpaQueryFactory.select(keyword.keywordNo)
-                .from(keyword)
-                .where(keyword.keywordName.in(keywordList))
+        List<Post> posts;
+
+        if (keywordList == null || keywordList.isEmpty()) {
+            posts = jpaQueryFactory.select(post)
+                    .from(post)
+                    .fetch();
+        } else {
+            List<Long> keywordNos = jpaQueryFactory.select(keyword.keywordNo)
+                    .from(keyword)
+                    .where(keyword.keywordName.in(keywordList))
+                    .fetch();
+
+            posts = jpaQueryFactory.select(post)
+                    .leftJoin(postKeyword)
+                    .where(postKeyword.keyword.keywordNo.in(keywordNos))
+                    .fetch();
+        }
+
+        List<Long> postNos = posts.stream().map(Post::getPostNo).collect(Collectors.toList());
+
+        List<Image> images = jpaQueryFactory.select(image)
+                .from(image)
+                .where(image.postNo.in(postNos))
                 .fetch();
 
-        List<Post> posts = jpaQueryFactory.select(post)
-                .leftJoin(postKeyword)
-                .where(postKeyword.keyword.keywordNo.in(keywordNos))
-                .fetch();
+        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
+                .collect(Collectors.groupingBy(Image::getPostNo,
+                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
 
-        return new PageImpl<>(posts.stream().map(GetAllPostsResponse::from).toList(), pageable, posts.size());
+        List<GetAllPostsResponse> responses = posts.stream()
+                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, responses.size());
+
     }
 
     @Transactional
@@ -232,8 +258,24 @@ public class PostService {
 
         Page<Post> posts = postRepository.findAllByReportCntIsGreaterThan(0, pageable);
 
-        return posts.map(GetAllPostsResponse::from);
+        List<Long> postNos = posts.getContent().stream().map(Post::getPostNo).collect(Collectors.toList());
+
+        List<Image> images = jpaQueryFactory.select(image)
+                .from(image)
+                .where(image.postNo.in(postNos))
+                .fetch();
+
+        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
+                .collect(Collectors.groupingBy(Image::getPostNo,
+                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
+
+        List<GetAllPostsResponse> responses = posts.getContent().stream()
+                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, posts.getTotalElements());
     }
+
 
 
     @Transactional
