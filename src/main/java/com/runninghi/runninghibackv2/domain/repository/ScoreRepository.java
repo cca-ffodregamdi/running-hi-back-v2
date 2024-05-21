@@ -15,12 +15,12 @@ import java.util.Optional;
 public interface ScoreRepository extends JpaRepository<Score, Long> {
     Optional<Score> findByMember(Member member);
 
-    @Query("SELECT s.scoreNo, s.distance, s.member.nickname," +
+    @Query("SELECT s.scoreNo AS scoreNo, s.distance AS distance, s.member.nickname AS nickname," +
             "RANK() OVER (ORDER BY s.distance DESC) AS rank FROM Score s")
     List<GetRankingResponse> findAllRanking();
 
-    @Query("SELECT s.scoreNo, s.distance, s.member.nickname, " +
-            "(SELECT COUNT(*) + 1 FROM Score s2 WHERE s2.distance > s.distance)" +
+    @Query("SELECT s.scoreNo AS scoreNo, s.distance AS distance, s.member.nickname AS nickname, " +
+            "(SELECT COUNT(*) + 1 FROM Score s2 WHERE s2.distance > s.distance) AS rank " +
             "FROM Score s WHERE s.member.memberNo = :memberNo")
     GetRankingResponse findMemberRanking(@Param("memberNo") Long memberNo);
 }
