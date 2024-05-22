@@ -14,7 +14,7 @@ import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.repository.ScoreRepository;
-import com.runninghi.runninghibackv2.domain.service.GpxCalculator;
+import com.runninghi.runninghibackv2.domain.service.GpsCalculator;
 import com.runninghi.runninghibackv2.domain.service.GpxCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,7 +44,7 @@ import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeywo
 @RequiredArgsConstructor
 public class PostService {
 
-    private final GpxCalculator calculateGPX;
+    private final GpsCalculator calculateGPX;
     private final PostChecker postChecker;
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
