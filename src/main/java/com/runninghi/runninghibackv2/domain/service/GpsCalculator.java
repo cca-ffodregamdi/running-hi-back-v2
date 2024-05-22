@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 @Service
-public class GpxCalculator {
+public class GpsCalculator {
 
     private static class TrackPoint {
         double lon;
@@ -33,6 +33,8 @@ public class GpxCalculator {
     private List<TrackPoint> trackPoints = new ArrayList<>();
     private float totalDistance = 0.0f;
     private float totalTimeInMinutes = 0.0f;
+    private static final double R = 6371;
+
 
     public String decompress(byte[] value) throws Exception {
 
@@ -64,6 +66,10 @@ public class GpxCalculator {
         }
     }
     public GpxDataVO getDataFromGpxFile(String gpxData) {
+
+        trackPoints.clear(); // trackPoints 리스트 초기화
+        totalDistance = 0.0f; // totalDistance 초기화
+        totalTimeInMinutes = 0.0f; // totalTimeInMinutes 초기화
 
         processJson(gpxData);
 
@@ -108,18 +114,20 @@ public class GpxCalculator {
             double lat2 = Math.toRadians(p2.lat);
             double lon2 = Math.toRadians(p2.lon);
 
-            // 하버사인 공식
-            double dlon = lon2 - lon1;
-            double dlat = lat2 - lat1;
-            double a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
-            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            double distance = 6371 * c;
+            double x1 = R * Math.cos(lat1) * Math.cos(lon1);
+            double y1 = R * Math.cos(lat1) * Math.sin(lon1);
+            double x2 = R * Math.cos(lat2) * Math.cos(lon2);
+            double y2 = R * Math.cos(lat2) * Math.sin(lon2);
+
+            // 유클리드 거리 계산
+            double distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
             totalDistance += (float) distance;
         }
 
         return totalDistance;
     }
+
 
     private float calculateTimeInMinutes() {
 
