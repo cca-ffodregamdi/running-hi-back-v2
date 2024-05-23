@@ -6,6 +6,7 @@ import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMembe
 import com.runninghi.runninghibackv2.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.application.service.MemberService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -207,5 +208,49 @@ public class MemberController {
 
         return ResponseEntity.ok().body(ApiResult.success("FCM 토큰 저장 성공", null));
     }
+
+
+    // 자동 로그인 : 액세스 토큰
+    @PostMapping("/api/v1/login/validate-token")
+    public ResponseEntity<ApiResult<Void>> autoLoginWithAccessToekn(@RequestHeader(value = "Authorization") String token) {
+        try {
+            if (jwtTokenProvider.validateAutoLoginAccessToken(token)) {
+                // Access Token이 유효한 경우
+                return ResponseEntity.ok(ApiResult.success("자동 로그인 : 토큰 유효성 검사 성공", null));
+            } else {
+                // Access Token이 만료된 경우
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 만료된 토큰입니다."));
+            }
+        } catch (InvalidTokenException e) {
+            // Access Token이 유효하지 않은 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 유효하지않은 토큰입니다."));
+        }
+    }
+
+
+    // 자동 로그인 : 리프레시 토큰
+    @PostMapping("/api/v1/login/validate-refresh-token")
+    public ResponseEntity<ApiResult<Void>> autoLoginWithRefreshToken(@RequestHeader("RefreshToekn") String refreshToken) {
+        try {
+            if (jwtTokenProvider.validateAutoLoginRefreshToken(refreshToken)) {
+                // Refresh Token이 유효한 경우 새로운 Access Token 발급
+                String newAccessToken = jwtTokenProvider.renewAccessToken(refreshToken);
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("Authorization", "Bearer " + newAccessToken);
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body((ApiResult.success("새로운 액세스 토큰 발급", null)));
+            } else {
+                // Refresh Token이 만료된 경우
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 만료된 토큰입니다. 다시 로그인해주세요."));
+            }
+        } catch (InvalidTokenException e) {
+            // Refresh Token이 유효하지 않은 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 유효하지않은 토큰입니다."));
+        }
+    }
+
 
 }
