@@ -175,7 +175,7 @@ public class JwtTokenProvider {
      * 자동 로그인 토큰의 유효성을 검사합니다.
      *
      * @param token 검사할 자동 로그인 토큰
-     * @return 토큰이 유효한 경우 true를 반환하고, 그렇지 않은 경우 false를 반환합니다.
+     * @return 토큰이 유효한 경우 true를 반환하고, 만료된 경우 false를 반환합니다.
      * @throws InvalidTokenException 토큰이 유효하지 않은 경우 발생하는 예외입니다.
      */
     public boolean validateAutoLoginAccessToken(String token) throws InvalidTokenException {
@@ -193,7 +193,7 @@ public class JwtTokenProvider {
      * 자동 로그인 토큰의 유효성을 검사합니다.
      *
      * @param token 검사할 자동 로그인 토큰
-     * @return 토큰이 유효한 경우 true를 반환하고, 그렇지 않은 경우 false를 반환합니다.
+     * @return 토큰이 유효한 경우 true를 반환하고, 만료된 경우 false를 반환합니다.
      * @throws InvalidTokenException 토큰이 유효하지 않은 경우 발생하는 예외입니다.
      */
     public boolean validateAutoLoginRefreshToken(String token) throws InvalidTokenException {

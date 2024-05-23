@@ -210,8 +210,19 @@ public class MemberController {
     }
 
 
-    // 자동 로그인 : 액세스 토큰
-    @PostMapping("/api/v1/login/validate-token")
+    /**
+     * 액세스 토큰의 유효성을 검사하여 자동 로그인을 처리하는 API입니다.
+     *
+     * <p>이 메서드는 사용자의 액세스 토큰을 검사하여 유효한 경우 자동 로그인을 처리합니다.
+     * 만료되었거나 유효하지 않은 경우 적절한 응답을 반환합니다.</p>
+     *
+     * @param token 사용자 인증을 위한 Bearer 토큰. 요청 헤더에 포함되어야 합니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다.
+     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
+     *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
+     */
+    @PostMapping("/api/v1/login/access-token/validate")
+    @Operation(summary = "자동 로그인의 액세스 토큰 유효성 검사", description = "액세스 토큰의 유효성을 검사하여 자동 로그인을 처리합니다.")
     public ResponseEntity<ApiResult<Void>> autoLoginWithAccessToekn(@RequestHeader(value = "Authorization") String token) {
         try {
             if (jwtTokenProvider.validateAutoLoginAccessToken(token)) {
@@ -228,8 +239,18 @@ public class MemberController {
     }
 
 
-    // 자동 로그인 : 리프레시 토큰
-    @PostMapping("/api/v1/login/validate-refresh-token")
+    /**
+     * 리프레시 토큰의 유효성을 검사하여 자동 로그인을 처리하고 새로운 액세스 토큰을 발급하는 API입니다.
+     *
+     * <p>이 메서드는 사용자의 리프레시 토큰을 검사하여 유효한 경우 새로운 액세스 토큰을 발급합니다. 만료되었거나 유효하지 않은 경우 적절한 응답을 반환합니다.</p>
+     *
+     * @param refreshToken 사용자 인증을 위한 리프레시 토큰. 요청 헤더에 포함되어야 합니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 새로운 액세스 토큰이 응답 헤더에 포함됩니다.
+     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 리프레시 토큰이 포함되어야 합니다.
+     *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
+     */
+    @PostMapping("/api/v1/login/refresh-token/validate")
+    @Operation(summary = "자동 로그인의 리프레시 토큰 유효성 검사 및 액세스 토큰 갱신", description = "리프레시 토큰의 유효성을 검사하여 자동 로그인을 처리하고 새로운 액세스 토큰을 발급합니다.")
     public ResponseEntity<ApiResult<Void>> autoLoginWithRefreshToken(@RequestHeader("RefreshToekn") String refreshToken) {
         try {
             if (jwtTokenProvider.validateAutoLoginRefreshToken(refreshToken)) {
