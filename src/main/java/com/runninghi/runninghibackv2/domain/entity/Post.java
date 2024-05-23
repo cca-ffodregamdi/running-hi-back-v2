@@ -1,9 +1,9 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
+import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
-import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -59,7 +59,7 @@ public class Post extends BaseTimeEntity {
     private Boolean status;
 
     @Embedded
-    private GpxDataVO gpxDataVO;
+    private GpsDataVO gpsDataVO;
 
     @Column
     @Comment("gpx 파일 url")
@@ -69,7 +69,7 @@ public class Post extends BaseTimeEntity {
     private List<Keyword> keywordList;
 
     @Builder
-    public Post(Member member, @Nullable String postTitle, @Nullable String postContent, Role role, String locationName, Boolean status, String gpxUrl, GpxDataVO gpxDataVO) {
+    public Post(Member member, @Nullable String postTitle, @Nullable String postContent, Role role, String locationName, Boolean status, String gpxUrl, GpsDataVO gpsDataVO) {
         this.member = member;
         this.postTitle = postTitle;
         this.postContent = postContent;
@@ -78,7 +78,7 @@ public class Post extends BaseTimeEntity {
         this.locationName = locationName;
         this.status = status;
         this.gpxUrl = gpxUrl;
-        this.gpxDataVO = gpxDataVO;
+        this.gpsDataVO = gpsDataVO;
     }
 
     public void shareToPost(CreatePostRequest request) {

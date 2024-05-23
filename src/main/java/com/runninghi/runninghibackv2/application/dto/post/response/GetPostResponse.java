@@ -1,9 +1,9 @@
 package com.runninghi.runninghibackv2.application.dto.post.response;
 
+import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public record GetPostResponse(
           "meanSlope": 3.0
         }
         """)
-        GpxDataVO gpxDataVO,
+        GpsDataVO gpsDataVO,
         @Schema(description = "키워드 목록", example = "보통,강아지랑,경사없음")
         List<Keyword> keywordList
 ) {
@@ -45,7 +45,7 @@ public record GetPostResponse(
                 post.getPostContent(),
                 post.getRole(),
                 post.getLocationName(),
-                post.getGpxDataVO(),
+                post.getGpsDataVO(),
                 list
         );
     }

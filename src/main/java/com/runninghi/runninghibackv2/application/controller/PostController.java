@@ -61,9 +61,9 @@ public class PostController {
 
     @GetMapping(value = "/coordinate/{postNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "GPX 경도, 위도 조회", description = " '나도 이 코스 달리기' 선택시 반환되는 데이터입니다. \n 지도 상 표기를 위해 경도-위도 값이 튜플 형태로 반환됩니다.")
-    public ResponseEntity<ApiResult<GpxDataResponse>> getGPXData(@PathVariable Long postNo) throws ParserConfigurationException, IOException, SAXException {
+    public ResponseEntity<ApiResult<GpsDataResponse>> getGPXData(@PathVariable Long postNo) throws ParserConfigurationException, IOException, SAXException {
 
-        GpxDataResponse response = postService.getGpxLonLatData(postNo);
+        GpsDataResponse response = postService.getGpxLonLatData(postNo);
 
         return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
