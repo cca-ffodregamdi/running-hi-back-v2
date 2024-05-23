@@ -5,6 +5,7 @@ import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,7 +68,7 @@ public class JwtTokenProvider {
     /**
      * 리프레시 토큰을 재생성합니다.
      *
-     * @param memberJwtInfo 멤버 정보를 담고 있는 객체
+     * @param refreshTokenInfo 멤버 정보를 담고 있는 객체
      * @return 생성된 리프레시 토큰
      */
     public String createRefreshToken(RefreshTokenInfo refreshTokenInfo) {
@@ -165,6 +166,42 @@ public class JwtTokenProvider {
     public void validateRefreshToken(String token) throws InvalidTokenException {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token);
+        } catch (Exception e) {
+            throw new InvalidTokenException();
+        }
+    }
+
+    /**
+     * 자동 로그인 토큰의 유효성을 검사합니다.
+     *
+     * @param token 검사할 자동 로그인 토큰
+     * @return 토큰이 유효한 경우 true를 반환하고, 만료된 경우 false를 반환합니다.
+     * @throws InvalidTokenException 토큰이 유효하지 않은 경우 발생하는 예외입니다.
+     */
+    public boolean validateAutoLoginAccessToken(String token) throws InvalidTokenException {
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token.substring(7));
+            return true;
+        } catch (ExpiredJwtException e) {
+            return false;
+        } catch (Exception e) {
+            throw new InvalidTokenException();
+        }
+    }
+
+    /**
+     * 자동 로그인 토큰의 유효성을 검사합니다.
+     *
+     * @param token 검사할 자동 로그인 토큰
+     * @return 토큰이 유효한 경우 true를 반환하고, 만료된 경우 false를 반환합니다.
+     * @throws InvalidTokenException 토큰이 유효하지 않은 경우 발생하는 예외입니다.
+     */
+    public boolean validateAutoLoginRefreshToken(String token) throws InvalidTokenException {
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            return false;
         } catch (Exception e) {
             throw new InvalidTokenException();
         }

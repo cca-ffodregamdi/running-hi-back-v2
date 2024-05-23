@@ -16,8 +16,8 @@ public record ApiResult<T>(
         T data
 ) {
 
-    public static <T> ApiResult<T> success(String message, T data) {
-        return new ApiResult<>(LocalDateTime.now(), HttpStatus.OK, message, data);
+    public static <T> ApiResult<T> success(String errorMessage, T data) {
+        return new ApiResult<>(LocalDateTime.now(), HttpStatus.OK, errorMessage, data);
     }
 
     public static <T> ApiResult<T> error(ErrorCode errorCode) {
@@ -27,6 +27,10 @@ public record ApiResult<T>(
 
     public static <T> ApiResult<T> error(HttpStatus httpStatus, String errorMessage) {
         return new ApiResult<>(LocalDateTime.now(), httpStatus, errorMessage, null);
+    }
+
+    public static <T> ApiResult<T> error(HttpStatus httpStatus, String errorMessage, T data) {
+        return new ApiResult<>(LocalDateTime.now(), httpStatus, errorMessage, data);
     }
 
 }

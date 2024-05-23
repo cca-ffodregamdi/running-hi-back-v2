@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -71,10 +72,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String[] excludePath = {"/login/kakao"};
+        String[] excludePaths = {
+                "/login/**",        // /login 경로와 하위 경로 모두 제외
+                "/api/v1/login/**"  // /api/v1/login 경로와 하위 경로 모두 제외
+        };
         String path = request.getRequestURI();
+        AntPathMatcher pathMatcher = new AntPathMatcher();
 
-        return Arrays.stream(excludePath).anyMatch(path::contains);
+        return Arrays.stream(excludePaths).anyMatch(excludePath -> pathMatcher.match(excludePath, path));
     }
 
     /**

@@ -6,6 +6,7 @@ import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMembe
 import com.runninghi.runninghibackv2.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.application.service.MemberService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,11 +56,7 @@ public class MemberController {
                             headers = {
                                     @Header(name = "Authorization", description = "Access Token", schema = @Schema(type = "string")),
                                     @Header(name = "Refresh-Token", description = "Refresh Token", schema = @Schema(type = "string"))
-                            },
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ApiResult.class)
-                            )
+                            }
                     )
             }
     )
@@ -139,7 +136,7 @@ public class MemberController {
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true)
             },
-            responses = { @ApiResponse(responseCode = "200", description = "회원 정보 업데이트 성공", content = @Content(schema = @Schema(implementation = ApiResult.class))) }
+            responses = { @ApiResponse(responseCode = "200", description = "회원 정보 업데이트 성공") }
     )
     public ResponseEntity<ApiResult<UpdateMemberInfoResponse>> updateMemberInfo(
             @RequestHeader(value = "Authorization") String token,
@@ -170,7 +167,7 @@ public class MemberController {
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true)
             },
-            responses = { @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공", content = @Content(schema = @Schema(implementation = ApiResult.class))) }
+            responses = { @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공") }
     )
     public ResponseEntity<ApiResult<GetMemberResponse>> getMemberInfo(@RequestHeader(value = "Authorization") String token) {
 
@@ -207,5 +204,98 @@ public class MemberController {
 
         return ResponseEntity.ok().body(ApiResult.success("FCM 토큰 저장 성공", null));
     }
+
+
+    /**
+     * 자동 로그인의 액세스 토큰 유효성 검사 API입니다.
+     *
+     * <p>이 메서드는 액세스 토큰의 유효성을 검사하여 자동 로그인을 처리합니다. 유효한 토큰인 경우 성공 응답을 반환하고, 만료된 토큰인 경우 적절한 에러 메시지를 반환합니다.</p>
+     *
+     * @param token 검사할 액세스 토큰. 요청 헤더에 "Authorization" 키로 포함되어야 합니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 응답 본문에는 토큰 유효성 검사 결과가 포함됩니다.
+     *          유효한 토큰은 true, 만료된 토큰은 false, 서명이 일치하지않는 토큰은 null 값이 응답 본문에 포함됩니다.
+     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 액세스 토큰이 포함되어야 합니다.
+     *          토큰이 유효하지 않거나, 만료된 경우 적절한 에러 응답을 반환합니다.
+     */
+    @PostMapping(value = "/api/v1/login/access-token/validate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "자동 로그인의 엑세스 토큰 유효성 검사",
+            description = "리프레시 토큰의 유효성을 검사하여 자동 로그인을 처리하고 새로운 액세스 토큰을 발급합니다. 응답 본문에는 토큰 유효성 검사 결과가 포함됩니다.\n" +
+                            "유효한 토큰은 true, 만료된 토큰은 false, 서명이 일치하지않는 토큰은 null 값이 응답 본문에 포함됩니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true)
+            },
+            responses = { @ApiResponse(responseCode = "200", description = "자동 로그인 : 엑세스 토큰 유효성 검사 성공"),
+                    @ApiResponse(responseCode = "403", description = "자동 로그인 : 만료된 엑세스 토큰입니다.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(example = "{\"timeStamp\": \"2024-05-23T07:36:26.119Z\", \"status\": \"FORBIDDEN\", \"message\": \"자동 로그인 : 만료된 엑세스 토큰입니다.\", \"data\": false}"))),
+                    @ApiResponse(responseCode = "401", description = "자동 로그인 : 유효하지않은 엑세스 토큰입니다.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(example = "{\"timeStamp\": \"2024-05-23T07:36:26.119Z\", \"status\": \"UNAUTHORIZED\", \"message\": \"자동 로그인 : 유효하지않은 엑세스 토큰입니다.\", \"data\": null}"))),
+            })
+    public ResponseEntity<ApiResult<Boolean>> autoLoginWithAccessToekn(@RequestHeader(value = "Authorization") String token) {
+        try {
+            if (jwtTokenProvider.validateAutoLoginAccessToken(token)) {
+                // Access Token이 유효한 경우
+                return ResponseEntity.ok(ApiResult.success("자동 로그인 : 엑세스 토큰 유효성 검사 성공", true));
+            } else {
+                // Access Token이 만료된 경우
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResult.error(HttpStatus.FORBIDDEN, "자동 로그인 : 만료된 엑세스 토큰입니다.", false));
+            }
+        } catch (InvalidTokenException e) {
+            // Access Token이 유효하지 않은 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 유효하지않은 엑세스 토큰입니다."));
+        }
+    }
+
+
+    /**
+     * 리프레시 토큰의 유효성을 검사하여 자동 로그인을 처리하고 새로운 액세스 토큰을 발급하는 API입니다.
+     *
+     * <p>이 메서드는 사용자의 리프레시 토큰을 검사하여 유효한 경우 새로운 액세스 토큰을 발급합니다. 만료되었거나 유효하지 않은 경우 적절한 응답을 반환합니다.</p>
+     *
+     * @param refreshToken 사용자 인증을 위한 리프레시 토큰. 요청 헤더에 "Refresh-Token" 키로 포함되어야 합니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 토큰이 유효한 경우 true값이 응답 본문에 들어가며, 새로운 액세스 토큰이 응답 헤더에 포함됩니다.
+     *          토큰이 만료된 경우 false, 서명이 유효하지않은 경우 null 값이 응답 본문에 포함됩니다.
+     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 리프레시 토큰이 포함되어야 합니다.
+     *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
+     */
+    @PostMapping(value = "/api/v1/login/refresh-token/validate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "자동 로그인의 리프레시 토큰 유효성 검사 및 액세스 토큰 갱신",
+            description = "리프레시 토큰의 유효성을 검사하여 자동 로그인을 처리하고 새로운 액세스 토큰을 발급합니다. " +
+                    "토큰이 유효한 경우 true 값이 응답 본문에 들어가며, 새로운 액세스 토큰이 응답 헤더에 포함됩니다.\n" +
+                    "토큰이 만료된 경우 false, 서명이 유효하지않은 경우 null 값이 응답 본문에 포함됩니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Refresh-Token", description = "사용자 인증을 위한 Refresh 토큰", required = true)
+            },
+            responses = { @ApiResponse(responseCode = "200", description = "자동 로그인 : 리프레시 토큰 유효성 검사 성공. 새로운 액세스 토큰 발급"),
+                          @ApiResponse(responseCode = "403", description = "자동 로그인 : 만료된 리프레시 토큰입니다. 다시 로그인해주세요.",
+                            content = @Content(mediaType = "application/json",
+                            schema = @Schema(example = "{\"timeStamp\": \"2024-05-23T07:36:26.119Z\", \"status\": \"FORBIDDEN\", \"message\": \"자동 로그인 : 만료된 리프레시 토큰입니다. 다시 로그인해주세요.\", \"data\": false}"))),
+                          @ApiResponse(responseCode = "401", description = "자동 로그인 : 유효하지않은 리프레시 토큰입니다.",
+                            content = @Content(mediaType = "application/json",
+                            schema = @Schema(example = "{\"timeStamp\": \"2024-05-23T07:36:26.119Z\", \"status\": \"UNAUTHORIZED\", \"message\": \"자동 로그인 : 유효하지않은 리프레시 토큰입니다.\", \"data\": null}"))),
+            })
+    public ResponseEntity<ApiResult<Boolean>> autoLoginWithRefreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
+        try {
+            if (jwtTokenProvider.validateAutoLoginRefreshToken(refreshToken)) {
+                // Refresh Token이 유효한 경우 새로운 Access Token 발급
+                String newAccessToken = jwtTokenProvider.renewAccessToken(refreshToken);
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("Authorization", "Bearer " + newAccessToken);
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body((ApiResult.success("새로운 액세스 토큰 발급", true)));
+            } else {
+                // Refresh Token이 만료된 경우
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResult.error(HttpStatus.FORBIDDEN, "자동 로그인 : 만료된 토큰입니다. 다시 로그인해주세요.", false));
+            }
+        } catch (InvalidTokenException e) {
+            // Refresh Token이 유효하지 않은 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 유효하지않은 토큰입니다.", null));
+        }
+    }
+
 
 }
