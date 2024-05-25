@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.*;
@@ -108,7 +107,7 @@ public class AppleOauthService {
 
     // 애플 연결해제, 회원 탈퇴 처리
     @Transactional
-    public boolean unlinkAndDeleteMember(Long memberNo, String clientSecret) throws IOException {
+    public boolean unlinkAndDeleteMember(Long memberNo, String clientSecret) {
         Member member = memberRepository.findById(memberNo)
                 .orElseThrow(EntityNotFoundException::new);
 
