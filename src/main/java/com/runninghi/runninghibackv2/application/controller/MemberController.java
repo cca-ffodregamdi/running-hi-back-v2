@@ -28,7 +28,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
@@ -204,7 +203,6 @@ public class MemberController {
      *
      * @param token 사용자의 인증을 위한 Bearer 토큰입니다.
      * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 회원 탈퇴가 성공하면 true 값을 반환합니다.
-     * @throws IOException I/O 예외가 발생할 경우 예외를 처리합니다.
      */
     @PutMapping(value = "/api/v1/unlink/apple", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
@@ -220,7 +218,7 @@ public class MemberController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized")
             }
     )
-    public ResponseEntity<ApiResult<Boolean>> appleUnlink(@RequestHeader(value = "Authorization") String token) throws IOException {
+    public ResponseEntity<ApiResult<Boolean>> appleUnlink(@RequestHeader(value = "Authorization") String token) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
