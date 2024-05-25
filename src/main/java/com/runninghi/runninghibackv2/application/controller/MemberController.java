@@ -27,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
@@ -171,13 +172,40 @@ public class MemberController {
                 .body(ApiResult.success("Success Apple Login", null));
     }
 
+    /**
+     * 애플 회원 탈퇴를 처리하는 API입니다.
+     *
+     * <p>이 API는 사용자의 애플 계정과 연동된 회원 정보를 탈퇴 처리합니다.
+     * 클라이언트는 Authorization 헤더에 Bearer 토큰을 포함하여 해당 엔드포인트를 호출해야 합니다.
+     * 탈퇴가 성공하면 응답 본문에 true 값을 반환합니다.</p>
+     *
+     * @param token 사용자의 인증을 위한 Bearer 토큰입니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 회원 탈퇴가 성공하면 true 값을 반환합니다.
+     * @throws IOException I/O 예외가 발생할 경우 예외를 처리합니다.
+     */
+    @PutMapping(value = "/api/v1/unlink/apple", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "애플 회원 탈퇴",
+            description = "사용자의 애플 계정과 연동된 회원 정보를 탈퇴 처리합니다. " +
+                    "클라이언트는 Authorization 헤더에 Bearer 토큰을 포함하여 해당 엔드포인트를 호출해야 합니다. " +
+                    "탈퇴가 성공하면 응답 본문에 true 값을 반환합니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success Apple Unlink"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<ApiResult<Boolean>> appleUnlink(@RequestHeader(value = "Authorization") String token) throws IOException {
 
-    @PutMapping("/api/v1/unlink/apple")
-    public ResponseEntity<ApiResult<Void>> appleUnlink() {
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
+        String clientSecret = appleOauthService.createClientSecret();
 
+        boolean isActive = appleOauthService.unlinkAndDeleteMember(memberNo, clientSecret);
 
-        return ResponseEntity.ok(ApiResult.success("Success Apple Unlink", null));
+        return ResponseEntity.ok(ApiResult.success("Success Apple Unlink", isActive));
     }
 
     /**
@@ -262,7 +290,7 @@ public class MemberController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(example = "{\"timeStamp\": \"2024-05-23T07:36:26.119Z\", \"status\": \"UNAUTHORIZED\", \"message\": \"자동 로그인 : 유효하지않은 엑세스 토큰입니다.\", \"data\": null}"))),
             })
-    public ResponseEntity<ApiResult<Boolean>> autoLoginWithAccessToekn(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<ApiResult<Boolean>> autoLoginWithAccessToken(@RequestHeader(value = "Authorization") String token) {
         try {
             if (jwtTokenProvider.validateAutoLoginAccessToken(token)) {
                 // Access Token이 유효한 경우
