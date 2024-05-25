@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -154,7 +155,29 @@ public class MemberController {
         return ResponseEntity.ok(ApiResult.success("회원 정보 업데이트 성공", response));
     }
 
-    @GetMapping("/api/v1/login/apple")
+
+    /**
+     * 애플 로그인 또는 회원가입을 처리하는 API입니다.
+     *
+     * <p>이 API는 사용자의 애플 계정으로 로그인하거나 회원가입을 처리합니다.
+     * 클라이언트는 애플 인증 코드와 nonce를 요청 본문에 담아서 해당 엔드포인트를 호출해야 합니다.
+     * 인증이 성공하면 응답 헤더에 액세스 토큰과 리프레시 토큰이 포함됩니다.</p>
+     *
+     * @param request AppleLoginRequest 객체로, 애플 인증 코드와 nonce를 포함합니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 인증이 성공하면 응답 헤더에 액세스 토큰과 리프레시 토큰이 포함됩니다.
+     */
+    @GetMapping(value = "/api/v1/login/apple", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "애플 로그인 또는 회원가입",
+            description = "사용자의 애플 계정으로 로그인하거나 회원가입을 처리합니다. " +
+                    "클라이언트는 애플 인증 코드와 nonce를 요청 본문에 담아서 해당 엔드포인트를 호출해야 합니다. " +
+                    "인증이 성공하면 응답 헤더에 액세스 토큰과 리프레시 토큰이 포함됩니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success Apple Login",
+                    headers = {
+                            @Header(name = "Authorization", description = "Access Token", schema = @Schema(type = "string")),
+                            @Header(name = "Refresh-Token", description = "Refresh Token", schema = @Schema(type = "string"))
+                    })
+    })
     public ResponseEntity<ApiResult<Void>> appleLogin(@RequestBody AppleLoginRequest request) {
 
         String clientSecret = appleOauthService.createClientSecret();
