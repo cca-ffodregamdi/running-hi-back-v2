@@ -23,7 +23,7 @@ import java.util.Map;
 
 
 @Component
-public class AppleClientSecret {
+public class AppleClientSecretProvider {
 
     @Value("${apple.key-path}")
     private String appleKeyPath;
