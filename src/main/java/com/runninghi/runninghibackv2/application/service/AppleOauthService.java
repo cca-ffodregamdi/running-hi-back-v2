@@ -10,10 +10,13 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.*;
@@ -44,15 +47,17 @@ public class AppleOauthService {
 
 
     // client secret 생성
+    @Transactional
     public String createClientSecret() {
         try {
-            return new AppleClientSecret().createClientSecret();
+            return new AppleClientSecretProvider().createClientSecret();
         } catch (Exception e) {
             throw new AppleOauthException("apple client secret 생성에 실패했습니다.");
         }
     }
 
     // apple id_token 요청
+    @Transactional
     public AppleTokenResponse getAppleToken(String code, String clientSecret) {
         try {
             return appleClient.appleAuth(clientId, redirectUri, code, GRANT_TYPE, clientSecret);
@@ -62,6 +67,7 @@ public class AppleOauthService {
     }
 
     // apple user 생성
+    @Transactional
     public Map<String, String> appleOauth(AppleTokenResponse appleTokenResponse, String nonce) {
         // id_token의 header를 추출
         Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(appleTokenResponse.idToken());
@@ -89,6 +95,8 @@ public class AppleOauthService {
                 .orElseGet(() -> loginWithAppleCreateMember(appleResponse, appleTokenResponse.refreshToken()));
     }
 
+    // id-token에서 sub, name 추출
+    @Transactional
     public Map<String, String> extractAppleResponse(Claims claims) {
         Map<String, String> appleResponse = new HashMap<>();
 
@@ -98,6 +106,23 @@ public class AppleOauthService {
         return appleResponse;
     }
 
+    // 애플 연결해제, 회원 탈퇴 처리
+    @Transactional
+    public boolean unlinkAndDeleteMember(Long memberNo, String clientSecret) throws IOException {
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(EntityNotFoundException::new);
+
+        String authorization = "Bearer " + clientSecret;
+
+        appleClient.revokeToken(authorization, clientId, member.getAppleRefreshToken(), "refresh_token");
+
+        member.deactivateMember();
+        memberRepository.save(member);
+
+        return member.isActive();
+    }
+
+    // 새로운 토큰 생성 & 반환
     private Map<String, String> generateTokens(Member member) {
         AccessTokenInfo accessTokenInfo = new AccessTokenInfo(member.getMemberNo(), member.getRole());
         RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getAppleId(), member.getRole());
