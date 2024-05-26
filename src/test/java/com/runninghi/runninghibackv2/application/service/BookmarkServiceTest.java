@@ -65,7 +65,6 @@ class BookmarkServiceTest {
         GpsDataVO gpxDataVO = new GpsDataVO(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f);
         post1 = Post.builder()
                 .member(member1)
-                .postTitle("게시글 제목1")
                 .postContent("게시글 내용1")
                 .role(Role.USER)
                 .locationName("로스엔젤리스")
@@ -73,7 +72,6 @@ class BookmarkServiceTest {
                 .build();
         post2 = Post.builder()
                 .member(member1)
-                .postTitle("게시글 제목2")
                 .postContent("게시글 내용2")
                 .role(Role.USER)
                 .locationName("도쿄")
