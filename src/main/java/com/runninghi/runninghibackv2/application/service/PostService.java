@@ -182,7 +182,7 @@ public class PostService {
     @Transactional
     public CreatePostResponse createPost(Long memberNo, CreatePostRequest request) {
 
-        postChecker.checkPostValidation(request.postTitle(), request.postContent());
+        postChecker.checkPostValidation(request.postContent());
 
         Post post = postRepository.findById(request.postNo())
                         .orElseThrow(EntityNotFoundException::new);

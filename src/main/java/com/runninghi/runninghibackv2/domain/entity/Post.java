@@ -2,6 +2,7 @@ package com.runninghi.runninghibackv2.domain.entity;
 
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
+import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import jakarta.annotation.Nullable;
@@ -34,13 +35,12 @@ public class Post extends BaseTimeEntity {
 
     @Column
     @Nullable
-    @Comment("게시글 제목")
-    private String postTitle;
-
-    @Column
-    @Nullable
     @Comment("게시글 내용")
     private String postContent;
+
+    @Column
+    @Comment("러닝코스 난이도")
+    private Difficulty difficulty;
 
     @Column
     @Comment("신고 횟수")
@@ -69,10 +69,10 @@ public class Post extends BaseTimeEntity {
     private List<Keyword> keywordList;
 
     @Builder
-    public Post(Member member, @Nullable String postTitle, @Nullable String postContent, Role role, String locationName, Boolean status, String gpxUrl, GpsDataVO gpsDataVO) {
+    public Post(Member member, @Nullable String postContent, Difficulty difficulty, Role role, String locationName, Boolean status, String gpxUrl, GpsDataVO gpsDataVO) {
         this.member = member;
-        this.postTitle = postTitle;
         this.postContent = postContent;
+        this.difficulty = difficulty;
         this.reportCnt = 0;
         this.role = role;
         this.locationName = locationName;
@@ -82,14 +82,12 @@ public class Post extends BaseTimeEntity {
     }
 
     public void shareToPost(CreatePostRequest request) {
-        this.postTitle = request.postTitle();
         this.postContent = request.postContent();
-        this.locationName = request.locationName();
+        this.difficulty = Difficulty.valueOf(request.difficulty());
         this.status = true;
     }
 
     public void update(UpdatePostRequest request) {
-        this.postTitle = request.postTitle();
         this.postContent = request.postContent();
     }
 
