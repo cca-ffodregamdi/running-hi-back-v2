@@ -89,6 +89,7 @@ public class Post extends BaseTimeEntity {
 
     public void update(UpdatePostRequest request) {
         this.postContent = request.postContent();
+        this.difficulty = Difficulty.valueOf(request.difficulty());
     }
 
     public void addReportedCount() {

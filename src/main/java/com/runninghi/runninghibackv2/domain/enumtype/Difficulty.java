@@ -2,6 +2,6 @@ package com.runninghi.runninghibackv2.domain.enumtype;
 
 public enum Difficulty {
 
-    EASY, NORMAL, HARD
+    EASY, EASY_NORMAL, NORMAL, NORMAL_HARD, HARD
 
 }
