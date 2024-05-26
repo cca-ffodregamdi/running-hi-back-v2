@@ -12,8 +12,6 @@ public record GetPostResponse(
 
         @Schema(description = "작성자 닉네임", example = "러너1")
         String nickname,
-        @Schema(description = "게시글 제목", example = "제목 예시")
-        String postTitle,
         @Schema(description = "게시글 내용", example = "게시글 내용 예시입니다.")
         String postContent,
         @Schema(description = "권한", example = "MEMBER")
@@ -41,7 +39,6 @@ public record GetPostResponse(
     public static GetPostResponse from(Post post, List<Keyword> list) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
-                post.getPostTitle(),
                 post.getPostContent(),
                 post.getRole(),
                 post.getLocationName(),

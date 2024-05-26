@@ -5,7 +5,6 @@ import com.runninghi.runninghibackv2.domain.entity.Post;
 public record BookmarkedPostListResponse(
         Long postNo,
         Long memberNo,
-        String postTitle,
         String postContent,
         String role,
         String locationName,
@@ -26,7 +25,6 @@ public record BookmarkedPostListResponse(
         return new BookmarkedPostListResponse(
                 post.getPostNo(),
                 post.getMember().getMemberNo(),
-                post.getPostTitle(),
                 post.getPostContent(),
                 post.getLocationName(),
                 post.getRole().name(),
