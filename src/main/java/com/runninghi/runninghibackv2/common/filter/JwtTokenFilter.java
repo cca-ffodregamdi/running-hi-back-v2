@@ -74,7 +74,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String[] excludePaths = {
                 "/login/**",        // /login 경로와 하위 경로 모두 제외
-                "/api/v1/login/**"  // /api/v1/login 경로와 하위 경로 모두 제외
+                "/api/v1/login/**",  // /api/v1/login 경로와 하위 경로 모두 제외
+                "/test/**"    // dummy 테스트 경로 모두 제외
         };
         String path = request.getRequestURI();
         AntPathMatcher pathMatcher = new AntPathMatcher();
