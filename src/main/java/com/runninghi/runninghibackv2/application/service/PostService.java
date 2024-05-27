@@ -133,6 +133,35 @@ public class PostService {
 
     }
 
+
+    @Transactional(readOnly = true)
+    public Page<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
+
+        List<Post> posts = jpaQueryFactory.select(post)
+                .from(post)
+                .where(post.member.memberNo.eq(memberNo))
+                .fetch();
+
+        List<Long> postNos = posts.stream().map(Post::getPostNo).collect(Collectors.toList());
+
+        List<Image> images = jpaQueryFactory.select(image)
+                .from(image)
+                .where(image.postNo.in(postNos))
+                .fetch();
+
+        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
+                .collect(Collectors.groupingBy(Image::getPostNo,
+                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
+
+        List<GetAllPostsResponse> responses = posts.stream()
+                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, responses.size());
+
+    }
+
+
     @Transactional
     public CreateRecordResponse createRecord(Long memberNo, String gpxFile) throws Exception {
 
