@@ -3,12 +3,9 @@ package com.runninghi.runninghibackv2.common.dummy;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
-import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
+import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.entity.vo.PostKeywordId;
-import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
-import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
-import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
-import com.runninghi.runninghibackv2.domain.enumtype.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -99,32 +96,31 @@ public class TestData {
 
         Post post1 = Post.builder()
                 .member(member1)
-                .postTitle("첫 번째 게시글")
                 .postContent("첫 번째 게시글 내용입니다.")
                 .role(Role.USER)
                 .locationName("서울")
-                .gpxDataVO(new GpxDataVO(37.1234f, 127.5678f, 37.9876f, 126.5432f, 10.5f, 3600f, 200f, 5f, 6f))
+                .difficulty(Difficulty.EASY)
+                .gpsDataVO(new GpsDataVO(37.1234f, 127.5678f, 37.9876f, 126.5432f, 10.5f, 3600f, 200f, 5f, 6f))
                 .build();
         posts.add(post1);
 
         // 남아있는 게시물
         Post post2 = Post.builder()
                 .member(member2)
-                .postTitle("두 번째 게시글")
                 .postContent("두 번째 게시글 내용입니다. : 남아있는 게시글 입니다.")
                 .role(Role.ADMIN)
                 .locationName("부산")
-                .gpxDataVO(new GpxDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500f, 250f, 4f, 5f))
+                .difficulty(Difficulty.EASY)
+                .gpsDataVO(new GpsDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500f, 250f, 4f, 5f))
                 .build();
         posts.add(post2);
 
         Post post3 = Post.builder()
                 .member(member1)
-                .postTitle("세 번째 게시글")
                 .postContent("세 번째 게시글 내용입니다.")
                 .role(Role.USER)
                 .locationName("대구")
-                .gpxDataVO(new GpxDataVO(35.6789f, 128.9876f, 35.4321f, 129.8765f, 8.7f, 3000f, 180f, 6f, 7f))
+                .gpsDataVO(new GpsDataVO(35.6789f, 128.9876f, 35.4321f, 129.8765f, 8.7f, 3000f, 180f, 6f, 7f))
                 .build();
         posts.add(post3);
 

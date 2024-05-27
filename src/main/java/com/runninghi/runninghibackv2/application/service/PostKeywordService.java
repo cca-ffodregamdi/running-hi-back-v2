@@ -53,8 +53,8 @@ public class PostKeywordService {
                     .build();
 
             postKeywords.add(postKeyword);
-
         }
+
         postKeywordRepository.saveAll(postKeywords);
     }
 

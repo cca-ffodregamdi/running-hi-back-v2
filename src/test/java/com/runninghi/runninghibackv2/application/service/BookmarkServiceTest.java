@@ -3,12 +3,12 @@ package com.runninghi.runninghibackv2.application.service;
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.BookmarkedPostListResponse;
 import com.runninghi.runninghibackv2.domain.entity.Bookmark;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
+import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.repository.BookmarkRepository;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
@@ -62,22 +62,20 @@ class BookmarkServiceTest {
                 .role(Role.USER)
                 .build();
 
-        GpxDataVO gpxDataVO = new GpxDataVO(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f);
+        GpsDataVO gpxDataVO = new GpsDataVO(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f);
         post1 = Post.builder()
                 .member(member1)
-                .postTitle("게시글 제목1")
                 .postContent("게시글 내용1")
                 .role(Role.USER)
                 .locationName("로스엔젤리스")
-                .gpxDataVO(gpxDataVO)
+                .gpsDataVO(gpxDataVO)
                 .build();
         post2 = Post.builder()
                 .member(member1)
-                .postTitle("게시글 제목2")
                 .postContent("게시글 내용2")
                 .role(Role.USER)
                 .locationName("도쿄")
-                .gpxDataVO(gpxDataVO)
+                .gpsDataVO(gpxDataVO)
                 .build();
 
         BookmarkId bookmarkId1 = BookmarkId.of(member1.getMemberNo(), post1.getPostNo());

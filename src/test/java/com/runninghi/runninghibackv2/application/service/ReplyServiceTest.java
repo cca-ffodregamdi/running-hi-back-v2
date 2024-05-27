@@ -78,7 +78,6 @@ class ReplyServiceTest {
 
         post = Post.builder()
                 .member(member1)
-                .postTitle("테스트 게시글")
                 .postContent("테스트 게시글 내용")
                 .role(Role.USER)
                 .build();
