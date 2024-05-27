@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.domain.service;
 
-import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
+import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -65,7 +65,7 @@ public class GpsCalculator {
             trackPoints.add(new TrackPoint(lon, lat, time));
         }
     }
-    public GpxDataVO getDataFromGpxFile(String gpxData) {
+    public GpsDataVO getDataFromGpxFile(String gpxData) {
 
         trackPoints.clear(); // trackPoints 리스트 초기화
         totalDistance = 0.0f; // totalDistance 초기화
@@ -83,7 +83,7 @@ public class GpsCalculator {
         float speed = calculateSpeed();
         float meanPace = calculateMeanPace();
 
-        return new GpxDataVO(startLatitude, startLongitude, endLatitude, endLongitude, distance, time, kcal, speed, meanPace);
+        return new GpsDataVO(startLatitude, startLongitude, endLatitude, endLongitude, distance, time, kcal, speed, meanPace);
     }
 
     private float getStartLatitude() {
