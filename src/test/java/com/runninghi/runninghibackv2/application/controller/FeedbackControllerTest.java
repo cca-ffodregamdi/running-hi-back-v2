@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.runninghi.runninghibackv2.application.controller.FeedbackController;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackRequest;
@@ -82,7 +81,7 @@ class FeedbackControllerTest {
     @DisplayName("피드백 생성")
     void testCreateFeedback() throws Exception {
         String responseMessage = "피드백 저장 성공";
-        CreateFeedbackRequest request = new CreateFeedbackRequest(title, content, category.getValue());
+        CreateFeedbackRequest request = new CreateFeedbackRequest(title, content, category);
         CreateFeedbackResponse response = new CreateFeedbackResponse(feedbackNo, title, content);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
@@ -111,7 +110,7 @@ class FeedbackControllerTest {
     void testCreateFeedback_MissingRequiredTitle() throws Exception {
         String errorStatus = getErrorStatus(ErrorCode.BAD_REQUEST);
         String errorMessage = getErrorMessage(ErrorCode.BAD_REQUEST);
-        CreateFeedbackRequest request = new CreateFeedbackRequest(null, content, category.getValue());
+        CreateFeedbackRequest request = new CreateFeedbackRequest(null, content, category);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
@@ -134,7 +133,7 @@ class FeedbackControllerTest {
     @Test
     @DisplayName("피드백 생성 실패 - 유효하지않은 요청(내용 누락)")
     void testCreateFeedback_MissingRequiredContent() throws Exception {
-        CreateFeedbackRequest request = new CreateFeedbackRequest(title, null, category.getValue());
+        CreateFeedbackRequest request = new CreateFeedbackRequest(title, null, category);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
@@ -158,7 +157,7 @@ class FeedbackControllerTest {
     @Test
     @DisplayName("피드백 생성 실패 - 유효하지않은 요청(빈 입력값)")
     void testCreateFeedback_IllegalArgument() throws Exception {
-        CreateFeedbackRequest request = new CreateFeedbackRequest("", content, category.getValue());
+        CreateFeedbackRequest request = new CreateFeedbackRequest("", content, category);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
@@ -363,7 +362,7 @@ class FeedbackControllerTest {
         String updateContent = "Updated Content";
         String responseMessage = "피드백 수정 성공";
         FeedbackCategory updatedCategory = FeedbackCategory.WEBERROR;
-        UpdateFeedbackRequest request = new UpdateFeedbackRequest(updateTitle, updateContent, updatedCategory.getValue());
+        UpdateFeedbackRequest request = new UpdateFeedbackRequest(updateTitle, updateContent, updatedCategory);
         UpdateFeedbackResponse response = new UpdateFeedbackResponse(feedbackNo, updateTitle, updateContent, updatedCategory.getDescription());
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
@@ -394,7 +393,7 @@ class FeedbackControllerTest {
         String updateTitle = "Updated Title";
         String updateContent = "Updated Content";
         FeedbackCategory updatedCategory = FeedbackCategory.WEBERROR;
-        UpdateFeedbackRequest request = new UpdateFeedbackRequest(updateTitle, updateContent, updatedCategory.getValue());
+        UpdateFeedbackRequest request = new UpdateFeedbackRequest(updateTitle, updateContent, updatedCategory);
 
         // Mockito를 사용하여 서비스 호출 시 FeedbackNotFoundException 예외를 던지도록 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
@@ -418,7 +417,7 @@ class FeedbackControllerTest {
     void testUpdateFeedback_MissingRequiredField() throws Exception {
         String updateTitle = "Updated Title";
         FeedbackCategory updatedCategory = FeedbackCategory.WEBERROR;
-        UpdateFeedbackRequest request = new UpdateFeedbackRequest(updateTitle, null, updatedCategory.getValue());
+        UpdateFeedbackRequest request = new UpdateFeedbackRequest(updateTitle, null, updatedCategory);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
@@ -444,7 +443,7 @@ class FeedbackControllerTest {
         String updateTitle = "Updated Title";
         String updateContent = "";
         FeedbackCategory updatedCategory = FeedbackCategory.WEBERROR;
-        UpdateFeedbackRequest request = new UpdateFeedbackRequest(updateTitle, updateContent, updatedCategory.getValue());
+        UpdateFeedbackRequest request = new UpdateFeedbackRequest(updateTitle, updateContent, updatedCategory);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
