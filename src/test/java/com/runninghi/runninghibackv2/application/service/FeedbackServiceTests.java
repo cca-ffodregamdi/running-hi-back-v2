@@ -4,7 +4,6 @@ import com.runninghi.runninghibackv2.application.dto.feedback.request.CreateFeed
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.response.*;
-import com.runninghi.runninghibackv2.application.service.FeedbackService;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Feedback;
 import com.runninghi.runninghibackv2.domain.entity.Member;
@@ -101,7 +100,7 @@ class FeedbackServiceTests {
     void testCreateFeedback() throws BadRequestException {
 
         // 피드백 생성
-        CreateFeedbackRequest request = new CreateFeedbackRequest("제목", "내용", 1);
+        CreateFeedbackRequest request = new CreateFeedbackRequest("제목", "내용", FeedbackCategory.PROPOSAL);
 
         // 서비스 메서드 호출
         CreateFeedbackResponse response = feedbackService.createFeedback(request, testMember1.getMemberNo());
@@ -125,7 +124,7 @@ class FeedbackServiceTests {
         // 새로운 제목과 내용으로 피드백 업데이트를 요청
         String newTitle = "New Title";
         String newContent = "New Content";
-        int newCategory = 0;
+        FeedbackCategory newCategory = FeedbackCategory.INQUIRY;
 
         UpdateFeedbackRequest request = new UpdateFeedbackRequest(newTitle, newContent, newCategory);
 
