@@ -27,7 +27,9 @@ public class QPost extends EntityPathBase<Post> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createDate = _super.createDate;
 
-    public final com.runninghi.runninghibackv2.domain.entity.vo.QGpxDataVO gpxDataVO;
+    public final EnumPath<com.runninghi.runninghibackv2.domain.enumtype.Difficulty> difficulty = createEnum("difficulty", com.runninghi.runninghibackv2.domain.enumtype.Difficulty.class);
+
+    public final com.runninghi.runninghibackv2.domain.entity.vo.QGpsDataVO gpsDataVO;
 
     public final StringPath gpxUrl = createString("gpxUrl");
 
@@ -40,8 +42,6 @@ public class QPost extends EntityPathBase<Post> {
     public final StringPath postContent = createString("postContent");
 
     public final NumberPath<Long> postNo = createNumber("postNo", Long.class);
-
-    public final StringPath postTitle = createString("postTitle");
 
     public final NumberPath<Integer> reportCnt = createNumber("reportCnt", Integer.class);
 
@@ -70,7 +70,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public QPost(Class<? extends Post> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.gpxDataVO = inits.isInitialized("gpxDataVO") ? new com.runninghi.runninghibackv2.domain.entity.vo.QGpxDataVO(forProperty("gpxDataVO")) : null;
+        this.gpsDataVO = inits.isInitialized("gpsDataVO") ? new com.runninghi.runninghibackv2.domain.entity.vo.QGpsDataVO(forProperty("gpsDataVO")) : null;
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }
 
