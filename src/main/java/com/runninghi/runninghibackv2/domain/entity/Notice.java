@@ -8,7 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Entity
-@Table(name = "tbl_notice")
+@Table(name = "TBL_NOTICE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice extends BaseTimeEntity {
 
