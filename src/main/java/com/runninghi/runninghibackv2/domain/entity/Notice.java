@@ -40,4 +40,10 @@ public class Notice extends BaseTimeEntity {
         this.content = content;
         this.noticeWriter = noticeWriter;
     }
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
 }
