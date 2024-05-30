@@ -37,19 +37,14 @@ public class NoticeService {
         return CreateNoticeResponse.from(notice);
     }
 
+    @Transactional
     public UpdateNoticeResponse updateNotice(Long noticeNo, UpdateNoticeRequest request) {
         Notice notice = noticeRepository.findById(noticeNo)
                 .orElseThrow(EntityNotFoundException::new);
 
-        Notice updateNotice = Notice.builder()
-                .title(request.title())
-                .content(request.content())
-                .noticeWriter(notice.getNoticeWriter())
-                .build();
+        notice.update(request.title(), request.content());
 
-        noticeRepository.save(updateNotice);
-
-        return UpdateNoticeResponse.from(updateNotice);
+        return UpdateNoticeResponse.from(notice);
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +57,7 @@ public class NoticeService {
 
     @Transactional(readOnly = true)
     public PageResponse<GetNoticeResponse> getAllNotices(Pageable pageable) {
-        Page<Notice> noticePage = noticeRepository.findAllNotice(pageable);
+        Page<Notice> noticePage = noticeRepository.findAllBy(pageable);
 
         Page<GetNoticeResponse> response = noticePage.map(GetNoticeResponse::from);
 
