@@ -9,6 +9,7 @@ import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,9 @@ public class NoticeController {
     @Operation(
             summary = "공지사항 생성",
             description = "새로운 공지사항을 생성합니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
+            },
             responses = @ApiResponse(responseCode = "200", description = "공지사항 생성 성공")
     )
     public ResponseEntity<ApiResult<CreateNoticeResponse>> createNotice(
@@ -44,7 +48,7 @@ public class NoticeController {
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
         CreateNoticeResponse response = noticeService.createNotice(request, memberNo);
 
-        return ResponseEntity.ok(ApiResult.success("", response));
+        return ResponseEntity.ok(ApiResult.success("공지사항 생성 성공", response));
     }
 
     /**
@@ -58,6 +62,10 @@ public class NoticeController {
     @Operation(
             summary = "공지사항 수정",
             description = "기존 공지사항을 수정합니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
+                    @Parameter(in = ParameterIn.PATH, name = "noticeNo", description = "수정하고자 하는 공지사항의 고유 번호", required = true)
+            },
             responses = @ApiResponse(responseCode = "200", description = "공지사항 수정 성공")
     )
     public ResponseEntity<ApiResult<UpdateNoticeResponse>> updateNotice(
@@ -67,7 +75,7 @@ public class NoticeController {
 
         UpdateNoticeResponse response = noticeService.updateNotice(noticeNo, request);
 
-        return ResponseEntity.ok(ApiResult.success("", response));
+        return ResponseEntity.ok(ApiResult.success("공지사항 수정 성공", response));
     }
 
     /**
@@ -79,6 +87,10 @@ public class NoticeController {
     @Operation(
             summary = "공지사항 조회",
             description = "특정 공지사항을 조회합니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
+                    @Parameter(in = ParameterIn.PATH, name = "noticeNo", description = "조회하고자 하는 공지사항의 고유 번호", required = true)
+            },
             responses = @ApiResponse(responseCode = "200", description = "공지사항 조회 성공")
     )
     public ResponseEntity<ApiResult<GetNoticeResponse>> getNotice(
@@ -87,7 +99,7 @@ public class NoticeController {
 
         GetNoticeResponse response = noticeService.getNotice(noticeNo);
 
-        return ResponseEntity.ok(ApiResult.success("", response));
+        return ResponseEntity.ok(ApiResult.success("공지사항 조회 성공", response));
     }
 
     /**
@@ -98,12 +110,15 @@ public class NoticeController {
     @Operation(
             summary = "모든 공지사항 조회",
             description = "모든 공지사항 리스트를 조회합니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
+            },
             responses = @ApiResponse(responseCode = "200", description = "모든 공지사항 조회 성공")
     )
     public ResponseEntity<ApiResult<PageResponse<GetNoticeResponse>>> getAllNotices(Pageable pageable) {
         PageResponse<GetNoticeResponse> response = noticeService.getAllNotices(pageable);
 
-        return ResponseEntity.ok(ApiResult.success("", response));
+        return ResponseEntity.ok(ApiResult.success("모든 공지사항 조회 성공", response));
     }
 
     /**
@@ -116,13 +131,17 @@ public class NoticeController {
     @Operation(
             summary = "공지사항 삭제",
             description = "기존 공지사항을 삭제합니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
+                    @Parameter(in = ParameterIn.PATH, name = "noticeNo", description = "삭제하고자 하는 공지사항의 고유 번호", required = true)
+            },
             responses = @ApiResponse(responseCode = "200", description = "공지사항 삭제 성공")
     )
     public ResponseEntity<ApiResult<DeleteNoticeResponse>> deleteNotice(
             @Parameter(description = "공지사항 ID") @PathVariable Long noticeNo
     ) {
         DeleteNoticeResponse response = noticeService.deleteNotice(noticeNo);
-        return ResponseEntity.ok(ApiResult.success("", response));
+        return ResponseEntity.ok(ApiResult.success("공지사항 삭제 성공", response));
     }
 
 }
