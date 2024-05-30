@@ -7,6 +7,8 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Notice;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.NoticeRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -36,6 +38,8 @@ class NoticeServiceTests {
 
     private Long memberNo;
 
+    private Notice notice1;
+
     @BeforeEach
     void setUp() {
         Member member = Member.builder()
@@ -43,9 +47,30 @@ class NoticeServiceTests {
                 .build();
         memberRepository.save(member);
         memberNo = member.getMemberNo();
+
+        notice1 = Notice.builder()
+            .title("Notice 1")
+            .content("Content 1")
+            .noticeWriter(member)
+            .build();
+        Notice notice2 = Notice.builder()
+                .title("Notice 2")
+                .content("Content 2")
+                .noticeWriter(member)
+                .build();
+        Notice notice3 = Notice.builder()
+                .title("Notice 3")
+                .content("Content 3")
+                .noticeWriter(member)
+                .build();
+
+        noticeRepository.save(notice1);
+        noticeRepository.save(notice2);
+        noticeRepository.save(notice3);
     }
 
     @Test
+    @DisplayName("공지사항 생성")
     void testCreateNotice() {
         CreateNoticeRequest request = new CreateNoticeRequest("Title", "Content");
 
@@ -60,6 +85,7 @@ class NoticeServiceTests {
     }
 
     @Test
+    @DisplayName("피드백 수정")
     void testUpdateNotice() {
         Notice notice = Notice.builder()
                 .title("Old Title")
@@ -82,6 +108,7 @@ class NoticeServiceTests {
     }
 
     @Test
+    @DisplayName("공지사항 조회")
     void testGetNotice() {
         Notice notice = Notice.builder()
                 .title("Title")
@@ -98,25 +125,23 @@ class NoticeServiceTests {
     }
 
     @Test
+    @DisplayName("공지사항 리스트 조회 ")
     void testGetAllNotices() {
-        Notice notice = Notice.builder()
-                .title("Title")
-                .content("Content")
-                .noticeWriter(memberRepository.findById(memberNo).orElseThrow())
-                .build();
-        noticeRepository.save(notice);
 
-        Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(1, 2);
         PageResponse<GetNoticeResponse> response = noticeService.getAllNotices(pageable);
 
         assertNotNull(response);
-        assertEquals(1, response.totalPages());
+        assertEquals(2, response.totalPages());
         assertEquals(1, response.content().size());
-        assertEquals(notice.getTitle(), response.content().get(0).title());
-        assertEquals(notice.getContent(), response.content().get(0).content());
+        assertEquals(2, response.currentPage());
+        assertEquals(notice1.getTitle(), response.content().get(0).title());
+        assertEquals(notice1.getContent(), response.content().get(0).content());
     }
 
+
     @Test
+    @DisplayName("공지사항 삭제")
     void testDeleteNotice() {
         Notice notice = Notice.builder()
                 .title("Title")
@@ -132,5 +157,20 @@ class NoticeServiceTests {
 
         Optional<Notice> noticeOptional = noticeRepository.findById(notice.getNoticeNo());
         assertTrue(noticeOptional.isEmpty());
+    }
+
+    @Test
+    @DisplayName("공지사항 수정 : EntityNotFound 존재하지않는 공지사항 번호")
+    void testUpdateNonExistentNotice() {
+        UpdateNoticeRequest request = new UpdateNoticeRequest("New Title", "New Content");
+        assertThrows(EntityNotFoundException.class,
+                () -> noticeService.updateNotice(999L, request));
+    }
+
+    @Test
+    @DisplayName("공지사항 조회 : EntityNotFound 존재하지않는 공지사항 번호")
+    void testDeleteNonExistentNotice() {
+        assertThrows(EntityNotFoundException.class,
+                () -> noticeService.deleteNotice(999L));
     }
 }
