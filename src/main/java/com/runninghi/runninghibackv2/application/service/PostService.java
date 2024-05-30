@@ -10,7 +10,7 @@ import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.Score;
-import com.runninghi.runninghibackv2.domain.entity.vo.GpxDataVO;
+import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.repository.ScoreRepository;
@@ -44,7 +44,7 @@ import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeywo
 @RequiredArgsConstructor
 public class PostService {
 
-    private final GpsCalculator calculateGPX;
+    private final GpsCalculator calculateGPS;
     private final PostChecker postChecker;
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
@@ -133,6 +133,35 @@ public class PostService {
 
     }
 
+
+    @Transactional(readOnly = true)
+    public Page<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
+
+        List<Post> posts = jpaQueryFactory.select(post)
+                .from(post)
+                .where(post.member.memberNo.eq(memberNo))
+                .fetch();
+
+        List<Long> postNos = posts.stream().map(Post::getPostNo).collect(Collectors.toList());
+
+        List<Image> images = jpaQueryFactory.select(image)
+                .from(image)
+                .where(image.postNo.in(postNos))
+                .fetch();
+
+        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
+                .collect(Collectors.groupingBy(Image::getPostNo,
+                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
+
+        List<GetAllPostsResponse> responses = posts.stream()
+                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, responses.size());
+
+    }
+
+
     @Transactional
     public CreateRecordResponse createRecord(Long memberNo, String gpxFile) throws Exception {
 
@@ -140,7 +169,7 @@ public class PostService {
         String gpxData = decompress(compressedData);
 
         //GPX 저장
-        GpxDataVO gpxDataVO = calculateGPX.getDataFromGpxFile(gpxData);
+        GpsDataVO gpsDataVO = calculateGPS.getDataFromGpxFile(gpxData);
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
@@ -149,13 +178,13 @@ public class PostService {
         Post createdPost = postRepository.save(Post.builder()
                 .member(member)
                 .role(member.getRole())
-                .gpxDataVO(gpxDataVO)
+                .gpsDataVO(gpsDataVO)
                 .gpxUrl(gpxUrl)
                 .status(false)
                 .build());
 
-        createOrUpdateScore(member, gpxDataVO);
-        GpxDataVO postGpxVO = createdPost.getGpxDataVO();
+        createOrUpdateScore(member, gpsDataVO);
+        GpsDataVO postGpxVO = createdPost.getGpsDataVO();
 
         return new CreateRecordResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
                 postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
@@ -182,7 +211,7 @@ public class PostService {
     @Transactional
     public CreatePostResponse createPost(Long memberNo, CreatePostRequest request) {
 
-        postChecker.checkPostValidation(request.postTitle(), request.postContent());
+        postChecker.checkPostValidation(request.postContent());
 
         Post post = postRepository.findById(request.postNo())
                         .orElseThrow(EntityNotFoundException::new);
@@ -303,27 +332,27 @@ public class PostService {
     }
 
 
-    public GpxDataResponse getGpxLonLatData(Long postNo) throws ParserConfigurationException, IOException, SAXException {
+    public GpsDataResponse getGpxLonLatData(Long postNo) throws ParserConfigurationException, IOException, SAXException {
         Post post = findPostByNo(postNo);
         String gpxUrl = post.getGpxUrl();
 
         URL url = new URL(gpxUrl);
 
         try (InputStream inputStream = url.openStream()) {
-            return new GpxDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
+            return new GpsDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
         }
     }
 
-    public void createOrUpdateScore(Member member, GpxDataVO gpxDataVO) {
+    public void createOrUpdateScore(Member member, GpsDataVO gpsDataVO) {
         Optional<Score> score = scoreRepository.findByMember(member);
 
         if (scoreRepository.findByMember(member).isEmpty()) {
             scoreRepository.save(Score.builder()
-                    .distance(gpxDataVO.getDistance())
+                    .distance(gpsDataVO.getDistance())
                     .member(member)
                     .build());
             return;
         }
-        score.get().addDistance(gpxDataVO.getDistance());
+        score.get().addDistance(gpsDataVO.getDistance());
     }
 }

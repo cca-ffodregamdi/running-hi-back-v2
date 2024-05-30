@@ -5,7 +5,6 @@ import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeed
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.response.*;
 import com.runninghi.runninghibackv2.domain.entity.Feedback;
-import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.FeedbackRepository;
@@ -39,7 +38,7 @@ public class FeedbackService {
                 .feedbackWriter(member)
                 .title(request.title())
                 .content(request.content())
-                .category(FeedbackCategory.getFeedbackCategoryFromValue(request.category()))
+                .category(request.category())
                 .hasReply(false)
                 .build();
 
@@ -63,7 +62,7 @@ public class FeedbackService {
                 .feedbackWriter(feedback.getFeedbackWriter())
                 .title(request.title())
                 .content(request.content())
-                .category(FeedbackCategory.getFeedbackCategoryFromValue(request.category()))
+                .category(request.category())
                 .hasReply(false)
                 .build();
 

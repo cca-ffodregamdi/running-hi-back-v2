@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @EqualsAndHashCode
-public class GpxDataVO implements Serializable {
+public class GpsDataVO implements Serializable {
 
     @Column
     @Comment("코스 시작 위도")
@@ -49,7 +49,7 @@ public class GpxDataVO implements Serializable {
     @Comment("평균 페이스 (분/km)")
     private float meanPace;
 
-    public GpxDataVO(float startLatitude, float startLongitude, float endLatitude, float endLongitude, float distance, float time, float kcal, float speed, float meanPace) {
+    public GpsDataVO(float startLatitude, float startLongitude, float endLatitude, float endLongitude, float distance, float time, float kcal, float speed, float meanPace) {
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;
         this.endLatitude = endLatitude;
