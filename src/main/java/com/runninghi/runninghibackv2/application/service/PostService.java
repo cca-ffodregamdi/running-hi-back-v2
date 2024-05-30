@@ -97,10 +97,14 @@ public class PostService {
     public Page<GetAllPostsResponse> getPostScroll(Pageable pageable, List<String> keywordList) {
 
         List<Post> posts;
+        long total;
 
         if (keywordList == null || keywordList.isEmpty()) {
+            total = jpaQueryFactory.selectFrom(post).fetchCount();
             posts = jpaQueryFactory.select(post)
                     .from(post)
+                    .offset(pageable.getOffset())
+                    .limit(10)
                     .fetch();
         } else {
             List<Long> keywordNos = jpaQueryFactory.select(keyword.keywordNo)
@@ -108,9 +112,17 @@ public class PostService {
                     .where(keyword.keywordName.in(keywordList))
                     .fetch();
 
-            posts = jpaQueryFactory.select(post)
-                    .leftJoin(postKeyword)
+            total = jpaQueryFactory.selectFrom(postKeyword)
                     .where(postKeyword.keyword.keywordNo.in(keywordNos))
+                    .fetchCount();
+
+            posts = jpaQueryFactory.select(post)
+                    .from(postKeyword)
+                    .leftJoin(post)
+                    .on(post.postNo.eq(postKeyword.post.postNo))
+                    .where(postKeyword.keyword.keywordNo.in(keywordNos))
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
                     .fetch();
         }
 
@@ -129,9 +141,9 @@ public class PostService {
                 .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(responses, pageable, responses.size());
-
+        return new PageImpl<>(responses, pageable, total);
     }
+
 
 
     @Transactional(readOnly = true)
@@ -157,7 +169,7 @@ public class PostService {
                 .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(responses, pageable, responses.size());
+        return new PageImpl<>(responses, pageable, 10);
 
     }
 
