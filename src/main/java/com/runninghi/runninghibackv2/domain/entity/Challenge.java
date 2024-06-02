@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
+import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -57,5 +58,14 @@ public class Challenge {
         this.endDate = endDate;
         this.reward = reward;
         this.participants = participants;
+    }
+
+    public void update(UpdateChallengeRequest request) {
+        this.title = request.title();
+        this.content = request.content();
+        this.distance = request.distance();
+        this.startDate = request.startDate();
+        this.endDate = request.endDate();
+        this.reward = request.reward();
     }
 }
