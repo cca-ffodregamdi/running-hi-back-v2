@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.common.exception;
 
+import com.runninghi.runninghibackv2.common.exception.custom.AppleOauthException;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthException;
 import com.runninghi.runninghibackv2.common.exception.custom.SchedulingException;
@@ -66,6 +67,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ApiResult> handleHandlerMethodValidationException() {
         ApiResult apiResult = ApiResult.error(ErrorCode.VALIDATION_FAIL);
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(AppleOauthException.class)
+    public ResponseEntity<ApiResult> handleAppleOauthException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_FAIL);
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 

@@ -31,6 +31,10 @@ public class KakaoOauthService {
 
     private static final int NICKNAME_DIGIT_LENGTH = 8;
     private static final int RANDOM_NUMBER_RANGE = 10;
+    private static final String GRANT_TYPE = "authorization_code";
+    private static final String ACCESS_TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token";
+    private static final String KAKAO_USER_INFO_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
+    private static final String KAKAO_UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink";
 
     @Value("${kakao.client-id}")
     private String kakaoClientId;
@@ -74,19 +78,18 @@ public class KakaoOauthService {
      *
      * @param code 카카오로부터 받은 인가 코드
      * @return 인증된 사용자의 액세스 토큰 및 리프레시 토큰
-     * @throws KakaoLoginException 카카오 로그인 처리 중 오류가 발생한 경우 예외가 발생합니다.
+     * @throws KakaoOauthException 카카오 로그인 처리 중 오류가 발생한 경우 예외가 발생합니다.
      */
     @Transactional
     public Map<String, String> kakaoOauth(String code) {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "authorization_code");
+        params.add("grant_type", GRANT_TYPE);
         params.add("client_id", kakaoClientId);
         params.add("client_secret", clientSecret);
         params.add("redirect_uri", currentVersionUri + kakaoRedirectUri);
         params.add("code", code);
 
-        String accessTokenRequestUrl = "https://kauth.kakao.com/oauth/token";
-        Map<String, String> response = restTemplate.postForObject(accessTokenRequestUrl, params, Map.class);
+        Map<String, String> response = restTemplate.postForObject(ACCESS_TOKEN_REQUEST_URL, params, Map.class);
 
         String kakaoAccessToken = response != null ? response.get("access_token") : null;
         if (kakaoAccessToken == null) {
@@ -109,9 +112,6 @@ public class KakaoOauthService {
      * @return 카카오 사용자의 프로필 정보
      */
     KakaoProfileResponse getKakaoProfile(String kakaoAccessToken){
-        // user 정보를 가져오는 kakao api url
-        String url = "https://kapi.kakao.com/v2/user/me";
-
         // http header 설정 : access token 을 넣어서 user 정보에 접근할 수 있도록 한다.
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -123,16 +123,10 @@ public class KakaoOauthService {
 
         HttpEntity<?> request = new HttpEntity<>(body, headers);
 
-        return restTemplate.postForObject(url, request, KakaoProfileResponse.class);
+        return restTemplate.postForObject(KAKAO_USER_INFO_REQUEST_URL, request, KakaoProfileResponse.class);
     }
 
-    /**
-     * 카카오 사용자의 프로필 정보를 사용하여 로그인 처리를 수행하고, 액세스 토큰 및 리프레시 토큰을 반환합니다.
-     *
-     * @param member 로그인할 회원 정보
-     * @return 액세스 토큰 및 리프레시 토큰
-     */
-    private Map<String, String> loginWithKakao(Member member) {
+    private Map<String, String> generateTokens(Member member) {
         AccessTokenInfo accessTokenInfo = new AccessTokenInfo(member.getMemberNo(), member.getRole());
         RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getKakaoId(), member.getRole());
 
@@ -140,7 +134,6 @@ public class KakaoOauthService {
         String accessToken = jwtTokenProvider.createAccessToken(accessTokenInfo);
 
         member.updateRefreshToken(refreshToken);
-        member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
         memberRepository.save(member);
 
         Map<String, String> tokens = new HashMap<>();
@@ -150,16 +143,17 @@ public class KakaoOauthService {
         return tokens;
     }
 
-    /**
-     * 카카오 프로필을 기반으로 새로운 회원을 생성하고, 회원의 액세스 토큰과 리프레시 토큰을 반환합니다.
-     *
-     * @param kakaoProfile 카카오 프로필 정보
-     * @return 액세스 토큰과 리프레시 토큰으로 구성된 맵
-     */
+    // 로그인 메서드
+    private Map<String, String> loginWithKakao(Member member) {
+        member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
+        return generateTokens(member);
+    }
+
+    // 회원 생성 및 로그인 메서드
     private Map<String, String> loginWithKakaoCreateMember(KakaoProfileResponse kakaoProfile) {
         Member member = Member.builder()
                 .kakaoId(kakaoProfile.getKakaoId().toString())
-                .kakaoName(kakaoProfile.getNickname())
+                .name(kakaoProfile.getNickname())
                 .nickname("러너 " + generateRandomDigits())
                 .isActive(true)
                 .isBlacklisted(false)
@@ -170,22 +164,8 @@ public class KakaoOauthService {
                 .level(0)
                 .build();
 
-        // 리프레시 토큰 생성
-        RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getKakaoId(), member.getRole());
-        String refreshToken = jwtTokenProvider.createRefreshToken(refreshTokenInfo);
-
-        member.updateRefreshToken(refreshToken);
-
-        // 멤버 저장, 액세스 토큰 생성
-        Member savedMember = memberRepository.saveAndFlush(member);
-        AccessTokenInfo accessTokenInfo = new AccessTokenInfo(savedMember.getMemberNo(), savedMember.getRole());
-        String accessToken = jwtTokenProvider.createAccessToken(accessTokenInfo);
-
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
-
-        return tokens;
+        memberRepository.saveAndFlush(member);
+        return generateTokens(member);
     }
 
     /**
@@ -194,15 +174,12 @@ public class KakaoOauthService {
      * @param memberNo 회원 번호
      * @return 회원의 활성화 상태를 토글한 결과 (활성화되었으면 true, 비활성화되었으면 false)
      * @throws EntityNotFoundException 요청된 회원 번호에 해당하는 회원을 찾을 수 없을 때 발생하는 예외
-     * @throws KakaoUnlinkException 카카오 API 호출이 실패한 경우 발생하는 예외
+     * @throws KakaoOauthException 카카오 API 호출이 실패한 경우 발생하는 예외
      */
     @Transactional
     public boolean unlinkAndDeleteMember(Long memberNo) {
         Member member = memberRepository.findById(memberNo)
                 .orElseThrow(EntityNotFoundException::new);
-
-        // 연결을 끊는 kakao api url
-        String url = "https://kapi.kakao.com/v1/user/unlink";
 
         // http header 설정 : access token 을 넣어서 user 정보에 접근할 수 있도록 한다.
         HttpHeaders headers = new HttpHeaders();
@@ -215,7 +192,7 @@ public class KakaoOauthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<String> response =  restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        ResponseEntity<String> response =  restTemplate.exchange(KAKAO_UNLINK_URL, HttpMethod.POST, request, String.class);
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new KakaoOauthException();
