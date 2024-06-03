@@ -3,7 +3,7 @@
 INSERT INTO tbl_post (
     difficulty, distance, end_latitude, end_longitude, kcal, mean_pace,
     report_cnt, role, speed, start_latitude, start_longitude, status, time,
-    create_date, member_no, update_date, gps_url, location_name, post_content
+    create_date, member_no, update_date, gpx_url, location_name, post_content
 ) VALUES
       (3, 54.0, 33.1083, 128.8954, 324, 5, 8, 0, 7, 37.5551, 124.9911, NULL, 1675, '2023-08-16 07:39:19', 1, NULL, NULL, '경남', '1 번째 게시글입니다.'),
       (0, 56.3, 34.3751, 126.0232, 633, 4, 8, 0, 10, 34.77, 130.4754, NULL, 6838, '2023-05-29 14:52:49', 1, NULL, NULL, '광주', '2 번째 게시글입니다.'),
