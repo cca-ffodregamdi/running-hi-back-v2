@@ -28,6 +28,8 @@ public record GetPostResponse(
         float time,
         @Schema(description = "평균 페이스 (분/km)", example = "4.66")
         float meanPace,
+        @Schema(description = "소모 칼로리 (kcal)", example = "200")
+        float kcal,
         @Schema(description = "이미지 URL 리스트", example = "[\"url1\", \"url2\"]")
         List<String> imageUrls
 ) {
@@ -42,6 +44,7 @@ public record GetPostResponse(
                 post.getGpsDataVO().getDistance(),
                 post.getGpsDataVO().getTime(),
                 post.getGpsDataVO().getMeanPace(),
+                post.getGpsDataVO().getKcal(),
                 imageUrls
         );
     }
