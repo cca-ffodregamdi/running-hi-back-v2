@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.common.dummy;
 
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
@@ -9,6 +10,8 @@ import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +33,8 @@ public class TestData {
     private final ReplyReportRepository replyReportRepository;
     private final ReplyRepository replyRepository;
     private final KeywordRepository keywordRepository;
+
+    private final TestDatabaseMapper testDatabaseMapper;
 
     @PostMapping("/test/data")
     public ResponseEntity<ApiResult<Void>> setUp() {
@@ -365,7 +370,24 @@ public class TestData {
 
         feedbackRepository.saveAllAndFlush(feedbacks);
 
+        testDatabaseMapper.insertPostDummyData();
+
         return ResponseEntity.ok(ApiResult.success("test용 dummy data 생성 성공", null));
+    }
+
+    @HasAccess
+    @Transactional
+    @GetMapping("/test/data/reset")
+    public ResponseEntity<ApiResult<Void>> resetDatabase() {
+        testDatabaseMapper.disableForeignKeyChecks();
+        List<String> tableList = testDatabaseMapper.getAllTableList();
+        System.out.println(tableList);
+        for( String i : tableList) {
+            testDatabaseMapper.truncateTable(i);
+        }
+        testDatabaseMapper.enableForeignKeyChecks();
+
+        return ResponseEntity.ok(ApiResult.success("test Database 초기화 성공", null));
     }
 
 }
