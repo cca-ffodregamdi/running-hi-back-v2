@@ -10,6 +10,7 @@ import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.repository.ScoreRepository;
 import com.runninghi.runninghibackv2.domain.service.GpsCalculator;
@@ -54,6 +55,7 @@ public class PostService {
     private final JPAQueryFactory jpaQueryFactory;
     private final GpxCoordinateExtractor gpxCoordinateExtractor;
     private final ScoreRepository scoreRepository;
+    private final PostQueryRepository postQueryRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -94,50 +96,8 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GetAllPostsResponse> getPostScroll(Pageable pageable, List<String> keywordList) {
-
-        List<Post> posts;
-        long total;
-
-        if (keywordList == null || keywordList.isEmpty()) {
-            total = jpaQueryFactory.selectFrom(post).fetchCount();
-            posts = jpaQueryFactory.select(post)
-                    .from(post)
-                    .offset(pageable.getOffset())
-                    .limit(10)
-                    .fetch();
-        } else {
-            List<Long> keywordNos = jpaQueryFactory.select(keyword.keywordNo)
-                    .from(keyword)
-                    .where(keyword.keywordName.in(keywordList))
-                    .fetch();
-
-            total = jpaQueryFactory.selectFrom(postKeyword)
-                    .where(postKeyword.keyword.keywordNo.in(keywordNos))
-                    .fetchCount();
-
-            posts = jpaQueryFactory.select(post)
-                    .from(postKeyword)
-                    .leftJoin(post)
-                    .on(post.postNo.eq(postKeyword.post.postNo))
-                    .where(postKeyword.keyword.keywordNo.in(keywordNos))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .fetch();
-        }
-
-        List<GetAllPostsResponse> responses = posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(QImage.image)
-                    .from(QImage.image)
-                    .where(QImage.image.postNo.eq(post.getPostNo()))
-                    .limit(1)
-                    .fetchOne();
-
-            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl);
-        }).collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, total);
+    public Page<GetAllPostsResponse> getPostScroll(Pageable pageable) {
+        return postQueryRepository.findAllPostsByPageable(pageable);
     }
 
 
@@ -145,29 +105,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
-        long total;
-
-        List<Post> posts = jpaQueryFactory.select(post)
-                .from(post)
-                .where(post.member.memberNo.eq(memberNo))
-                .fetch();
-        total = jpaQueryFactory.selectFrom(post).fetchCount();
-
-        List<Long> postNos = posts.stream().map(Post::getPostNo).collect(Collectors.toList());
-
-        List<GetAllPostsResponse> responses = posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(QImage.image)
-                    .from(QImage.image)
-                    .where(QImage.image.postNo.eq(post.getPostNo()))
-                    .limit(1)
-                    .fetchOne();
-
-            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl);
-        }).collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, total);
-
+        return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
     }
 
 
@@ -274,28 +212,12 @@ public class PostService {
 
     }
 
-//    @Transactional(readOnly = true)
-//    public GetPostResponse getPostByPostNo(Long postNo) {
-//
-//        Post post = postRepository.findById(postNo)
-//                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
-//
-//        List<PostKeyword> list = postKeywordService.getKeywordsByPost(post);
-//
-//        List<Keyword> keywordList = new ArrayList<>();
-//
-//        for (PostKeyword postKeyword : list) {
-//            keywordList.add(postKeyword.getKeyword());
-//        }
-//
-//        return GetPostResponse.from(post, keywordList);
-//    }
-
     private Post findPostByNo(Long postNo) {
         return postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
     }
 
+    // 수정 필요!
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getReportedPostScroll(Pageable pageable) {
 

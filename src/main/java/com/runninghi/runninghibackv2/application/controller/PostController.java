@@ -41,10 +41,10 @@ public class PostController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 특정 키워드들로 필터링이 가능합니다.")
-    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getAllPosts(@ModelAttribute PostKeywordCriteria criteria) {
-        Pageable pageable = PageRequest.of(criteria.page(), 10);
+    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getAllPosts(@RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 10);
 
-        Page<GetAllPostsResponse> response = postService.getPostScroll(pageable, criteria.keyword());
+        Page<GetAllPostsResponse> response = postService.getPostScroll(pageable);
 
         return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
