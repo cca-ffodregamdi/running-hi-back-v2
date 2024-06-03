@@ -2,14 +2,12 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
-import com.runninghi.runninghibackv2.domain.entity.Image;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.entity.Score;
+import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
@@ -32,11 +30,13 @@ import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
+import static com.runninghi.runninghibackv2.domain.entity.QMember.member;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
 import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeyword;
 
@@ -126,52 +126,50 @@ public class PostService {
                     .fetch();
         }
 
-        List<Long> postNos = posts.stream().map(Post::getPostNo).collect(Collectors.toList());
+        List<GetAllPostsResponse> responses = posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.select(QImage.image)
+                    .from(QImage.image)
+                    .where(QImage.image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
 
-        List<Image> images = jpaQueryFactory.select(image)
-                .from(image)
-                .where(image.postNo.in(postNos))
-                .fetch();
-
-        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
-                .collect(Collectors.groupingBy(Image::getPostNo,
-                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
-
-        List<GetAllPostsResponse> responses = posts.stream()
-                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
-                .collect(Collectors.toList());
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+            return GetAllPostsResponse.from(post, imageUrl);
+        }).collect(Collectors.toList());
 
         return new PageImpl<>(responses, pageable, total);
     }
 
 
 
+
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
+        long total;
 
         List<Post> posts = jpaQueryFactory.select(post)
                 .from(post)
                 .where(post.member.memberNo.eq(memberNo))
                 .fetch();
+        total = jpaQueryFactory.selectFrom(post).fetchCount();
 
         List<Long> postNos = posts.stream().map(Post::getPostNo).collect(Collectors.toList());
 
-        List<Image> images = jpaQueryFactory.select(image)
-                .from(image)
-                .where(image.postNo.in(postNos))
-                .fetch();
+        List<GetAllPostsResponse> responses = posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.select(QImage.image)
+                    .from(QImage.image)
+                    .where(QImage.image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
 
-        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
-                .collect(Collectors.groupingBy(Image::getPostNo,
-                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+            return GetAllPostsResponse.from(post, imageUrl);
+        }).collect(Collectors.toList());
 
-        List<GetAllPostsResponse> responses = posts.stream()
-                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, 10);
+        return new PageImpl<>(responses, pageable, total);
 
     }
+
 
 
     @Transactional
@@ -305,17 +303,14 @@ public class PostService {
 
         List<Long> postNos = posts.getContent().stream().map(Post::getPostNo).collect(Collectors.toList());
 
-        List<Image> images = jpaQueryFactory.select(image)
+        Image mainImage = jpaQueryFactory.select(QImage.image)
                 .from(image)
                 .where(image.postNo.in(postNos))
-                .fetch();
+                .limit(1)
+                .fetchOne();
 
-        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
-                .collect(Collectors.groupingBy(Image::getPostNo,
-                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
-
-        List<GetAllPostsResponse> responses = posts.getContent().stream()
-                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
+        List<GetAllPostsResponse> responses = posts.stream()
+                .map(post -> GetAllPostsResponse.from(post, mainImage.getImageUrl()))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(responses, pageable, posts.getTotalElements());
@@ -366,5 +361,23 @@ public class PostService {
             return;
         }
         score.get().addDistance(gpsDataVO.getDistance());
+    }
+
+    @Transactional(readOnly = true)
+    public GetPostResponse getPostDetailByPostNo(Long postNo) {
+
+        Post post = postRepository.findById(postNo)
+                .orElseThrow(EntityNotFoundException::new);
+
+        List<Image> images = jpaQueryFactory.select(QImage.image)
+                .from(QImage.image)
+                .where(QImage.image.postNo.eq(postNo))
+                .fetch();
+
+        List<String> imageUrls = images.stream()
+                .map(Image::getImageUrl)
+                .collect(Collectors.toList());
+
+        return GetPostResponse.from(post, imageUrls.isEmpty() ? null : imageUrls);
     }
 }
