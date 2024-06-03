@@ -2,16 +2,15 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
-import com.runninghi.runninghibackv2.domain.entity.Image;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.entity.Score;
+import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.repository.ScoreRepository;
 import com.runninghi.runninghibackv2.domain.service.GpsCalculator;
@@ -32,11 +31,13 @@ import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
+import static com.runninghi.runninghibackv2.domain.entity.QMember.member;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
 import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeyword;
 
@@ -54,6 +55,7 @@ public class PostService {
     private final JPAQueryFactory jpaQueryFactory;
     private final GpxCoordinateExtractor gpxCoordinateExtractor;
     private final ScoreRepository scoreRepository;
+    private final PostQueryRepository postQueryRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -94,84 +96,18 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GetAllPostsResponse> getPostScroll(Pageable pageable, List<String> keywordList) {
-
-        List<Post> posts;
-        long total;
-
-        if (keywordList == null || keywordList.isEmpty()) {
-            total = jpaQueryFactory.selectFrom(post).fetchCount();
-            posts = jpaQueryFactory.select(post)
-                    .from(post)
-                    .offset(pageable.getOffset())
-                    .limit(10)
-                    .fetch();
-        } else {
-            List<Long> keywordNos = jpaQueryFactory.select(keyword.keywordNo)
-                    .from(keyword)
-                    .where(keyword.keywordName.in(keywordList))
-                    .fetch();
-
-            total = jpaQueryFactory.selectFrom(postKeyword)
-                    .where(postKeyword.keyword.keywordNo.in(keywordNos))
-                    .fetchCount();
-
-            posts = jpaQueryFactory.select(post)
-                    .from(postKeyword)
-                    .leftJoin(post)
-                    .on(post.postNo.eq(postKeyword.post.postNo))
-                    .where(postKeyword.keyword.keywordNo.in(keywordNos))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .fetch();
-        }
-
-        List<Long> postNos = posts.stream().map(Post::getPostNo).collect(Collectors.toList());
-
-        List<Image> images = jpaQueryFactory.select(image)
-                .from(image)
-                .where(image.postNo.in(postNos))
-                .fetch();
-
-        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
-                .collect(Collectors.groupingBy(Image::getPostNo,
-                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
-
-        List<GetAllPostsResponse> responses = posts.stream()
-                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, total);
+    public Page<GetAllPostsResponse> getPostScroll(Pageable pageable) {
+        return postQueryRepository.findAllPostsByPageable(pageable);
     }
+
 
 
 
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
-
-        List<Post> posts = jpaQueryFactory.select(post)
-                .from(post)
-                .where(post.member.memberNo.eq(memberNo))
-                .fetch();
-
-        List<Long> postNos = posts.stream().map(Post::getPostNo).collect(Collectors.toList());
-
-        List<Image> images = jpaQueryFactory.select(image)
-                .from(image)
-                .where(image.postNo.in(postNos))
-                .fetch();
-
-        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
-                .collect(Collectors.groupingBy(Image::getPostNo,
-                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
-
-        List<GetAllPostsResponse> responses = posts.stream()
-                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, 10);
-
+        return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
     }
+
 
 
     @Transactional
@@ -276,28 +212,12 @@ public class PostService {
 
     }
 
-//    @Transactional(readOnly = true)
-//    public GetPostResponse getPostByPostNo(Long postNo) {
-//
-//        Post post = postRepository.findById(postNo)
-//                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
-//
-//        List<PostKeyword> list = postKeywordService.getKeywordsByPost(post);
-//
-//        List<Keyword> keywordList = new ArrayList<>();
-//
-//        for (PostKeyword postKeyword : list) {
-//            keywordList.add(postKeyword.getKeyword());
-//        }
-//
-//        return GetPostResponse.from(post, keywordList);
-//    }
-
     private Post findPostByNo(Long postNo) {
         return postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
     }
 
+    // 수정 필요!
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getReportedPostScroll(Pageable pageable) {
 
@@ -305,17 +225,14 @@ public class PostService {
 
         List<Long> postNos = posts.getContent().stream().map(Post::getPostNo).collect(Collectors.toList());
 
-        List<Image> images = jpaQueryFactory.select(image)
+        Image mainImage = jpaQueryFactory.select(QImage.image)
                 .from(image)
                 .where(image.postNo.in(postNos))
-                .fetch();
+                .limit(1)
+                .fetchOne();
 
-        Map<Long, List<String>> imageUrlsByPostNo = images.stream()
-                .collect(Collectors.groupingBy(Image::getPostNo,
-                        Collectors.mapping(Image::getImageUrl, Collectors.toList())));
-
-        List<GetAllPostsResponse> responses = posts.getContent().stream()
-                .map(post -> GetAllPostsResponse.from(post, imageUrlsByPostNo.getOrDefault(post.getPostNo(), Collections.emptyList())))
+        List<GetAllPostsResponse> responses = posts.stream()
+                .map(post -> GetAllPostsResponse.from(post, mainImage.getImageUrl()))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(responses, pageable, posts.getTotalElements());
@@ -366,5 +283,23 @@ public class PostService {
             return;
         }
         score.get().addDistance(gpsDataVO.getDistance());
+    }
+
+    @Transactional(readOnly = true)
+    public GetPostResponse getPostDetailByPostNo(Long postNo) {
+
+        Post post = postRepository.findById(postNo)
+                .orElseThrow(EntityNotFoundException::new);
+
+        List<Image> images = jpaQueryFactory.select(QImage.image)
+                .from(QImage.image)
+                .where(QImage.image.postNo.eq(postNo))
+                .fetch();
+
+        List<String> imageUrls = images.stream()
+                .map(Image::getImageUrl)
+                .collect(Collectors.toList());
+
+        return GetPostResponse.from(post, imageUrls.isEmpty() ? null : imageUrls);
     }
 }

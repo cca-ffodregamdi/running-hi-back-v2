@@ -41,10 +41,10 @@ public class PostController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 특정 키워드들로 필터링이 가능합니다.")
-    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getAllPosts(@ModelAttribute PostKeywordCriteria criteria) {
-        Pageable pageable = PageRequest.of(criteria.page(), 10);
+    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getAllPosts(@RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 10);
 
-        Page<GetAllPostsResponse> response = postService.getPostScroll(pageable, criteria.keyword());
+        Page<GetAllPostsResponse> response = postService.getPostScroll(pageable);
 
         return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
@@ -62,14 +62,14 @@ public class PostController {
         return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
-//    @GetMapping("/{postNo}")
-//    @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
-//    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
-//
-//        GetPostResponse response = postService.getPostByPostNo(postNo);
-//
-//        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
-//    }
+    @GetMapping("/{postNo}")
+    @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
+    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
+
+        GetPostResponse response = postService.getPostDetailByPostNo(postNo);
+
+        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
+    }
 
     @GetMapping(value = "/coordinate/{postNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "GPX 경도, 위도 조회", description = " '나도 이 코스 달리기' 선택시 반환되는 데이터입니다. \n 지도 상 표기를 위해 경도-위도 값이 튜플 형태로 반환됩니다.")

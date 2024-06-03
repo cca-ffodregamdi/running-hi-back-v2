@@ -34,6 +34,10 @@ public class Member extends BaseTimeEntity {
     private String nickname;
 
     @Column
+    @Comment("프로필 이미지 url")
+    private String profileUrl;
+
+    @Column
     @Comment("카카오 로그인 : id")
     private String kakaoId;
 
@@ -100,7 +104,7 @@ public class Member extends BaseTimeEntity {
     private int level = 0;
 
     @Builder
-    public Member(Long memberNo, String account, String password, String nickname, String kakaoId, String name,
+    public Member(Long memberNo, String account, String password, String nickname, String profileUrl, String kakaoId, String name,
                   String appleId, int reportCnt, boolean isActive, boolean isBlacklisted, Role role, String refreshToken,
                   String appleRefreshToken, String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate,
                   double totalDistance, double totalKcal, int distanceToNextLevel, int level) {
@@ -108,6 +112,7 @@ public class Member extends BaseTimeEntity {
         this.account = account;
         this.password = password;
         this.nickname = nickname;
+        this.profileUrl = profileUrl;
         this.kakaoId = kakaoId;
         this.name = name;
         this.appleId = appleId;
