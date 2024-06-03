@@ -32,7 +32,7 @@ public class TestToken {
             Member member1 = Member.builder()
                     .alarmConsent(true)
                     .kakaoId("12345")
-                    .kakaoName("관리자 : 카카오 이름")
+                    .name("관리자 : 카카오 이름")
                     .nickname("관리자 : 테스트용 관리자입니다.")
                     .level(0)
                     .isActive(true)
@@ -45,7 +45,7 @@ public class TestToken {
             Member member2 = Member.builder()
                     .alarmConsent(true)
                     .kakaoId("67890")
-                    .kakaoName("유저 : 카카오 이름")
+                    .name("유저 : 카카오 이름")
                     .nickname("유저 : 테스트용 유저입니다.")
                     .level(1)
                     .isActive(true)
@@ -74,6 +74,7 @@ public class TestToken {
         try {
             Member admin = testMemberRepository.findByNickname("관리자 : 테스트용 관리자입니다.");
             Member user = testMemberRepository.findByNickname("유저 : 테스트용 유저입니다.");
+
 
             TestTokenResponse response = createTokens(admin, user);
 

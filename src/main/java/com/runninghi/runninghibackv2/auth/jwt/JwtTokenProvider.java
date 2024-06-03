@@ -76,7 +76,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))
-                .setSubject(refreshTokenInfo.kakaoId())
+                .setSubject(refreshTokenInfo.id())
                 .claim("role", refreshTokenInfo.role())
                 .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(Date.from(now.plusDays(refreshExpireDays).atZone(ZoneId.systemDefault()).toInstant()))
