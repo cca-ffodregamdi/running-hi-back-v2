@@ -68,6 +68,8 @@ dependencies {
     //json
     implementation 'org.json:json:20231013'
 
+    // MyBatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 
 }
 
