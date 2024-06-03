@@ -12,38 +12,37 @@ public record GetPostResponse(
 
         @Schema(description = "작성자 닉네임", example = "러너1")
         String nickname,
+        @Schema(description = "작성자 프로필 사진 URL", example = "https://picsum.photos/200")
+        String profileImageUrl,
+        @Schema(description = "작성자 레벨", example = "1")
+        int level,
         @Schema(description = "게시글 내용", example = "게시글 내용 예시입니다.")
         String postContent,
         @Schema(description = "권한", example = "MEMBER")
         Role role,
         @Schema(description = "코스 위치", example = "서울특별시 성북구")
         String locationName,
-        @Schema(description = "코스 데이터", example = """
-        {
-          "startLatitude": 37.1234,
-          "startLongitude": 127.5678,
-          "endLatitude": 37.5678,
-          "endLongitude": 127.1234,
-          "distance": 10.5,
-          "time": 3600,
-          "kcal": 500,
-          "speed": 2.5,
-          "meanPace": 8.0,
-          "meanSlope": 3.0
-        }
-        """)
-        GpsDataVO gpsDataVO,
-        @Schema(description = "키워드 목록", example = "보통,강아지랑,경사없음")
-        List<Keyword> keywordList
+        @Schema(description = "달린 거리(km)", example = "8.38")
+        float distance,
+        @Schema(description = "달린 시간", example = "1.23333")
+        float time,
+        @Schema(description = "평균 페이스 (분/km)", example = "4.66")
+        float meanPace,
+        @Schema(description = "이미지 URL 리스트", example = "[\"url1\", \"url2\"]")
+        List<String> imageUrls
 ) {
-    public static GetPostResponse from(Post post, List<Keyword> list) {
+    public static GetPostResponse from(Post post, List<String> imageUrls) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
+                post.getMember().getProfileUrl(),
+                post.getMember().getLevel(),
                 post.getPostContent(),
                 post.getRole(),
                 post.getLocationName(),
-                post.getGpsDataVO(),
-                list
+                post.getGpsDataVO().getDistance(),
+                post.getGpsDataVO().getTime(),
+                post.getGpsDataVO().getMeanPace(),
+                imageUrls
         );
     }
 }
