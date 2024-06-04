@@ -34,7 +34,7 @@ public class FaqService {
     }
 
     @Transactional
-    public UpdateFaqResponse updateNotice(Long faqNo, UpdateFaqRequest request) {
+    public UpdateFaqResponse updateFaq(Long faqNo, UpdateFaqRequest request) {
         Faq faq = faqRepository.findById(faqNo)
                 .orElseThrow(EntityNotFoundException::new);
 
@@ -52,7 +52,7 @@ public class FaqService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetFaqResponse> getAllFaqs() {
+    public List<GetFaqResponse> getAllFaq() {
         return faqRepository.findAll()
                 .stream()
                 .map(GetFaqResponse::from)
