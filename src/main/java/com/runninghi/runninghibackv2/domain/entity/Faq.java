@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
+import com.runninghi.runninghibackv2.application.dto.faq.request.UpdateFaqRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,6 +32,11 @@ public class Faq {
         this.faqNo = faqNo;
         this.question = question;
         this.answer = answer;
+    }
+
+    public void update(UpdateFaqRequest request) {
+        this.question = request.question();
+        this.answer = request.answer();
     }
 
 
