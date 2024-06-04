@@ -127,7 +127,7 @@ public class NoticeController {
      * @return 삭제 성공 여부
      */
     @HasAccess
-    @DeleteMapping(value = "/api/v1/notice/{noticeNo}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/api/v1/notices/{noticeNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "공지사항 삭제",
             description = "기존 공지사항을 삭제합니다.",
