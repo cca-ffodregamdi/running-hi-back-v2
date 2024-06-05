@@ -3,10 +3,10 @@ package com.runninghi.runninghibackv2.common.converter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Converter(autoApply = true)
 public class FloatListConverter implements AttributeConverter<List<Float>, String> {
@@ -19,22 +19,15 @@ public class FloatListConverter implements AttributeConverter<List<Float>, Strin
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
     }
+
     @Override
     public List<Float> convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.isEmpty()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
-        return Arrays.stream(dbData.split(","))
+        return Stream.of(dbData.split(","))
                 .map(String::trim)
-                .map(this::parseFloat)
+                .map(Float::parseFloat)
                 .collect(Collectors.toList());
-    }
-
-    private Float parseFloat(String str) {
-        try {
-            return Float.parseFloat(str);
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 }
