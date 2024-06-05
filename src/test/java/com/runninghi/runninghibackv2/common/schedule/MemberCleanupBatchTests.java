@@ -3,7 +3,6 @@ package com.runninghi.runninghibackv2.common.schedule;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
-import com.runninghi.runninghibackv2.domain.entity.vo.PostKeywordId;
 import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import org.junit.jupiter.api.AfterEach;
@@ -40,9 +39,6 @@ class MemberCleanupBatchTests {
     private FeedbackRepository feedbackRepository;
 
     @Autowired
-    private PostKeywordRepository postKeywordRepository;
-
-    @Autowired
     private PostReportRepository postReportRepository;
 
     @Autowired
@@ -66,7 +62,6 @@ class MemberCleanupBatchTests {
         alarmRepository.deleteAllInBatch();
         bookmarkRepository.deleteAllInBatch();
         feedbackRepository.deleteAllInBatch();
-        postKeywordRepository.deleteAllInBatch();
         postReportRepository.deleteAllInBatch();
         postRepository.deleteAllInBatch();
         replyReportRepository.deleteAllInBatch();
@@ -357,31 +352,6 @@ class MemberCleanupBatchTests {
         keywordRepository.saveAllAndFlush(keywords);
 
 
-        List<PostKeyword> postKeywords = new ArrayList<>();
-
-        PostKeyword postKeyword1 = PostKeyword.builder()
-                .postKeywordId(PostKeywordId.builder()
-                        .keywordNo(keyword1.getKeywordNo())
-                        .postNo(post1.getPostNo())
-                        .build())
-                .keyword(keyword1)
-                .post(post1)
-                .build();
-        postKeywords.add(postKeyword1);
-
-        PostKeyword postKeyword2 = PostKeyword.builder()
-                .postKeywordId(PostKeywordId.builder()
-                        .keywordNo(keyword2.getKeywordNo())
-                        .postNo(post2.getPostNo())
-                        .build())
-                .keyword(keyword2)
-                .post(post2)
-                .build();
-        postKeywords.add(postKeyword2);
-
-        postKeywordRepository.saveAllAndFlush(postKeywords);
-
-
         List<Feedback> feedbacks = new ArrayList<>();
 
         Feedback feedback1 = Feedback.builder()
@@ -416,7 +386,6 @@ class MemberCleanupBatchTests {
         int beforeReply = replyRepository.findAll().size();
         int beforeReplyReport = replyReportRepository.findAll().size();
         int beforePostReport = postReportRepository.findAll().size();
-        int beforePostKeyword = postKeywordRepository.findAll().size();
         int beforeFeedback = feedbackRepository.findAll().size();
 
         List<Member> deactivatedMembers = memberRepository.findAllByDeactivateDate(dateTime);
@@ -437,7 +406,6 @@ class MemberCleanupBatchTests {
             List<Reply> afterReplies = replyRepository.findAll();
             List<ReplyReport> afterReplyReport = replyReportRepository.findAll();
             List<PostReport> afterPostReport = postReportRepository.findAll();
-            List<PostKeyword> afterPostKeyword = postKeywordRepository.findAll();
             List<Feedback> afterFeedback = feedbackRepository.findAll();
 
             // 결과 확인 및 검증하는 코드
@@ -447,7 +415,6 @@ class MemberCleanupBatchTests {
             assertEquals(6, beforeReply);
             assertEquals(3, beforeReplyReport);
             assertEquals(3, beforePostReport);
-            assertEquals(2, beforePostKeyword);
             assertEquals(2, beforeFeedback);
             assertEquals(1, deactivatedMembers.size());
             assertEquals(1, afterPosts.size());
@@ -456,7 +423,6 @@ class MemberCleanupBatchTests {
             assertEquals(1, afterReplies.size());
             assertEquals(1, afterReplyReport.size());
             assertEquals(2, afterPostReport.size());
-            assertEquals(1, afterPostKeyword.size());
             assertEquals(1, afterFeedback.size());
         }
     }
