@@ -78,7 +78,6 @@ class MemberCleanupBatchTests {
     @BeforeEach
     void setUp() {
         List<Member> members = new ArrayList<>();
-        List<Float> initialRunData = new ArrayList<>();
         dateTime = LocalDateTime.now().minusDays(31);
 
         Member member1 = Member.builder()
@@ -86,7 +85,7 @@ class MemberCleanupBatchTests {
                 .alarmConsent(true)
                 .name("kakaoName")
                 .isActive(false)
-                .runDataVO(new RunDataVO(1000,0.0,10,1, initialRunData,initialRunData,initialRunData))
+                .runDataVO(new RunDataVO(1000,0.0,10,1))
                 .build();
         members.add(member1);
 
@@ -95,7 +94,7 @@ class MemberCleanupBatchTests {
                 .alarmConsent(true)
                 .name("nyam")
                 .isActive(true)
-                .runDataVO(new RunDataVO(1000,0.0,10,1, initialRunData,initialRunData,initialRunData))
+                .runDataVO(new RunDataVO(1000,0.0,10,1))
                 .build();
         members.add(member2);
 

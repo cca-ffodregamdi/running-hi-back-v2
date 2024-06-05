@@ -149,9 +149,6 @@ public class AppleOauthService {
     // 회원 생성 및 로그인 메서드
     private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToekn) {
 
-        // 초기 배열 선언
-        List<Float> initialRunData = new ArrayList<>();
-
         Member member = Member.builder()
                 .appleId(appleResponse.get("sub"))
                 .name(appleResponse.get("name"))
@@ -160,7 +157,7 @@ public class AppleOauthService {
                 .isActive(true)
                 .isBlacklisted(false)
                 .role(Role.USER)
-                .runDataVO(new RunDataVO(0.0,0.0,10,0, initialRunData,initialRunData,initialRunData))
+                .runDataVO(new RunDataVO(0.0,0.0,10,0))
                 .build();
 
         memberRepository.saveAndFlush(member);

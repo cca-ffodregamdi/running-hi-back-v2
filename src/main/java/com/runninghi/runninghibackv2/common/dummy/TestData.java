@@ -42,14 +42,12 @@ public class TestData {
         List<Member> members = new ArrayList<>();
         LocalDateTime dateTime = LocalDateTime.now().minusDays(31);
 
-        List<Float> initialRunData = new ArrayList<>();
-
         Member member1 = Member.builder()
                 .deactivateDate(dateTime)
                 .alarmConsent(true)
                 .name("name")
                 .isActive(false)
-                .runDataVO(new RunDataVO(1000,5000,30,1, initialRunData,initialRunData,initialRunData))
+                .runDataVO(new RunDataVO(1000,5000,30,1))
                 .build();
         members.add(member1);
 
@@ -58,7 +56,7 @@ public class TestData {
                 .alarmConsent(true)
                 .name("nyam")
                 .isActive(true)
-                .runDataVO(new RunDataVO(1000,5000,30,1, initialRunData,initialRunData,initialRunData))
+                .runDataVO(new RunDataVO(1000,5000,30,1))
                 .build();
         members.add(member2);
 

@@ -151,9 +151,6 @@ public class KakaoOauthService {
     // 회원 생성 및 로그인 메서드
     private Map<String, String> loginWithKakaoCreateMember(KakaoProfileResponse kakaoProfile) {
 
-        // 초기 배열 선언
-        List<Float> initialRunData = new ArrayList<>();
-
         Member member = Member.builder()
                 .kakaoId(kakaoProfile.getKakaoId().toString())
                 .name(kakaoProfile.getNickname())
@@ -161,7 +158,7 @@ public class KakaoOauthService {
                 .isActive(true)
                 .isBlacklisted(false)
                 .role(Role.USER)
-                .runDataVO(new RunDataVO(0.0,0.0,10,0, initialRunData,initialRunData,initialRunData))
+                .runDataVO(new RunDataVO(0.0,0.0,10,0))
                 .build();
 
         memberRepository.saveAndFlush(member);
