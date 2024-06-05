@@ -47,7 +47,6 @@ public class TestData {
                 .alarmConsent(true)
                 .name("name")
                 .role(Role.USER)
-                .level(1)
                 .isActive(false)
                 .runDataVO(new RunDataVO(1000,5000,30,1))
                 .build();
@@ -58,7 +57,6 @@ public class TestData {
                 .alarmConsent(true)
                 .name("러닝마스터")
                 .role(Role.USER)
-                .level(1)
                 .name("nyam")
                 .isActive(true)
                 .runDataVO(new RunDataVO(1000,5000,30,1))
