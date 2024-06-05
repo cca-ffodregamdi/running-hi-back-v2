@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "공지사항 API", description = "공지사항 관련 API")
 public class NoticeController {
 
     private final NoticeService noticeService;
@@ -127,7 +129,7 @@ public class NoticeController {
      * @return 삭제 성공 여부
      */
     @HasAccess
-    @DeleteMapping(value = "/api/v1/notice/{noticeNo}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/api/v1/notices/{noticeNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "공지사항 삭제",
             description = "기존 공지사항을 삭제합니다.",

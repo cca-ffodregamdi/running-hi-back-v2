@@ -5,6 +5,7 @@ import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;

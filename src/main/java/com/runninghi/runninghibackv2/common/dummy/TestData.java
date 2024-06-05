@@ -6,6 +6,7 @@ import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.entity.vo.PostKeywordId;
+import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,7 @@ public class TestData {
                 .role(Role.USER)
                 .level(1)
                 .isActive(false)
-                .totalDistance(1000)
+                .runDataVO(new RunDataVO(1000,5000,30,1))
                 .build();
         members.add(member1);
 
@@ -58,8 +59,9 @@ public class TestData {
                 .name("러닝마스터")
                 .role(Role.USER)
                 .level(1)
+                .name("nyam")
                 .isActive(true)
-                .totalDistance(1000)
+                .runDataVO(new RunDataVO(1000,5000,30,1))
                 .build();
         members.add(member2);
 

@@ -61,5 +61,4 @@ public class MemberService {
         member.updateAlarmConsent(alarmConsent);
 
     }
-
 }
