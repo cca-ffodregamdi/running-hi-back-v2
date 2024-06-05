@@ -6,6 +6,7 @@ import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.entity.vo.PostKeywordId;
+import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -41,13 +42,14 @@ public class TestData {
         List<Member> members = new ArrayList<>();
         LocalDateTime dateTime = LocalDateTime.now().minusDays(31);
 
+        List<Float> initialRunData = new ArrayList<>();
+
         Member member1 = Member.builder()
                 .deactivateDate(dateTime)
                 .alarmConsent(true)
                 .name("name")
-                .level(1)
                 .isActive(false)
-                .totalDistance(1000)
+                .runDataVO(new RunDataVO(1000,5000,30,1, initialRunData,initialRunData,initialRunData))
                 .build();
         members.add(member1);
 
@@ -55,9 +57,8 @@ public class TestData {
                 .deactivateDate(LocalDateTime.now().minusDays(15))
                 .alarmConsent(true)
                 .name("nyam")
-                .level(1)
                 .isActive(true)
-                .totalDistance(1000)
+                .runDataVO(new RunDataVO(1000,5000,30,1, initialRunData,initialRunData,initialRunData))
                 .build();
         members.add(member2);
 
