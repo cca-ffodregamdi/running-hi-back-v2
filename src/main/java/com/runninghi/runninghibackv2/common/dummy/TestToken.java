@@ -37,11 +37,8 @@ public class TestToken {
                                 .kakaoId("12345")
                                 .name(adminName)
                                 .nickname("관리자 : 테스트용 관리자입니다.")
-                                .level(0)
-                                .isActive(true)
-                                .totalDistance(0)
-                                .distanceToNextLevel(10)
                                 .role(Role.ADMIN)
+                                .runDataVO(new RunDataVO(0.0,0.0,10,1))
                                 .build();
                         testMemberRepository.saveAndFlush(newAdmin);
                         return newAdmin;
@@ -54,11 +51,9 @@ public class TestToken {
                                 .kakaoId("67890")
                                 .name(userName)
                                 .nickname("유저 : 테스트용 유저입니다.")
-                                .level(1)
                                 .isActive(true)
-                                .totalDistance(0)
-                                .distanceToNextLevel(10)
                                 .role(Role.USER)
+                                .runDataVO(new RunDataVO(0.0,0.0,10,1))
                                 .build();
                         testMemberRepository.saveAndFlush(newUser);
                         return newUser;
