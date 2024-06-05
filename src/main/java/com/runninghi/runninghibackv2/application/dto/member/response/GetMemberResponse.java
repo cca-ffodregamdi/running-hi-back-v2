@@ -17,7 +17,8 @@ public record GetMemberResponse(
         double totalKcal
 ) {
     public static GetMemberResponse from(Member member) {
-        return new GetMemberResponse(member.getNickname(), member.getLevel(),
-                member.getTotalDistance(), member.getDistanceToNextLevel(), member.getTotalKcal());
+        return new GetMemberResponse(member.getNickname(), member.getRunDataVO().getLevel(),
+                member.getRunDataVO().getTotalDistance(), member.getRunDataVO().getDistanceToNextLevel(),
+                member.getRunDataVO().getTotalKcal());
     }
 }

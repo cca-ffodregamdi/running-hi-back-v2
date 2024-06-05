@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.application.service;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
+import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthException;
 import com.runninghi.runninghibackv2.application.dto.member.response.KakaoProfileResponse;
@@ -21,9 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -151,6 +150,10 @@ public class KakaoOauthService {
 
     // 회원 생성 및 로그인 메서드
     private Map<String, String> loginWithKakaoCreateMember(KakaoProfileResponse kakaoProfile) {
+
+        // 초기 배열 선언
+        List<Float> initialRunData = new ArrayList<>();
+
         Member member = Member.builder()
                 .kakaoId(kakaoProfile.getKakaoId().toString())
                 .name(kakaoProfile.getNickname())
@@ -158,10 +161,7 @@ public class KakaoOauthService {
                 .isActive(true)
                 .isBlacklisted(false)
                 .role(Role.USER)
-                .distanceToNextLevel(10)
-                .totalKcal(0.0)
-                .totalDistance(0.0)
-                .level(0)
+                .runDataVO(new RunDataVO(0.0,0.0,10,0, initialRunData,initialRunData,initialRunData))
                 .build();
 
         memberRepository.saveAndFlush(member);
