@@ -37,7 +37,7 @@ public record GetPostResponse(
         return new GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
-                post.getMember().getLevel(),
+                post.getMember().getRunDataVO().getLevel(),
                 post.getPostContent(),
                 post.getRole(),
                 post.getLocationName(),

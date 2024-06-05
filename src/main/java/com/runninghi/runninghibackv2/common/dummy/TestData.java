@@ -5,6 +5,8 @@ import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
+import com.runninghi.runninghibackv2.domain.entity.vo.PostKeywordId;
+import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class TestData {
     private final AlarmRepository alarmRepository;
     private final BookmarkRepository bookmarkRepository;
     private final FeedbackRepository feedbackRepository;
+    private final PostKeywordRepository postKeywordRepository;
     private final PostReportRepository postReportRepository;
     private final PostRepository postRepository;
     private final ReplyReportRepository replyReportRepository;
@@ -43,9 +46,8 @@ public class TestData {
                 .deactivateDate(dateTime)
                 .alarmConsent(true)
                 .name("name")
-                .level(1)
                 .isActive(false)
-                .totalDistance(1000)
+                .runDataVO(new RunDataVO(1000,5000,30,1))
                 .build();
         members.add(member1);
 
@@ -53,9 +55,8 @@ public class TestData {
                 .deactivateDate(LocalDateTime.now().minusDays(15))
                 .alarmConsent(true)
                 .name("nyam")
-                .level(1)
                 .isActive(true)
-                .totalDistance(1000)
+                .runDataVO(new RunDataVO(1000,5000,30,1))
                 .build();
         members.add(member2);
 
@@ -317,6 +318,32 @@ public class TestData {
         keywords.add(keyword3);
 
         keywordRepository.saveAllAndFlush(keywords);
+
+
+        List<PostKeyword> postKeywords = new ArrayList<>();
+
+        PostKeyword postKeyword1 = PostKeyword.builder()
+                .postKeywordId(PostKeywordId.builder()
+                        .keywordNo(keyword1.getKeywordNo())
+                        .postNo(post1.getPostNo())
+                        .build())
+                .keyword(keyword1)
+                .post(post1)
+                .build();
+        postKeywords.add(postKeyword1);
+
+        PostKeyword postKeyword2 = PostKeyword.builder()
+                .postKeywordId(PostKeywordId.builder()
+                        .keywordNo(keyword2.getKeywordNo())
+                        .postNo(post2.getPostNo())
+                        .build())
+                .keyword(keyword2)
+                .post(post2)
+                .build();
+        postKeywords.add(postKeyword2);
+
+        postKeywordRepository.saveAllAndFlush(postKeywords);
+
 
         List<Feedback> feedbacks = new ArrayList<>();
 

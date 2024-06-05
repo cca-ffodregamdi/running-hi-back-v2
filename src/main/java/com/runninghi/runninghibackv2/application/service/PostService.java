@@ -101,13 +101,10 @@ public class PostService {
     }
 
 
-
-
     @Transactional(readOnly = true)
     public Page<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
         return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
     }
-
 
 
     @Transactional
@@ -132,10 +129,11 @@ public class PostService {
                 .build());
 
         createOrUpdateScore(member, gpsDataVO);
-        GpsDataVO postGpxVO = createdPost.getGpsDataVO();
 
-        return new CreateRecordResponse(createdPost.getPostNo(), postGpxVO.getDistance(), postGpxVO.getTime(),
-                postGpxVO.getKcal(), postGpxVO.getSpeed(), postGpxVO.getMeanPace());
+        member.getRunDataVO().increaseRunData(gpsDataVO.getDistance());
+
+        return new CreateRecordResponse(createdPost.getPostNo(), gpsDataVO.getDistance(), gpsDataVO.getTime(),
+                gpsDataVO.getKcal(), gpsDataVO.getSpeed(), gpsDataVO.getMeanPace());
     }
 
 
@@ -261,7 +259,7 @@ public class PostService {
     }
 
 
-    public GpsDataResponse getGpxLonLatData(Long postNo) throws ParserConfigurationException, IOException, SAXException {
+    public GpsDataResponse getGpxLonLatData(Long postNo) throws IOException {
         Post post = findPostByNo(postNo);
         String gpxUrl = post.getGpxUrl();
 

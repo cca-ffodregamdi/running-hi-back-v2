@@ -7,6 +7,7 @@ import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.exception.custom.AppleOauthException;
 import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
@@ -147,6 +148,7 @@ public class AppleOauthService {
 
     // 회원 생성 및 로그인 메서드
     private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToekn) {
+
         Member member = Member.builder()
                 .appleId(appleResponse.get("sub"))
                 .name(appleResponse.get("name"))
@@ -155,10 +157,7 @@ public class AppleOauthService {
                 .isActive(true)
                 .isBlacklisted(false)
                 .role(Role.USER)
-                .distanceToNextLevel(0)
-                .totalKcal(0.0)
-                .totalDistance(0.0)
-                .level(0)
+                .runDataVO(new RunDataVO(0.0,0.0,10,0))
                 .build();
 
         memberRepository.saveAndFlush(member);

@@ -5,6 +5,7 @@ import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -34,11 +35,9 @@ public class TestToken {
                     .kakaoId("12345")
                     .name("관리자 : 카카오 이름")
                     .nickname("관리자 : 테스트용 관리자입니다.")
-                    .level(0)
                     .isActive(true)
-                    .totalDistance(0)
-                    .distanceToNextLevel(10)
                     .role(Role.ADMIN)
+                    .runDataVO(new RunDataVO(0.0,0.0,10,0))
                     .build();
             members.add(member1);
 
@@ -47,11 +46,8 @@ public class TestToken {
                     .kakaoId("67890")
                     .name("유저 : 카카오 이름")
                     .nickname("유저 : 테스트용 유저입니다.")
-                    .level(1)
-                    .isActive(true)
-                    .totalDistance(0)
-                    .distanceToNextLevel(10)
                     .role(Role.USER)
+                    .runDataVO(new RunDataVO(0.0,0.0,10,1))
                     .build();
             members.add(member2);
 
