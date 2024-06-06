@@ -85,6 +85,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Add remote server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
+
       # 서버에 jar파일을 보내기 위해 scp 명령어를 사용합니다.
       - name: SCP transfer
         run: scp *.jar ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }}:/home/ubuntu
