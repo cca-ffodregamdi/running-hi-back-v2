@@ -98,6 +98,6 @@ jobs:
       # 서버 원격으로 명령어를 실행합니다. 서버 포트를 확인하고 실행중이면 종료합니다. 빌도된 jar파일을 실행합니다.
       - name: Execute remote commands
         run: |
-          ssh ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }} "sudo fuser -k ${{ secrets.DEV_SERVER_PORT }}/tcp"
+          ssh ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }} "sudo fuser -k ${{ secrets.DEV_SERVER_PORT }}/tcp || true"
           ssh ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }} "sudo nohup java -jar ~/home/ubuntu/*.jar &"
 
