@@ -18,6 +18,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: cicdsample
+          path: build/libs
 
       # 서버에 통신하기 위한 SSH를 설정합니다.
       - name: Setup SSH
