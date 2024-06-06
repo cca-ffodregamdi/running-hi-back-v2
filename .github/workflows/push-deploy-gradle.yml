@@ -20,6 +20,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      ## MySQL 환경을 테스트 환경에서 설정합니다.
+      - name: Setup MySQL
+        uses: samin/mysql-action@v1
+        with:
+          character set server: 'utf8'
+          mysql database: 'runninghi'
+          mysql user: ${{ secrets.MYSQL_USERNAME }}
+          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+
       ## resources 디렉토리 확인 및 생성, application.yml 설정
       - name: Setup application.yml
         run: |
