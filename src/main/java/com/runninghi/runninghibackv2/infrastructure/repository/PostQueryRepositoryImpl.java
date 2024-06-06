@@ -2,6 +2,8 @@ package com.runninghi.runninghibackv2.infrastructure.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
+import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.QImage;
@@ -26,7 +28,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
     @Override
     @Transactional(readOnly = true)
-    public Page<GetAllPostsResponse> findAllPostsByPageable(Pageable pageable) {
+    public PageResultData<GetAllPostsResponse> findAllPostsByPageable(Pageable pageable) {
         List<Post> posts;
         long total;
 
@@ -48,7 +50,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             return GetAllPostsResponse.from(post, imageUrl);
         }).collect(Collectors.toList());
 
-        return new PageImpl<>(responses, pageable, total);
+        return new PageResultData<>(responses, pageable, total);
     }
 
     @Override

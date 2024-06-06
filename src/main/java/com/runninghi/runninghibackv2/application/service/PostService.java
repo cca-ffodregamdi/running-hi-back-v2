@@ -7,6 +7,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
+import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
@@ -96,7 +98,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GetAllPostsResponse> getPostScroll(Pageable pageable) {
+    public PageResultData<GetAllPostsResponse> getPostScroll(Pageable pageable) {
         return postQueryRepository.findAllPostsByPageable(pageable);
     }
 
