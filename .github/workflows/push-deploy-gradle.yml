@@ -79,26 +79,25 @@ jobs:
           name: cicd
           path: build/libs
 
-      # jar 파일을 서버에 옮깁니다.
-      - name: Copy jar file to remote
-        uses: appleboy/scp-action@master
+      # 서버에 통신하기 위한 SSH를 설정합니다.
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
         with:
-          username: ${{ secrets.DEV_SERVER_USERNAME }}
-          host: ${{ secrets.HOST }}
-          key: ${{ secrets.PRIVATE_KEY }}
-          source: "./build/libs/*.jar"
-          target: "/home/ubuntu"
-          strip_components: 2
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # 배포 서버에 host 키 확인
+      - name: Add remote server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      # 서버에 jar파일을 보내기 위해 scp 명령어를 사용합니다.
+      - name: SCP transfer
+        run: scp ./build/libs/*.jar ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }}:/home/ubuntu
 
       # 서버 원격으로 명령어를 실행합니다. 서버 포트를 확인하고 실행중이면 종료합니다. 빌도된 jar파일을 실행합니다.
-      - name: Execute deploy script
-        uses: appleboy/ssh-action@master
-        with:
-          username: $${{ secrets.DEV_SERVER_USERNAME }}
-          host: ${{ secrets.HOST }}
-          key: ${{ secrets.PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            sudo fuser -k ${{ secrets.DEV_SERVER_PORT }}/tcp
-            sudo nohup java -jar ~/home/ubuntu/*.jar &
+      - name: Execute remote commands
+        run: |
+          ssh ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }} "sudo fuser -k ${{ secrets.DEV_SERVER_PORT }}/tcp"
+          ssh ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }} "sudo nohup java -jar ~/home/ubuntu/*.jar &"
 
