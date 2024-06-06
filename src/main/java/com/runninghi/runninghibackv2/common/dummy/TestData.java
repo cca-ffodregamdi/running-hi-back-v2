@@ -46,6 +46,7 @@ public class TestData {
                 .deactivateDate(dateTime)
                 .alarmConsent(true)
                 .name("name")
+                .role(Role.USER)
                 .isActive(false)
                 .runDataVO(new RunDataVO(1000,5000,30,1))
                 .build();
@@ -54,6 +55,8 @@ public class TestData {
         Member member2 = Member.builder()
                 .deactivateDate(LocalDateTime.now().minusDays(15))
                 .alarmConsent(true)
+                .name("러닝마스터")
+                .role(Role.USER)
                 .name("nyam")
                 .isActive(true)
                 .runDataVO(new RunDataVO(1000,5000,30,1))
