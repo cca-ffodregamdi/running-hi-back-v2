@@ -52,16 +52,17 @@ public class PostController {
     }
 
     @GetMapping(value = "my-feed",produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 특정 키워드들로 필터링이 가능합니다.")
-    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getMyPosts(@RequestHeader("Authorization") String bearerToken) {
+    @Operation(summary = "게시글 리스트 조회", description = "나의 게시글 전체 리스트를 조회합니다. 공유 여부가 함께 조회됩니다.")
+    public ResponseEntity<PageResult<GetAllPostsResponse>> getMyPosts(@RequestHeader("Authorization") String bearerToken,
+                                                                           @RequestParam(defaultValue = "0") int page) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(page,10);
 
-        Page<GetAllPostsResponse> response = postService.getMyPostsScroll(pageable, memberInfo.memberNo());
+        PageResultData<GetAllPostsResponse> response = postService.getMyPostsScroll(pageable, memberInfo.memberNo());
 
-        return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
+        return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
     @GetMapping("/{postNo}")

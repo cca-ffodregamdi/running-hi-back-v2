@@ -104,7 +104,7 @@ public class PostService {
 
 
     @Transactional(readOnly = true)
-    public Page<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
+    public PageResultData<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
         return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
     }
 

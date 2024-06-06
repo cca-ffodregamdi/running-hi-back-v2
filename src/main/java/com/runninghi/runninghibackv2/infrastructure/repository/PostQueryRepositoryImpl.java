@@ -35,6 +35,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         total = jpaQueryFactory.selectFrom(post).fetchCount();
         posts = jpaQueryFactory.select(post)
                 .from(post)
+                .where(post.status.eq(true))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -54,7 +55,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public Page<GetAllPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo) {
+    public PageResultData<GetAllPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo) {
         long total;
 
         List<Post> posts = jpaQueryFactory.select(post)
@@ -74,7 +75,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             return GetAllPostsResponse.from(post, imageUrl);
         }).collect(Collectors.toList());
 
-        return new PageImpl<>(responses, pageable, total);
+        return new PageResultData<>(responses, pageable, total);
     }
 
 }
