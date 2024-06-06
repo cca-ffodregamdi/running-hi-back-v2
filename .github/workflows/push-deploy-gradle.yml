@@ -1,0 +1,38 @@
+name: Deploy on Merge
+
+on:
+  push:
+    branches: [ "dev" ]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # artifact에서 jar파일을 다운로드 받습니다.
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: cicdsample
+
+      # 서버에 통신하기 위한 SSH를 설정합니다.
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # 서버에 jar파일을 보내기 위해 scp 명령어를 사용합니다.
+      - name: SCP transfer
+        run: scp *.jar ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }}:/home/ubuntu
+
+      # 서버 원격으로 명령어를 실행합니다. 서버 포트를 확인하고 실행중이면 종료합니다. 빌도된 jar파일을 실행합니다.
+      - name: Execute remote commands
+        run: |
+          ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} "sudo fuser -k ${{ secrets.DEV_SERVER_PORT }}/tcp"
+          ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} "sudo nohup java -jar ~/home/ubuntu/*.jar &"
+
+

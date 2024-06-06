@@ -5,7 +5,7 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
-name: Java CI with Gradle
+name: PR Build and Test
 
 on:
   pull_request:
@@ -51,7 +51,7 @@ jobs:
         with:
           name: "runninghi-firebase-adminsdk.json"
           json: ${{ secrets.FIREBASE_SDK }}
-      
+
       ## firebase 디렉토리 생성 및 JSON 파일 이동
       - name: Setup Firebase Directory and Move JSON
         run: |
@@ -59,7 +59,7 @@ jobs:
           mv ./runninghi-firebase-adminsdk.json ./src/main/resources/firebase/
 
 
-      - name: Add permission
+      - name: Add permission to make gradlew executable
         run: chmod +x gradlew
 
       - name: Test with Gradle
@@ -70,3 +70,9 @@ jobs:
         with:
           arguments: build
 
+      # build 된 jar 파일을 업로드합니다.
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cicdsample
+          path: build/libs/*.jar
