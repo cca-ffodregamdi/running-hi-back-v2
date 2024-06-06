@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # artifact에서 jar파일을 다운로드 받습니다.
+      # artifact에서 jar파일을 다운로드 받습니다. 경로 설정
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
