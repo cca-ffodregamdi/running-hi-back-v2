@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
+import com.runninghi.runninghibackv2.application.dto.reply.response.GetPostReplyResponse;
 import com.runninghi.runninghibackv2.common.response.PageResult;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.*;
@@ -42,6 +43,7 @@ import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
 import static com.runninghi.runninghibackv2.domain.entity.QMember.member;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
 import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeyword;
+import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 
 @Service
 @RequiredArgsConstructor
@@ -104,7 +106,7 @@ public class PostService {
 
 
     @Transactional(readOnly = true)
-    public Page<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
+    public PageResultData<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
         return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
     }
 
@@ -219,7 +221,7 @@ public class PostService {
 
     // 수정 필요!
     @Transactional(readOnly = true)
-    public Page<GetAllPostsResponse> getReportedPostScroll(Pageable pageable) {
+    public Page<GetReportedPostsResponse> getReportedPostScroll(Pageable pageable) {
 
         Page<Post> posts = postRepository.findAllByReportCntIsGreaterThan(0, pageable);
 
@@ -231,8 +233,8 @@ public class PostService {
                 .limit(1)
                 .fetchOne();
 
-        List<GetAllPostsResponse> responses = posts.stream()
-                .map(post -> GetAllPostsResponse.from(post, mainImage.getImageUrl()))
+        List<GetReportedPostsResponse> responses = posts.stream()
+                .map(post -> GetReportedPostsResponse.from(post, mainImage.getImageUrl()))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(responses, pageable, posts.getTotalElements());
@@ -287,19 +289,6 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public GetPostResponse getPostDetailByPostNo(Long postNo) {
-
-        Post post = postRepository.findById(postNo)
-                .orElseThrow(EntityNotFoundException::new);
-
-        List<Image> images = jpaQueryFactory.select(QImage.image)
-                .from(QImage.image)
-                .where(QImage.image.postNo.eq(postNo))
-                .fetch();
-
-        List<String> imageUrls = images.stream()
-                .map(Image::getImageUrl)
-                .collect(Collectors.toList());
-
-        return GetPostResponse.from(post, imageUrls.isEmpty() ? null : imageUrls);
+        return postQueryRepository.getPostDetailByPostNo(postNo);
     }
 }

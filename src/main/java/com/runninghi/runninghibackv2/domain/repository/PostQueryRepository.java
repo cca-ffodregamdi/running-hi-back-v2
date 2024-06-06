@@ -1,11 +1,13 @@
 package com.runninghi.runninghibackv2.domain.repository;
 
 import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
+import com.runninghi.runninghibackv2.application.dto.post.response.GetPostResponse;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface PostQueryRepository {
     PageResultData<GetAllPostsResponse> findAllPostsByPageable(Pageable pageable);
-    Page<GetAllPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo);
+    PageResultData<GetAllPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo);
+    GetPostResponse getPostDetailByPostNo(Long postNo);
 }
