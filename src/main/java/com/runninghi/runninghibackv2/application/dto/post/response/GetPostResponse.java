@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.post.response;
 
+import com.runninghi.runninghibackv2.application.dto.reply.response.GetPostReplyResponse;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Keyword;
@@ -31,9 +32,13 @@ public record GetPostResponse(
         @Schema(description = "소모 칼로리 (kcal)", example = "200")
         float kcal,
         @Schema(description = "이미지 URL 리스트", example = "[\"url1\", \"url2\"]")
-        List<String> imageUrls
+        List<String> imageUrls,
+        @Schema(description = "댓글 리스트", example = "[\"url1\", \"url2\"]")
+        List<GetPostReplyResponse> replyList,
+        @Schema(description = "좋아요 개수", example = "5")
+        Long likeCnt
 ) {
-    public static GetPostResponse from(Post post, List<String> imageUrls) {
+    public static GetPostResponse from(Post post, List<String> imageUrls, List<GetPostReplyResponse> replyList) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
@@ -45,7 +50,9 @@ public record GetPostResponse(
                 post.getGpsDataVO().getTime(),
                 post.getGpsDataVO().getMeanPace(),
                 post.getGpsDataVO().getKcal(),
-                imageUrls
+                imageUrls,
+                replyList,
+                5L
         );
     }
 }

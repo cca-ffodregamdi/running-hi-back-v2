@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record GetAllPostsResponse(
+public record GetReportedPostsResponse(
         @Schema(description = "게시글 번호", example = "1")
         Long postNo,
         @Schema(description = "작성 날짜", example = "2024-05-22T14:33:29")
@@ -23,17 +23,10 @@ public record GetAllPostsResponse(
         @Schema(description = "소모 칼로리 (kcal)", example = "200")
         float kcal,
         @Schema(description = "대표 이미지 URL", example = "https://picsum.photos/200")
-        String imageUrl,
-
-        @Schema(description = "북마크 개수", example = "5")
-        Long bookmarkCnt,
-
-        @Schema(description = "좋아요 개수", example = "10")
-        Long likeCnt
-
+        String imageUrl
 ) {
-    public static GetAllPostsResponse from(Post post, String imageUrl, Long bookmark) {
-        return new GetAllPostsResponse(
+    public static GetReportedPostsResponse from(Post post, String imageUrl) {
+        return new GetReportedPostsResponse(
                 post.getPostNo(),
                 post.getCreateDate(),
                 post.getPostContent(),
@@ -41,10 +34,7 @@ public record GetAllPostsResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
                 post.getGpsDataVO().getKcal(),
-                imageUrl,
-                bookmark,
-                //Like 임시로 5개로 고정
-                5L
+                imageUrl
         );
     }
 }
