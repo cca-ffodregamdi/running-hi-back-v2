@@ -7,6 +7,8 @@ import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.application.service.PostService;
+import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
@@ -40,13 +42,13 @@ public class PostController {
     private static final String DELETE_RESPONSE_MESSAGE = "성공적으로 삭제되었습니다.";
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 특정 키워드들로 필터링이 가능합니다.")
-    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getAllPosts(@RequestParam(defaultValue = "0") int page) {
+    @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 난이도/지열별로 필터링이 가능합니다.")
+    public ResponseEntity<PageResult<GetAllPostsResponse>> getAllPosts(@RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
 
-        Page<GetAllPostsResponse> response = postService.getPostScroll(pageable);
+        PageResultData<GetAllPostsResponse> response = postService.getPostScroll(pageable);
 
-        return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
+        return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
     @GetMapping(value = "my-feed",produces = MediaType.APPLICATION_JSON_VALUE)
