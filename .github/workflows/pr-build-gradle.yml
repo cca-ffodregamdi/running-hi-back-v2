@@ -76,15 +76,3 @@ jobs:
         with:
           name: cicdsample
           path: build/libs/*.jar
-
-      # 배포된 서버와 연결 테스트
-      - name: Excuting remote ssh commands using ssh key
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.DEV_SERVER_HOST }}
-          username: ${{ secrets.DEV_SERVER_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.DEV_SERVER_PORT }}
-          script: |
-            whoami
-            ls -al
