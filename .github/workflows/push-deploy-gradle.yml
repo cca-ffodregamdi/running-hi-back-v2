@@ -92,7 +92,7 @@ jobs:
 
       # 서버에 jar파일을 보내기 위해 scp 명령어를 사용합니다.
       - name: SCP transfer
-        run: scp *.jar ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }}:/home/ubuntu
+        run: scp ./build/libs/*.jar ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }}:/home/ubuntu
 
       # 서버 원격으로 명령어를 실행합니다. 서버 포트를 확인하고 실행중이면 종료합니다. 빌도된 jar파일을 실행합니다.
       - name: Execute remote commands
