@@ -1,7 +1,6 @@
 INSERT INTO tbl_reply (reply_no, create_date, update_date, is_deleted, reply_content, reported_count, parent_no, post_no, member_no)
 VALUES
     (1, '2024-06-06 17:09:38', null, false, '댓글 예시입니다1', null, null, 1, 1),
-    (2, '2024-06-06 17:10:38', null, false, '댓글 예시입니다2', null, null, 2, 2),
     (3, '2024-06-06 17:11:38', null, false, '댓글 예시입니다3', null, null, 3, 1),
     (4, '2024-06-06 17:12:38', null, false, '댓글 예시입니다4', null, null, 4, 2),
     (5, '2024-06-06 17:13:38', null, false, '댓글 예시입니다5', null, null, 5, 1),

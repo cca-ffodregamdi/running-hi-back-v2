@@ -11,6 +11,12 @@ public interface TestDatabaseMapper {
     List<String> getAllTableList();
     void truncateTable(String tableName);
     void enableForeignKeyChecks();
-
     void insertPostDummyData();
+    void insertMemberDummyData();
+    void insertAlarmDummyData();
+    void insertImageDummyData();
+    void insertBookmarkDummyData();
+    void insertReplyDummyData();
+    void insertReportDummyData();
+    void insertFeedbackDummyData();
 }
