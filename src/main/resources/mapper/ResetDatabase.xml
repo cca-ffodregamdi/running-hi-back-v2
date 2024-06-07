@@ -23,11 +23,11 @@
     </update>
 
     <insert id="insertMemberDummyData">
-        INSERT INTO tbl_member (tbl_member.member_no, deactivate_date, alarm_consent, name, role, is_active, total_distance, total_kcal, distance_to_next_level, level)
+        INSERT INTO tbl_member (deactivate_date, alarm_consent, name, role, is_active, total_distance, total_kcal, distance_to_next_level, level, report_cnt, is_blacklisted)
         VALUES
-            (1, null, true, 'name', 'USER', true, 1000, 5000, 30, 1),
-            (2, null, true, 'name2', 'USER', true, 1000, 5000, 30, 1),
-            (3, NOW() - INTERVAL 15 DAY, true, 'nyam', 'USER', true, 1000, 5000, 30, 1);
+            (null, true, 'name', 'USER', false, 1000, 5000, 30, 1, 0, false),
+            (null, true, 'name2', 'USER', false, 1000, 5000, 30, 1, 0, false),
+            (NOW() - INTERVAL 15 DAY, true, 'nyam', 'USER', true, 1000, 5000, 30, 1, 0, false);
     </insert>
 
     <insert id="insertPostDummyData" >
