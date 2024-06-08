@@ -7,6 +7,7 @@ import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record GetPostResponse(
@@ -17,6 +18,8 @@ public record GetPostResponse(
         String profileImageUrl,
         @Schema(description = "작성자 레벨", example = "1")
         int level,
+        @Schema(description = "게시글 생성 시간", example = "2024-03-29T13:16:06")
+        LocalDateTime createDate,
         @Schema(description = "게시글 내용", example = "게시글 내용 예시입니다.")
         String postContent,
         @Schema(description = "권한", example = "MEMBER")
@@ -43,6 +46,7 @@ public record GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
                 post.getMember().getRunDataVO().getLevel(),
+                post.getCreateDate(),
                 post.getPostContent(),
                 post.getRole(),
                 post.getLocationName(),
