@@ -92,15 +92,11 @@ public class Member extends BaseTimeEntity {
     @Comment("누적거리에 따른 레벨")
     private int level = 0;
 
-    @OneToMany(mappedBy = "member")
-    @Comment("멤버가 참여한 챌린지")
-    private List<MemberChallenge> challenges;
-
     @Builder
     public Member(Long memberNo, String account, String password, String nickname, String kakaoId, String kakaoName,
                   int reportCnt, boolean isActive, boolean isBlacklisted, Role role, String refreshToken,
                   String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate, double totalDistance,
-                  double totalKcal, int distanceToNextLevel, int level, List<MemberChallenge> challenges) {
+                  double totalKcal, int distanceToNextLevel, int level) {
         this.memberNo = memberNo;
         this.account = account;
         this.password = password;
@@ -119,7 +115,6 @@ public class Member extends BaseTimeEntity {
         this.totalKcal = totalKcal;
         this.distanceToNextLevel = distanceToNextLevel;
         this.level = level;
-        this.challenges = challenges;
     }
 
     // 리프레시 토큰 업데이트
