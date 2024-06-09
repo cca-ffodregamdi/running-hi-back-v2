@@ -27,10 +27,10 @@ public class ChallengeService {
         Challenge challenge = Challenge.builder()
                 .title(request.title())
                 .content(request.content())
-                .distance(request.distance())
+                .challengeCategory(request.challengeCategory())
+                .targetValue(request.targetValue())
                 .startDate(request.startDate())
                 .endDate(request.endDate())
-                .reward(request.reward())
                 .build();
 
         challengeRepository.save(challenge);
