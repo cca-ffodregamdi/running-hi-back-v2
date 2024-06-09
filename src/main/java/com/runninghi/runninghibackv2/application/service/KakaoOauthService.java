@@ -19,7 +19,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -30,22 +29,9 @@ public class KakaoOauthService {
 
     private static final int NICKNAME_DIGIT_LENGTH = 8;
     private static final int RANDOM_NUMBER_RANGE = 10;
-    private static final String GRANT_TYPE = "authorization_code";
-    private static final String ACCESS_TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token";
     private static final String KAKAO_USER_INFO_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
     private static final String KAKAO_UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink";
 
-    @Value("${kakao.client-id}")
-    private String kakaoClientId;
-
-    @Value("${kakao.redirect-uri}")
-    private String kakaoRedirectUri;
-
-    @Value("${kakao.client-secret}")
-    private String clientSecret;
-
-    @Value("${kakao.current-version-uri}")
-    private String currentVersionUri;
 
     @Value("${kakao.admin-key}")
     private String adminKey;
@@ -58,50 +44,24 @@ public class KakaoOauthService {
 
 
     /**
-     * 카카오 인증 페이지의 URI를 생성하여 반환합니다.
-     *
-     * @return 카카오 인증 페이지의 URI
-     */
-    public String getKakaoUri() {
-
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://kauth.kakao.com/oauth/authorize")
-                .queryParam("client_id", kakaoClientId)
-                .queryParam("redirect_uri", currentVersionUri + kakaoRedirectUri)
-                .queryParam("response_type", "code");
-
-        return builder.toUriString();
-    }
-
-    /**
-     * 카카오 인가 코드를 사용하여 OAuth를 처리하고, 인증된 사용자의 정보를 반환합니다.
-     *
-     * @param code 카카오로부터 받은 인가 코드
+     * 카카오 토큰을 사용하여 검증하고, 검증된 사용자의 정보를 반환합니다.
+     * @param kakaoToken 카카오로부터 받은 인가 코드
      * @return 인증된 사용자의 액세스 토큰 및 리프레시 토큰
      * @throws KakaoOauthException 카카오 로그인 처리 중 오류가 발생한 경우 예외가 발생합니다.
      */
     @Transactional
-    public Map<String, String> kakaoOauth(String code) {
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", GRANT_TYPE);
-        params.add("client_id", kakaoClientId);
-        params.add("client_secret", clientSecret);
-        params.add("redirect_uri", currentVersionUri + kakaoRedirectUri);
-        params.add("code", code);
+    public Map<String, String> kakaoOauth(String kakaoToken) {
+        try {
+            KakaoProfileResponse kakaoProfileResponse = getKakaoProfile(kakaoToken);
+            if (kakaoProfileResponse == null) {
+                throw new KakaoOauthException();
+            }
+            Optional<Member> optionalMember = memberRepository.findByKakaoId(kakaoProfileResponse.getKakaoId().toString());
 
-        Map<String, String> response = restTemplate.postForObject(ACCESS_TOKEN_REQUEST_URL, params, Map.class);
-
-        String kakaoAccessToken = response != null ? response.get("access_token") : null;
-        if (kakaoAccessToken == null) {
-            throw new KakaoOauthException();
+            return optionalMember.map(this::loginWithKakao).orElseGet(() -> loginWithKakaoCreateMember(kakaoProfileResponse));
+        } catch (Exception e) {
+            throw new KakaoOauthException("카카오 OAuth 오류입니다. : " + e.getMessage());
         }
-
-        KakaoProfileResponse kakaoProfileResponse = getKakaoProfile(kakaoAccessToken);
-        if (kakaoProfileResponse == null) {
-            throw new KakaoOauthException();
-        }
-        Optional<Member> optionalMember = memberRepository.findByKakaoId(kakaoProfileResponse.getKakaoId().toString());
-
-        return optionalMember.map(this::loginWithKakao).orElseGet(() -> loginWithKakaoCreateMember(kakaoProfileResponse));
     }
 
     /**
@@ -110,7 +70,7 @@ public class KakaoOauthService {
      * @param kakaoAccessToken 카카오 액세스 토큰
      * @return 카카오 사용자의 프로필 정보
      */
-    KakaoProfileResponse getKakaoProfile(String kakaoAccessToken){
+    private KakaoProfileResponse getKakaoProfile(String kakaoAccessToken){
         // http header 설정 : access token 을 넣어서 user 정보에 접근할 수 있도록 한다.
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
