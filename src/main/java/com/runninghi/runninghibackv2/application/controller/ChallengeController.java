@@ -9,13 +9,17 @@ import com.runninghi.runninghibackv2.application.service.ChallengeService;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateChallengeRequest;
 import com.runninghi.runninghibackv2.application.service.MyChallengeService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "챌린지 API", description = "챌린지 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/challenges")
@@ -25,6 +29,8 @@ public class ChallengeController {
     private final MyChallengeService myChallengeService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Operation(summary = "챌린지 저장", description = "챌린지를 저장합니다.\n 관리자만 챌린지를 생성할 수 있습니다.")
+    @HasAccess
     @PostMapping()
     public ResponseEntity<ApiResult<CreateChallengeResponse>> createChallenge(
             @RequestBody CreateChallengeRequest request) {
@@ -34,6 +40,7 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("챌린지 저장 성공", response));
     }
 
+    @Operation(summary = "챌린지 전체 조회", description = "모든 챌린지를 조회합니다.")
     @GetMapping()
     public ResponseEntity<ApiResult<List<GetChallengeResponse>>> getAllChallenges() {
 
@@ -42,6 +49,7 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("챌린지 전체 조회 성공", response));
     }
 
+    @Operation(summary = "챌린지 상세 조회", description = "챌린지를 상세 정보를 조회합니다.")
     @GetMapping("/{challengeNo}")
     public ResponseEntity<ApiResult<GetChallengeResponse>> getChallengeById(@PathVariable Long challengeNo) {
 
@@ -50,6 +58,9 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("챌린지 상세 조회 성공", response));
     }
 
+    @Operation(summary = "챌린지 수정", description = "챌린지 제목, 내용, 카테고리, 목표수치, 시작일자, 종료일자를 수정할 수 있습니다." +
+            "\n 관리자만 챌린지를 수정할 수 있습니다")
+    @HasAccess
     @PutMapping("/{challengeNo}")
     public ResponseEntity<ApiResult<UpdateChallengeResponse>> updateChallenge(
             @PathVariable Long challengeNo,
@@ -60,6 +71,8 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("챌린지 수정 성공", response));
     }
 
+    @Operation(summary = "챌린지 삭제", description = "챌린지를 삭제합니다. \n 관리자만 챌린지를 삭제할 수 있습니다")
+    @HasAccess
     @DeleteMapping("/{challengeNo}")
     public ResponseEntity<ApiResult<DeleteChallengeResponse>> deleteChallenge(@PathVariable Long challengeNo) {
 
@@ -68,6 +81,7 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("챌린지 삭제 성공", response));
     }
 
+    @Operation(summary = "나의 챌린지 저장", description = "나의 챌린지를 생성합니다. \n 챌린지 참여하기를 누르면 생성됩니다.")
     @PostMapping("/my-challenge")
     public ResponseEntity<ApiResult<CreateMyChallengeResponse>> createMyChallenge(
             @RequestBody CreateMyChallengeRequest request,
@@ -80,6 +94,7 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 저장 성공", response));
     }
 
+    @Operation(summary = "나의 챌린지 전체 조회", description = "로그인한 사용자가 참여중인 모든 챌린지를 조회합니다.")
     @GetMapping("/my-challenge")
     public ResponseEntity<ApiResult<List<GetMyChallengeResponse>>> getAllMyChallenges(
             @RequestHeader(name = "Authorization") String bearerToken) {
@@ -91,6 +106,8 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 전체 조회 성공", response));
     }
 
+    @Operation(summary = "나의 챌린지 상세 조회", description = "로그인한 사용자가 참여중인 챌린지 목록 화면에서 " +
+            "선택한 챌린지의 정보를 조회합니다.")
     @GetMapping("/my-challenge/{myChallengeNo}")
     public ResponseEntity<ApiResult<GetMyChallengeResponse>> getMyChallengeById(
             @PathVariable Long myChallengeNo,
