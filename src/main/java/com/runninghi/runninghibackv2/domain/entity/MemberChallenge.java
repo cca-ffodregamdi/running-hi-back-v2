@@ -1,5 +1,7 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
+import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +13,7 @@ import org.hibernate.annotations.Comment;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TBL_MEMBER_CHALLENGE")
-public class MemberChallenge {
+public class MemberChallenge extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,21 +29,36 @@ public class MemberChallenge {
     @Comment("챌린지에 참여한 멤버")
     private Member member;
 
-    @Column
     @Comment("챌린지 시작 후 달린 거리")
     private float distance;
 
-    @Column
+    @Comment("챌린지 시작 후 달린 시간")
+    private float runningTime;
+
+    @Comment("챌린지 시작 후 소모 칼로리")
+    private float kcal;
+
+    @Comment("챌린지 시작 후 평균 속도")
+    private float speed;
+
+    @Comment("챌린지 시작 후 평균 페이스 (분/km)")
+    private float meanPace;
+
     @Comment("챌린지 달성 여부")
-    private boolean isCompleted;
+    private boolean status;
 
     @Builder
-    public MemberChallenge(Long memberChallengeId, Challenge challenge, Member member,
-                           float distance, boolean isCompleted) {
+    public MemberChallenge(Long memberChallengeId, Challenge challenge, Member member, float distance, float runningTime,
+                           float kcal, float speed, float meanPace, boolean status) {
         this.memberChallengeId = memberChallengeId;
         this.challenge = challenge;
         this.member = member;
         this.distance = distance;
-        this.isCompleted = isCompleted;
+        this.runningTime = runningTime;
+        this.kcal = kcal;
+        this.speed = speed;
+        this.meanPace = meanPace;
+        this.status = status;
     }
+
 }
