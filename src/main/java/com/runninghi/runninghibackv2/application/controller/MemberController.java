@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
+import com.runninghi.runninghibackv2.application.dto.member.request.KakaoLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
@@ -28,7 +29,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.Map;
 
 @RestController
@@ -42,17 +42,14 @@ public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 카카오 로그인 페이지로 리다이렉트합니다.
-     *
-     * <p>이 API는 사용자를 카카오 로그인 페이지로 리다이렉트 시키는 역할을 합니다. 사용자가 카카오 계정으로 로그인을 시도할 때 사용됩니다.
-     * 로그인이 성공적으로 완료되면, 카카오는 사용자를 /api/v1/login/kakao/callback 엔드포인트로 리다이렉트하며, 인가 코드를 함께 전달합니다.
-     * 이 인가 코드를 통해 서버는 카카오 서버로부터 사용자의 회원 정보를 받아와 회원가입 또는 로그인 처리를 진행합니다.
+     * 카카오 회원가입/로그인 API 엔드포인트입니다.
+     * <p>
+     * 카카오 토큰을 검증한 후 회원가입 또는 로그인 처리합니다.
      * 처리가 완료되면, 사용자에게 로그인 성공 여부와 함께 액세스 토큰 및 리프레시 토큰이 반환됩니다.</p>
      */
-    @GetMapping(value = "/api/v1/login/kakao", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/v1/login/kakao", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "카카오 회원가입/로그인",
-            description = "카카오 로그인 페이지로 리다이렉트합니다. 사용자가 카카오 계정으로 로그인하면, 서버는 리다이렉트하여 인가 코드를 처리합니다. " +
-                    "회원 가입 처리가 완료되면 최종적으로 헤더에 엑세스 토큰과 리프레시 토큰 정보를 넣어서 클라이언트에 반환합니다.",
+            description = "회원 가입/로그인 처리가 완료되면 헤더에 엑세스 토큰과 리프레시 토큰 정보를 넣어서 클라이언트에 반환합니다.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -64,28 +61,8 @@ public class MemberController {
                     )
             }
     )
-    public ResponseEntity<Void> kakaoLogin() {
-
-        URI kakaoUri = URI.create(kakaoOauthService.getKakaoUri());
-
-        return ResponseEntity.status(HttpStatus.FOUND).location(kakaoUri).build();
-    }
-
-    /**
-     * 카카오 로그인 콜백을 처리하는 API 엔드포인트입니다.
-     *
-     * <p>카카오로부터 리다이렉트된 요청을 처리하며, 인가 코드를 포함하고 있습니다.
-     * 이 코드를 사용하여 카카오 서버에서 사용자 정보를 받아온 후, 이를 통해 사용자의 회원가입 또는 로그인 처리를 진행합니다.
-     * 처리가 완료되면, 로그인 성공 여부와 함께 액세스 토큰 및 리프레시 토큰을 헤더에 포함하여 클라이언트에게 반환합니다.</p>
-     *
-     * @param code 카카오로부터 받은 인가 코드. 로그인 성공 시 카카오로부터 전달받습니다.
-     * @return 로그인 성공 여부 및 인증 토큰 정보를 포함하는 ResponseEntity 객체.
-     */
-    @RequestMapping("/api/v1/login/kakao/callback")
-    @Operation(hidden = true)
-    public ResponseEntity<ApiResult<Void>> kakaoCallback(@RequestParam("code") String code) {
-
-        Map<String, String> tokens = kakaoOauthService.kakaoOauth(code);
+    public ResponseEntity<ApiResult<Void>> kakaoLogin(@RequestBody KakaoLoginRequest request) {
+        Map<String, String> tokens = kakaoOauthService.kakaoOauth(request.kakaoToken());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", tokens.get("accessToken"));
