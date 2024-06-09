@@ -2,20 +2,14 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
-import com.runninghi.runninghibackv2.application.dto.reply.response.GetPostReplyResponse;
-import com.runninghi.runninghibackv2.common.response.PageResult;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
-import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
-import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
-import com.runninghi.runninghibackv2.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.domain.repository.ScoreRepository;
+import com.runninghi.runninghibackv2.domain.repository.*;
 import com.runninghi.runninghibackv2.domain.service.GpsCalculator;
 import com.runninghi.runninghibackv2.domain.service.GpxCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
@@ -27,23 +21,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
-import static com.runninghi.runninghibackv2.domain.entity.QKeyword.keyword;
-import static com.runninghi.runninghibackv2.domain.entity.QMember.member;
-import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
-import static com.runninghi.runninghibackv2.domain.entity.QPostKeyword.postKeyword;
-import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +46,7 @@ public class PostService {
     private final GpxCoordinateExtractor gpxCoordinateExtractor;
     private final ScoreRepository scoreRepository;
     private final PostQueryRepository postQueryRepository;
+    private final MemberChallengeRepository memberChallengeRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -133,6 +120,7 @@ public class PostService {
                 .build());
 
         createOrUpdateScore(member, gpsDataVO);
+        updateRecordOfMyChallenges(member, gpsDataVO);
 
         member.getRunDataVO().increaseRunData(gpsDataVO.getDistance());
 
@@ -285,6 +273,16 @@ public class PostService {
             return;
         }
         score.get().addDistance(gpsDataVO.getDistance());
+    }
+
+    private void updateRecordOfMyChallenges(Member member, GpsDataVO gpsDataVO) {
+        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMember(member);
+
+        if (myChallenges.size() == 0) return;
+
+        for (MemberChallenge myChallenge : myChallenges) {
+            myChallenge.updateRecord(gpsDataVO);
+        }
     }
 
     @Transactional(readOnly = true)

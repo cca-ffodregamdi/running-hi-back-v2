@@ -61,4 +61,22 @@ public class MemberChallenge extends BaseTimeEntity {
         this.status = status;
     }
 
+    public void updateRecord(GpsDataVO gpsDataVO) {
+        this.distance += gpsDataVO.getDistance();
+        this.runningTime += gpsDataVO.getTime();
+        this.kcal += gpsDataVO.getKcal();
+        this.speed = this.speed == 0 ? gpsDataVO.getSpeed() : (speed + gpsDataVO.getSpeed()) / 2;
+        this.meanPace = this.meanPace == 0 ? gpsDataVO.getMeanPace() : (meanPace + gpsDataVO.getMeanPace()) / 2;
+
+        checkAndUpdateStatus(this.challenge.getChallengeCategory(), this.challenge.getTargetValue());
+    }
+
+    private void checkAndUpdateStatus(ChallengeCategory challengeCategory, float targetValue) {
+        float value = 0;
+        if(challengeCategory == ChallengeCategory.DISTANCE) value = this.distance;
+        if(challengeCategory == ChallengeCategory.SPEED) value = this.speed;
+        // if(challengeCategory == ChallengeCategory.ATTENDANCE)
+
+        this.status = value >= targetValue ? true : false;
+    }
 }
