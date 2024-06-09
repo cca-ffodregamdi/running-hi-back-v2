@@ -72,7 +72,10 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 
     // ios 로그인
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
+    implementation 'org.springframework.cloud:spring-cloud-commons:4.1.1'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.68'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.68'
 
 }
 

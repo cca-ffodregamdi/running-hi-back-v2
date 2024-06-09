@@ -33,6 +33,7 @@ public class AppleOauthService {
     private final AppleClient appleClient;
     private final ApplePublicKeyGenerator applePublicKeyGenerator;
     private final AppleClaimsValidator appleClaimsValidator;
+    private final AppleClientSecretProvider appleClientSecretProvider;
 
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -45,14 +46,17 @@ public class AppleOauthService {
     @Value("${apple.redirect-uri}")
     private String redirectUri;
 
+    @Value("${apple.redirect-domain}")
+    private String redirectDomain;
+
 
     // client secret 생성
     @Transactional
     public String createClientSecret() {
         try {
-            return new AppleClientSecretProvider().createClientSecret();
+            return appleClientSecretProvider.createClientSecret();
         } catch (Exception e) {
-            throw new AppleOauthException("apple client secret 생성에 실패했습니다.");
+            throw new AppleOauthException("apple client secret 생성에 실패했습니다. : " + e.getMessage());
         }
     }
 
@@ -60,9 +64,9 @@ public class AppleOauthService {
     @Transactional
     public AppleTokenResponse getAppleToken(String code, String clientSecret) {
         try {
-            return appleClient.appleAuth(clientId, redirectUri, code, GRANT_TYPE, clientSecret);
+            return appleClient.appleAuth(clientId, code, GRANT_TYPE, clientSecret);
         } catch (Exception e) {
-            throw new AppleOauthException("apple token 요청에 실패했습니다.");
+            throw new AppleOauthException("apple token 요청에 실패했습니다. : " + e.getMessage());
         }
     }
 
