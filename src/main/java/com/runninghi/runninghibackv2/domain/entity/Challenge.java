@@ -58,6 +58,7 @@ public class Challenge extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "challenge")
     @Comment("챌린지에 참여한 멤버 리스트")
+    @JsonIgnore
     private List<MemberChallenge> participants;
 
     @Builder
