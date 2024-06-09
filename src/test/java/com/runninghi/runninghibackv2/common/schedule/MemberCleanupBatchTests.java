@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.entity.vo.PostKeywordId;
+import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import org.junit.jupiter.api.AfterEach;
@@ -82,20 +83,18 @@ class MemberCleanupBatchTests {
         Member member1 = Member.builder()
                 .deactivateDate(dateTime)
                 .alarmConsent(true)
-                .kakaoName("kakaoName")
-                .level(1)
+                .name("kakaoName")
                 .isActive(false)
-                .totalDistance(1000)
+                .runDataVO(new RunDataVO(1000,0.0,10,1))
                 .build();
         members.add(member1);
 
         Member member2 = Member.builder()
                 .deactivateDate(LocalDateTime.now().minusDays(15))
                 .alarmConsent(true)
-                .kakaoName("nyam")
-                .level(1)
+                .name("nyam")
                 .isActive(true)
-                .totalDistance(1000)
+                .runDataVO(new RunDataVO(1000,0.0,10,1))
                 .build();
         members.add(member2);
 

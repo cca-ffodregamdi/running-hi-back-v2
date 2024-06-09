@@ -11,26 +11,25 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AWSS3Config {
 
-    @Value("${cloud.aws.credentials.access-key}")
-    private String accessKey;
-
-    @Value("${cloud.aws.credentials.secret-key}")
-    private String secretKey;
+    /* 배포 버전에서는 IAM Role을 사용하여 access-key 발급 */
+//    @Value("${cloud.aws.credentials.access-key}")
+//    private String accessKey;
+//
+//    @Value("${cloud.aws.credentials.secret-key}")
+//    private String secretKey;
 
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    @Bean
-    public BasicAWSCredentials awsCredentialsProvider() {
-        return new BasicAWSCredentials(accessKey, secretKey);
-    }
+//    @Bean
+//    public BasicAWSCredentials awsCredentialsProvider() {
+//        return new BasicAWSCredentials(accessKey, secretKey);
+//    }
 
     @Bean
     public AmazonS3Client amazonS3Client() {
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
         return (AmazonS3Client) AmazonS3ClientBuilder
                 .standard()
-                .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
                 .withRegion(region)
                 .build();
     }

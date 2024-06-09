@@ -4,10 +4,12 @@ import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 
 public record RefreshTokenInfo(
-        String kakaoId,
+        String id,
         Role role
 ) {
     public static RefreshTokenInfo from(Member member) {
-        return new RefreshTokenInfo(member.getKakaoId(), member.getRole());
+        String id = member.getAppleId() == null ? member.getKakaoId() : member.getAppleId();
+
+        return new RefreshTokenInfo(id, member.getRole());
     }
 }

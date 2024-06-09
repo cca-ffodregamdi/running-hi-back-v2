@@ -15,8 +15,8 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "COMMON ERR-401-TOKEN", "유효하지않은 토큰입니다."),
     KAKAO_OAUTH_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON ERR-500-KAKAO", "카카오 OAuth 오류입니다."),
     VALIDATION_FAIL(HttpStatus.BAD_REQUEST, "COMMON ERR-400-VALIDATION", "입력값이 올바른 형식이 아닙니다."),
-    SCHEDULING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SCHEDULING ERR-500", "스케줄링 오류가 발생했습니다.")
-    ;
+    SCHEDULING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SCHEDULING ERR-500", "스케줄링 오류가 발생했습니다."),
+    APPLE_OAUTH_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON ERR-500-APPLE", "애플 OAuth 오류입니다.");
 
     private final HttpStatus status;
     private final String code;

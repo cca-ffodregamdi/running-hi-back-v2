@@ -35,7 +35,6 @@ out/
 ### VS Code ###
 .vscode/
 
-*.yml
 application.yml
 
 ## firebase

@@ -7,6 +7,8 @@ import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.application.service.PostService;
+import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
@@ -40,40 +42,41 @@ public class PostController {
     private static final String DELETE_RESPONSE_MESSAGE = "성공적으로 삭제되었습니다.";
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 특정 키워드들로 필터링이 가능합니다.")
-    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getAllPosts(@ModelAttribute PostKeywordCriteria criteria) {
-        Pageable pageable = PageRequest.of(criteria.page(), 10);
+    @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 난이도/지열별로 필터링이 가능합니다.")
+    public ResponseEntity<PageResult<GetAllPostsResponse>> getAllPosts(@RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 10);
 
-        Page<GetAllPostsResponse> response = postService.getPostScroll(pageable, criteria.keyword());
+        PageResultData<GetAllPostsResponse> response = postService.getPostScroll(pageable);
 
-        return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
+        return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
     @GetMapping(value = "my-feed",produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 특정 키워드들로 필터링이 가능합니다.")
-    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getMyPosts(@RequestHeader("Authorization") String bearerToken) {
+    @Operation(summary = "나의 게시글 리스트 조회", description = "나의 게시글 전체 리스트를 조회합니다. 공유 여부가 함께 조회됩니다.")
+    public ResponseEntity<PageResult<GetAllPostsResponse>> getMyPosts(@RequestHeader("Authorization") String bearerToken,
+                                                                           @RequestParam(defaultValue = "0") int page) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(page,10);
 
-        Page<GetAllPostsResponse> response = postService.getMyPostsScroll(pageable, memberInfo.memberNo());
+        PageResultData<GetAllPostsResponse> response = postService.getMyPostsScroll(pageable, memberInfo.memberNo());
 
-        return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
+        return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
-//    @GetMapping("/{postNo}")
-//    @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
-//    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
-//
-//        GetPostResponse response = postService.getPostByPostNo(postNo);
-//
-//        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
-//    }
+    @GetMapping("/{postNo}")
+    @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
+    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
+
+        GetPostResponse response = postService.getPostDetailByPostNo(postNo);
+
+        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
+    }
 
     @GetMapping(value = "/coordinate/{postNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "GPX 경도, 위도 조회", description = " '나도 이 코스 달리기' 선택시 반환되는 데이터입니다. \n 지도 상 표기를 위해 경도-위도 값이 튜플 형태로 반환됩니다.")
-    public ResponseEntity<ApiResult<GpsDataResponse>> getGPXData(@PathVariable Long postNo) throws ParserConfigurationException, IOException, SAXException {
+    public ResponseEntity<ApiResult<GpsDataResponse>> getGPXData(@PathVariable Long postNo) throws IOException {
 
         GpsDataResponse response = postService.getGpxLonLatData(postNo);
 
@@ -131,13 +134,13 @@ public class PostController {
     @HasAccess
     @GetMapping(value = "/reported", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "신고된 게시글 조회", description = "신고된 게시글만 볼 수 있습니다.")
-    public ResponseEntity<ApiResult<Page<GetAllPostsResponse>>> getReportedPostList(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
+    public ResponseEntity<ApiResult<Page<GetReportedPostsResponse>>> getReportedPostList(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
                                                                                     @RequestParam(defaultValue = "10") @Positive int size,
                                                                                     @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
-        Page<GetAllPostsResponse> response = postService.getReportedPostScroll(pageable);
+        Page<GetReportedPostsResponse> response = postService.getReportedPostScroll(pageable);
 
         return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
     }

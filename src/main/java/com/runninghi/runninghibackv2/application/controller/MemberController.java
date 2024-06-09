@@ -1,8 +1,11 @@
 package com.runninghi.runninghibackv2.application.controller;
 
+import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
+import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
+import com.runninghi.runninghibackv2.application.service.AppleOauthService;
 import com.runninghi.runninghibackv2.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.application.service.MemberService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
@@ -15,6 +18,7 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -34,8 +38,8 @@ public class MemberController {
 
     private final MemberService memberService;
     private final KakaoOauthService kakaoOauthService;
+    private final AppleOauthService appleOauthService;
     private final JwtTokenProvider jwtTokenProvider;
-
 
     /**
      * 카카오 로그인 페이지로 리다이렉트합니다.
@@ -110,7 +114,7 @@ public class MemberController {
             },
             responses = { @ApiResponse(responseCode = "200", description = "Success Kakao Unlink") }
     )
-    public ResponseEntity<ApiResult<Boolean>> kakaoLogout(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<ApiResult<Boolean>> kakaoUnlink(@RequestHeader(value = "Authorization") String token) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
@@ -148,6 +152,81 @@ public class MemberController {
         UpdateMemberInfoResponse response = memberService.updateMemberInfo(memberNo, request);
 
         return ResponseEntity.ok(ApiResult.success("회원 정보 업데이트 성공", response));
+    }
+
+
+    /**
+     * 애플 로그인 또는 회원가입을 처리하는 API입니다.
+     *
+     * <p>이 API는 사용자의 애플 계정으로 로그인하거나 회원가입을 처리합니다.
+     * 클라이언트는 애플 인증 코드와 nonce를 요청 본문에 담아서 해당 엔드포인트를 호출해야 합니다.
+     * 인증이 성공하면 응답 헤더에 액세스 토큰과 리프레시 토큰이 포함됩니다.</p>
+     *
+     * @param request AppleLoginRequest 객체로, 애플 인증 코드와 nonce를 포함합니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 인증이 성공하면 응답 헤더에 액세스 토큰과 리프레시 토큰이 포함됩니다.
+     */
+    @GetMapping(value = "/api/v1/login/apple", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "애플 로그인 또는 회원가입",
+            description = "사용자의 애플 계정으로 로그인하거나 회원가입을 처리합니다. " +
+                    "클라이언트는 애플 인증 코드와 nonce를 요청 본문에 담아서 해당 엔드포인트를 호출해야 합니다. " +
+                    "인증이 성공하면 응답 헤더에 액세스 토큰과 리프레시 토큰이 포함됩니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success Apple Login",
+                    headers = {
+                            @Header(name = "Authorization", description = "Access Token", schema = @Schema(type = "string")),
+                            @Header(name = "Refresh-Token", description = "Refresh Token", schema = @Schema(type = "string"))
+                    })
+    })
+    public ResponseEntity<ApiResult<Void>> appleLogin(@RequestBody AppleLoginRequest request) {
+
+        String clientSecret = appleOauthService.createClientSecret();
+
+        AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
+
+        Map<String, String> tokens = appleOauthService.appleOauth(appleTokenResponse, request.nonce());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", tokens.get("accessToken"));
+        headers.add("Refresh-Token", tokens.get("refreshToken"));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(ApiResult.success("Success Apple Login", null));
+    }
+
+    /**
+     * 애플 회원 탈퇴를 처리하는 API입니다.
+     *
+     * <p>이 API는 사용자의 애플 계정과 연동된 회원 정보를 탈퇴 처리합니다.
+     * 클라이언트는 Authorization 헤더에 Bearer 토큰을 포함하여 해당 엔드포인트를 호출해야 합니다.
+     * 탈퇴가 성공하면 응답 본문에 true 값을 반환합니다.</p>
+     *
+     * @param token 사용자의 인증을 위한 Bearer 토큰입니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 회원 탈퇴가 성공하면 true 값을 반환합니다.
+     */
+    @PutMapping(value = "/api/v1/unlink/apple", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "애플 회원 탈퇴",
+            description = "사용자의 애플 계정과 연동된 회원 정보를 탈퇴 처리합니다. " +
+                    "클라이언트는 Authorization 헤더에 Bearer 토큰을 포함하여 해당 엔드포인트를 호출해야 합니다. " +
+                    "탈퇴가 성공하면 응답 본문에 true 값을 반환합니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success Apple Unlink"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<ApiResult<Boolean>> appleUnlink(@RequestHeader(value = "Authorization") String token) {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
+        String clientSecret = appleOauthService.createClientSecret();
+
+        boolean isActive = appleOauthService.unlinkAndDeleteMember(memberNo, clientSecret);
+
+        return ResponseEntity.ok(ApiResult.success("Success Apple Unlink", isActive));
     }
 
     /**
@@ -232,7 +311,7 @@ public class MemberController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(example = "{\"timeStamp\": \"2024-05-23T07:36:26.119Z\", \"status\": \"UNAUTHORIZED\", \"message\": \"자동 로그인 : 유효하지않은 엑세스 토큰입니다.\", \"data\": null}"))),
             })
-    public ResponseEntity<ApiResult<Boolean>> autoLoginWithAccessToekn(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<ApiResult<Boolean>> autoLoginWithAccessToken(@RequestHeader(value = "Authorization") String token) {
         try {
             if (jwtTokenProvider.validateAutoLoginAccessToken(token)) {
                 // Access Token이 유효한 경우

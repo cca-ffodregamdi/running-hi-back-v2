@@ -17,6 +17,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByKakaoId(String kakaoId);
 
+    Optional<Member> findByAppleId(String sub);
+
     @Query("SELECT m FROM Member m WHERE m.deactivateDate <= :deactivateDate")
     List<Member> findAllByDeactivateDate(LocalDateTime deactivateDate);
 
