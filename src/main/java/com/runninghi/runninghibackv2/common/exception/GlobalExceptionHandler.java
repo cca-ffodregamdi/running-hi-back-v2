@@ -59,8 +59,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(KakaoOauthException.class)
-    public ResponseEntity<ApiResult> handleKakaoLoginException() {
-        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_FAIL);
+    public ResponseEntity<ApiResult> handleKakaoLoginException(KakaoOauthException e) {
+        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_FAIL.getStatus(), e.getMessage());
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
@@ -83,8 +83,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IOException.class)
-    public ResponseEntity<ApiResult> handleIOException() {
-        ApiResult apiResult = ApiResult.error(ErrorCode.INTER_SERVER_ERROR);
+    public ResponseEntity<ApiResult> handleIOException(IOException e) {
+        ApiResult apiResult = ApiResult.error(ErrorCode.INTER_SERVER_ERROR.getStatus(), e.getMessage());
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
