@@ -18,7 +18,6 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -134,7 +133,7 @@ public class FeedbackController {
             },
             responses = { @ApiResponse(responseCode = "200", description = "피드백 페이지 조회 성공") }
     )
-    public ResponseEntity<ApiResult<Page<GetFeedbackResponse>>> getFeedbackScroll(
+    public ResponseEntity<ApiResult<FeedbackPageResponse<GetFeedbackResponse>>> getFeedbackScroll(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
@@ -145,7 +144,7 @@ public class FeedbackController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
-        Page<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, memberNo);
+        FeedbackPageResponse<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("피드백 페이지 조회 성공", response));
     }
@@ -216,7 +215,7 @@ public class FeedbackController {
             },
             responses = { @ApiResponse(responseCode = "200", description = "피드백 리스트 조회 성공 : 관리자") }
     )
-    public ResponseEntity<ApiResult<Page<GetFeedbackResponse>>> getFeedbackScrollByAdmin(
+    public ResponseEntity<ApiResult<FeedbackPageResponse<GetFeedbackResponse>>> getFeedbackScrollByAdmin(
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
@@ -227,7 +226,7 @@ public class FeedbackController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
-        Page<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
+        FeedbackPageResponse<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("피드백 리스트 조회 성공 : 관리자", response));
     }
