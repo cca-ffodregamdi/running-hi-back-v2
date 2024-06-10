@@ -12,8 +12,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -117,8 +122,15 @@ public class NoticeController {
             },
             responses = @ApiResponse(responseCode = "200", description = "모든 공지사항 조회 성공")
     )
-    public ResponseEntity<ApiResult<PageResponse<GetNoticeResponse>>> getAllNotices(Pageable pageable) {
-        PageResponse<GetNoticeResponse> response = noticeService.getAllNotices(pageable);
+    public ResponseEntity<ApiResult<NoticePageResponse<GetNoticeResponse>>> getAllNotices(
+            @RequestHeader(value = "Authorization") String token,
+            @RequestParam(defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(defaultValue = "10") @Positive int size,
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
+        NoticePageResponse<GetNoticeResponse> response = noticeService.getAllNotices(pageable);
 
         return ResponseEntity.ok(ApiResult.success("모든 공지사항 조회 성공", response));
     }
