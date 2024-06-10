@@ -107,24 +107,28 @@ public class FeedbackService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GetFeedbackResponse> getFeedbackScroll(Pageable pageable, Long memberNo) {
+    public FeedbackPageResponse<GetFeedbackResponse> getFeedbackScroll(Pageable pageable, Long memberNo) {
 
         Member member = findMemberByNo(memberNo);
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllByFeedbackWriter(member, pageable);
 
-        return feedbackPage.map(GetFeedbackResponse::from);
+        Page<GetFeedbackResponse> response = feedbackPage.map(GetFeedbackResponse::from);
+
+        return FeedbackPageResponse.from(response);
     }
 
     @Transactional(readOnly = true)
-    public Page<GetFeedbackResponse> getFeedbackScrollByAdmin(Pageable pageable, Long memberNo) {
+    public FeedbackPageResponse<GetFeedbackResponse> getFeedbackScrollByAdmin(Pageable pageable, Long memberNo) {
         Member member = findMemberByNo(memberNo);
 
         feedbackChecker.isAdmin(member.getRole());
 
         Page<Feedback> feedbackPage = feedbackRepository.findAllBy(pageable);
 
-        return feedbackPage.map(GetFeedbackResponse::from);
+        Page<GetFeedbackResponse> response = feedbackPage.map(GetFeedbackResponse::from);
+
+        return FeedbackPageResponse.from(response);
     }
 
     @Transactional
