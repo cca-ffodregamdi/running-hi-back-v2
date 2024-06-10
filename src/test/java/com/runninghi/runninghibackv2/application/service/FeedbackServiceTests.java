@@ -20,11 +20,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -171,37 +170,23 @@ class FeedbackServiceTests {
     }
 
     @Test
-    @DisplayName("본인이 작성한 피드백 전체 조회")
+    @DisplayName("본인의 피드백 리스트 조회")
     void testGetFeedbackScroll() {
-        // 페이지 요청, 멤버 번호 설정
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        Long memberNo = testMember1.getMemberNo();
-        Long memberNo2 = testMember2.getMemberNo();
-
         // 서비스 메서드 호출
-        Page<GetFeedbackResponse> feedbackPage = feedbackService.getFeedbackScroll(pageRequest, memberNo);
+        Pageable pageable = PageRequest.of(0, 10);
+        FeedbackPageResponse<GetFeedbackResponse> response = feedbackService.getFeedbackScroll(pageable, testMember1.getMemberNo());
 
         // 응답 확인
-        assertNotNull(feedbackPage);
-        assertFalse(feedbackPage.isEmpty());
-        assertEquals(1, feedbackPage.getTotalElements());
-
-        GetFeedbackResponse response = feedbackPage.getContent().get(0);
         assertNotNull(response);
-        assertEquals(testFeedback.getTitle(), response.title());
-        assertEquals(testFeedback.getContent(), response.content());
-        assertEquals(testFeedback.getCategory(), response.category());
-        assertEquals(testFeedback.getCreateDate(), response.createDate());
-        assertEquals(testFeedback.getUpdateDate(), response.updateDate());
-        assertEquals(testFeedback.isHasReply(), response.hasReply());
-        assertEquals(testFeedback.getReply(), response.reply());
-        assertEquals(testMember1.getNickname(), response.nickname());
-
-        // 피드백을 작성하지않는 멤버가 전체 조회할 때 확인
-        Page<GetFeedbackResponse> feedbackPage2 = feedbackService.getFeedbackScroll(pageRequest, memberNo2);
-
-        assertEquals(0, feedbackPage2.getTotalElements());
+        assertEquals(1, response.totalPages());
+        assertEquals(testFeedback.getTitle(), response.content().get(0).title());
+        assertEquals(testFeedback.getContent(), response.content().get(0).content());
+        assertEquals(testFeedback.getCategory(), response.content().get(0).category());
+        assertEquals(testFeedback.isHasReply(), response.content().get(0).hasReply());
+        assertEquals(testFeedback.getReply(), response.content().get(0).reply());
+        assertEquals(testMember1.getNickname(), response.content().get(0).nickname());
     }
+
 
     @Test
     @DisplayName("관리자가 특정 피드백 조회")
@@ -237,9 +222,9 @@ class FeedbackServiceTests {
         Long adminMemberNo = testAdmin.getMemberNo();
 
         assertDoesNotThrow(() -> {
-            Page<GetFeedbackResponse> feedbackPage = feedbackService.getFeedbackScrollByAdmin(PageRequest.of(0, 10), adminMemberNo);
+            FeedbackPageResponse<GetFeedbackResponse> feedbackPage = feedbackService.getFeedbackScrollByAdmin(PageRequest.of(0, 10), adminMemberNo);
             assertNotNull(feedbackPage);
-            assertEquals(1, feedbackPage.getTotalElements()); // 페이지에 포함된 피드백의 총 개수가 1개인지 확인
+            assertEquals(1, feedbackPage.totalPages()); // 페이지에 포함된 피드백의 총 개수가 1개인지 확인
         });
 
         // 일반 사용자로 인증된 경우

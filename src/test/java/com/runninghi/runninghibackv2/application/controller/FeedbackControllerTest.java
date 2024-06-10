@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -223,14 +225,16 @@ class FeedbackControllerTest {
     @DisplayName("본인의 피드백 리스트 조회")
     void testGetFeedbackScroll() throws Exception {
         String responseMessage = "피드백 페이지 조회 성공";
-        Page<GetFeedbackResponse> pageResponse = new PageImpl<>(Collections.singletonList(
-                new GetFeedbackResponse(1L, title, content, category,
-                        LocalDateTime.now(), LocalDateTime.now(), false, null, nickname)
-        ));
 
+        List<GetFeedbackResponse> feedbackList = Collections.singletonList(
+                new GetFeedbackResponse(1L, title, content, category, LocalDateTime.now(), LocalDateTime.now(), false, null, nickname)
+        );
+
+        Page<GetFeedbackResponse> pageResponse = new PageImpl<>(feedbackList, PageRequest.of(0, 10), feedbackList.size());
+        FeedbackPageResponse<GetFeedbackResponse> response = FeedbackPageResponse.from(pageResponse);
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(1L);
-        when(feedbackService.getFeedbackScroll(any(Pageable.class), eq(1L))).thenReturn(pageResponse);
+        when(feedbackService.getFeedbackScroll(any(Pageable.class), eq(1L))).thenReturn(response);
 
         // 요청 수행 및 응답 검증
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/feedbacks")
@@ -296,11 +300,13 @@ class FeedbackControllerTest {
         int size = 10;
         String sort = "desc";
         String responseMessage = "피드백 리스트 조회 성공 : 관리자";
-        Page<GetFeedbackResponse> responsePage = new PageImpl<>(Collections.emptyList());
+        // 빈 페이지를 만들어 FeedbackPageResponse로 변환
+        Page<GetFeedbackResponse> responsePage = new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), 0);
+        FeedbackPageResponse<GetFeedbackResponse> response = FeedbackPageResponse.from(responsePage);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
-        when(feedbackService.getFeedbackScrollByAdmin(any(Pageable.class), eq(1L))).thenReturn(responsePage);
+        when(feedbackService.getFeedbackScrollByAdmin(any(Pageable.class), eq(1L))).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/feedbacks/admin")
                         .header("Authorization", token)
