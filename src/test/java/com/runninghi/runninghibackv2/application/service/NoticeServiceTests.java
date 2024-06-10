@@ -8,6 +8,7 @@ import com.runninghi.runninghibackv2.domain.entity.Notice;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.NoticeRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,8 +18,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,25 +52,39 @@ class NoticeServiceTests {
         memberRepository.save(member);
         memberNo = member.getMemberNo();
 
+        List<Notice> notices = new ArrayList<>();
+
         notice1 = Notice.builder()
-            .title("Notice 1")
-            .content("Content 1")
-            .noticeWriter(member)
-            .build();
+                .title("Notice 1")
+                .content("Content 1")
+                .noticeWriter(member)
+                .build();
+        notices.add(notice1);
+
         Notice notice2 = Notice.builder()
                 .title("Notice 2")
                 .content("Content 2")
                 .noticeWriter(member)
                 .build();
+        notices.add(notice2);
+
         Notice notice3 = Notice.builder()
                 .title("Notice 3")
                 .content("Content 3")
                 .noticeWriter(member)
                 .build();
+        notices.add(notice3);
 
-        noticeRepository.save(notice1);
-        noticeRepository.save(notice2);
-        noticeRepository.save(notice3);
+        noticeRepository.saveAll(notices);
+    }
+
+
+
+    @BeforeEach
+    @AfterEach
+    void clear() {
+        noticeRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @Test
@@ -127,9 +145,8 @@ class NoticeServiceTests {
     @Test
     @DisplayName("공지사항 리스트 조회 ")
     void testGetAllNotices() {
-
-        Pageable pageable = PageRequest.of(1, 2);
-        PageResponse<GetNoticeResponse> response = noticeService.getAllNotices(pageable);
+        Pageable pageable = PageRequest.of(1, 2, Sort.by(Sort.Direction.DESC, "noticeNo"));
+        NoticePageResponse<GetNoticeResponse> response = noticeService.getAllNotices(pageable);
 
         assertNotNull(response);
         assertEquals(2, response.totalPages());
