@@ -43,13 +43,6 @@ public class AppleOauthService {
     @Value("${apple.client-id}")
     private String clientId;
 
-    @Value("${apple.redirect-uri}")
-    private String redirectUri;
-
-    @Value("${apple.redirect-domain}")
-    private String redirectDomain;
-
-
     // client secret 생성
     @Transactional
     public String createClientSecret() {
@@ -151,12 +144,12 @@ public class AppleOauthService {
     }
 
     // 회원 생성 및 로그인 메서드
-    private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToekn) {
+    private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToken) {
 
         Member member = Member.builder()
                 .appleId(appleResponse.get("sub"))
                 .name(appleResponse.get("name"))
-                .appleRefreshToken(appleRefreshToekn)
+                .appleRefreshToken(appleRefreshToken)
                 .nickname("러너 " + generateRandomDigits())
                 .isActive(true)
                 .isBlacklisted(false)
