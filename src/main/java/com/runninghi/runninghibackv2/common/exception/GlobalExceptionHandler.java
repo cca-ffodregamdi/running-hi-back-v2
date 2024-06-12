@@ -71,8 +71,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AppleOauthException.class)
-    public ResponseEntity<ApiResult> handleAppleOauthException() {
-        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_FAIL);
+    public ResponseEntity<ApiResult> handleAppleOauthException(AppleOauthException e) {
+        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_FAIL.getStatus(), e.getMessage());
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
