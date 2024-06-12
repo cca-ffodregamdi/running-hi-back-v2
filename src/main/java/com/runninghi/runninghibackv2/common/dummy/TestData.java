@@ -42,7 +42,7 @@ public class TestData {
         testDatabaseMapper.insertFeedbackDummyData();
         testDatabaseMapper.insertImageDummyData();
         testDatabaseMapper.insertBookmarkDummyData();
-//        testDatabaseMapper.insertReplyDummyData();
+        testDatabaseMapper.insertReplyDummyData();
         testDatabaseMapper.insertReportDummyData();
 
         return ResponseEntity.ok(ApiResult.success("DB 초기화, test용 dummy data 생성 성공", null));
