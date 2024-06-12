@@ -102,21 +102,15 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         Post post = postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
 
-        List<Image> images = jpaQueryFactory.selectFrom(image)
+        String imageUrl = jpaQueryFactory
+                .select(image.imageUrl)
+                .from(image)
                 .where(image.postNo.eq(postNo))
-                .fetch();
+                .fetchFirst();
 
-        List<String> imageUrls = images.stream()
-                .map(Image::getImageUrl)
-                .collect(Collectors.toList());
+        Long replyCnt = replyRepository.findAllByPost_PostNo(postNo).stream().count();
 
-        List<Reply> replies = replyRepository.findAllByPost_PostNo(postNo);
-
-        List<GetPostReplyResponse> replyList = replies.stream()
-                .map(GetPostReplyResponse::from)
-                .collect(Collectors.toList());
-
-        return GetPostResponse.from(post, imageUrls.isEmpty() ? null : imageUrls, replyList);
+        return GetPostResponse.from(post, imageUrl, replyCnt);
     }
 
 }
