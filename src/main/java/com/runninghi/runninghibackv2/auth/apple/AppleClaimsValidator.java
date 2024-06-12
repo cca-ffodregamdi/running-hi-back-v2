@@ -25,9 +25,9 @@ public class AppleClaimsValidator {
         Date expiration = claims.getExpiration();
         Date currentDate = new Date();
 
-        return expiration.before(currentDate) &&
+        return currentDate.before(expiration) &&
                 claims.getIssuer().contains(iss) &&
                 claims.getAudience().equals(clientId) &&
-                claims.get(nonce).equals(nonce);
+                claims.get("nonce").equals(nonce);
     }
 }

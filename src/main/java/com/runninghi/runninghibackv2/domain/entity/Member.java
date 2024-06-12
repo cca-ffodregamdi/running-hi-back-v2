@@ -68,7 +68,7 @@ public class Member extends BaseTimeEntity {
     @Comment("권한")
     private Role role;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     @Comment("리프레시 토큰")
     private String refreshToken;
 
