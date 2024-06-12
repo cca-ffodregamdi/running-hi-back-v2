@@ -10,9 +10,7 @@ import com.runninghi.runninghibackv2.domain.repository.NoticeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,14 +56,12 @@ public class NoticeService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<GetNoticeResponse> getAllNotices(Pageable pageable) {
-        PageRequest sortedPageable = PageRequest
-                .of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "noticeNo"));
-        Page<Notice> noticePage = noticeRepository.findAllBy(sortedPageable);
+    public NoticePageResponse<GetNoticeResponse> getAllNotices(Pageable pageable) {
+        Page<Notice> noticePage = noticeRepository.findAll(pageable);
 
         Page<GetNoticeResponse> response = noticePage.map(GetNoticeResponse::from);
 
-        return PageResponse.from(response);
+        return NoticePageResponse.from(response);
     }
 
     @Transactional

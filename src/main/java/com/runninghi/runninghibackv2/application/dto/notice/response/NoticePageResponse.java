@@ -5,12 +5,12 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record PageResponse<T>(
+public record NoticePageResponse<T>(
         List<T> content,
         int currentPage,
         int totalPages
 ) {
-    public static <T> PageResponse<T> from(Page<T> page) {
-        return new PageResponse<>(page.getContent(), page.getNumber() + 1, page.getTotalPages());
+    public static <T> NoticePageResponse<T> from(Page<T> page) {
+        return new NoticePageResponse<>(page.getContent(), page.getNumber() + 1, page.getTotalPages());
     }
 }
