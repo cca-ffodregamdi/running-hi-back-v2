@@ -34,14 +34,14 @@ public record GetPostResponse(
         float meanPace,
         @Schema(description = "소모 칼로리 (kcal)", example = "200")
         float kcal,
-        @Schema(description = "이미지 URL 리스트", example = "[\"url1\", \"url2\"]")
-        List<String> imageUrls,
-        @Schema(description = "댓글 리스트", example = "[\"url1\", \"url2\"]")
-        List<GetPostReplyResponse> replyList,
+        @Schema(description = "이미지 URL 리스트", example = "https://picsum.photos/200")
+        String imageUrl,
         @Schema(description = "좋아요 개수", example = "5")
-        Long likeCnt
+        Long likeCnt,
+        @Schema(description = "댓글 개수", example = "5")
+        Long replyCnt
 ) {
-    public static GetPostResponse from(Post post, List<String> imageUrls, List<GetPostReplyResponse> replyList) {
+    public static GetPostResponse from(Post post, String imageUrl, Long replyCnt) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
@@ -54,9 +54,9 @@ public record GetPostResponse(
                 post.getGpsDataVO().getTime(),
                 post.getGpsDataVO().getMeanPace(),
                 post.getGpsDataVO().getKcal(),
-                imageUrls,
-                replyList,
-                5L
+                imageUrl,
+                5L,
+                replyCnt
         );
     }
 }
