@@ -13,6 +13,5 @@ import lombok.Setter;
 public class ReplyFCMDTO {
 
         Reply savedReply;
-        Reply parentReply;
 
 }
