@@ -69,7 +69,6 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                         reply.replyContent,
                         reply.reportedCount,
                         reply.isDeleted,
-                        reply.parent.replyNo,
                         reply.createDate,
                         reply.updateDate
                 ))
