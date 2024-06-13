@@ -97,17 +97,6 @@ public class ReplyService {
                 .replyContent(request.replyContent())
                 .build();
 
-        // 부모 댓글 존재 시에
-        if (request.parentReplyNo() != null) {
-            Reply parentReply = findReplyByReplyNo(request.parentReplyNo());
-
-            parentReply.addChildrenReply(reply);
-            reply.addParentReply(parentReply);
-
-            // 부모 댓글 작성자에게 푸쉬 알림
-            replyFCMDTO.setParentReply(parentReply);
-        }
-
         Reply savedReply = replyRepository.save(reply);
 
         // 게시물 작성자에게 푸쉬 알림

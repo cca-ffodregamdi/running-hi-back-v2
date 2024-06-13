@@ -79,7 +79,7 @@ public class ReplyController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "댓글 작성",
-            description = "댓글을 작성하고, 해당 게시글 작성자와 부모 댓글이 있다면 부모 댓글 작성자에게 알림을 발송합니다.",
+            description = "댓글을 작성하고, 해당 게시글 작성자에게 알림을 발송합니다. 알림은 테스트 전까지 주석처리 해두겠습니다.",
             responses = @ApiResponse(responseCode = "200", description = CREATE_RESPONSE_MESSAGE)
     )
     public ResponseEntity<ApiResult<CreateReplyResponse>> createReply(@Parameter(description = "사용자 인증을 위한 Bearer Token")
