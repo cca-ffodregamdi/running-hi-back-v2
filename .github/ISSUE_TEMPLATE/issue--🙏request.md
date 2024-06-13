@@ -1,7 +1,7 @@
 ---
 name: "issue--\U0001F64Frequest"
 about: 기능 요청 시 이슈 작성
-title: "[Request - Jun 1st, 2024] - {도메인} 내용"
+title: "[Request - Jun, 2024] - {도메인} 내용"
 labels: "\U0001F64F Request"
 assignees: ''
 
