@@ -23,7 +23,6 @@ public class AlarmService {
     private final FirebaseMessaging firebaseMessaging;
 
     private final AlarmRepository alarmRepository;
-    private final MemberRepository memberRepository;
 
     private final String POST_FCM_MESSAGE = "회원님의 게시글에 댓글이 등록되었습니다.";
     private final String POST_FCM_TITLE = "댓글 알림";
@@ -31,8 +30,7 @@ public class AlarmService {
     /**
      * 댓글 관련 푸쉬 알림 발송 메소드
      * 댓글 작성 시, 게시글 작성자에게 알림 발송.
-     * 대댓글 작성 시, 게시글 작성자, 부모 댓글 작성자에게 알림 발송.
-     * @param replyFCMDTO 저장된 댓글, 부모 댓글
+     * @param replyFCMDTO 저장된 댓글
      */
     public void sendReplyPushNotification(ReplyFCMDTO replyFCMDTO) {
 
@@ -59,29 +57,6 @@ public class AlarmService {
                         .content(POST_FCM_MESSAGE)
                         .build()
         );
-
-        // 부모 댓글 대댓글 작성 시
-        if (replyFCMDTO.getParentReply() != null) {
-
-            Notification childReplyNotification = Notification.builder()
-                    .setTitle(replyFCMDTO.getSavedReply().getWriter().getNickname())
-                    .setBody(replyFCMDTO.getParentReply().getReplyContent())
-                    .build();
-
-            Message childReplyMessage = Message.builder()
-                    .setToken(replyFCMDTO.getParentReply().getWriter().getFcmToken())
-                    .setNotification(childReplyNotification)
-                    .build();
-
-            firebaseMessaging.sendAsync(childReplyMessage);
-            alarmList.add(
-                    Alarm.builder()
-                            .member(replyFCMDTO.getParentReply().getWriter())
-                            .title(replyFCMDTO.getSavedReply().getWriter().getNickname())
-                            .content(replyFCMDTO.getSavedReply().getReplyContent())
-                            .build()
-            );
-        }
 
         alarmRepository.saveAll(alarmList);
 

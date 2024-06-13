@@ -44,7 +44,7 @@ public class ReplyService {
     /**
      * 게시글 조회 시 해당 게시글에 대한 댓글들 조회 메소드
      * @param postNo 게시글 식별을 위한 키 값
-     * @return 댓글들 리스트 ( 댓글 정보, 부모와 자식 댓글 리스트 포함)
+     * @return 댓글들 리스트 ( 댓글 정보)
      */
     @Transactional(readOnly = true)
     public List<GetReplyListResponse> getReplyList(Long postNo) {
@@ -63,7 +63,7 @@ public class ReplyService {
     /**
      * '내가 쓴 댓글들' 혹은 '특정 회원이 쓴 댓글들' 조회 메소드
      * @param memberNo 작성자 식별을 위한 키 값
-     * @return 순수 댓글들(부모, 자식 댓글들 제외)
+     * @return 댓글들
      */
     @Transactional(readOnly = true)
     public List<GetReplyListResponse> getReplyListByMemberNo(Long memberNo) {
@@ -80,7 +80,7 @@ public class ReplyService {
     /**
      * 댓글 작성 메소드
      * @param request 댓글 작성에 필요한 정보
-     * @return 댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 부모 댓글 번호, 생성 일, 수정 일
+     * @return 댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 생성 일, 수정 일
      */
     @Transactional
     public CreateReplyResponse createReply(CreateReplyRequest request, Long memberNo) {
@@ -97,17 +97,6 @@ public class ReplyService {
                 .replyContent(request.replyContent())
                 .build();
 
-        // 부모 댓글 존재 시에
-        if (request.parentReplyNo() != null) {
-            Reply parentReply = findReplyByReplyNo(request.parentReplyNo());
-
-            parentReply.addChildrenReply(reply);
-            reply.addParentReply(parentReply);
-
-            // 부모 댓글 작성자에게 푸쉬 알림
-            replyFCMDTO.setParentReply(parentReply);
-        }
-
         Reply savedReply = replyRepository.save(reply);
 
         // 게시물 작성자에게 푸쉬 알림
@@ -121,7 +110,7 @@ public class ReplyService {
      * 댓글 수정 메소드
      * @param replyNo 댓글 식별을 위한 키 값
      * @param request 회원 식별을 위한 키 값, 수정할 댓글 내용
-     * @return  댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 부모 댓글 번호, 생성 일, 수정 일
+     * @return  댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 생성 일, 수정 일
      */
     @Transactional
     public UpdateReplyResponse updateReply(Long replyNo, UpdateReplyRequest request) {

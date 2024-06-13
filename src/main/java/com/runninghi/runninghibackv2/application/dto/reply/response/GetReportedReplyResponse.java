@@ -17,8 +17,6 @@ public record GetReportedReplyResponse (
         int reportedCount,
         @Schema(description = "댓글 삭제 여부", example = "false")
         boolean isDeleted,
-        @Schema(description = "부모 댓글", example = "")
-        Long parentReplyNo,
         @Schema(description = "댓글 생성 일", example = "2024-03-27T13:23:12")
         LocalDateTime createDate,
         @Schema(description = "댓글 수정 일", example = "2024-03-27T13:23:12")

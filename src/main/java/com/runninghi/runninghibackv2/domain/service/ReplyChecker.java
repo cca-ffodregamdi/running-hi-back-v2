@@ -24,7 +24,6 @@ public class ReplyChecker {
 
     public void checkSearchValid(String search) {
         if (!Pattern.matches(NO_SPECIAL_SYMBOLS_REGULAR_EXPRESSION, search)) {
-            System.out.println("밸리드 체크 실패");
             throw new IllegalArgumentException();
         }
 
