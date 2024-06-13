@@ -180,51 +180,6 @@ class ReplyServiceTest {
 
     }
 
-//    @Test
-//    @DisplayName("댓글 생성 테스트 : success")
-//    void testCreateReplyTest () {
-//
-//        // given
-//        CreateReplyRequest request = new CreateReplyRequest(
-//                member1.getMemberNo(),
-//                post.getPostNo(),
-//                "새로운 댓글",
-//                null
-//        );
-//        long beforeSize = replyRepository.count();
-//
-//        // when & then
-//        replyService.createReply(request);
-//        long afterSize = replyRepository.count();
-//
-//        // then
-//        Assertions.assertThat(afterSize)
-//                .isEqualTo(beforeSize+1);
-//
-//
-//    }
-
-//    @Test
-//    @DisplayName("댓글 생성 테스트 : 부모 댓글 존재 시 엔티티 내부 부모 댓글 컬럼 확인")
-//    void testParentReply () {
-//
-//        // given
-//        CreateReplyRequest request = new CreateReplyRequest(
-//                member1.getMemberNo(),
-//                post.getPostNo(),
-//                "새로운 댓글",
-//                1L
-//        );
-//
-//        // when
-//        CreateReplyResponse response = replyService.createReply(request);
-//
-//        // then
-//        Assertions.assertThat(response)
-//                .extracting("parentReplyNo")
-//                .isEqualTo(request.parentReplyNo());
-//    }
-
     @Test
     @DisplayName("댓글 수정 테스트 : success")
     void testUpdateReply() {
