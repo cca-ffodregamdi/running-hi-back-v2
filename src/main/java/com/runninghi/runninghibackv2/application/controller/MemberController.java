@@ -63,7 +63,6 @@ public class MemberController {
             }
     )
     public ResponseEntity<ApiResult<CreateMemberResponse>> kakaoLogin(@RequestBody KakaoLoginRequest request) {
-        System.out.println("request = " + request.kakaoToken());
         Map<String, String> memberResponse = kakaoOauthService.kakaoOauth(request.kakaoToken());
 
         HttpHeaders headers = new HttpHeaders();
