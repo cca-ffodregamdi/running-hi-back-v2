@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRe
 import com.runninghi.runninghibackv2.application.dto.member.request.KakaoLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
+import com.runninghi.runninghibackv2.application.dto.member.response.CreateMemberResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
 import com.runninghi.runninghibackv2.application.service.AppleOauthService;
@@ -61,16 +62,19 @@ public class MemberController {
                     )
             }
     )
-    public ResponseEntity<ApiResult<Void>> kakaoLogin(@RequestBody KakaoLoginRequest request) {
-        Map<String, String> tokens = kakaoOauthService.kakaoOauth(request.kakaoToken());
+    public ResponseEntity<ApiResult<CreateMemberResponse>> kakaoLogin(@RequestBody KakaoLoginRequest request) {
+        System.out.println("request = " + request.kakaoToken());
+        Map<String, String> memberResponse = kakaoOauthService.kakaoOauth(request.kakaoToken());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", tokens.get("accessToken"));
-        headers.add("Refresh-Token", tokens.get("refreshToken"));
+        headers.add("Authorization", memberResponse.get("accessToken"));
+        headers.add("Refresh-Token", memberResponse.get("refreshToken"));
+
+        CreateMemberResponse response = CreateMemberResponse.from(memberResponse.getOrDefault("memberNo", null));
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(ApiResult.success("Success Kakao Login", null));
+                .body(ApiResult.success("Success Kakao Login", response));
     }
 
     /**
@@ -154,21 +158,23 @@ public class MemberController {
                             @Header(name = "Refresh-Token", description = "Refresh Token", schema = @Schema(type = "string"))
                     })
     })
-    public ResponseEntity<ApiResult<Void>> appleLogin(@RequestBody AppleLoginRequest request) {
+    public ResponseEntity<ApiResult<CreateMemberResponse>> appleLogin(@RequestBody AppleLoginRequest request) {
 
         String clientSecret = appleOauthService.createClientSecret();
 
         AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
 
-        Map<String, String> tokens = appleOauthService.appleOauth(appleTokenResponse, request.nonce());
+        Map<String, String> memberResponse = appleOauthService.appleOauth(appleTokenResponse, request.nonce());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", tokens.get("accessToken"));
-        headers.add("Refresh-Token", tokens.get("refreshToken"));
+        headers.add("Authorization", memberResponse.get("accessToken"));
+        headers.add("Refresh-Token", memberResponse.get("refreshToken"));
+
+        CreateMemberResponse response = CreateMemberResponse.from(memberResponse.getOrDefault("memberNo", null));
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(ApiResult.success("Success Apple Login", null));
+                .body(ApiResult.success("Success Apple Login", response));
     }
 
     /**

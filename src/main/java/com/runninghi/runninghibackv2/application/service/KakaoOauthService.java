@@ -78,14 +78,14 @@ public class KakaoOauthService {
 
         // 필요한 사용자 정보 가져오기
         MultiValueMapAdapter<String, String> body = new LinkedMultiValueMap<>();
-        body.add("property_keys", "[\"id\", \"kakao_account.email\", \"properties.nickname\"]");
+        body.add("property_keys", "[\"id\", \"properties.nickname\"]");
 
         HttpEntity<?> request = new HttpEntity<>(body, headers);
 
         return restTemplate.postForObject(KAKAO_USER_INFO_REQUEST_URL, request, KakaoProfileResponse.class);
     }
 
-    private Map<String, String> generateTokens(Member member) {
+    private Map<String, String> generateTokens(Member member, boolean isNewMember) {
         AccessTokenInfo accessTokenInfo = new AccessTokenInfo(member.getMemberNo(), member.getRole());
         RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getKakaoId(), member.getRole());
 
@@ -95,17 +95,20 @@ public class KakaoOauthService {
         member.updateRefreshToken(refreshToken);
         memberRepository.save(member);
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
 
-        return tokens;
+        if (isNewMember)
+            response.put("memberNo", member.getMemberNo().toString());
+
+        return response;
     }
 
     // 로그인 메서드
     private Map<String, String> loginWithKakao(Member member) {
         member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
-        return generateTokens(member);
+        return generateTokens(member, false);
     }
 
     // 회원 생성 및 로그인 메서드
@@ -122,7 +125,7 @@ public class KakaoOauthService {
                 .build();
 
         memberRepository.saveAndFlush(member);
-        return generateTokens(member);
+        return generateTokens(member, true);
     }
 
     /**
