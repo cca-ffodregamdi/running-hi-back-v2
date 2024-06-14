@@ -17,6 +17,7 @@ public interface TestDatabaseMapper {
     void insertImageDummyData();
     void insertBookmarkDummyData();
     void insertReplyDummyData();
-    void insertReportDummyData();
+    void insertPostReportDummyData();
+    void insertReplyReportDummyData();
     void insertFeedbackDummyData();
 }
