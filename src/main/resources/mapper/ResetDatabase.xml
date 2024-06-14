@@ -248,17 +248,17 @@
     </insert>
 
     <insert id="insertReportDummyData">
-         INSERT INTO tbl_post_report (category, content, status, reporter_no, reported_post_no, is_post_deleted)
-         VALUES
-             (1, '스팸 게시글입니다.', 0, 2, 1, false),
-             (2, '부적절한 내용이 포함된 게시글입니다.', 0, 1, 2, false),
-             (1, '부적절한 내용이 포함된 게시글입니다.', 0, 2, 2, false);
+        INSERT INTO tbl_post_report (category, content, status, reporter_no, reported_post_no, is_post_deleted, post_content)
+        VALUES
+            ('SPAM', '스팸 게시글입니다.', 'INPROGRESS', 1,1, false, '우하핫'),
+            ('ILLEGALITY', '부적절한 내용이 포함된 게시글입니다.', 'INPROGRESS', 1, 3, false, '우끼끼'),
+            ('ILLEGALITY', '부적절한 내용이 포함된 게시글입니다.', 'INPROGRESS', 2, 4, false, '쵸오오오비');
 
-         INSERT INTO tbl_reply_report (category, content, status, reporter_no, reported_reply_no, is_reply_deleted)
-         VALUES
-             (1, '스팸 댓글입니다.', 0, 1, 2, false),
-             (2, '부적절한 내용이 포함된 댓글입니다.', 0, 2, 1,  false),
-             (1, '부적절한 내용이 포함된 댓글입니다.', 0, 2, 3,  false);
+        INSERT INTO tbl_reply_report (category, content, status, reporter_no, reported_reply_no, is_reply_deleted, reply_content)
+        VALUES
+            ('SPAM', '스팸 댓글입니다.', 'INPROGRESS', 1, 2, false, '스팸댓글'),
+            (2, '부적절한 내용이 포함된 댓글입니다.', 'INPROGRESS', 2, 1,  false, '부적절적절'),
+            (1, '부적절한 내용이 포함된 댓글입니다.', 'INPROGRESS', 2, 3,  false, '부적부적절');
     </insert>
 
     <insert id="insertFeedbackDummyData">
