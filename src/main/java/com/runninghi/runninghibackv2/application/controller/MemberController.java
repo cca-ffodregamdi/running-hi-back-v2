@@ -3,10 +3,7 @@ package com.runninghi.runninghibackv2.application.controller;
 import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.KakaoLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
-import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
-import com.runninghi.runninghibackv2.application.dto.member.response.CreateMemberResponse;
-import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
-import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
+import com.runninghi.runninghibackv2.application.dto.member.response.*;
 import com.runninghi.runninghibackv2.application.service.AppleOauthService;
 import com.runninghi.runninghibackv2.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.application.service.MemberService;
@@ -356,6 +353,35 @@ public class MemberController {
             // Refresh Token이 유효하지 않은 경우
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 유효하지않은 토큰입니다.", null));
         }
+    }
+
+
+    /**
+     * 액세스 토큰에서 멤버 번호를 추출하여 반환하는 API입니다.
+     *
+     * @param token 사용자 인증을 위한 액세스 토큰. 요청 헤더에 "Authorization" 키로 포함되어야 합니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 토큰이 유효한 경우 멤버 번호가 응답 본문에 들어가며, 유효하지 않은 경우 null 값이 응답 본문에 포함됩니다.
+     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 액세스 토큰이 포함되어야 합니다.
+     *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
+     */
+    @GetMapping(value = "/api/v1/member/id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "액세스 토큰 유효성 검사 및 멤버 번호 반환",
+            description = "액세스 토큰의 유효성을 검사하여 멤버 번호를 추출합니다. " +
+                    "토큰이 유효한 경우 멤버 번호가 응답 본문에 들어갑니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Access 토큰", required = true)
+            },
+            responses = { @ApiResponse(responseCode = "200", description = "토큰 유효성 검사 성공. 멤버 번호 반환",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetMemberNoResponse.class))),
+            })
+    public ResponseEntity<ApiResult<GetMemberNoResponse>> getMemberNoFromToken(@RequestHeader(value = "Authorization") String token) {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
+        GetMemberNoResponse response = GetMemberNoResponse.from(memberNo);
+
+        return ResponseEntity.ok(ApiResult.success("회원 id 조회 성공", response));
     }
 
 
