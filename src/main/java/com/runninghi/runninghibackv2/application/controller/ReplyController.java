@@ -10,6 +10,8 @@ import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
+import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -63,16 +65,16 @@ public class ReplyController {
     @HasAccess
     @GetMapping(value = "/reported", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "신고된 댓글 리스트 조회", description = "신고된 댓글 리스트를 조회합니다.", responses = @ApiResponse(description = GET_RESPONSE_MESSAGE))
-    public ResponseEntity<ApiResult<Page<GetReportedReplyResponse>>> getReportedReplyList(@Valid @ModelAttribute GetReportedReplySearchRequest searchRequest) {
+    public ResponseEntity<PageResult<GetReportedReplyResponse>> getReportedReplyList(@Valid @ModelAttribute GetReportedReplySearchRequest searchRequest) {
 
         Sort sort = Sort.by( Sort.Direction.fromString(searchRequest.getSortDirection()), "createDate" );
         Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize(), sort);
-        Page<GetReportedReplyResponse> reportedReplyPage = replyService.getReportedReplyList(
+        PageResultData<GetReportedReplyResponse> reportedReplyPage = replyService.getReportedReplyList(
                 GetReportedReplyRequest.of(pageable, searchRequest.getSearch(), searchRequest.getReportStatus())
         );
-        if (reportedReplyPage == null) return ResponseEntity.ok().body(ApiResult.success(NO_CONTENT_RESPONSE_MESSAGE, null));
+        if (reportedReplyPage == null) return ResponseEntity.ok().body(PageResult.success(NO_CONTENT_RESPONSE_MESSAGE, null));
 
-        return ResponseEntity.ok().body(ApiResult.success(GET_RESPONSE_MESSAGE, reportedReplyPage));
+        return ResponseEntity.ok().body(PageResult.success(GET_RESPONSE_MESSAGE, reportedReplyPage));
     }
 
 
@@ -83,7 +85,7 @@ public class ReplyController {
             responses = @ApiResponse(responseCode = "200", description = CREATE_RESPONSE_MESSAGE)
     )
     public ResponseEntity<ApiResult<CreateReplyResponse>> createReply(@Parameter(description = "사용자 인증을 위한 Bearer Token")
-                                                                        @RequestHeader("Authorization") String bearerToken,
+                                                                      @RequestHeader("Authorization") String bearerToken,
                                                                       @RequestBody CreateReplyRequest request) {
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         CreateReplyResponse response = replyService.createReply(request, accessTokenInfo.memberNo());
