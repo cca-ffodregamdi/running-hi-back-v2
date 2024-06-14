@@ -9,6 +9,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -33,19 +35,17 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     private static final int REPORTED_COUNT = 1;
 
     @Override
-    public Page<GetReportedReplyResponse> findAllReportedByPageableAndSearch(GetReportedReplyRequest request) {
+    @Transactional(readOnly = true)
+    public PageResultData<GetReportedReplyResponse> findAllReportedByPageableAndSearch(GetReportedReplyRequest request) {
 
         Long count = getCount(request);
         if (count < 1) return null;
         List<GetReportedReplyResponse> content = getReportedReplyList(request);
-        System.out.println("content : " + content);
 
-        return new PageImpl<>(content, request.pageable(), count);
+        return new PageResultData<>(content, request.pageable(), count);
     }
 
     private Long getCount(GetReportedReplyRequest request) {
-        System.out.println("reportStatus : " + request.reportStatus());
-        System.out.println("getCount 입니다.");
         return jpaQueryFactory
                 .select(reply.replyNo.count())
                 .from(reply)
