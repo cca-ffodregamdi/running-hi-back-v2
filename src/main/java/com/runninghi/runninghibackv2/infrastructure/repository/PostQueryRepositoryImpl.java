@@ -108,7 +108,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .where(image.postNo.eq(postNo))
                 .fetchFirst();
 
-        Long replyCnt = replyRepository.findAllByPost_PostNo(postNo).stream().count();
+        Long replyCnt = replyRepository.countByPost_PostNo(postNo);
 
         return GetPostResponse.from(post, imageUrl, replyCnt);
     }
