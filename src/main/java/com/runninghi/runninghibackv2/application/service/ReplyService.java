@@ -1,32 +1,27 @@
 package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.application.dto.alarm.ReplyFCMDTO;
-import com.runninghi.runninghibackv2.application.dto.reply.request.CreateReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.request.DeleteReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.request.UpdateReplyRequest;
+import com.runninghi.runninghibackv2.application.dto.reply.request.*;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
-import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.Reply;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
 import com.runninghi.runninghibackv2.domain.service.ReplyChecker;
-import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,38 +38,23 @@ public class ReplyService {
 
     /**
      * 게시글 조회 시 해당 게시글에 대한 댓글들 조회 메소드
-     * @param postNo 게시글 식별을 위한 키 값
+     * @param request 게시글 식별을 위한 키 값
      * @return 댓글들 리스트 ( 댓글 정보)
      */
     @Transactional(readOnly = true)
-    public List<GetReplyListResponse> getReplyList(Long postNo) {
-
-        List<Reply> replyList =  replyRepository.findAllByPost_PostNo(postNo);
-        if (replyList.isEmpty()) throw new EntityNotFoundException();
-
-
-        return replyList.stream()
-                .filter(reply -> !reply.isDeleted())
-                .map(GetReplyListResponse::fromEntity)
-                .toList();
+    public PageResultData<GetReplyListResponse> getReplyList(GetReplyListRequest request) {
+        return replyQueryRepository.findAllByPostNo(request);
     }
 
 
     /**
      * '내가 쓴 댓글들' 혹은 '특정 회원이 쓴 댓글들' 조회 메소드
-     * @param memberNo 작성자 식별을 위한 키 값
+     * @param request 작성자 식별을 위한 키 값
      * @return 댓글들
      */
     @Transactional(readOnly = true)
-    public List<GetReplyListResponse> getReplyListByMemberNo(Long memberNo) {
-
-        List<Reply> replyList = replyRepository.findAllByWriter_MemberNo(memberNo);
-        if (replyList.isEmpty()) throw new EntityNotFoundException();
-
-        return replyList.stream()
-                .filter(reply -> !reply.isDeleted())
-                .map(GetReplyListResponse::pureReplyListFromEntity)
-                .toList();
+    public PageResultData<GetReplyListResponse> getReplyListByMemberNo(GetReplyListByMemberRequest request) {
+        return replyQueryRepository.findAllByMemberNo(request);
     }
 
     /**
@@ -103,7 +83,7 @@ public class ReplyService {
 //        replyFCMDTO.setSavedReply(savedReply);
 //        alarmService.sendReplyPushNotification(replyFCMDTO);
 
-        return CreateReplyResponse.fromEntity(savedReply);
+        return new CreateReplyResponse(3);
     }
 
     /**
@@ -167,7 +147,7 @@ public class ReplyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GetReportedReplyResponse> getReportedReplyList(GetReportedReplyRequest request) {
+    public PageResultData<GetReportedReplyResponse> getReportedReplyList(GetReportedReplyRequest request) {
         replyChecker.checkSearchValid(request.search());
         return  replyQueryRepository.findAllReportedByPageableAndSearch(request);
     }

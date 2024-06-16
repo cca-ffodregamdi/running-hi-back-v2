@@ -19,7 +19,7 @@ public class GetReportedReplySearchRequest {
         int page;
 
         @Positive
-        @Schema(description = "페이지 당 표시 게시글 수", example = "10")
+        @Schema(description = "페이지 당 표시 댓글 수", example = "10")
         int size;
 
         @Pattern(regexp = "desc|asc|ASC|DESC", message = "정렬 조건이 맞지 않습니다.")
@@ -41,7 +41,6 @@ public class GetReportedReplySearchRequest {
                 this.sortDirection = sortDirection;
                 this.reportStatus = reportStatus;
                 this.search = search;
-
 
         }
 }

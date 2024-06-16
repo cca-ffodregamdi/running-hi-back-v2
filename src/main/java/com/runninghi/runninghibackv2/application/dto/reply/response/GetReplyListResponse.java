@@ -4,12 +4,13 @@ import com.runninghi.runninghibackv2.domain.entity.Reply;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record GetReplyListResponse (
 
         @Schema(description = "댓글 번호", example = "2")
         Long replyNo,
+        @Schema(description = "댓글 작성자 Id", example = "1")
+        Long memberNo,
         @Schema(description = "댓글 작성자 닉네임", example = "러너1")
         String memberName,
         @Schema(description = "게시글 번호", example = "1")
@@ -30,19 +31,7 @@ public record GetReplyListResponse (
     public static GetReplyListResponse fromEntity (Reply reply) {
         return new GetReplyListResponse(
                 reply.getReplyNo(),
-                reply.getWriter().getNickname(),
-                reply.getPost().getPostNo(),
-                reply.getReplyContent(),
-                reply.getReportedCount(),
-                reply.isDeleted(),
-                reply.getCreateDate(),
-                reply.getUpdateDate()
-        );
-    }
-
-    public static GetReplyListResponse pureReplyListFromEntity (Reply reply) {
-        return new GetReplyListResponse(
-                reply.getReplyNo(),
+                reply.getWriter().getMemberNo(),
                 reply.getWriter().getNickname(),
                 reply.getPost().getPostNo(),
                 reply.getReplyContent(),
