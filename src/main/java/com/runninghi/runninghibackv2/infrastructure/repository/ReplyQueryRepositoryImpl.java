@@ -169,11 +169,16 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .from(reply)
                 .join(reply.writer, member)
                 .where(
-                        reply.replyNo.loe(request.getReplyNo()),
+                        eqReplyNo(request.getReplyNo()),
                         reply.isDeleted.eq(false))
                 .orderBy(reply.replyNo.desc())
                 .limit(request.getSize())
                 .fetch();
+    }
+
+    private BooleanExpression eqReplyNo(Long replyNo) {
+        if (replyNo == null) return null;
+        return reply.replyNo.loe(replyNo);
     }
 
 
