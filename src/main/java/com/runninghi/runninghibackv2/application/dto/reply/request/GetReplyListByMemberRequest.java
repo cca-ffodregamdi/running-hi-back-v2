@@ -24,17 +24,12 @@ public class GetReplyListByMemberRequest {
     @Schema(description = "특정 회원 번호", example = "1")
     Long memberNo;
 
-    @Positive(message = "replyNo는 자연수만 입력 가능합니다.")
-    @Schema(description = "댓글 번호", example = "1")
-    Long replyNo;
-
     Pageable pageable;
 
-    public GetReplyListByMemberRequest(Integer page, Integer size, Long memberNo, Long replyNo) {
+    public GetReplyListByMemberRequest(Integer page, Integer size, Long memberNo) {
         this.page = page == null ? 0 : page;
         this.size = size == null ? 10 : size;
         this.memberNo = memberNo;
-        this.replyNo = replyNo;
     }
 
     public void setPageable(Pageable pageable) {

@@ -43,7 +43,14 @@ public class ReplyService {
      */
     @Transactional(readOnly = true)
     public PageResultData<GetReplyListResponse> getReplyList(GetReplyListRequest request) {
-        return replyQueryRepository.findAllByPostNo(request);
+
+        PageResultData<GetReplyListResponse> pageResultData =  replyQueryRepository.findAllByPostNo(request);
+        pageResultData.getContent()
+                .stream()
+                .filter(i -> i.getMemberNo().equals(request.getMemberNo()))
+                .forEach(i -> i.setIsOwner(true));
+
+        return pageResultData;
     }
 
 
@@ -54,6 +61,13 @@ public class ReplyService {
      */
     @Transactional(readOnly = true)
     public PageResultData<GetReplyListResponse> getReplyListByMemberNo(GetReplyListByMemberRequest request) {
+
+        PageResultData<GetReplyListResponse> pageResultData = replyQueryRepository.findAllByMemberNo(request);
+        pageResultData.getContent()
+                .stream()
+                .filter(i -> i.getMemberNo().equals(request.getMemberNo()))
+                .forEach(i -> i.setIsOwner(true));
+
         return replyQueryRepository.findAllByMemberNo(request);
     }
 

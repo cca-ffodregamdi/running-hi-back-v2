@@ -147,10 +147,10 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .join(reply.writer, member)
                 .where(
                         reply.post.postNo.eq(request.getPostNo()),
-                        reply.replyNo.loe(request.getReplyNo()),
                         reply.isDeleted.eq(false))
                 .orderBy(reply.replyNo.desc())
-                .limit(request.getSize())
+                .offset(request.getPageable().getOffset())
+                .limit(request.getPageable().getPageSize())
                 .fetch();
     }
 
@@ -169,11 +169,16 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .from(reply)
                 .join(reply.writer, member)
                 .where(
-                        reply.replyNo.loe(request.getReplyNo()),
                         reply.isDeleted.eq(false))
                 .orderBy(reply.replyNo.desc())
-                .limit(request.getSize())
+                .offset(request.getPageable().getOffset())
+                .limit(request.getPageable().getPageSize())
                 .fetch();
+    }
+
+    private BooleanExpression eqReplyNo(Long replyNo) {
+        if (replyNo == null) return null;
+        return reply.replyNo.loe(replyNo);
     }
 
 
@@ -188,6 +193,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
 
         return replyReport.status.eq(reportStatus);
     }
+
 
     private List<OrderSpecifier<?>> getOrderSpecifierList (Sort sort) {
 
