@@ -38,10 +38,12 @@ public record GetPostResponse(
         String imageUrl,
         @Schema(description = "좋아요 개수", example = "5")
         Long likeCnt,
+        @Schema(description = "북마크 개수", example = "10")
+        Long bookmarkCnt,
         @Schema(description = "댓글 개수", example = "5")
         Long replyCnt
 ) {
-    public static GetPostResponse from(Post post, String imageUrl, Long replyCnt) {
+    public static GetPostResponse from(Post post, String imageUrl, Long bookmarkCnt, Long replyCnt) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
@@ -55,6 +57,7 @@ public record GetPostResponse(
                 post.getGpsDataVO().getMeanPace(),
                 post.getGpsDataVO().getKcal(),
                 imageUrl,
+                bookmarkCnt,
                 5L,
                 replyCnt
         );
