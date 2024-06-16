@@ -147,7 +147,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .join(reply.writer, member)
                 .where(
                         reply.post.postNo.eq(request.getPostNo()),
-                        reply.replyNo.loe(request.getReplyNo()),
+                        eqReplyNo(request.getReplyNo()),
                         reply.isDeleted.eq(false))
                 .orderBy(reply.replyNo.desc())
                 .limit(request.getSize())
