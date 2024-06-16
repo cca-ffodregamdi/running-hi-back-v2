@@ -15,18 +15,14 @@ public record GetChallengeResponse(
         String content,
         @Schema(description = "챌린지 타입", example = "DISTANCE")
         ChallengeCategory challengeCategory,
+        @Schema(description = "챌린지 이미지", example = "test.jpg")
+        String imageUrl,
         @Schema(description = "목표 수치", example = "100.0")
-        float targetValue,
+        String targetValue,
         @Schema(description = "챌린지 시작일자", example = "2024-06-01T00:00:00")
         LocalDateTime startDate,
         @Schema(description = "챌린지 종료일자", example = "2024-0.6-30T00:00:00")
-        LocalDateTime endDate,
-        @Schema(description = "누적 달린 시간", example = "26.4")
-        float totalRunningTime,
-        @Schema(description = "누적 소모 칼로리", example = "170.34352")
-        float totalKcal,
-        @Schema(description = "누적 평균 페이스 (분/km)", example = "4.66935")
-        float totalMeanPace
+        LocalDateTime endDate
 ) {
     public static GetChallengeResponse from(Challenge challenge) {
         return new GetChallengeResponse(
@@ -34,12 +30,10 @@ public record GetChallengeResponse(
                 challenge.getTitle(),
                 challenge.getContent(),
                 challenge.getChallengeCategory(),
+                challenge.getImageUrl(),
                 challenge.getTargetValue(),
                 challenge.getStartDate(),
-                challenge.getEndDate(),
-                challenge.getTotalRunningTime(),
-                challenge.getTotalKcal(),
-                challenge.getTotalMeanPace()
+                challenge.getEndDate()
         );
     }
 }
