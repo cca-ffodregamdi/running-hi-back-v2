@@ -194,6 +194,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
         return replyReport.status.eq(reportStatus);
     }
 
+
     private List<OrderSpecifier<?>> getOrderSpecifierList (Sort sort) {
 
         List<OrderSpecifier<?>> orderList = new ArrayList<>();

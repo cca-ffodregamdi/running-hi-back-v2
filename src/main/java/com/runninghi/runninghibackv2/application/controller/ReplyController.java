@@ -65,13 +65,7 @@ public class ReplyController {
     @Operation(summary = "특정 회원 댓글 리스트 조회", description = "특정 회원의 댓글 리스트를 조회합니다.", responses = @ApiResponse(description = GET_RESPONSE_MESSAGE))
     public ResponseEntity<PageResult<GetReplyListResponse>> getReplyListByMemberNo(@Valid @ModelAttribute GetReplyListByMemberRequest request) {
 
-        request.setPageable(
-                PageRequest.of(
-                        request.getPage(),
-                        request.getSize(),
-                        Sort.by(Sort.Direction.DESC,"replyNo")
-                ));
-        PageResultData<GetReplyListResponse> replyList = replyService.getReplyListByMemberNo(request);
+        List<GetReplyListResponse> replyList = replyService.getReplyListByMemberNo(memberNo);
 
         return ResponseEntity.ok().body(PageResult.success(GET_RESPONSE_MESSAGE, replyList));
     }
