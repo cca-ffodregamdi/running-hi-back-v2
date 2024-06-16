@@ -147,10 +147,10 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .join(reply.writer, member)
                 .where(
                         reply.post.postNo.eq(request.getPostNo()),
-                        eqReplyNo(request.getReplyNo()),
                         reply.isDeleted.eq(false))
                 .orderBy(reply.replyNo.desc())
-                .limit(request.getSize())
+                .offset(request.getPageable().getOffset())
+                .limit(request.getPageable().getPageSize())
                 .fetch();
     }
 
@@ -169,10 +169,10 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .from(reply)
                 .join(reply.writer, member)
                 .where(
-                        eqReplyNo(request.getReplyNo()),
                         reply.isDeleted.eq(false))
                 .orderBy(reply.replyNo.desc())
-                .limit(request.getSize())
+                .offset(request.getPageable().getOffset())
+                .limit(request.getPageable().getPageSize())
                 .fetch();
     }
 

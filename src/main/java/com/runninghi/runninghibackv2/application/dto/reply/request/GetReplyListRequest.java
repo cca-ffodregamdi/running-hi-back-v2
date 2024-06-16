@@ -23,16 +23,13 @@ public class GetReplyListRequest {
     @Schema(description = "특정 게시물 번호", example = "1")
     Long postNo;
 
-    @Positive(message = "replyNo는 자연수만 입력 가능합니다.")
-    @Schema(description = "댓글 번호", example = "1")
-    Long replyNo;
+    Long memberNo;
 
     Pageable pageable;
 
-    public GetReplyListRequest (Integer page, Integer size, Long postNo, Long replyNo) {
+    public GetReplyListRequest (Integer page, Integer size, Long postNo) {
         this.page = page == null ? 0 : page;
         this.size = size == null ? 10 : size;
-        this.replyNo = replyNo;
         this.postNo = postNo;
 
     }
@@ -40,5 +37,7 @@ public class GetReplyListRequest {
     public void setPageable(Pageable pageable) {
         this.pageable = pageable;
     }
+
+    public void setMemberNo(Long memberNo) { this.memberNo = memberNo;}
 
 }
