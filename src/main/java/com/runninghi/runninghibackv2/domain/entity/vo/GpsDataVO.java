@@ -35,11 +35,11 @@ public class GpsDataVO implements Serializable {
 
     @Column
     @Comment("뛴 시간")
-    private float time;
+    private int time;
 
     @Column
     @Comment("소모 칼로리")
-    private float kcal;
+    private int kcal;
 
     @Column
     @Comment("평균 속도")
@@ -47,9 +47,9 @@ public class GpsDataVO implements Serializable {
 
     @Column
     @Comment("평균 페이스 (분/km)")
-    private float meanPace;
+    private int meanPace;
 
-    public GpsDataVO(float startLatitude, float startLongitude, float endLatitude, float endLongitude, float distance, float time, float kcal, float speed, float meanPace) {
+    public GpsDataVO(float startLatitude, float startLongitude, float endLatitude, float endLongitude, float distance, int time, int kcal, float speed, int meanPace) {
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;
         this.endLatitude = endLatitude;
