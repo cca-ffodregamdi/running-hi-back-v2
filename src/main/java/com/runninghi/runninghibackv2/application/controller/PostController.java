@@ -66,9 +66,10 @@ public class PostController {
 
     @GetMapping("/{postNo}")
     @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
-    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
-
-        GetPostResponse response = postService.getPostDetailByPostNo(postNo);
+    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@RequestHeader("Authorization") String bearerToken,
+                                                              @PathVariable Long postNo) {
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        GetPostResponse response = postService.getPostDetailByPostNo(memberInfo.memberNo(), postNo);
 
         return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
     }

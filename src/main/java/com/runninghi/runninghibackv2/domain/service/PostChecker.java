@@ -20,4 +20,11 @@ public class PostChecker {
             throw new AccessDeniedException("권한이 없습니다.");
         }
     }
+
+    public boolean isOwner(Long memberNo, Long postWriterNo) {
+        if (!postWriterNo.equals(memberNo)) {
+            return false;
+        }
+        return true;
+    }
 }

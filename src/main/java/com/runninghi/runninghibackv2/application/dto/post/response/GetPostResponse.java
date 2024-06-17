@@ -24,6 +24,8 @@ public record GetPostResponse(
         String postContent,
         @Schema(description = "권한", example = "MEMBER")
         Role role,
+        @Schema(description = "게시글 작성자 본인 여부", example = "true")
+        boolean isOwner,
         @Schema(description = "코스 위치", example = "서울특별시 성북구")
         String locationName,
         @Schema(description = "달린 거리(km)", example = "8.38")
@@ -43,7 +45,7 @@ public record GetPostResponse(
         @Schema(description = "댓글 개수", example = "5")
         Long replyCnt
 ) {
-    public static GetPostResponse from(Post post, String imageUrl, Long bookmarkCnt, Long replyCnt) {
+    public static GetPostResponse from(Post post, String imageUrl, Long bookmarkCnt, Long replyCnt, Boolean isOwner) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
@@ -51,6 +53,7 @@ public record GetPostResponse(
                 post.getCreateDate(),
                 post.getPostContent(),
                 post.getRole(),
+                isOwner,
                 post.getLocationName(),
                 post.getGpsDataVO().getDistance(),
                 post.getGpsDataVO().getTime(),
