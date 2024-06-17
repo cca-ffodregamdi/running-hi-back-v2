@@ -286,7 +286,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public GetPostResponse getPostDetailByPostNo(Long postNo) {
-        return postQueryRepository.getPostDetailByPostNo(postNo);
+    public GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo) {
+        return postQueryRepository.getPostDetailByPostNo(memberNo, postNo);
     }
 }

@@ -10,6 +10,7 @@ import com.runninghi.runninghibackv2.domain.entity.QImage;
 import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
+import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
     private final PostRepository postRepository;
     private final ReplyRepository replyRepository;
+    private final PostChecker postChecker;
 
     @Override
     @Transactional(readOnly = true)
@@ -95,10 +97,12 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public GetPostResponse getPostDetailByPostNo(Long postNo) {
+    public GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo) {
 
         Post post = postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
+
+        Boolean isWriter = postChecker.isOwner(memberNo, post.getMember().getMemberNo());
 
         String imageUrl = jpaQueryFactory
                 .select(image.imageUrl)
@@ -116,7 +120,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
 
 
-        return GetPostResponse.from(post, imageUrl, bookmarkCnt, replyCnt);
+        return GetPostResponse.from(post, imageUrl, bookmarkCnt, replyCnt, isWriter);
     }
 
 }

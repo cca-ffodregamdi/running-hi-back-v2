@@ -9,5 +9,5 @@ import org.springframework.data.domain.Pageable;
 public interface PostQueryRepository {
     PageResultData<GetAllPostsResponse> findAllPostsByPageable(Pageable pageable);
     PageResultData<GetAllPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo);
-    GetPostResponse getPostDetailByPostNo(Long postNo);
+    GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo);
 }
