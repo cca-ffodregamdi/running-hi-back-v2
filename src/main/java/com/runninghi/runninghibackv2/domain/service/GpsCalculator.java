@@ -32,7 +32,7 @@ public class GpsCalculator {
 
     private List<TrackPoint> trackPoints = new ArrayList<>();
     private float totalDistance = 0.0f;
-    private float totalTimeInMinutes = 0.0f;
+    private int totalTimeInSeconds = 0;
     private static final double R = 6371;
 
 
@@ -69,7 +69,7 @@ public class GpsCalculator {
 
         trackPoints.clear(); // trackPoints 리스트 초기화
         totalDistance = 0.0f; // totalDistance 초기화
-        totalTimeInMinutes = 0.0f; // totalTimeInMinutes 초기화
+        totalTimeInSeconds = 0; // totalTimeInMinutes 초기화
 
         processJson(gpxData);
 
@@ -78,10 +78,10 @@ public class GpsCalculator {
         float endLatitude = getEndLatitude();
         float endLongitude = getEndLongitude();
         float distance = calculateDistance();
-        float time = calculateTimeInMinutes();
-        float kcal = calculateKcal();
+        int time = calculateTimeInSeconds();
+        int kcal = calculateKcal();
         float speed = calculateSpeed();
-        float meanPace = calculateMeanPace();
+        int meanPace = calculateMeanPace();
 
         return new GpsDataVO(startLatitude, startLongitude, endLatitude, endLongitude, distance, time, kcal, speed, meanPace);
     }
@@ -129,31 +129,31 @@ public class GpsCalculator {
     }
 
 
-    private float calculateTimeInMinutes() {
+    private int calculateTimeInSeconds() {
 
         LocalDateTime startTime = trackPoints.get(0).time;
         LocalDateTime endTime = trackPoints.get(trackPoints.size() - 1).time;
         Duration duration = Duration.between(startTime, endTime);
 
-        totalTimeInMinutes = (float) duration.getSeconds() / 60;
+        totalTimeInSeconds = (int) duration.getSeconds();
 
-        return totalTimeInMinutes;
+        return totalTimeInSeconds;
     }
 
-    private float calculateKcal() {
+    private int calculateKcal() {
         // 평균 1km 당 50kcal 소모 (키, 몸무게에 따라 변동 필요)
-        return totalDistance * 50.0f;
+        return (int) (totalDistance * 50.0f);
     }
 
     private float calculateSpeed() {
         // 속도 = 거리 / 시간
-        return totalDistance / totalTimeInMinutes;
+        return totalDistance / totalTimeInSeconds / 60;
     }
 
-    private float calculateMeanPace() {
+    private int calculateMeanPace() {
         // 페이스 = 시간 / 거리
         // 1분당 평균 페이스로 반환
-        return totalTimeInMinutes / totalDistance;
+        return (int) (totalTimeInSeconds  / totalDistance);
     }
 
 //    private float calculateMeanSlope() {

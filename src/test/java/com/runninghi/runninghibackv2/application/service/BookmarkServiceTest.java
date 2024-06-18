@@ -62,7 +62,7 @@ class BookmarkServiceTest {
                 .role(Role.USER)
                 .build();
 
-        GpsDataVO gpxDataVO = new GpsDataVO(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f);
+        GpsDataVO gpxDataVO = new GpsDataVO(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 42000, 200, 0.1f, 300);
         post1 = Post.builder()
                 .member(member1)
                 .postContent("게시글 내용1")

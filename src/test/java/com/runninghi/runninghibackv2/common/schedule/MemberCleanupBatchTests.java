@@ -142,7 +142,7 @@ class MemberCleanupBatchTests {
                 .role(Role.USER)
                 .locationName("서울")
                 .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO(37.1234f, 127.5678f, 37.9876f, 126.5432f, 10.5f, 3600f, 200f, 5f, 6f))
+                .gpsDataVO(new GpsDataVO(37.1234f, 127.5678f, 37.9876f, 126.5432f, 10.5f, 3600, 200, 5f, 6))
                 .build();
         posts.add(post1);
 
@@ -153,7 +153,7 @@ class MemberCleanupBatchTests {
                 .role(Role.ADMIN)
                 .locationName("부산")
                 .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500f, 250f, 4f, 5f))
+                .gpsDataVO(new GpsDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500, 250, 4f, 5))
                 .build();
         posts.add(post2);
 
@@ -163,7 +163,7 @@ class MemberCleanupBatchTests {
                 .role(Role.USER)
                 .locationName("대구")
                 .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO(35.6789f, 128.9876f, 35.4321f, 129.8765f, 8.7f, 3000f, 180f, 6f, 7f))
+                .gpsDataVO(new GpsDataVO(35.6789f, 128.9876f, 35.4321f, 129.8765f, 8.7f, 3000, 180, 6f, 7))
                 .build();
         posts.add(post3);
 

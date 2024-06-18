@@ -30,12 +30,12 @@ public record GetPostResponse(
         String locationName,
         @Schema(description = "달린 거리(km)", example = "8.38")
         float distance,
-        @Schema(description = "달린 시간", example = "1.23333")
-        float time,
-        @Schema(description = "평균 페이스 (분/km)", example = "4.66")
-        float meanPace,
+        @Schema(description = "달린 시간", example = "42000(초)")
+        int time,
+        @Schema(description = "평균 페이스 (분/km), 초 단위", example = "300(초)")
+        int meanPace,
         @Schema(description = "소모 칼로리 (kcal)", example = "200")
-        float kcal,
+        int kcal,
         @Schema(description = "이미지 URL 리스트", example = "https://picsum.photos/200")
         String imageUrl,
         @Schema(description = "좋아요 개수", example = "5")
