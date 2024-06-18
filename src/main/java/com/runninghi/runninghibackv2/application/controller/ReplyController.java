@@ -18,13 +18,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "댓글 API", description = "댓글 관련 API")
 public class ReplyController {
 
+    private static final Logger log = LoggerFactory.getLogger(ReplyController.class);
     private final JwtTokenProvider jwtTokenProvider;
     private final ReplyService replyService;
 
@@ -51,7 +54,7 @@ public class ReplyController {
         request.setMemberNo(accessTokenInfo.memberNo());
         request.setPageable(
                 PageRequest.of(
-                        request.getPage(),
+                        request.getPage() - 1,
                         request.getSize(),
                         Sort.by(Sort.Direction.DESC,"replyNo")
                 ));
@@ -68,7 +71,7 @@ public class ReplyController {
 
         request.setPageable(
                 PageRequest.of(
-                        request.getPage(),
+                        request.getPage() - 1,
                         request.getSize(),
                         Sort.by(Sort.Direction.DESC,"replyNo")
                 ));
@@ -83,7 +86,7 @@ public class ReplyController {
     public ResponseEntity<PageResult<GetReportedReplyResponse>> getReportedReplyList(@Valid @ModelAttribute GetReportedReplySearchRequest searchRequest) {
 
         Sort sort = Sort.by( Sort.Direction.fromString(searchRequest.getSortDirection()), "createDate" );
-        Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize(), sort);
+        Pageable pageable = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize(), sort);
         PageResultData<GetReportedReplyResponse> reportedReplyPage = replyService.getReportedReplyList(
                 GetReportedReplyRequest.of(pageable, searchRequest.getSearch(), searchRequest.getReportStatus())
         );
@@ -132,14 +135,14 @@ public class ReplyController {
     @Operation(
             summary = "댓글 삭제",
             description = "특정 댓글을 삭제합니다.",
-            responses = @ApiResponse(responseCode = "204", description = DELETE_RESPONSE_MESSAGE)
+            responses = @ApiResponse(responseCode = "200", description = DELETE_RESPONSE_MESSAGE)
     )
     public ResponseEntity<ApiResult<Void>> deleteReply(@Parameter(description = "삭제할 댓글 번호") @PathVariable(name = "replyNo") Long replyNo,
                                                  @Parameter(description = "사용자 인증을 위한 BearerToken") @RequestHeader("Authorization") String bearerToken) {
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, accessTokenInfo.role(), accessTokenInfo.memberNo());
         replyService.deleteReply(request);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success(DELETE_RESPONSE_MESSAGE, null));
+        return ResponseEntity.ok().body(ApiResult.success(DELETE_RESPONSE_MESSAGE, null));
     }
 
 }

@@ -6,14 +6,12 @@ import org.springframework.data.domain.Pageable;
 
 public record GetReportedReplyRequest (
         Pageable pageable,
-        long offset,
         String search,
         ProcessingStatus reportStatus
 ) {
     public static GetReportedReplyRequest of (Pageable pageable, String search, String reportStatus) {
         return new GetReportedReplyRequest(
                 pageable,
-                (long) (pageable.getPageNumber() - 1)* pageable.getPageSize(),
                 search,
                 reportStatus.equals("ALL") ? null : ProcessingStatus.valueOf(reportStatus)
         );
