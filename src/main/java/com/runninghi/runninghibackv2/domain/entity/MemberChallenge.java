@@ -40,5 +40,22 @@ public class MemberChallenge extends BaseTimeEntity {
         this.record = record;
     }
 
+    public void updateRecord(GpsDataVO gpsDataVO) {
+        ChallengeCategory challengeCategory = this.challenge.getChallengeCategory();
+        float floatRecord = Float.parseFloat(this.record);
 
+        if(challengeCategory == ChallengeCategory.DISTANCE) {
+            this.record = String.valueOf(floatRecord + gpsDataVO.getDistance());
+        }
+
+        if(challengeCategory == ChallengeCategory.SPEED) {
+            this.record = String.valueOf(floatRecord + gpsDataVO.getSpeed());
+        }
+    }
+
+    public void updateRecord() {
+        int intRecord = Integer.parseInt(this.record);
+
+        this.record = String.valueOf(intRecord + 1);
+    }
 }
