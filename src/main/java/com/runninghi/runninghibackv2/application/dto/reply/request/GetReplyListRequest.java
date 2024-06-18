@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 @ToString
 public class GetReplyListRequest {
 
-    @PositiveOrZero(message = "현재 페이지는 0 또는 자연수만 입력 가능합니다.")
+    @Positive(message = "현재 페이지는 자연수만 입력 가능합니다.")
     @Schema(description = "현재 페이지", example = "1")
     int page;
 

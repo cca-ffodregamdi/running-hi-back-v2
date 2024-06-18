@@ -41,6 +41,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
 
         Long count = getReportedCount(request);
         if (count < 1) return null;
+        if (request.pageable().getPageNumber() > 1) checkReplyCount(count, request.pageable().getPageNumber(), request.pageable().getPageSize());
         List<GetReportedReplyResponse> content = getReportedReplyList(request);
 
         return new PageResultData<>(content, request.pageable(), count);
@@ -51,9 +52,16 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
 
         Long count = getCountByPostNo(request);
         if (count < 1) throw new EntityNotFoundException();
+        if (request.getPage() > 1) checkReplyCount(count, request.getPage(), request.getSize());
         List<GetReplyListResponse> content = getReplyListByPostNo(request);
 
         return new PageResultData<>(content, request.getPageable(), count);
+    }
+
+    private void checkReplyCount(Long count, int page, int size) {
+        if (page > Math.ceil((double)count / size)) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -61,6 +69,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
 
         Long count = getCountByMemberNo(request);
         if (count < 1) throw new EntityNotFoundException();
+        if (request.getPage() > 1) checkReplyCount(count, request.getPage(), request.getSize());
         List<GetReplyListResponse> content = getReplyListByMemberNo(request);
 
         return new PageResultData<>(content, request.getPageable(), count);
@@ -124,7 +133,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .orderBy(
                         getOrderSpecifierList(request.pageable().getSort())
                                 .toArray(OrderSpecifier[]::new))
-                .offset(request.offset())
+                .offset(request.pageable().getOffset())
                 .limit( request.pageable().getPageSize())
                 .fetch();
 
@@ -169,6 +178,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .from(reply)
                 .join(reply.writer, member)
                 .where(
+                        reply.writer.memberNo.eq(request.getMemberNo()),
                         reply.isDeleted.eq(false))
                 .orderBy(reply.replyNo.desc())
                 .offset(request.getPageable().getOffset())
