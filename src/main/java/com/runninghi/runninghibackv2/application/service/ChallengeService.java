@@ -28,6 +28,7 @@ public class ChallengeService {
                 .title(request.title())
                 .content(request.content())
                 .challengeCategory(request.challengeCategory())
+                .imageUrl(request.imageUrl())
                 .targetValue(request.targetValue())
                 .startDate(request.startDate())
                 .endDate(request.endDate())

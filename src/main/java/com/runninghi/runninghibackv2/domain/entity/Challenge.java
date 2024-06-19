@@ -38,8 +38,12 @@ public class Challenge extends BaseTimeEntity {
     private ChallengeCategory challengeCategory;
 
     @NotNull
+    @Comment("챌린지 이미지")
+    private String imageUrl;
+
+    @NotNull
     @Comment("목표 수치")
-    private float targetValue;
+    private String targetValue;
 
     @Comment("챌린지 시작일자")
     private LocalDateTime startDate;
@@ -47,34 +51,27 @@ public class Challenge extends BaseTimeEntity {
     @Comment("챌린지 종료일자")
     private LocalDateTime endDate;
 
-    @Comment("누적 달린 시간")
-    private float totalRunningTime;
+    @Comment("챌린지 활성화 상태")
+    private boolean status;
 
-    @Comment("누적 소모 칼로리")
-    private float totalKcal;
-
-    @Comment("누적 평균 페이스 (분/km)")
-    private float totalMeanPace;
-
-    @OneToMany(mappedBy = "challenge")
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Comment("챌린지에 참여한 멤버 리스트")
     @JsonIgnore
     private List<MemberChallenge> participants;
 
     @Builder
     public Challenge(Long challengeNo, String title, String content, ChallengeCategory challengeCategory,
-                     float targetValue, LocalDateTime startDate, LocalDateTime endDate,
-                     float totalRunningTime, float totalKcal, float totalMeanPace, List<MemberChallenge> participants) {
+                     String imageUrl, String targetValue, LocalDateTime startDate, LocalDateTime endDate,
+                     boolean status, List<MemberChallenge> participants) {
         this.challengeNo = challengeNo;
         this.title = title;
         this.content = content;
         this.challengeCategory = challengeCategory;
+        this.imageUrl = imageUrl;
         this.targetValue = targetValue;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.totalRunningTime = totalRunningTime;
-        this.totalKcal = totalKcal;
-        this.totalMeanPace = totalMeanPace;
+        this.status = status;
         this.participants = participants;
     }
 
@@ -82,6 +79,7 @@ public class Challenge extends BaseTimeEntity {
         this.title = request.title();
         this.content = request.content();
         this.challengeCategory = request.challengeCategory();
+        this.imageUrl = request.imageUrl();
         this.targetValue = request.targetValue();
         this.startDate = request.startDate();
         this.endDate = request.endDate();
