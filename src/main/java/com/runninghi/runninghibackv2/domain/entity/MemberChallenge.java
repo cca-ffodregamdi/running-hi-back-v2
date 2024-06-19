@@ -49,7 +49,8 @@ public class MemberChallenge extends BaseTimeEntity {
         }
 
         if(challengeCategory == ChallengeCategory.SPEED) {
-            this.record = String.valueOf(floatRecord + gpsDataVO.getSpeed());
+            floatRecord = floatRecord == 0 ? gpsDataVO.getMeanPace() : (floatRecord + gpsDataVO.getMeanPace()) / 2;
+            this.record = String.valueOf(floatRecord);
         }
     }
 
