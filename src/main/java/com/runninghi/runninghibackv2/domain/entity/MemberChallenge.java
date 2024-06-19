@@ -29,54 +29,34 @@ public class MemberChallenge extends BaseTimeEntity {
     @Comment("챌린지에 참여한 멤버")
     private Member member;
 
-    @Comment("챌린지 시작 후 달린 거리")
-    private float distance;
-
-    @Comment("챌린지 시작 후 달린 시간")
-    private float runningTime;
-
-    @Comment("챌린지 시작 후 소모 칼로리")
-    private float kcal;
-
-    @Comment("챌린지 시작 후 평균 속도")
-    private float speed;
-
-    @Comment("챌린지 시작 후 평균 페이스 (분/km)")
-    private float meanPace;
-
-    @Comment("챌린지 달성 여부")
-    private boolean status;
+    @Comment("챌린지 시작 후 누적 기록")
+    private String record;
 
     @Builder
-    public MemberChallenge(Long memberChallengeId, Challenge challenge, Member member, float distance, float runningTime,
-                           float kcal, float speed, float meanPace, boolean status) {
+    public MemberChallenge(Long memberChallengeId, Challenge challenge, Member member) {
         this.memberChallengeId = memberChallengeId;
         this.challenge = challenge;
         this.member = member;
-        this.distance = distance;
-        this.runningTime = runningTime;
-        this.kcal = kcal;
-        this.speed = speed;
-        this.meanPace = meanPace;
-        this.status = status;
+        this.record = "0";
     }
 
     public void updateRecord(GpsDataVO gpsDataVO) {
-        this.distance += gpsDataVO.getDistance();
-        this.runningTime += gpsDataVO.getTime();
-        this.kcal += gpsDataVO.getKcal();
-        this.speed = this.speed == 0 ? gpsDataVO.getSpeed() : (speed + gpsDataVO.getSpeed()) / 2;
-        this.meanPace = this.meanPace == 0 ? gpsDataVO.getMeanPace() : (meanPace + gpsDataVO.getMeanPace()) / 2;
+        ChallengeCategory challengeCategory = this.challenge.getChallengeCategory();
+        float floatRecord = Float.parseFloat(this.record);
 
-        checkAndUpdateStatus(this.challenge.getChallengeCategory(), this.challenge.getTargetValue());
+        if(challengeCategory == ChallengeCategory.DISTANCE) {
+            this.record = String.valueOf(floatRecord + gpsDataVO.getDistance());
+        }
+
+        if(challengeCategory == ChallengeCategory.SPEED) {
+            floatRecord = floatRecord == 0 ? gpsDataVO.getMeanPace() : (floatRecord + gpsDataVO.getMeanPace()) / 2;
+            this.record = String.valueOf(floatRecord);
+        }
     }
 
-    private void checkAndUpdateStatus(ChallengeCategory challengeCategory, float targetValue) {
-        float value = 0;
-        if(challengeCategory == ChallengeCategory.DISTANCE) value = this.distance;
-        if(challengeCategory == ChallengeCategory.SPEED) value = this.speed;
-        // if(challengeCategory == ChallengeCategory.ATTENDANCE)
+    public void updateRecord() {
+        int intRecord = Integer.parseInt(this.record);
 
-        this.status = value >= targetValue ? true : false;
+        this.record = String.valueOf(intRecord + 1);
     }
 }
