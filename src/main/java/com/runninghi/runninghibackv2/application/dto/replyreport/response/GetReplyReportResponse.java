@@ -24,6 +24,7 @@ public record GetReplyReportResponse(
         boolean isReplyDeleted
 ) {
     public static GetReplyReportResponse from(ReplyReport replyReport) {
+        Long replyNo = replyReport.getReportedReply() != null ? replyReport.getReportedReply().getReplyNo() : null;
 
         return new GetReplyReportResponse(
                 replyReport.getReplyReportNo(),
@@ -31,7 +32,7 @@ public record GetReplyReportResponse(
                 replyReport.getContent(),
                 replyReport.getStatus(),
                 replyReport.getReporter().getMemberNo(),
-                replyReport.getReportedReply().getReplyNo(),
+                replyNo,
                 replyReport.getReplyContent(),
                 replyReport.isReplyDeleted());
     }

@@ -47,7 +47,7 @@ public class PostReport extends BaseTimeEntity {
     private Post reportedPost;
 
     @Column(nullable = false)
-    @Comment("용")
+    @Comment("신고된 게시글 내용")
     private String postContent;
 
     @Column(nullable = false)

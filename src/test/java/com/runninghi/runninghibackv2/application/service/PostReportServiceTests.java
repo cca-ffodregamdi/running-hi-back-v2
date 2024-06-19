@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-//@Transactional
+@Transactional
 class PostReportServiceTests {
 
     @Autowired
@@ -61,7 +61,6 @@ class PostReportServiceTests {
 
         reportedPost = Post.builder()
                 .member(reportedMember)
-                .postTitle("title")
                 .postContent("content")
                 .role(Role.USER)
                 .locationName("서울")
