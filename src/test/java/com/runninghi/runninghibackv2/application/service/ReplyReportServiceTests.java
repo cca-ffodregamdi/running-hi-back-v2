@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-//@Transactional
+@Transactional
 class ReplyReportServiceTests {
 
     @Autowired
@@ -65,7 +65,6 @@ class ReplyReportServiceTests {
 
         reportedPost = Post.builder()
                 .member(reportedMember)
-                .postTitle("title")
                 .postContent("content")
                 .role(Role.USER)
                 .locationName("서울")
@@ -102,7 +101,7 @@ class ReplyReportServiceTests {
         // when
         replyReportService.createReplyReport(reporter.getMemberNo(), request);
 
-        long afterCount = replyRepository.count();
+        long afterCount = replyReportRepository.count();
 
         // then
         assertEquals(1, afterCount - beforeCount);
