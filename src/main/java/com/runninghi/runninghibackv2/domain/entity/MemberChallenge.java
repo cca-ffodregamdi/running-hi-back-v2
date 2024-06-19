@@ -33,11 +33,11 @@ public class MemberChallenge extends BaseTimeEntity {
     private String record;
 
     @Builder
-    public MemberChallenge(Long memberChallengeId, Challenge challenge, Member member, String record) {
+    public MemberChallenge(Long memberChallengeId, Challenge challenge, Member member) {
         this.memberChallengeId = memberChallengeId;
         this.challenge = challenge;
         this.member = member;
-        this.record = record;
+        this.record = "0";
     }
 
     public void updateRecord(GpsDataVO gpsDataVO) {
