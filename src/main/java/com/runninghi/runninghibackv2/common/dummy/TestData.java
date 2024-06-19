@@ -23,6 +23,8 @@ public class TestData {
     private final ReplyReportRepository replyReportRepository;
     private final ReplyRepository replyRepository;
     private final KeywordRepository keywordRepository;
+    private final ChallengeRepository challengeRepository;
+    private final MemberChallengeRepository memberChallengeRepository;
 
     private final TestDatabaseMapper testDatabaseMapper;
 
@@ -45,6 +47,8 @@ public class TestData {
         testDatabaseMapper.insertReplyDummyData();
         testDatabaseMapper.insertPostReportDummyData();
         testDatabaseMapper.insertReplyReportDummyData();
+        testDatabaseMapper.insertChallengeDummyData();
+        testDatabaseMapper.insertMemberChallengeDummyData();
 
         return ResponseEntity.ok(ApiResult.success("DB 초기화, test용 dummy data 생성 성공", null));
     }
