@@ -20,4 +20,6 @@ public interface TestDatabaseMapper {
     void insertPostReportDummyData();
     void insertReplyReportDummyData();
     void insertFeedbackDummyData();
+    void insertChallengeDummyData();
+    void insertMemberChallengeDummyData();
 }

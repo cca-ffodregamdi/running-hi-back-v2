@@ -9,6 +9,7 @@ import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import com.runninghi.runninghibackv2.domain.service.GpsCalculator;
 import com.runninghi.runninghibackv2.domain.service.GpxCoordinateExtractor;
@@ -25,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
@@ -111,6 +114,8 @@ public class PostService {
 
         String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
 
+        updateRecordOfMyChallenges(member, gpsDataVO);
+
         Post createdPost = postRepository.save(Post.builder()
                 .member(member)
                 .role(member.getRole())
@@ -118,9 +123,6 @@ public class PostService {
                 .gpxUrl(gpxUrl)
                 .status(false)
                 .build());
-
-        createOrUpdateScore(member, gpsDataVO);
-        updateRecordOfMyChallenges(member, gpsDataVO);
 
         member.getRunDataVO().increaseRunData(gpsDataVO.getDistance());
 
@@ -280,7 +282,18 @@ public class PostService {
 
         if (myChallenges.size() == 0) return;
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = now.toLocalDate().atTime(LocalTime.MAX);
+
         for (MemberChallenge myChallenge : myChallenges) {
+            if (myChallenge.getChallenge().getChallengeCategory() == ChallengeCategory.ATTENDANCE) {
+                Optional<Post> post = postRepository.findFirstByMemberAndCreateDateBetween(member, startOfDay, endOfDay);
+                if (post.isEmpty()) {
+                    myChallenge.updateRecord();
+                }
+                continue;
+            }
             myChallenge.updateRecord(gpsDataVO);
         }
     }

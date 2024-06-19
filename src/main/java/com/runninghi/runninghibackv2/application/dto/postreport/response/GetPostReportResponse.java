@@ -24,6 +24,7 @@ public record GetPostReportResponse(
         boolean isPostDeleted
 ) {
     public static GetPostReportResponse from(PostReport postReport) {
+        Long postNo = postReport.getReportedPost() != null ? postReport.getReportedPost().getPostNo() : null;
 
         return new GetPostReportResponse(
                 postReport.getPostReportNo(),
@@ -31,7 +32,7 @@ public record GetPostReportResponse(
                 postReport.getContent(),
                 postReport.getStatus(),
                 postReport.getReporter().getMemberNo(),
-                postReport.getReportedPost().getPostNo(),
+                postNo,
                 postReport.getPostContent(),
                 postReport.isPostDeleted());
     }
