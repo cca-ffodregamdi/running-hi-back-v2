@@ -21,8 +21,8 @@ public class PageResultData<T> {
      */
     public PageResultData(List<T> content, Pageable pageable, long total) {
         this.content = content;
-        this.pageNumber = pageable.getPageNumber();
-        this.totalPages = (int) Math.floor((double) total / pageable.getPageSize());
+        this.pageNumber = pageable.getPageNumber() + 1;
+        this.totalPages = (int) Math.ceil((double) total / pageable.getPageSize());
     }
 }
 

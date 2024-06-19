@@ -24,24 +24,28 @@ public record GetPostResponse(
         String postContent,
         @Schema(description = "권한", example = "MEMBER")
         Role role,
+        @Schema(description = "게시글 작성자 본인 여부", example = "true")
+        boolean isOwner,
         @Schema(description = "코스 위치", example = "서울특별시 성북구")
         String locationName,
         @Schema(description = "달린 거리(km)", example = "8.38")
         float distance,
-        @Schema(description = "달린 시간", example = "1.23333")
-        float time,
-        @Schema(description = "평균 페이스 (분/km)", example = "4.66")
-        float meanPace,
+        @Schema(description = "달린 시간", example = "42000(초)")
+        int time,
+        @Schema(description = "평균 페이스 (분/km), 초 단위", example = "300(초)")
+        int meanPace,
         @Schema(description = "소모 칼로리 (kcal)", example = "200")
-        float kcal,
-        @Schema(description = "이미지 URL 리스트", example = "[\"url1\", \"url2\"]")
-        List<String> imageUrls,
-        @Schema(description = "댓글 리스트", example = "[\"url1\", \"url2\"]")
-        List<GetPostReplyResponse> replyList,
+        int kcal,
+        @Schema(description = "이미지 URL 리스트", example = "https://picsum.photos/200")
+        String imageUrl,
         @Schema(description = "좋아요 개수", example = "5")
-        Long likeCnt
+        Long likeCnt,
+        @Schema(description = "북마크 개수", example = "10")
+        Long bookmarkCnt,
+        @Schema(description = "댓글 개수", example = "5")
+        Long replyCnt
 ) {
-    public static GetPostResponse from(Post post, List<String> imageUrls, List<GetPostReplyResponse> replyList) {
+    public static GetPostResponse from(Post post, String imageUrl, Long bookmarkCnt, Long replyCnt, Boolean isOwner) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
@@ -49,14 +53,16 @@ public record GetPostResponse(
                 post.getCreateDate(),
                 post.getPostContent(),
                 post.getRole(),
+                isOwner,
                 post.getLocationName(),
                 post.getGpsDataVO().getDistance(),
                 post.getGpsDataVO().getTime(),
                 post.getGpsDataVO().getMeanPace(),
                 post.getGpsDataVO().getKcal(),
-                imageUrls,
-                replyList,
-                5L
+                imageUrl,
+                bookmarkCnt,
+                5L,
+                replyCnt
         );
     }
 }

@@ -1,32 +1,27 @@
 package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.application.dto.alarm.ReplyFCMDTO;
-import com.runninghi.runninghibackv2.application.dto.reply.request.CreateReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.request.DeleteReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.request.UpdateReplyRequest;
+import com.runninghi.runninghibackv2.application.dto.reply.request.*;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
-import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.Reply;
+import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
 import com.runninghi.runninghibackv2.domain.service.ReplyChecker;
-import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,44 +38,43 @@ public class ReplyService {
 
     /**
      * 게시글 조회 시 해당 게시글에 대한 댓글들 조회 메소드
-     * @param postNo 게시글 식별을 위한 키 값
-     * @return 댓글들 리스트 ( 댓글 정보, 부모와 자식 댓글 리스트 포함)
+     * @param request 게시글 식별을 위한 키 값
+     * @return 댓글들 리스트 ( 댓글 정보)
      */
     @Transactional(readOnly = true)
-    public List<GetReplyListResponse> getReplyList(Long postNo) {
+    public PageResultData<GetReplyListResponse> getReplyList(GetReplyListRequest request) {
 
-        List<Reply> replyList =  replyRepository.findAllByPost_PostNo(postNo);
-        if (replyList.isEmpty()) throw new EntityNotFoundException();
+        PageResultData<GetReplyListResponse> pageResultData =  replyQueryRepository.findAllByPostNo(request);
+        pageResultData.getContent()
+                .stream()
+                .filter(i -> i.getMemberNo().equals(request.getMemberNo()))
+                .forEach(i -> i.setIsOwner(true));
 
-
-        return replyList.stream()
-                .filter(reply -> !reply.isDeleted())
-                .map(GetReplyListResponse::fromEntity)
-                .toList();
+        return pageResultData;
     }
 
 
     /**
      * '내가 쓴 댓글들' 혹은 '특정 회원이 쓴 댓글들' 조회 메소드
-     * @param memberNo 작성자 식별을 위한 키 값
-     * @return 순수 댓글들(부모, 자식 댓글들 제외)
+     * @param request 작성자 식별을 위한 키 값
+     * @return 댓글들
      */
     @Transactional(readOnly = true)
-    public List<GetReplyListResponse> getReplyListByMemberNo(Long memberNo) {
+    public PageResultData<GetReplyListResponse> getReplyListByMemberNo(GetReplyListByMemberRequest request) {
 
-        List<Reply> replyList = replyRepository.findAllByWriter_MemberNo(memberNo);
-        if (replyList.isEmpty()) throw new EntityNotFoundException();
+        PageResultData<GetReplyListResponse> pageResultData = replyQueryRepository.findAllByMemberNo(request);
+        pageResultData.getContent()
+                .stream()
+                .filter(i -> i.getMemberNo().equals(request.getMemberNo()))
+                .forEach(i -> i.setIsOwner(true));
 
-        return replyList.stream()
-                .filter(reply -> !reply.isDeleted())
-                .map(GetReplyListResponse::pureReplyListFromEntity)
-                .toList();
+        return replyQueryRepository.findAllByMemberNo(request);
     }
 
     /**
      * 댓글 작성 메소드
      * @param request 댓글 작성에 필요한 정보
-     * @return 댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 부모 댓글 번호, 생성 일, 수정 일
+     * @return 댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 생성 일, 수정 일
      */
     @Transactional
     public CreateReplyResponse createReply(CreateReplyRequest request, Long memberNo) {
@@ -97,31 +91,20 @@ public class ReplyService {
                 .replyContent(request.replyContent())
                 .build();
 
-        // 부모 댓글 존재 시에
-        if (request.parentReplyNo() != null) {
-            Reply parentReply = findReplyByReplyNo(request.parentReplyNo());
-
-            parentReply.addChildrenReply(reply);
-            reply.addParentReply(parentReply);
-
-            // 부모 댓글 작성자에게 푸쉬 알림
-            replyFCMDTO.setParentReply(parentReply);
-        }
-
         Reply savedReply = replyRepository.save(reply);
 
         // 게시물 작성자에게 푸쉬 알림
 //        replyFCMDTO.setSavedReply(savedReply);
 //        alarmService.sendReplyPushNotification(replyFCMDTO);
 
-        return CreateReplyResponse.fromEntity(savedReply);
+        return new CreateReplyResponse(3);
     }
 
     /**
      * 댓글 수정 메소드
      * @param replyNo 댓글 식별을 위한 키 값
      * @param request 회원 식별을 위한 키 값, 수정할 댓글 내용
-     * @return  댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 부모 댓글 번호, 생성 일, 수정 일
+     * @return  댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 생성 일, 수정 일
      */
     @Transactional
     public UpdateReplyResponse updateReply(Long replyNo, UpdateReplyRequest request) {
@@ -178,7 +161,7 @@ public class ReplyService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GetReportedReplyResponse> getReportedReplyList(GetReportedReplyRequest request) {
+    public PageResultData<GetReportedReplyResponse> getReportedReplyList(GetReportedReplyRequest request) {
         replyChecker.checkSearchValid(request.search());
         return  replyQueryRepository.findAllReportedByPageableAndSearch(request);
     }

@@ -142,7 +142,7 @@ class MemberCleanupBatchTests {
                 .role(Role.USER)
                 .locationName("서울")
                 .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO(37.1234f, 127.5678f, 37.9876f, 126.5432f, 10.5f, 3600f, 200f, 5f, 6f))
+                .gpsDataVO(new GpsDataVO(37.1234f, 127.5678f, 37.9876f, 126.5432f, 10.5f, 3600, 200, 5f, 6))
                 .build();
         posts.add(post1);
 
@@ -153,7 +153,7 @@ class MemberCleanupBatchTests {
                 .role(Role.ADMIN)
                 .locationName("부산")
                 .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500f, 250f, 4f, 5f))
+                .gpsDataVO(new GpsDataVO(36.9876f, 126.5432f, 36.1234f, 127.5678f, 12.3f, 4500, 250, 4f, 5))
                 .build();
         posts.add(post2);
 
@@ -163,7 +163,7 @@ class MemberCleanupBatchTests {
                 .role(Role.USER)
                 .locationName("대구")
                 .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO(35.6789f, 128.9876f, 35.4321f, 129.8765f, 8.7f, 3000f, 180f, 6f, 7f))
+                .gpsDataVO(new GpsDataVO(35.6789f, 128.9876f, 35.4321f, 129.8765f, 8.7f, 3000, 180, 6f, 7))
                 .build();
         posts.add(post3);
 
@@ -234,35 +234,6 @@ class MemberCleanupBatchTests {
                 .build();
         replies.add(reply3);
 
-        Reply parentReply = Reply.builder()
-                .writer(member1)
-                .post(post2)
-                .replyContent("부모 댓글입니다.")
-                .reportedCount(0)
-                .isDeleted(false)
-                .build();
-        replies.add(parentReply);
-
-        Reply childReply1 = Reply.builder()
-                .writer(member2)
-                .post(post2)
-                .replyContent("자식 댓글입니다.")
-                .reportedCount(0)
-                .isDeleted(false)
-                .parent(parentReply)
-                .build();
-        replies.add(childReply1);
-
-        Reply childReply2 = Reply.builder()
-                .writer(member1)
-                .post(post2)
-                .replyContent("또 다른 자식 댓글입니다.")
-                .reportedCount(0)
-                .isDeleted(false)
-                .parent(parentReply)
-                .build();
-        replies.add(childReply2);
-
         replyRepository.saveAllAndFlush(replies);
 
 
@@ -290,17 +261,6 @@ class MemberCleanupBatchTests {
                 .isReplyDeleted(false)
                 .build();
         replyReports.add(report2);
-
-        ReplyReport report3 = ReplyReport.builder()
-                .category(ReportCategory.ILLEGALITY)
-                .content("부적절한 내용이 포함된 댓글입니다.")
-                .status(ProcessingStatus.INPROGRESS)
-                .reporter(member2)
-                .reportedReply(childReply1)
-                .replyContent(childReply1.getReplyContent())
-                .isReplyDeleted(false)
-                .build();
-        replyReports.add(report3);
 
         replyReportRepository.saveAllAndFlush(replyReports);
 
@@ -434,6 +394,7 @@ class MemberCleanupBatchTests {
             List<Alarm> afterAlarms = alarmRepository.findAll();
             List<Bookmark> afterBookmarks = bookmarkRepository.findAll();
             List<Reply> afterReplies = replyRepository.findAll();
+            System.out.println(afterReplies.size());
             List<ReplyReport> afterReplyReport = replyReportRepository.findAll();
             List<PostReport> afterPostReport = postReportRepository.findAll();
             List<PostKeyword> afterPostKeyword = postKeywordRepository.findAll();
@@ -443,8 +404,8 @@ class MemberCleanupBatchTests {
             assertEquals(3, beforePost);
             assertEquals(3, beforeAlarm);
             assertEquals(4, beforeBookmark);
-            assertEquals(6, beforeReply);
-            assertEquals(3, beforeReplyReport);
+            assertEquals(3, beforeReply);
+            assertEquals(2, beforeReplyReport);
             assertEquals(3, beforePostReport);
             assertEquals(2, beforePostKeyword);
             assertEquals(2, beforeFeedback);

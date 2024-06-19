@@ -47,16 +47,6 @@ public class Reply extends BaseTimeEntity {
     @Comment("삭제 여부")
     private boolean isDeleted;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "PARENT_NO")
-    @Comment("부모 댓글")
-    private Reply parent;
-
-    @OneToMany(mappedBy = "parent", orphanRemoval = true, cascade = CascadeType.REMOVE)   // cascade 설정! 부모 댓글 삭제 시 자식 댓글 삭제
-    @Comment("하위 댓글들")
-    private final List<Reply> children = new ArrayList<>();
-
     @OneToMany(mappedBy = "reportedReply", orphanRemoval = true, cascade = CascadeType.REMOVE)
     @Comment("댓글 신고 리스트")
     private final List<ReplyReport> reportList = new ArrayList<>();
@@ -68,16 +58,8 @@ public class Reply extends BaseTimeEntity {
         this.replyContent = builder.replyContent;
         this.reportedCount = builder.reportedCount;
         this.isDeleted = builder.isDeleted;
-        this.parent = builder.parent;
     }
 
-    public void addChildrenReply(Reply reply) {
-        this.children.add(reply);
-    }
-
-    public void addParentReply(Reply reply) {
-        this.parent = reply;
-    }
     public void addReportedCount () {this.reportedCount++;}
 
     public void resetReportedCount() {
@@ -96,14 +78,13 @@ public class Reply extends BaseTimeEntity {
 
 
     @Builder
-    public Reply(Long replyNo, Member writer, Post post, String replyContent, int reportedCount, boolean isDeleted, Reply parent) {
+    public Reply(Long replyNo, Member writer, Post post, String replyContent, int reportedCount, boolean isDeleted) {
         this.replyNo = replyNo;
         this.writer = writer;
         this.post = post;
         this.replyContent = replyContent;
         this.reportedCount = reportedCount;
         this.isDeleted = isDeleted;
-        this.parent = parent;
     }
 
 }

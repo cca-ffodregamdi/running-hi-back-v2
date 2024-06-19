@@ -1,12 +1,13 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.application.dto.post.request.*;
+import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
+import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
+import com.runninghi.runninghibackv2.application.service.PostService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
-import com.runninghi.runninghibackv2.application.service.PostService;
 import com.runninghi.runninghibackv2.common.response.PageResult;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,10 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.IOException;
 
 @Tag(name = "게시글/러닝코스 API", description = "게시글 작성, 조회, 수정, 삭제와 해당 게시글의 러닝코스 데이터를 조회하는 API 입니다.")
 @RestController
@@ -67,9 +66,10 @@ public class PostController {
 
     @GetMapping("/{postNo}")
     @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
-    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@PathVariable Long postNo) {
-
-        GetPostResponse response = postService.getPostDetailByPostNo(postNo);
+    public ResponseEntity<ApiResult<GetPostResponse>> getPost(@RequestHeader("Authorization") String bearerToken,
+                                                              @PathVariable Long postNo) {
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        GetPostResponse response = postService.getPostDetailByPostNo(memberInfo.memberNo(), postNo);
 
         return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
     }

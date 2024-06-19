@@ -7,13 +7,16 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.runninghi.runninghibackv2.application.dto.reply.request.GetReplyListByMemberRequest;
+import com.runninghi.runninghibackv2.application.dto.reply.request.GetReplyListRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedReplyRequest;
+import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -22,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.runninghi.runninghibackv2.domain.entity.QMember.member;
+import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
 import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 import static com.runninghi.runninghibackv2.domain.entity.QReplyReport.replyReport;
 
@@ -33,19 +37,67 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     private static final int REPORTED_COUNT = 1;
 
     @Override
-    public Page<GetReportedReplyResponse> findAllReportedByPageableAndSearch(GetReportedReplyRequest request) {
+    public PageResultData<GetReportedReplyResponse> findAllReportedByPageableAndSearch(GetReportedReplyRequest request) {
 
-        Long count = getCount(request);
+        Long count = getReportedCount(request);
         if (count < 1) return null;
+        if (request.pageable().getPageNumber() > 1) checkReplyCount(count, request.pageable().getPageNumber(), request.pageable().getPageSize());
         List<GetReportedReplyResponse> content = getReportedReplyList(request);
-        System.out.println("content : " + content);
 
-        return new PageImpl<>(content, request.pageable(), count);
+        return new PageResultData<>(content, request.pageable(), count);
     }
 
-    private Long getCount(GetReportedReplyRequest request) {
-        System.out.println("reportStatus : " + request.reportStatus());
-        System.out.println("getCount 입니다.");
+    @Override
+    public PageResultData<GetReplyListResponse> findAllByPostNo(GetReplyListRequest request) {
+
+        Long count = getCountByPostNo(request);
+        if (count < 1) throw new EntityNotFoundException();
+        if (request.getPage() > 1) checkReplyCount(count, request.getPage(), request.getSize());
+        List<GetReplyListResponse> content = getReplyListByPostNo(request);
+
+        return new PageResultData<>(content, request.getPageable(), count);
+    }
+
+    private void checkReplyCount(Long count, int page, int size) {
+        if (page > Math.ceil((double)count / size)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public PageResultData<GetReplyListResponse> findAllByMemberNo(GetReplyListByMemberRequest request) {
+
+        Long count = getCountByMemberNo(request);
+        if (count < 1) throw new EntityNotFoundException();
+        if (request.getPage() > 1) checkReplyCount(count, request.getPage(), request.getSize());
+        List<GetReplyListResponse> content = getReplyListByMemberNo(request);
+
+        return new PageResultData<>(content, request.getPageable(), count);
+    }
+
+    private Long getCountByMemberNo(GetReplyListByMemberRequest request) {
+        return jpaQueryFactory
+                .select(reply.replyNo.count())
+                .from(reply)
+                .where(
+                        reply.writer.memberNo.eq(request.getMemberNo()),
+                        reply.isDeleted.eq(false))
+                .fetchOne();
+    }
+
+    private Long getCountByPostNo(GetReplyListRequest request) {
+
+        return jpaQueryFactory
+                .select(reply.replyNo.count())
+                .from(reply)
+                .where(
+                        reply.post.postNo.eq(request.getPostNo()),
+                        reply.isDeleted.eq(false))
+                .fetchOne();
+
+    }
+
+    private Long getReportedCount(GetReportedReplyRequest request) {
         return jpaQueryFactory
                 .select(reply.replyNo.count())
                 .from(reply)
@@ -69,7 +121,6 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                         reply.replyContent,
                         reply.reportedCount,
                         reply.isDeleted,
-                        reply.parent.replyNo,
                         reply.createDate,
                         reply.updateDate
                 ))
@@ -82,11 +133,64 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .orderBy(
                         getOrderSpecifierList(request.pageable().getSort())
                                 .toArray(OrderSpecifier[]::new))
-                .offset(request.offset())
+                .offset(request.pageable().getOffset())
                 .limit( request.pageable().getPageSize())
                 .fetch();
 
     }
+
+    private List<GetReplyListResponse> getReplyListByPostNo(GetReplyListRequest request) {
+        return jpaQueryFactory
+                .select(Projections.constructor(GetReplyListResponse.class,
+                        reply.replyNo,
+                        member.memberNo,
+                        member.nickname,
+                        reply.post.postNo,
+                        reply.replyContent,
+                        reply.reportedCount,
+                        reply.isDeleted,
+                        reply.createDate,
+                        reply.updateDate))
+                .from(reply)
+                .join(reply.post, post)
+                .join(reply.writer, member)
+                .where(
+                        reply.post.postNo.eq(request.getPostNo()),
+                        reply.isDeleted.eq(false))
+                .orderBy(reply.replyNo.desc())
+                .offset(request.getPageable().getOffset())
+                .limit(request.getPageable().getPageSize())
+                .fetch();
+    }
+
+    private List<GetReplyListResponse> getReplyListByMemberNo(GetReplyListByMemberRequest request) {
+        return jpaQueryFactory
+                .select(Projections.constructor(GetReplyListResponse.class,
+                        reply.replyNo,
+                        member.memberNo,
+                        member.nickname,
+                        reply.post.postNo,
+                        reply.replyContent,
+                        reply.reportedCount,
+                        reply.isDeleted,
+                        reply.createDate,
+                        reply.updateDate))
+                .from(reply)
+                .join(reply.writer, member)
+                .where(
+                        reply.writer.memberNo.eq(request.getMemberNo()),
+                        reply.isDeleted.eq(false))
+                .orderBy(reply.replyNo.desc())
+                .offset(request.getPageable().getOffset())
+                .limit(request.getPageable().getPageSize())
+                .fetch();
+    }
+
+    private BooleanExpression eqReplyNo(Long replyNo) {
+        if (replyNo == null) return null;
+        return reply.replyNo.loe(replyNo);
+    }
+
 
     private BooleanExpression likeNickname (String search) {
         if (!StringUtils.hasText(search)) return null;   // space bar까지 막아줌

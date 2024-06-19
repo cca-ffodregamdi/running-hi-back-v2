@@ -33,6 +33,7 @@ public class AppleOauthService {
     private final AppleClient appleClient;
     private final ApplePublicKeyGenerator applePublicKeyGenerator;
     private final AppleClaimsValidator appleClaimsValidator;
+    private final AppleClientSecretProvider appleClientSecretProvider;
 
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -42,17 +43,13 @@ public class AppleOauthService {
     @Value("${apple.client-id}")
     private String clientId;
 
-    @Value("${apple.redirect-uri}")
-    private String redirectUri;
-
-
     // client secret 생성
     @Transactional
     public String createClientSecret() {
         try {
-            return new AppleClientSecretProvider().createClientSecret();
+            return appleClientSecretProvider.createClientSecret();
         } catch (Exception e) {
-            throw new AppleOauthException("apple client secret 생성에 실패했습니다.");
+            throw new AppleOauthException("apple client secret 생성에 실패했습니다. : " + e.getMessage());
         }
     }
 
@@ -60,9 +57,9 @@ public class AppleOauthService {
     @Transactional
     public AppleTokenResponse getAppleToken(String code, String clientSecret) {
         try {
-            return appleClient.appleAuth(clientId, redirectUri, code, GRANT_TYPE, clientSecret);
+            return appleClient.appleAuth(clientId, code, GRANT_TYPE, clientSecret);
         } catch (Exception e) {
-            throw new AppleOauthException("apple token 요청에 실패했습니다.");
+            throw new AppleOauthException("apple token 요청에 실패했습니다. : " + e.getMessage());
         }
     }
 
@@ -123,7 +120,7 @@ public class AppleOauthService {
     }
 
     // 새로운 토큰 생성 & 반환
-    private Map<String, String> generateTokens(Member member) {
+    private Map<String, String> generateTokens(Member member, boolean isNewMember) {
         AccessTokenInfo accessTokenInfo = new AccessTokenInfo(member.getMemberNo(), member.getRole());
         RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getAppleId(), member.getRole());
 
@@ -133,26 +130,29 @@ public class AppleOauthService {
         member.updateRefreshToken(refreshToken);
         memberRepository.save(member);
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
 
-        return tokens;
+        if (isNewMember)
+            response.put("memberNo", member.getMemberNo().toString());
+
+        return response;
     }
 
     // 로그인 메서드
     private Map<String, String> loginWithApple(Member member) {
         member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
-        return generateTokens(member);
+        return generateTokens(member, false);
     }
 
     // 회원 생성 및 로그인 메서드
-    private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToekn) {
+    private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToken) {
 
         Member member = Member.builder()
                 .appleId(appleResponse.get("sub"))
                 .name(appleResponse.get("name"))
-                .appleRefreshToken(appleRefreshToekn)
+                .appleRefreshToken(appleRefreshToken)
                 .nickname("러너 " + generateRandomDigits())
                 .isActive(true)
                 .isBlacklisted(false)
@@ -161,7 +161,7 @@ public class AppleOauthService {
                 .build();
 
         memberRepository.saveAndFlush(member);
-        return generateTokens(member);
+        return generateTokens(member, true);
     }
 
     /**

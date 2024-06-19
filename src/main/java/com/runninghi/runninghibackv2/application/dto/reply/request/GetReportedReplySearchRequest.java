@@ -19,10 +19,10 @@ public class GetReportedReplySearchRequest {
         int page;
 
         @Positive
-        @Schema(description = "페이지 당 표시 게시글 수", example = "10")
+        @Schema(description = "페이지 당 표시 댓글 수", example = "10")
         int size;
 
-        @Pattern(regexp = "desc|asc", message = "정렬 조건이 맞지 않습니다.")
+        @Pattern(regexp = "desc|asc|ASC|DESC", message = "정렬 조건이 맞지 않습니다.")
         @Schema(description = "정렬 조건", example = "desc")
         String sortDirection;
 
@@ -31,7 +31,7 @@ public class GetReportedReplySearchRequest {
         String reportStatus;
 
         @Size(max = 10, message = "10자 이내로 입력해주세요.")
-        @Pattern(regexp = "^[ ㄱ-ㅎ가-힣a-zA-Z0-9]*$") // 특수문자 입력 방지, 빈 문자, 공백 허용
+        @Pattern(regexp = "^[ ㄱ-ㅎ가-힣a-zA-Z0-9]*$", message = "한글과 영문, 숫자만 입력 가능합니다.") // 특수문자 입력 방지, 빈 문자, 공백 허용
         @Schema(description = "닉네임 검색 내용", example = " ")
         String search;
 
@@ -41,7 +41,6 @@ public class GetReportedReplySearchRequest {
                 this.sortDirection = sortDirection;
                 this.reportStatus = reportStatus;
                 this.search = search;
-
 
         }
 }

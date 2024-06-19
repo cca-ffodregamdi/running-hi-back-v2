@@ -59,8 +59,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(KakaoOauthException.class)
-    public ResponseEntity<ApiResult> handleKakaoLoginException() {
-        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_FAIL);
+    public ResponseEntity<ApiResult> handleKakaoLoginException(KakaoOauthException e) {
+        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_FAIL.getStatus(), e.getMessage());
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
@@ -71,8 +71,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AppleOauthException.class)
-    public ResponseEntity<ApiResult> handleAppleOauthException() {
-        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_FAIL);
+    public ResponseEntity<ApiResult> handleAppleOauthException(AppleOauthException e) {
+        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_FAIL.getStatus(), e.getMessage());
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
@@ -83,8 +83,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IOException.class)
-    public ResponseEntity<ApiResult> handleIOException() {
-        ApiResult apiResult = ApiResult.error(ErrorCode.INTER_SERVER_ERROR);
+    public ResponseEntity<ApiResult> handleIOException(IOException e) {
+        ApiResult apiResult = ApiResult.error(ErrorCode.INTER_SERVER_ERROR.getStatus(), e.getMessage());
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
@@ -93,6 +93,11 @@ public class GlobalExceptionHandler {
 
         String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResult.error(ErrorCode.BAD_REQUEST.getStatus(), errorMessage));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResult<Void>> handleIllegarArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResult.error(ErrorCode.BAD_REQUEST));
     }
 
 }

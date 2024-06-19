@@ -19,7 +19,6 @@ public interface AppleClient {
     @PostMapping("/auth/oauth2/v2/token")
     AppleTokenResponse appleAuth(
             @RequestParam("client_id") String clientId,
-            @RequestParam("redirect_uri") String redirectUri,
             @RequestParam("code") String code,
             @RequestParam("grant_type") String grantType,
             @RequestParam("client_secret") String clientSecret);

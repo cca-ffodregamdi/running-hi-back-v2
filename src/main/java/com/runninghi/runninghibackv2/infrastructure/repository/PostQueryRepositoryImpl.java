@@ -3,17 +3,16 @@ package com.runninghi.runninghibackv2.infrastructure.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetPostResponse;
-import com.runninghi.runninghibackv2.application.dto.reply.response.GetPostReplyResponse;
-import com.runninghi.runninghibackv2.common.response.PageResult;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
-import com.runninghi.runninghibackv2.domain.entity.*;
+import com.runninghi.runninghibackv2.domain.entity.Image;
+import com.runninghi.runninghibackv2.domain.entity.Post;
+import com.runninghi.runninghibackv2.domain.entity.QImage;
 import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
+import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +31,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
     private final PostRepository postRepository;
     private final ReplyRepository replyRepository;
+    private final PostChecker postChecker;
 
     @Override
     @Transactional(readOnly = true)
@@ -97,26 +97,30 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public GetPostResponse getPostDetailByPostNo(Long postNo) {
+    public GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo) {
 
         Post post = postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
 
-        List<Image> images = jpaQueryFactory.selectFrom(image)
+        Boolean isWriter = postChecker.isOwner(memberNo, post.getMember().getMemberNo());
+
+        String imageUrl = jpaQueryFactory
+                .select(image.imageUrl)
+                .from(image)
                 .where(image.postNo.eq(postNo))
-                .fetch();
+                .fetchFirst();
 
-        List<String> imageUrls = images.stream()
-                .map(Image::getImageUrl)
-                .collect(Collectors.toList());
+        Long bookmarkCnt = jpaQueryFactory
+                .select(bookmark.count())
+                .from(bookmark)
+                .where(bookmark.post.postNo.eq(postNo))
+                .fetchOne();
 
-        List<Reply> replies = replyRepository.findAllByPost_PostNo(postNo);
+        Long replyCnt = replyRepository.countByPost_PostNo(postNo);
 
-        List<GetPostReplyResponse> replyList = replies.stream()
-                .map(GetPostReplyResponse::from)
-                .collect(Collectors.toList());
 
-        return GetPostResponse.from(post, imageUrls.isEmpty() ? null : imageUrls, replyList);
+
+        return GetPostResponse.from(post, imageUrl, bookmarkCnt, replyCnt, isWriter);
     }
 
 }

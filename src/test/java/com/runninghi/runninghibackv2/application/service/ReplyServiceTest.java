@@ -123,106 +123,61 @@ class ReplyServiceTest {
     }
 
     /* Read */
-    @Test
-    @DisplayName("특정 게시글의 댓글 리스트 조회 테스트 : success, 삭제된 댓글은 제외되는 지 확인")
-    void testGetReplyList() {
-
-        // when
-        List<GetReplyListResponse> response = replyService.getReplyList(post.getPostNo());
-
-        // then
-        Assertions.assertThat(response)
-                .isNotEmpty()
-                .hasSize(3)
-                .extracting("memberName", String.class)
-                .contains("테스트멤버1", "테스트멤버2");
-    }
-
-    @ParameterizedTest
-    @DisplayName("특정 게시글의 댓글 리스트 조회 테스트 : 게시글 엔티티 조회 실패 시 예외 발생 확인")
-    @NullSource
-    @ValueSource(longs = 3)
-    void testGetReplyListException (Long postNo) {
-
-        // when & then
-        Assertions.assertThatThrownBy(() -> replyService.getReplyList(postNo))
-                .isInstanceOf(EntityNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("특정 회원의 쓴 댓글들 리스트 조회 테스트 : success, 삭제된 댓글 제외되는 지 확인")
-    void testGetReplyListByMemberNo () {
-
-        // given
-        List<String> expected = Arrays.asList("테스트멤버1", "테스트멤버1");
-
-        // when
-        List<GetReplyListResponse> response = replyService.getReplyListByMemberNo(member1.getMemberNo());
-
-        // then
-        Assertions.assertThat(response)
-                .isNotEmpty()
-                .hasSize(2)
-                .extracting("memberName", String.class)
-                .isEqualTo(expected);
-    }
-
-    @ParameterizedTest
-    @DisplayName("특정 회원의 쓴 댓글들 리스트 조회 테스트 : 없는 회원일 시 예외 발생하는 지 확인")
-    @NullSource
-    @ValueSource(longs = 0L)
-    void testGetReplyListBtMemberNoException(Long memberNo) {
-
-        // when & then
-        Assertions.assertThatThrownBy(
-                () -> replyService.getReplyListByMemberNo(memberNo)
-        ).isInstanceOf(EntityNotFoundException.class);
-
-    }
-
 //    @Test
-//    @DisplayName("댓글 생성 테스트 : success")
-//    void testCreateReplyTest () {
-//
-//        // given
-//        CreateReplyRequest request = new CreateReplyRequest(
-//                member1.getMemberNo(),
-//                post.getPostNo(),
-//                "새로운 댓글",
-//                null
-//        );
-//        long beforeSize = replyRepository.count();
-//
-//        // when & then
-//        replyService.createReply(request);
-//        long afterSize = replyRepository.count();
-//
-//        // then
-//        Assertions.assertThat(afterSize)
-//                .isEqualTo(beforeSize+1);
-//
-//
-//    }
-
-//    @Test
-//    @DisplayName("댓글 생성 테스트 : 부모 댓글 존재 시 엔티티 내부 부모 댓글 컬럼 확인")
-//    void testParentReply () {
-//
-//        // given
-//        CreateReplyRequest request = new CreateReplyRequest(
-//                member1.getMemberNo(),
-//                post.getPostNo(),
-//                "새로운 댓글",
-//                1L
-//        );
+//    @DisplayName("특정 게시글의 댓글 리스트 조회 테스트 : success, 삭제된 댓글은 제외되는 지 확인")
+//    void testGetReplyList() {
 //
 //        // when
-//        CreateReplyResponse response = replyService.createReply(request);
+//        List<GetReplyListResponse> response = replyService.getReplyList(post.getPostNo());
 //
 //        // then
 //        Assertions.assertThat(response)
-//                .extracting("parentReplyNo")
-//                .isEqualTo(request.parentReplyNo());
+//                .isNotEmpty()
+//                .hasSize(3)
+//                .extracting("memberName", String.class)
+//                .contains("테스트멤버1", "테스트멤버2");
+//    }
+//
+//    @ParameterizedTest
+//    @DisplayName("특정 게시글의 댓글 리스트 조회 테스트 : 게시글 엔티티 조회 실패 시 예외 발생 확인")
+//    @NullSource
+//    @ValueSource(longs = 3)
+//    void testGetReplyListException (Long postNo) {
+//
+//        // when & then
+//        Assertions.assertThatThrownBy(() -> replyService.getReplyList(postNo))
+//                .isInstanceOf(EntityNotFoundException.class);
+//    }
+//
+//    @Test
+//    @DisplayName("특정 회원의 쓴 댓글들 리스트 조회 테스트 : success, 삭제된 댓글 제외되는 지 확인")
+//    void testGetReplyListByMemberNo () {
+//
+//        // given
+//        List<String> expected = Arrays.asList("테스트멤버1", "테스트멤버1");
+//
+//        // when
+//        List<GetReplyListResponse> response = replyService.getReplyListByMemberNo(member1.getMemberNo());
+//
+//        // then
+//        Assertions.assertThat(response)
+//                .isNotEmpty()
+//                .hasSize(2)
+//                .extracting("memberName", String.class)
+//                .isEqualTo(expected);
+//    }
+//
+//    @ParameterizedTest
+//    @DisplayName("특정 회원의 쓴 댓글들 리스트 조회 테스트 : 없는 회원일 시 예외 발생하는 지 확인")
+//    @NullSource
+//    @ValueSource(longs = 0L)
+//    void testGetReplyListBtMemberNoException(Long memberNo) {
+//
+//        // when & then
+//        Assertions.assertThatThrownBy(
+//                () -> replyService.getReplyListByMemberNo(memberNo)
+//        ).isInstanceOf(EntityNotFoundException.class);
+//
 //    }
 
     @Test

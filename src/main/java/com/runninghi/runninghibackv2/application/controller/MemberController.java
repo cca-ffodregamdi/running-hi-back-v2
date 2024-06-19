@@ -1,10 +1,9 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
+import com.runninghi.runninghibackv2.application.dto.member.request.KakaoLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
-import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
-import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
-import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
+import com.runninghi.runninghibackv2.application.dto.member.response.*;
 import com.runninghi.runninghibackv2.application.service.AppleOauthService;
 import com.runninghi.runninghibackv2.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.application.service.MemberService;
@@ -28,7 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.Map;
 
 @RestController
@@ -42,17 +40,14 @@ public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 카카오 로그인 페이지로 리다이렉트합니다.
-     *
-     * <p>이 API는 사용자를 카카오 로그인 페이지로 리다이렉트 시키는 역할을 합니다. 사용자가 카카오 계정으로 로그인을 시도할 때 사용됩니다.
-     * 로그인이 성공적으로 완료되면, 카카오는 사용자를 /api/v1/login/kakao/callback 엔드포인트로 리다이렉트하며, 인가 코드를 함께 전달합니다.
-     * 이 인가 코드를 통해 서버는 카카오 서버로부터 사용자의 회원 정보를 받아와 회원가입 또는 로그인 처리를 진행합니다.
+     * 카카오 회원가입/로그인 API 엔드포인트입니다.
+     * <p>
+     * 카카오 토큰을 검증한 후 회원가입 또는 로그인 처리합니다.
      * 처리가 완료되면, 사용자에게 로그인 성공 여부와 함께 액세스 토큰 및 리프레시 토큰이 반환됩니다.</p>
      */
-    @GetMapping(value = "/api/v1/login/kakao", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/v1/login/kakao", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "카카오 회원가입/로그인",
-            description = "카카오 로그인 페이지로 리다이렉트합니다. 사용자가 카카오 계정으로 로그인하면, 서버는 리다이렉트하여 인가 코드를 처리합니다. " +
-                    "회원 가입 처리가 완료되면 최종적으로 헤더에 엑세스 토큰과 리프레시 토큰 정보를 넣어서 클라이언트에 반환합니다.",
+            description = "회원 가입/로그인 처리가 완료되면 헤더에 엑세스 토큰과 리프레시 토큰 정보를 넣어서 클라이언트에 반환합니다.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -64,36 +59,18 @@ public class MemberController {
                     )
             }
     )
-    public ResponseEntity<Void> kakaoLogin() {
-
-        URI kakaoUri = URI.create(kakaoOauthService.getKakaoUri());
-
-        return ResponseEntity.status(HttpStatus.FOUND).location(kakaoUri).build();
-    }
-
-    /**
-     * 카카오 로그인 콜백을 처리하는 API 엔드포인트입니다.
-     *
-     * <p>카카오로부터 리다이렉트된 요청을 처리하며, 인가 코드를 포함하고 있습니다.
-     * 이 코드를 사용하여 카카오 서버에서 사용자 정보를 받아온 후, 이를 통해 사용자의 회원가입 또는 로그인 처리를 진행합니다.
-     * 처리가 완료되면, 로그인 성공 여부와 함께 액세스 토큰 및 리프레시 토큰을 헤더에 포함하여 클라이언트에게 반환합니다.</p>
-     *
-     * @param code 카카오로부터 받은 인가 코드. 로그인 성공 시 카카오로부터 전달받습니다.
-     * @return 로그인 성공 여부 및 인증 토큰 정보를 포함하는 ResponseEntity 객체.
-     */
-    @RequestMapping("/api/v1/login/kakao/callback")
-    @Operation(hidden = true)
-    public ResponseEntity<ApiResult<Void>> kakaoCallback(@RequestParam("code") String code) {
-
-        Map<String, String> tokens = kakaoOauthService.kakaoOauth(code);
+    public ResponseEntity<ApiResult<CreateMemberResponse>> kakaoLogin(@RequestBody KakaoLoginRequest request) {
+        Map<String, String> memberResponse = kakaoOauthService.kakaoOauth(request.kakaoToken());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", tokens.get("accessToken"));
-        headers.add("Refresh-Token", tokens.get("refreshToken"));
+        headers.add("Authorization", memberResponse.get("accessToken"));
+        headers.add("Refresh-Token", memberResponse.get("refreshToken"));
+
+        CreateMemberResponse response = CreateMemberResponse.from(memberResponse.getOrDefault("memberNo", null));
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(ApiResult.success("Success Kakao Login", null));
+                .body(ApiResult.success("Success Kakao Login", response));
     }
 
     /**
@@ -165,7 +142,7 @@ public class MemberController {
      * @param request AppleLoginRequest 객체로, 애플 인증 코드와 nonce를 포함합니다.
      * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 인증이 성공하면 응답 헤더에 액세스 토큰과 리프레시 토큰이 포함됩니다.
      */
-    @GetMapping(value = "/api/v1/login/apple", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/v1/login/apple", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "애플 로그인 또는 회원가입",
             description = "사용자의 애플 계정으로 로그인하거나 회원가입을 처리합니다. " +
                     "클라이언트는 애플 인증 코드와 nonce를 요청 본문에 담아서 해당 엔드포인트를 호출해야 합니다. " +
@@ -177,21 +154,23 @@ public class MemberController {
                             @Header(name = "Refresh-Token", description = "Refresh Token", schema = @Schema(type = "string"))
                     })
     })
-    public ResponseEntity<ApiResult<Void>> appleLogin(@RequestBody AppleLoginRequest request) {
+    public ResponseEntity<ApiResult<CreateMemberResponse>> appleLogin(@RequestBody AppleLoginRequest request) {
 
         String clientSecret = appleOauthService.createClientSecret();
 
         AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
 
-        Map<String, String> tokens = appleOauthService.appleOauth(appleTokenResponse, request.nonce());
+        Map<String, String> memberResponse = appleOauthService.appleOauth(appleTokenResponse, request.nonce());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", tokens.get("accessToken"));
-        headers.add("Refresh-Token", tokens.get("refreshToken"));
+        headers.add("Authorization", memberResponse.get("accessToken"));
+        headers.add("Refresh-Token", memberResponse.get("refreshToken"));
+
+        CreateMemberResponse response = CreateMemberResponse.from(memberResponse.getOrDefault("memberNo", null));
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(ApiResult.success("Success Apple Login", null));
+                .body(ApiResult.success("Success Apple Login", response));
     }
 
     /**
@@ -374,6 +353,35 @@ public class MemberController {
             // Refresh Token이 유효하지 않은 경우
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 유효하지않은 토큰입니다.", null));
         }
+    }
+
+
+    /**
+     * 액세스 토큰에서 멤버 번호를 추출하여 반환하는 API입니다.
+     *
+     * @param token 사용자 인증을 위한 액세스 토큰. 요청 헤더에 "Authorization" 키로 포함되어야 합니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 토큰이 유효한 경우 멤버 번호가 응답 본문에 들어가며, 유효하지 않은 경우 null 값이 응답 본문에 포함됩니다.
+     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 액세스 토큰이 포함되어야 합니다.
+     *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
+     */
+    @GetMapping(value = "/api/v1/member/id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "액세스 토큰 유효성 검사 및 멤버 번호 반환",
+            description = "액세스 토큰의 유효성을 검사하여 멤버 번호를 추출합니다. " +
+                    "토큰이 유효한 경우 멤버 번호가 응답 본문에 들어갑니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Access 토큰", required = true)
+            },
+            responses = { @ApiResponse(responseCode = "200", description = "토큰 유효성 검사 성공. 멤버 번호 반환",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetMemberNoResponse.class))),
+            })
+    public ResponseEntity<ApiResult<GetMemberNoResponse>> getMemberNoFromToken(@RequestHeader(value = "Authorization") String token) {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
+        GetMemberNoResponse response = GetMemberNoResponse.from(memberNo);
+
+        return ResponseEntity.ok(ApiResult.success("회원 id 조회 성공", response));
     }
 
 
