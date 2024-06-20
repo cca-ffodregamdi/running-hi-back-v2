@@ -224,7 +224,7 @@ public class FeedbackController {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
         FeedbackPageResponse<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
 

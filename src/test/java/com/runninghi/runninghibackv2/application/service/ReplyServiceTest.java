@@ -185,11 +185,10 @@ class ReplyServiceTest {
     void testUpdateReply() {
 
         // given
-        Long replyNo = reply1.getReplyNo();
-        UpdateReplyRequest request = new UpdateReplyRequest(member1.getMemberNo(), member1.getRole(), "수정된 댓글");
+        UpdateReplyRequest request = new UpdateReplyRequest(member1.getMemberNo(), member1.getRole(), reply1.getReplyNo(), "수정된 댓글");
 
         // when
-        UpdateReplyResponse response = replyService.updateReply(replyNo, request);
+        UpdateReplyResponse response = replyService.updateReply(request);
 
         // then
         Assertions.assertThat(response)
@@ -202,12 +201,11 @@ class ReplyServiceTest {
     void testAnotherMemberRequestUpdate () {
 
         // given
-        Long replyNo = reply1.getReplyNo();
-        UpdateReplyRequest request = new UpdateReplyRequest(member2.getMemberNo(), member2.getRole(), "수정한 내용");
+        UpdateReplyRequest request = new UpdateReplyRequest(member2.getMemberNo(), member2.getRole(), reply1.getReplyNo(), "수정한 내용");
 
         // when
         Assertions.assertThatThrownBy(
-                () -> replyService.updateReply(replyNo, request)
+                () -> replyService.updateReply(request)
         ).isInstanceOf(AccessDeniedException.class)
                 .hasMessageContaining("권한이 없습니다.");
     }

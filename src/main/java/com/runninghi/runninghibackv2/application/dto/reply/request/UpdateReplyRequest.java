@@ -2,17 +2,22 @@ package com.runninghi.runninghibackv2.application.dto.reply.request;
 
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
-public record UpdateReplyRequest (
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@ToString
+public class UpdateReplyRequest {
 
-    @Schema(description = "회원 번호", example = "1")
-    Long memberNo,
-    @Schema(description = "회원 등급", example = "USER")
-    Role role,
+    @Schema(hidden = true)
+    Long memberNo;
+    @Schema(hidden = true)
+    Role role;
+    @Schema(hidden = true)
+    Long replyNo;
     @Schema(description = "변경할 댓글 내용", example = "변경된 댓글 내용")
-    String replyContent
-) {
-    public static UpdateReplyRequest of (Long memberNo, Role role, String replyContent) {
-        return new UpdateReplyRequest(memberNo, role, replyContent);
-    }
+    String replyContent;
+
 }
