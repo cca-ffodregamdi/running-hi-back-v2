@@ -296,7 +296,7 @@ class FeedbackControllerTest {
     @Test
     @DisplayName("피드백 리스트 조회 : 관리자")
     void testGetFeedbackScrollByAdmin() throws Exception {
-        int page = 0;
+        int page = 1;
         int size = 10;
         String sort = "desc";
         String responseMessage = "피드백 리스트 조회 성공 : 관리자";
