@@ -122,11 +122,14 @@ public class ReplyController {
                                                  @Parameter(description = "수정할 댓글 번호")
                                                  @PathVariable(name = "replyNo") Long replyNo,
                                                  @Parameter(description = "수정할 댓글 내용")
-                                                 @RequestBody(required = true) String replyContent) {
+                                                 @RequestBody(required = true)  UpdateReplyRequest request) {
 
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        UpdateReplyRequest request = UpdateReplyRequest.of(accessTokenInfo.memberNo(), accessTokenInfo.role(), replyContent);
-        UpdateReplyResponse reply = replyService.updateReply(replyNo, request);
+        request.setMemberNo(accessTokenInfo.memberNo());
+        request.setRole(accessTokenInfo.role());
+        request.setReplyNo(replyNo);
+
+        UpdateReplyResponse reply = replyService.updateReply(request);
 
         return ResponseEntity.ok().body(ApiResult.success(UPDATE_RESPONSE_MESSAGE, reply));
     }

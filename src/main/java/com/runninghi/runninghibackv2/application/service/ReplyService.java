@@ -102,16 +102,15 @@ public class ReplyService {
 
     /**
      * 댓글 수정 메소드
-     * @param replyNo 댓글 식별을 위한 키 값
-     * @param request 회원 식별을 위한 키 값, 수정할 댓글 내용
+     * @param request 회원 식별을 위한 키 값, 회원 역할, 수정할 댓글 키 값, 수정할 댓글 내용
      * @return  댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 생성 일, 수정 일
      */
     @Transactional
-    public UpdateReplyResponse updateReply(Long replyNo, UpdateReplyRequest request) {
+    public UpdateReplyResponse updateReply(UpdateReplyRequest request) {
 
-        Reply reply = findReplyByReplyNo(replyNo);
-        checkWriterOrAdmin(request.memberNo(), request.role(), reply);
-        reply.update(request.replyContent());
+        Reply reply = findReplyByReplyNo(request.getReplyNo());
+        checkWriterOrAdmin(request.getMemberNo(), request.getRole(), reply);
+        reply.update(request.getReplyContent());
 
         return UpdateReplyResponse.fromEntity(reply);
     }
