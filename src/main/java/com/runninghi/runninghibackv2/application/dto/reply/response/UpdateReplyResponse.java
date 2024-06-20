@@ -15,7 +15,7 @@ public record UpdateReplyResponse (
         @Schema(description = "댓글 내용", example = "댓글 내용")
         String replyContent,
         @Schema(description = "댓글 삭제 여부", example = "false")
-        boolean isDeleted,
+        Boolean isDeleted,
         @Schema(description = "댓글 생성 일", example = "2024-03-27T13:23:12")
         LocalDateTime createDate,
         @Schema(description = "댓글 수정 일", example = "2024-03-27T13:23:12" )
