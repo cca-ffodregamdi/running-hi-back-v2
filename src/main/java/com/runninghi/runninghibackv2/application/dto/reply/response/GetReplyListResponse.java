@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GetReplyListResponse {
@@ -23,13 +24,13 @@ public class GetReplyListResponse {
         @Schema(description = "신고된 횟수", example = "1")
         int reportedCount;
         @Schema(description = "댓글 삭제 여부", example = "false")
-        boolean isDeleted;
+        Boolean isDeleted;
         @Schema(description = "댓글 작성자 본인 여부", example = "true")
-        boolean isOwner;
+        Boolean isOwner;
         @Schema(description = "댓글 생성 일", example = "2024-03-27T13:23:12")
         LocalDateTime createDate;
         @Schema(description = "댓글 수정 일", example = "2024-03-27T13:23:12")
-        LocalDateTime updateDate;
+        Boolean isUpdated;
 
     public GetReplyListResponse(Long replyNo, Long memberNo, String memberName, Long postNo, String replyContent, int reportedCount, boolean isDeleted, LocalDateTime createDate, LocalDateTime updateDate) {
         this.replyNo = replyNo;
@@ -40,10 +41,7 @@ public class GetReplyListResponse {
         this.reportedCount = reportedCount;
         this.isDeleted = isDeleted;
         this.createDate = createDate;
-        this.updateDate = updateDate;
+        this.isUpdated = updateDate != null;
     }
 
-    public void setIsOwner(boolean isOwner) {
-        this.isOwner = isOwner;
-    }
 }

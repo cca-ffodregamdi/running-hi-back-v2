@@ -17,6 +17,8 @@ import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -33,6 +35,7 @@ import static com.runninghi.runninghibackv2.domain.entity.QReplyReport.replyRepo
 @RequiredArgsConstructor
 public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(ReplyQueryRepositoryImpl.class);
     private final JPAQueryFactory jpaQueryFactory;
     private static final int REPORTED_COUNT = 1;
 
