@@ -90,13 +90,17 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResultData<GetAllPostsResponse> getPostScroll(Pageable pageable) {
-        return postQueryRepository.findAllPostsByPageable(pageable);
+    public PageResultData<GetAllPostsResponse> getPostScroll(Long memberNo, Pageable pageable, String sort, int distance) {
+        if (sort.equalsIgnoreCase("latest")) {
+            return postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
+        } else {
+            return postQueryRepository.findAllPostsByRecommended(memberNo, pageable, distance);
+        }
     }
 
 
     @Transactional(readOnly = true)
-    public PageResultData<GetAllPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
+    public PageResultData<GetMyPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
         return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
     }
 
