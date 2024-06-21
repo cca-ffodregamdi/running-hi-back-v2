@@ -16,6 +16,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,24 +43,30 @@ public class PostController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "게시글 리스트 조회", description = "게시글 전체 리스트를 조회합니다.\n 난이도/지열별로 필터링이 가능합니다.")
-    public ResponseEntity<PageResult<GetAllPostsResponse>> getAllPosts(@RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, 10);
+    public ResponseEntity<PageResult<GetAllPostsResponse>> getAllPosts(@RequestHeader("Authorization") String bearerToken,
+                                                                       @RequestParam(defaultValue = "1") @PositiveOrZero int page,
+                                                                       @RequestParam(defaultValue = "10") @Positive int size,
+                                                                       @RequestParam(defaultValue = "latest") String sort,
+                                                                       @RequestParam(defaultValue = "1") @Positive int distance) {
 
-        PageResultData<GetAllPostsResponse> response = postService.getPostScroll(pageable);
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        Pageable pageable = PageRequest.of(page, size);
+
+        PageResultData<GetAllPostsResponse> response = postService.getPostScroll(memberInfo.memberNo(), pageable, sort, distance);
 
         return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
     @GetMapping(value = "my-feed",produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "나의 게시글 리스트 조회", description = "나의 게시글 전체 리스트를 조회합니다. 공유 여부가 함께 조회됩니다.")
-    public ResponseEntity<PageResult<GetAllPostsResponse>> getMyPosts(@RequestHeader("Authorization") String bearerToken,
+    public ResponseEntity<PageResult<GetMyPostsResponse>> getMyPosts(@RequestHeader("Authorization") String bearerToken,
                                                                            @RequestParam(defaultValue = "0") int page) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
         Pageable pageable = PageRequest.of(page,10);
 
-        PageResultData<GetAllPostsResponse> response = postService.getMyPostsScroll(pageable, memberInfo.memberNo());
+        PageResultData<GetMyPostsResponse> response = postService.getMyPostsScroll(pageable, memberInfo.memberNo());
 
         return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
@@ -74,14 +81,14 @@ public class PostController {
         return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
-    @GetMapping(value = "/coordinate/{postNo}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "GPX 경도, 위도 조회", description = " '나도 이 코스 달리기' 선택시 반환되는 데이터입니다. \n 지도 상 표기를 위해 경도-위도 값이 튜플 형태로 반환됩니다.")
-    public ResponseEntity<ApiResult<GpsDataResponse>> getGPXData(@PathVariable Long postNo) throws IOException {
-
-        GpsDataResponse response = postService.getGpxLonLatData(postNo);
-
-        return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
-    }
+//    @GetMapping(value = "/coordinate/{postNo}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @Operation(summary = "GPX 경도, 위도 조회", description = " '나도 이 코스 달리기' 선택시 반환되는 데이터입니다. \n 지도 상 표기를 위해 경도-위도 값이 튜플 형태로 반환됩니다.")
+//    public ResponseEntity<ApiResult<GpsDataResponse>> getGPXData(@PathVariable Long postNo) throws IOException {
+//
+//        GpsDataResponse response = postService.getGpxLonLatData(postNo);
+//
+//        return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
+//    }
 
     @PostMapping(value = "/gpx", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "러닝 데이터 저장", description = "러닝이 끝난 직후 gpx 파일을 저장하고 데이터 (거리, 속도, 시간, 등) 을 반환합니다. ")
