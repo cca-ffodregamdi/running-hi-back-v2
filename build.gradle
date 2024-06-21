@@ -79,7 +79,7 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.68'
 
     // DB geo 추가
-    implementation 'org.hibernate:hibernate-spatial'
+    implementation 'org.hibernate:hibernate-spatial:6.2.5.Final'
     implementation 'com.querydsl:querydsl-spatial'
 
 }
