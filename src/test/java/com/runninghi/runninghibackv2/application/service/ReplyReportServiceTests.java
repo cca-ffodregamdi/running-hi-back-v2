@@ -93,7 +93,7 @@ class ReplyReportServiceTests {
         long beforeCount = replyReportRepository.count();
 
         CreateReplyReportRequest request = new CreateReplyReportRequest(
-                ReportCategory.ILLEGALITY,
+                ReportCategory.ILLEGAL,
                 null,
                 reportedReply.getReplyNo()
         );

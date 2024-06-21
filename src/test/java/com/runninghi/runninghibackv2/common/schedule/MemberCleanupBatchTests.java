@@ -252,7 +252,7 @@ class MemberCleanupBatchTests {
         replyReports.add(report1);
 
         ReplyReport report2 = ReplyReport.builder()
-                .category(ReportCategory.ILLEGALITY)
+                .category(ReportCategory.ILLEGAL)
                 .content("부적절한 내용이 포함된 댓글입니다.")
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member2)
@@ -280,7 +280,7 @@ class MemberCleanupBatchTests {
 
         // 남아있는 게시물 신고
         PostReport postReport2 = PostReport.builder()
-                .category(ReportCategory.ILLEGALITY)
+                .category(ReportCategory.ILLEGAL)
                 .content("부적절한 내용이 포함된 게시글입니다.")
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member1)
@@ -292,7 +292,7 @@ class MemberCleanupBatchTests {
 
         // 남아있는 게시물 신고
         PostReport postReport3 = PostReport.builder()
-                .category(ReportCategory.ILLEGALITY)
+                .category(ReportCategory.ILLEGAL)
                 .content("부적절한 내용이 포함된 게시글입니다.")
                 .status(ProcessingStatus.INPROGRESS)
                 .reporter(member2)
