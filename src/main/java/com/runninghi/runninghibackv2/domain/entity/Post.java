@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -56,7 +57,7 @@ public class Post extends BaseTimeEntity {
     private String locationName;
 
     @Column(columnDefinition = "POINT SRID 4326")
-    private Point geography;
+    private Point geometry;
 
     @Column
     @Comment("게시글 공유 여부")
@@ -69,20 +70,25 @@ public class Post extends BaseTimeEntity {
     @Comment("gpx 파일 url")
     private String gpxUrl;
 
+    @Column
+    @Comment("메인페이지 표시 대표 데이터")
+    String mainData;
+
 
 
     @Builder
-    public Post(Member member, @Nullable String postContent, Difficulty difficulty, Role role, String locationName, Point geography, Boolean status, String gpxUrl, GpsDataVO gpsDataVO) {
+    public Post(Member member, @Nullable String postContent, Difficulty difficulty, Role role, String locationName, Point geometry, Boolean status, String gpxUrl, GpsDataVO gpsDataVO, String mainData) {
         this.member = member;
         this.postContent = postContent;
         this.difficulty = difficulty;
         this.reportCnt = 0;
         this.role = role;
         this.locationName = locationName;
-        this.geography = geography;
+        this.geometry = geometry;
         this.status = status;
         this.gpxUrl = gpxUrl;
         this.gpsDataVO = gpsDataVO;
+        this.mainData = mainData;
     }
 
     public void shareToPost(CreatePostRequest request) {
