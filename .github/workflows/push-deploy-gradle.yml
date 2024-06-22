@@ -56,7 +56,7 @@ jobs:
         run: |
           mkdir -p ./src/main/resources/apple
           touch ./src/main/resources/apple/Apple_AuthKey.p8
-          echo "${{ secrets.APPLE_AUTHKEY }}" > ./src/mani/resources/apple/Apple_AuthKey.p8
+          echo "${{ secrets.APPLE_AUTHKEY }}" > ./src/mains/resources/apple/Apple_AuthKey.p8
 
       - name: Add permission to make gradlew executable
         run: chmod +x gradlew
