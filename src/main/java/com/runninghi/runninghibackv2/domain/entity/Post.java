@@ -11,13 +11,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.locationtech.jts.geom.Point;
 
-import java.util.List;
 
 @Entity
 @Getter
@@ -72,7 +70,7 @@ public class Post extends BaseTimeEntity {
 
     @Column
     @Comment("메인페이지 표시 대표 데이터")
-    String mainData;
+    private String mainData;
 
 
 
