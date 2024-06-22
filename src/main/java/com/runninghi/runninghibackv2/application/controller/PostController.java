@@ -50,7 +50,7 @@ public class PostController {
                                                                        @RequestParam(defaultValue = "1") @Positive int distance) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1 , size);
 
         PageResultData<GetAllPostsResponse> response = postService.getPostScroll(memberInfo.memberNo(), pageable, sort, distance);
 
