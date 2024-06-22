@@ -101,7 +101,7 @@ public class Member extends BaseTimeEntity {
     public Member(Long memberNo, String account, String password, String nickname, String profileUrl, String kakaoId, String name,
                   String appleId, int reportCnt, boolean isActive, boolean isBlacklisted, Role role, String refreshToken,
                   String appleRefreshToken, String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate,
-                  RunDataVO runDataVO) {
+                  RunDataVO runDataVO, Point geometry) {
         this.memberNo = memberNo;
         this.account = account;
         this.password = password;
@@ -120,6 +120,7 @@ public class Member extends BaseTimeEntity {
         this.alarmConsent = alarmConsent;
         this.deactivateDate = deactivateDate;
         this.runDataVO = runDataVO;
+        this.geometry = geometry;
     }
 
     // 리프레시 토큰 업데이트
