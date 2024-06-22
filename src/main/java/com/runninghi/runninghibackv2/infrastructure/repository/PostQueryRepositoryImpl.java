@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.infrastructure.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
@@ -99,13 +100,14 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         long total;
 
         Point referencePoint = memberRepository.findByMemberNo(memberNo).getGeometry();
+        System.out.println("referencePoint = " + referencePoint);
 
         total = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
                         .and(post.geometry.isNotNull())
                         .and(Expressions.booleanTemplate(
                                 DISTANCE_CONDITION,
-                                post.geometry, referencePoint, distance * 1000
+                                post.geometry, referencePoint, distance * 10000
                         ))
                 )
                 .fetchCount();
@@ -116,7 +118,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                         .and(post.geometry.isNotNull())
                         .and(Expressions.booleanTemplate(
                                 DISTANCE_CONDITION,
-                                post.geometry, referencePoint, distance * 1000
+                                post.geometry, referencePoint, distance * 10000
                         ))
                 )
                 .offset(pageable.getOffset())
@@ -157,22 +159,22 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         total = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(post.geometry.isNotNull())
                         .and(Expressions.booleanTemplate(
                                 DISTANCE_CONDITION,
-                                post.geometry, referencePoint, distance * 1000
+                                post.geometry, referencePoint, distance * 10000
                         ))
                 )
                 .fetchCount();
+
+        System.out.println("total = " + total);
 
         posts = jpaQueryFactory.select(post)
                 .from(post)
                 .leftJoin(bookmark).on(bookmark.post.postNo.eq(post.postNo))
                 .where(post.status.eq(true)
-                        .and(post.geometry.isNotNull())
                         .and(Expressions.booleanTemplate(
                                 DISTANCE_CONDITION,
-                                post.geometry, referencePoint, distance * 1000
+                                post.geometry, referencePoint, distance * 10000
                         ))
                 )
                 .groupBy(post.postNo)
