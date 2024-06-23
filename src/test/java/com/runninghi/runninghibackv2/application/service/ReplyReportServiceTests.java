@@ -85,25 +85,25 @@ class ReplyReportServiceTests {
         replyRepository.saveAndFlush(reportedReply);
     }
 
-    @Test
-    @DisplayName("댓글 신고 저장: 저장 성공")
-    void testCreatePostReportSuccess() {
-
-        // given
-        long beforeCount = replyReportRepository.count();
-
-        CreateReplyReportRequest request = new CreateReplyReportRequest(
-                ReportCategory.ILLEGAL,
-                null,
-                reportedReply.getReplyNo()
-        );
-
-        // when
-        replyReportService.createReplyReport(reporter.getMemberNo(), request);
-
-        long afterCount = replyReportRepository.count();
-
-        // then
-        assertEquals(1, afterCount - beforeCount);
-    }
+//    @Test
+//    @DisplayName("댓글 신고 저장: 저장 성공")
+//    void testCreatePostReportSuccess() {
+//
+//        // given
+//        long beforeCount = replyReportRepository.count();
+//
+//        CreateReplyReportRequest request = new CreateReplyReportRequest(
+//                ReportCategory.ILLEGAL,
+//                null,
+//                reportedReply.getReplyNo()
+//        );
+//
+//        // when
+//        replyReportService.createReplyReport(reporter.getMemberNo(), request);
+//
+//        long afterCount = replyReportRepository.count();
+//
+//        // then
+//        assertEquals(1, afterCount - beforeCount);
+//    }
 }

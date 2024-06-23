@@ -47,7 +47,7 @@ public class Reply extends BaseTimeEntity {
     @Comment("삭제 여부")
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "reportedReply", orphanRemoval = true, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "reportedReply")
     @Comment("댓글 신고 리스트")
     private final List<ReplyReport> reportList = new ArrayList<>();
 

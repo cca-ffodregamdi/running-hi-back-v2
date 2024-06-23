@@ -25,7 +25,7 @@ public record GetPostResponse(
         @Schema(description = "권한", example = "MEMBER")
         Role role,
         @Schema(description = "게시글 작성자 본인 여부", example = "true")
-        boolean isOwner,
+        boolean owner,
         @Schema(description = "코스 위치", example = "서울특별시 성북구")
         String locationName,
         @Schema(description = "달린 거리(km)", example = "8.38")

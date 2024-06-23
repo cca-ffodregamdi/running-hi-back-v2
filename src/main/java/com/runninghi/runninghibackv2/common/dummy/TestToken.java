@@ -8,6 +8,10 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +34,9 @@ public class TestToken {
             String adminName = "관리자 : 테스트 계정 이름";
             String userName = "유저 : 테스트 계정 이름";
 
+            GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326); // 4326 is the SRID for WGS84
+            Point point = geometryFactory.createPoint(new Coordinate(127.543, 36.9876));
+
             Member admin = testMemberRepository.findByName(adminName)
                     .orElseGet(() -> {
                         Member newAdmin = Member.builder()
@@ -39,6 +46,7 @@ public class TestToken {
                                 .nickname("관리자 : 테스트용 관리자입니다.")
                                 .role(Role.ADMIN)
                                 .runDataVO(new RunDataVO(0.0,0.0,10,1))
+                                .geometry(point)
                                 .build();
                         testMemberRepository.saveAndFlush(newAdmin);
                         return newAdmin;
@@ -54,6 +62,7 @@ public class TestToken {
                                 .isActive(true)
                                 .role(Role.USER)
                                 .runDataVO(new RunDataVO(0.0,0.0,10,1))
+                                .geometry(point)
                                 .build();
                         testMemberRepository.saveAndFlush(newUser);
                         return newUser;

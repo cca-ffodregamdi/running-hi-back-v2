@@ -13,9 +13,7 @@ public record HandlePostReportResponse(
         @Schema(description = "기타 신고 사유", example = "공백 제외 10자 이상의 사유")
         String content,
         @Schema(description = "신고 처리 상태", example = "ACCEPTED")
-        ProcessingStatus status,
-        @Schema(description = "연관된 게시글 삭제 여부", example = "false")
-        boolean isPostDeleted
+        ProcessingStatus status
 ) {
     public static HandlePostReportResponse from(PostReport postReport) {
 
@@ -23,7 +21,6 @@ public record HandlePostReportResponse(
                 postReport.getPostReportNo(),
                 postReport.getCategory(),
                 postReport.getContent(),
-                postReport.getStatus(),
-                postReport.isPostDeleted());
+                postReport.getStatus());
     }
 }

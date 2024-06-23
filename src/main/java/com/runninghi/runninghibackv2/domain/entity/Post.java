@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.locationtech.jts.geom.Point;
 
-import java.util.List;
 
 @Entity
 @Getter
@@ -54,6 +54,9 @@ public class Post extends BaseTimeEntity {
     @Comment("지역명")
     private String locationName;
 
+    @Column(columnDefinition = "POINT SRID 4326")
+    private Point geometry;
+
     @Column
     @Comment("게시글 공유 여부")
     private Boolean status;
@@ -65,20 +68,25 @@ public class Post extends BaseTimeEntity {
     @Comment("gpx 파일 url")
     private String gpxUrl;
 
-    @OneToMany(mappedBy = "keywordNo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Keyword> keywordList;
+    @Column
+    @Comment("메인페이지 표시 대표 데이터")
+    private String mainData;
+
+
 
     @Builder
-    public Post(Member member, @Nullable String postContent, Difficulty difficulty, Role role, String locationName, Boolean status, String gpxUrl, GpsDataVO gpsDataVO) {
+    public Post(Member member, @Nullable String postContent, Difficulty difficulty, Role role, String locationName, Point geometry, Boolean status, String gpxUrl, GpsDataVO gpsDataVO, String mainData) {
         this.member = member;
         this.postContent = postContent;
         this.difficulty = difficulty;
         this.reportCnt = 0;
         this.role = role;
         this.locationName = locationName;
+        this.geometry = geometry;
         this.status = status;
         this.gpxUrl = gpxUrl;
         this.gpsDataVO = gpsDataVO;
+        this.mainData = mainData;
     }
 
     public void shareToPost(CreatePostRequest request) {

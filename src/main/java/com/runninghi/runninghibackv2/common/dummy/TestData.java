@@ -34,9 +34,10 @@ public class TestData {
         testDatabaseMapper.disableForeignKeyChecks();
         List<String> tableList = testDatabaseMapper.getAllTableList();
         for (String i : tableList) {
-            testDatabaseMapper.truncateTable(i);
+            if (!i.equals("tbl_member")) {
+                testDatabaseMapper.truncateTable(i);
+            }
         }
-        testDatabaseMapper.enableForeignKeyChecks();
 
         testDatabaseMapper.insertMemberDummyData();
         testDatabaseMapper.insertPostDummyData();

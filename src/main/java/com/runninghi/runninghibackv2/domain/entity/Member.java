@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,11 +93,15 @@ public class Member extends BaseTimeEntity {
    @Embedded
    private RunDataVO runDataVO;
 
+    @Column(columnDefinition = "POINT SRID 4326")
+    @Comment("초기 설정 지역 위경도")
+    private Point geometry;
+
     @Builder
     public Member(Long memberNo, String account, String password, String nickname, String profileUrl, String kakaoId, String name,
                   String appleId, int reportCnt, boolean isActive, boolean isBlacklisted, Role role, String refreshToken,
                   String appleRefreshToken, String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate,
-                  RunDataVO runDataVO) {
+                  RunDataVO runDataVO, Point geometry) {
         this.memberNo = memberNo;
         this.account = account;
         this.password = password;
@@ -115,6 +120,7 @@ public class Member extends BaseTimeEntity {
         this.alarmConsent = alarmConsent;
         this.deactivateDate = deactivateDate;
         this.runDataVO = runDataVO;
+        this.geometry = geometry;
     }
 
     // 리프레시 토큰 업데이트
