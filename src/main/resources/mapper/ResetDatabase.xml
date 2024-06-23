@@ -23,11 +23,13 @@
     </update>
 
     <insert id="insertMemberDummyData">
-            INSERT INTO tbl_member (deactivate_date, alarm_consent, name, role, is_active, total_distance, total_kcal, distance_to_next_level, level, report_cnt, is_blacklisted, geometry)
-            VALUES
-            (null, true, 'name', 'USER', false, 1000, 5000, 30, 1, 0, false,ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat')),
-            (null, true, 'name2', 'USER', false, 1000, 5000, 30, 1, 0, false,ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat')),
-            (NOW() - INTERVAL 15 DAY, true, 'nyam', 'USER', true, 1000, 5000, 30, 1, 0, false,ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat'));
+        INSERT INTO tbl_member (deactivate_date, create_date, alarm_consent, name, nickname, role, is_active, total_distance, total_kcal, distance_to_next_level, level, report_cnt, is_blacklisted)
+        VALUES
+            (null, '2024-01-06 17:09:38', true, 'name', '러너1', 'USER', false, 1000, 5000, 30, 1, 0, false),
+            (null, '2024-01-07 17:09:38', true, 'name2', '러너2', 'USER', false, 1000, 5000, 30, 1, 0, false),
+            (NOW() - INTERVAL 15 DAY, '2024-01-08 17:09:38', true, 'nyam', '러너3', 'USER', true, 1000, 5000, 30, 1, 0, false),
+            (null, '2024-01-09 17:09:38', true, 'name4', '러너4', 'USER', false, 1000, 5000, 3312, 30, 0, false),
+            (null, '2024-01-10 17:09:38', true, 'name5', '러너5', 'USER', false, 1000, 5000, 30, 2, 0, false);
     </insert>
 
     <insert id="insertPostDummyData" >
