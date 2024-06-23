@@ -48,7 +48,6 @@ public class ReplyReportService {
                 .reporter(reporter)
                 .reportedReply(reportedReply)
                 .replyContent(reportedReply.getReplyContent())
-                .isReplyDeleted(false)
                 .build();
 
         replyReportRepository.save(replyReport);
@@ -101,12 +100,13 @@ public class ReplyReportService {
             status = ProcessingStatus.ACCEPTED;
             Member reportedMember = reportedReply.getWriter();
             reportedMember.addReportedCount();
-
-            replyReportList.forEach(replyReport -> replyReport.update(status, true, null));
             replyRepository.deleteById(replyNo);
+
+            replyReportList.forEach(replyReport -> replyReport.update(status));
         } else {
             status = ProcessingStatus.REJECTED;
             reportedReply.resetReportedCount();
+
             replyReportList.forEach(replyReport -> replyReport.update(status));
         }
 

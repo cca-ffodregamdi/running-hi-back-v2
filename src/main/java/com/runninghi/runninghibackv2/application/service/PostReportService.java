@@ -48,7 +48,6 @@ public class PostReportService {
                 .reporter(reporter)
                 .reportedPost(reportedPost)
                 .postContent(reportedPost.getPostContent())
-                .isPostDeleted(false)
                 .build();
 
         postReportRepository.save(postReport);
@@ -105,12 +104,13 @@ public class PostReportService {
             Member reportedMember = reportedPost.getMember();
             reportedMember.addReportedCount();
             status = ProcessingStatus.ACCEPTED;
-
-            postReportList.forEach(postReport -> postReport.update(status, true, null));
             postRepository.deleteById(postNo);
+
+            postReportList.forEach(postReport -> postReport.update(status));
         } else {
             status = ProcessingStatus.REJECTED;
             reportedPost.resetReportedCount();
+
             postReportList.forEach(postReport -> postReport.update(status));
         }
 
