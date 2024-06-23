@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -36,13 +37,13 @@ public class ReplyReport extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_no")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @Comment("신고자")
     private Member reporter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_reply_no")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @Comment("신고된 댓글")
     private Reply reportedReply;
 
@@ -50,84 +51,16 @@ public class ReplyReport extends BaseTimeEntity {
     @Comment("신고된 댓글 내용")
     private String replyContent;
 
-    @Column(nullable = false)
-    @Comment("연관된 댓글 삭제 여부")
-    private boolean isReplyDeleted;
-
-    public ReplyReport(Builder builder) {
-        this.replyReportNo = builder.replyReportNo;
-        this.category = builder.category;
-        this.content = builder.content;
-        this.status = builder.status;
-        this.reporter = builder.reporter;
-        this.reportedReply = builder.reportedReply;
-        this.replyContent = builder.replyContent;
-        this.isReplyDeleted = builder.isReplyDeleted;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-
-        private Long replyReportNo;
-        private ReportCategory category;
-        private String content;
-        private ProcessingStatus status;
-        private Member reporter;
-        private Reply reportedReply;
-        private String  replyContent;
-        private boolean isReplyDeleted;
-
-        public Builder replyReportNo(Long replyReportNo) {
-            this.replyReportNo = replyReportNo;
-            return this;
-        }
-
-        public Builder category(ReportCategory category) {
-            this.category = category;
-            return this;
-        }
-
-        public Builder content(String content) {
-            this.content = content;
-            return this;
-        }
-
-        public Builder status(ProcessingStatus status) {
-            this.status = status;
-            return this;
-        }
-        public Builder reporter(Member reporter) {
-            this.reporter = reporter;
-            return this;
-        }
-
-        public Builder reportedReply(Reply reportedReply) {
-            this.reportedReply = reportedReply;
-            return this;
-        }
-
-        public Builder replyContent(String replyContent) {
-            this.replyContent = replyContent;
-            return this;
-        }
-
-        public Builder isReplyDeleted(boolean isReplyDeleted) {
-            this.isReplyDeleted = isReplyDeleted;
-            return this;
-        }
-
-        public ReplyReport build() {
-            return new ReplyReport(this);
-        }
-    }
-
-    public void update(ProcessingStatus status, boolean isReplyDeleted, Reply reportedReply) {
+    @Builder
+    public ReplyReport(Long replyReportNo, ReportCategory category, String content, ProcessingStatus status,
+                       Member reporter, Reply reportedReply, String replyContent) {
+        this.replyReportNo = replyReportNo;
+        this.category = category;
+        this.content = content;
         this.status = status;
-        this.isReplyDeleted = isReplyDeleted;
+        this.reporter = reporter;
         this.reportedReply = reportedReply;
+        this.replyContent = replyContent;
     }
 
     public void update(ProcessingStatus status) {

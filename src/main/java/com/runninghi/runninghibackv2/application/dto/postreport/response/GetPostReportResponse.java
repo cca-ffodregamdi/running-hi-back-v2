@@ -19,9 +19,7 @@ public record GetPostReportResponse(
         @Schema(description = "신고된 게시글 번호", example = "1")
         Long reportedPostNo,
         @Schema(description = "신고된 게시글 내용", example = "1")
-        String postContent,
-        @Schema(description = "연관된 게시글 삭제 여부", example = "false")
-        boolean isPostDeleted
+        String postContent
 ) {
     public static GetPostReportResponse from(PostReport postReport) {
         Long postNo = postReport.getReportedPost() != null ? postReport.getReportedPost().getPostNo() : null;
@@ -33,7 +31,6 @@ public record GetPostReportResponse(
                 postReport.getStatus(),
                 postReport.getReporter().getMemberNo(),
                 postNo,
-                postReport.getPostContent(),
-                postReport.isPostDeleted());
+                postReport.getPostContent());
     }
 }

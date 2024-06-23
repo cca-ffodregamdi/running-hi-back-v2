@@ -23,11 +23,13 @@
     </update>
 
     <insert id="insertMemberDummyData">
-            INSERT INTO tbl_member (deactivate_date, alarm_consent, name, role, is_active, total_distance, total_kcal, distance_to_next_level, level, report_cnt, is_blacklisted, geometry)
-            VALUES
-            (null, true, 'name', 'USER', false, 1000, 5000, 30, 1, 0, false,ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat')),
-            (null, true, 'name2', 'USER', false, 1000, 5000, 30, 1, 0, false,ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat')),
-            (NOW() - INTERVAL 15 DAY, true, 'nyam', 'USER', true, 1000, 5000, 30, 1, 0, false,ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat'));
+        INSERT INTO tbl_member (deactivate_date, create_date, alarm_consent, name, nickname, role, is_active, total_distance, total_kcal, distance_to_next_level, level, report_cnt, is_blacklisted, geometry)
+        VALUES
+            (null, '2024-01-06 17:09:38', true, 'name', '러너1', 'USER', false, 1000, 5000, 30, 1, 0, false, ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat')),
+            (null, '2024-01-07 17:09:38', true, 'name2', '러너2', 'USER', false, 1000, 5000, 30, 1, 0, false, ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat')),
+            (NOW() - INTERVAL 15 DAY, '2024-01-08 17:09:38', true, 'nyam', '러너3', 'USER', true, 1000, 5000, 30, 1, 0, false, ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat')),
+            (null, '2024-01-09 17:09:38', true, 'name4', '러너4', 'USER', false, 1000, 5000, 3312, 30, 0, false, ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat')),
+            (null, '2024-01-10 17:09:38', true, 'name5', '러너5', 'USER', false, 1000, 5000, 30, 2, 0, false, ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat'));
     </insert>
 
     <insert id="insertPostDummyData" >
@@ -238,19 +240,19 @@
     </insert>
 
     <insert id="insertPostReportDummyData">
-        INSERT INTO tbl_post_report (category, content, status, reporter_no, reported_post_no, is_post_deleted, post_content)
+        INSERT INTO tbl_post_report (category, content, status, reporter_no, reported_post_no, post_content)
         VALUES
-            ('SPAM', '스팸 게시글입니다.', 'INPROGRESS', 1,1, false, '우하핫'),
-            ('ILLEGAL', '부적절한 내용이 포함된 게시글입니다.', 'INPROGRESS', 1, 3, false, '우끼끼'),
-            ('ILLEGAL', '부적절한 내용이 포함된 게시글입니다.', 'INPROGRESS', 2, 4, false, '쵸오오오비');
+            ('SPAM', '스팸 게시글입니다.', 'INPROGRESS', 1,1, '우하핫'),
+            ('ILLEGAL', '부적절한 내용이 포함된 게시글입니다.', 'INPROGRESS', 1, 3, '우끼끼'),
+            ('ILLEGAL', '부적절한 내용이 포함된 게시글입니다.', 'INPROGRESS', 2, 4, '쵸오오오비');
     </insert>
 
     <insert id="insertReplyReportDummyData">
-        INSERT INTO tbl_reply_report (category, content, status, reporter_no, reported_reply_no, is_reply_deleted, reply_content)
+        INSERT INTO tbl_reply_report (category, content, status, reporter_no, reported_reply_no, reply_content)
         VALUES
-            ('SPAM', '스팸 댓글입니다.', 'INPROGRESS', 1, 2, false, '스팸댓글'),
-            ('ILLEGAL', '부적절한 내용이 포함된 댓글입니다.', 'INPROGRESS', 2, 1,  false, '부적절적절'),
-            ('ILLEGAL', '부적절한 내용이 포함된 댓글입니다.', 'INPROGRESS', 2, 3,  false, '부적부적절');
+            ('SPAM', '스팸 댓글입니다.', 'INPROGRESS', 1, 2, '스팸댓글'),
+            ('ILLEGAL', '부적절한 내용이 포함된 댓글입니다.', 'INPROGRESS', 2, 1, '부적절적절'),
+            ('ILLEGAL', '부적절한 내용이 포함된 댓글입니다.', 'INPROGRESS', 2, 3, '부적부적절');
     </insert>
 
     <insert id="insertFeedbackDummyData">

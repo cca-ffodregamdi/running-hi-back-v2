@@ -19,9 +19,7 @@ public record GetReplyReportResponse(
         @Schema(description = "신고된 댓글 번호", example = "1")
         Long reportedReplyNo,
         @Schema(description = "신고된 댓글 내용", example = "1")
-        String replyContent,
-        @Schema(description = "연관된 댓글 삭제 여부", example = "false")
-        boolean isReplyDeleted
+        String replyContent
 ) {
     public static GetReplyReportResponse from(ReplyReport replyReport) {
         Long replyNo = replyReport.getReportedReply() != null ? replyReport.getReportedReply().getReplyNo() : null;
@@ -33,7 +31,6 @@ public record GetReplyReportResponse(
                 replyReport.getStatus(),
                 replyReport.getReporter().getMemberNo(),
                 replyNo,
-                replyReport.getReplyContent(),
-                replyReport.isReplyDeleted());
+                replyReport.getReplyContent());
     }
 }

@@ -247,7 +247,6 @@ class MemberCleanupBatchTests {
                 .reporter(member1)
                 .reportedReply(reply2)
                 .replyContent(reply2.getReplyContent())
-                .isReplyDeleted(false)
                 .build();
         replyReports.add(report1);
 
@@ -258,7 +257,6 @@ class MemberCleanupBatchTests {
                 .reporter(member2)
                 .reportedReply(reply1)
                 .replyContent(reply1.getReplyContent())
-                .isReplyDeleted(false)
                 .build();
         replyReports.add(report2);
 
@@ -274,7 +272,6 @@ class MemberCleanupBatchTests {
                 .reporter(member2)
                 .reportedPost(post1)
                 .postContent(post1.getPostContent())
-                .isPostDeleted(false)
                 .build();
         postReports.add(postReport1);
 
@@ -286,7 +283,6 @@ class MemberCleanupBatchTests {
                 .reporter(member1)
                 .reportedPost(post2)
                 .postContent(post2.getPostContent())
-                .isPostDeleted(false)
                 .build();
         postReports.add(postReport2);
 
@@ -298,7 +294,6 @@ class MemberCleanupBatchTests {
                 .reporter(member2)
                 .reportedPost(post2)
                 .postContent(post2.getPostContent())
-                .isPostDeleted(false)
                 .build();
         postReports.add(postReport3);
 
