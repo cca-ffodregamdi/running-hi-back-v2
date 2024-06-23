@@ -33,6 +33,10 @@ public class MyChallengeService {
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
+        if(memberChallengeRepository.findByMemberAndChallenge(member, challenge).isPresent()) {
+            throw new IllegalArgumentException("이미 참여중인 챌린지입니다.");
+        }
+
         MemberChallenge memberChallenge = MemberChallenge.builder()
                 .challenge(challenge)
                 .member(member)
