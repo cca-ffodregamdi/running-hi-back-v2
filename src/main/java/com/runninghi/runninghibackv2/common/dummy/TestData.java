@@ -34,9 +34,10 @@ public class TestData {
         testDatabaseMapper.disableForeignKeyChecks();
         List<String> tableList = testDatabaseMapper.getAllTableList();
         for (String i : tableList) {
-            testDatabaseMapper.truncateTable(i);
+            if (!i.equals("tbl_member")) {
+                testDatabaseMapper.truncateTable(i);
+            }
         }
-        testDatabaseMapper.enableForeignKeyChecks();
 
         testDatabaseMapper.insertMemberDummyData();
         testDatabaseMapper.insertPostDummyData();
@@ -47,8 +48,8 @@ public class TestData {
         testDatabaseMapper.insertReplyDummyData();
         testDatabaseMapper.insertPostReportDummyData();
         testDatabaseMapper.insertReplyReportDummyData();
-        testDatabaseMapper.insertChallengeDummyData();
-        testDatabaseMapper.insertMemberChallengeDummyData();
+//        testDatabaseMapper.insertChallengeDummyData();
+//        testDatabaseMapper.insertMemberChallengeDummyData();
 
         return ResponseEntity.ok(ApiResult.success("DB 초기화, test용 dummy data 생성 성공", null));
     }
