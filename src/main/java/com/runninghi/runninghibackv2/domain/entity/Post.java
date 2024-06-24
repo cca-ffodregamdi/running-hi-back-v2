@@ -89,15 +89,17 @@ public class Post extends BaseTimeEntity {
         this.mainData = mainData;
     }
 
-    public void shareToPost(CreatePostRequest request) {
+    public void shareToPost(CreatePostRequest request, String mainData) {
         this.postContent = request.postContent();
         this.difficulty = Difficulty.valueOf(request.difficulty());
         this.status = true;
+        this.mainData = mainData;
     }
 
-    public void update(UpdatePostRequest request) {
+    public void update(UpdatePostRequest request, String mainData) {
         this.postContent = request.postContent();
         this.difficulty = Difficulty.valueOf(request.difficulty());
+        this.mainData = mainData;
     }
 
     public void addReportedCount() {

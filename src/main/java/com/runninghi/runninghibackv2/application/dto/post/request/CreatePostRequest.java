@@ -1,10 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.post.request;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.util.List;
 
 public record CreatePostRequest(
         @Schema(description = "게시글 번호", example = "1")
@@ -13,10 +9,10 @@ public record CreatePostRequest(
         String postContent,
         @Schema(description = "코스 난이도", example = "EASY")
         String difficulty,
-        @Schema(description = "키워드 목록", example = "[\"보통\",\"강아지랑\",\"경사없음\"]")
-        List<String> keywordList,
-        @Schema(description = "이미지 목록", example = "[\"test.jpg\",\"test2.jpg2\"]")
-        List<String> imageUrlList
+        @Schema(description = "대표 기록", example = "0")
+        int mainData,
+        @Schema(description = "이미지 URL", example = "https://picsum.photos/200")
+        String imageUrl
 ) {
 
 }
