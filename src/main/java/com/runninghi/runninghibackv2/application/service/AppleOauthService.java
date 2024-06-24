@@ -111,7 +111,7 @@ public class AppleOauthService {
 
         String authorization = "Bearer " + clientSecret;
 
-        appleClient.revokeToken(authorization, clientId, member.getAppleRefreshToken(), "refresh_token");
+        appleClient.revokeToken(authorization, clientId, member.getAppleRefreshToken(), clientSecret, "refresh_token");
 
         member.deactivateMember();
         memberRepository.save(member);
