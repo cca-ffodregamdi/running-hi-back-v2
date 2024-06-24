@@ -19,6 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -54,7 +55,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     public PageResultData<GetReplyListResponse> findAllByPostNo(GetReplyListRequest request) {
 
         Long count = getCountByPostNo(request);
-        if (count < 1) throw new EntityNotFoundException();
+        if (count < 1) return new PageResultData<>(new ArrayList<>(), request.getPageable(), count);
         if (request.getPage() > 1) checkReplyCount(count, request.getPage(), request.getSize());
         List<GetReplyListResponse> content = getReplyListByPostNo(request);
 
