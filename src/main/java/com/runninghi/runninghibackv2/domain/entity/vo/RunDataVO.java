@@ -47,7 +47,7 @@ public class RunDataVO {
     @Column
     @Convert(converter = FloatListConverter.class)
     @Comment("연간 러닝 기록 (2024년~)")
-    private List<Float> yearlyRunData;
+    private List<Float> yearlyRunData = new ArrayList<>(Collections.nCopies(1, 0f));
 
     @Builder
     public RunDataVO(double totalDistance, double totalKcal, int distanceToNextLevel, int level) {

@@ -77,6 +77,13 @@ public class ImageService {
                     .updatePostNo(postNo);
     }
 
+    @Transactional
+    public void savePostNo(String imageUrl, Long postNo) {
+        imageRepository.findImageByImageUrl(imageUrl)
+                .orElseThrow(EntityNotFoundException::new)
+                .updatePostNo(postNo);
+    }
+
     public void moveDirectOnS3(String key, String targetKey) {
         copyFile(key, targetKey);
         deleteFile(key);

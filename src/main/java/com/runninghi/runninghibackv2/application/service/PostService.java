@@ -115,7 +115,7 @@ public class PostService {
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
-        String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
+//        String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
 
         updateRecordOfMyChallenges(member, gpsDataVO);
 
@@ -123,7 +123,7 @@ public class PostService {
                 .member(member)
                 .role(member.getRole())
                 .gpsDataVO(gpsDataVO)
-                .gpxUrl(gpxUrl)
+                .gpxUrl("gpxUrl")
                 .status(false)
                 .build());
 
@@ -151,9 +151,29 @@ public class PostService {
         return new String(outStream.toByteArray());
     }
 
+    private String getMainData(int dataNo, GpsDataVO gpsDataVO) {
+
+        String mainData = null;
+
+        switch (dataNo) {
+            case 0:
+                mainData = gpsDataVO.getDistance() + "km";
+                break;
+            case 1:
+                mainData = gpsDataVO.getTime()/60 + "분 " + gpsDataVO.getTime()%60 + "초";
+                break;
+            case 2:
+                mainData = gpsDataVO.getKcal() + "Kcal";
+                break;
+            case 3:
+                mainData = gpsDataVO.getMeanPace()/60 + "' " + gpsDataVO.getMeanPace()%60 + "\"";
+                break;
+        }
+        return  mainData;
+    }
+
     @Transactional
     public CreatePostResponse createPost(Long memberNo, CreatePostRequest request) {
-
         postChecker.checkPostValidation(request.postContent());
 
         Post post = postRepository.findById(request.postNo())
@@ -161,10 +181,11 @@ public class PostService {
 
         postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
-        postKeywordService.createPostKeyword(post, request.keywordList());
-        savePostImages(request.imageUrlList(), post.getPostNo());
+        savePostImage(request.imageUrl(), post.getPostNo());
 
-        post.shareToPost(request);
+        String mainData = getMainData(request.mainData(), post.getGpsDataVO());
+
+        post.shareToPost(request, mainData);
 
         return new CreatePostResponse(post.getPostNo());
 
@@ -173,14 +194,12 @@ public class PostService {
 
     @Transactional
     public UpdatePostResponse updatePost(Long memberNo, Long postNo, UpdatePostRequest request) {
-
         Post post = findPostByNo(postNo);
-
         postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
-        post.update(request);
+        String mainData = getMainData(request.mainData(), post.getGpsDataVO());
 
-        updateService.updatePostKeyword(post, request.keywordList());
+        post.update(request, mainData);
 
         return UpdatePostResponse.from(post);
     }
@@ -220,7 +239,7 @@ public class PostService {
 
         List<Long> postNos = posts.getContent().stream().map(Post::getPostNo).collect(Collectors.toList());
 
-        Image mainImage = jpaQueryFactory.select(QImage.image)
+        Image mainImage = jpaQueryFactory.select(image)
                 .from(image)
                 .where(image.postNo.in(postNos))
                 .limit(1)
@@ -253,6 +272,10 @@ public class PostService {
 
     private void savePostImages(List<String> imageUrlList, Long postNo) {
         imageService.savePostNo(imageUrlList, postNo);
+    }
+
+    private void savePostImage(String imageUrl, Long postNo) {
+        imageService.savePostNo(imageUrl, postNo);
     }
 
 
