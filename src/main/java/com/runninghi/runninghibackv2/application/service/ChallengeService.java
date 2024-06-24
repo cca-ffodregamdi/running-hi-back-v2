@@ -2,12 +2,11 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
-import com.runninghi.runninghibackv2.application.dto.challenge.response.CreateChallengeResponse;
-import com.runninghi.runninghibackv2.application.dto.challenge.response.DeleteChallengeResponse;
-import com.runninghi.runninghibackv2.application.dto.challenge.response.GetChallengeResponse;
-import com.runninghi.runninghibackv2.application.dto.challenge.response.UpdateChallengeResponse;
+import com.runninghi.runninghibackv2.application.dto.challenge.response.*;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetChallengeRankingResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.repository.ChallengeRepository;
+import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +19,7 @@ import java.util.List;
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
+    private final MemberChallengeRepository memberChallengeRepository;
 
     @Transactional
     public CreateChallengeResponse createChallenge(CreateChallengeRequest request) {
@@ -40,10 +40,18 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetChallengeResponse> getAllChallenges() {
+    public List<GetAllChallengeResponse> getAllActiveChallenges() {
 
-        return challengeRepository.findAll().stream()
-                .map(GetChallengeResponse::from)
+        return challengeRepository.findByStatus(true).stream()
+                .map(GetAllChallengeResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetAllChallengeResponse> getAllInactiveChallenges() {
+
+        return challengeRepository.findByStatus(false).stream()
+                .map(GetAllChallengeResponse::from)
                 .toList();
     }
 
@@ -53,7 +61,10 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeNo)
                 .orElseThrow(EntityNotFoundException::new);
 
-        return GetChallengeResponse.from(challenge);
+        List<GetChallengeRankingResponse> ranking =
+                memberChallengeRepository.findChallengeRanking(challenge.getChallengeNo());
+
+        return GetChallengeResponse.from(challenge, ranking);
     }
 
     @Transactional
