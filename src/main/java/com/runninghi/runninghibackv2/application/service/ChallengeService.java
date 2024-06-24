@@ -40,17 +40,9 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetAllChallengeResponse> getAllActiveChallenges() {
+    public List<GetAllChallengeResponse> getAllChallengesByStatus(boolean status) {
 
-        return challengeRepository.findByStatus(true).stream()
-                .map(GetAllChallengeResponse::from)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<GetAllChallengeResponse> getAllInactiveChallenges() {
-
-        return challengeRepository.findByStatus(false).stream()
+        return challengeRepository.findByStatus(status).stream()
                 .map(GetAllChallengeResponse::from)
                 .toList();
     }

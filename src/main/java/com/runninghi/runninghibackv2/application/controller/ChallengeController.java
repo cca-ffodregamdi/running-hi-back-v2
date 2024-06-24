@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.application.dto.memberchallenge.request.Cre
 import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.response.*;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.CreateMyChallengeResponse;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetAllMyChallengeResponse;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetMyChallengeResponse;
 import com.runninghi.runninghibackv2.application.service.ChallengeService;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateChallengeRequest;
@@ -40,11 +41,13 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("챌린지 저장 성공", response));
     }
 
-    @Operation(summary = "챌린지 전체 조회", description = "모든 챌린지를 조회합니다.")
-    @GetMapping()
-    public ResponseEntity<ApiResult<List<GetChallengeResponse>>> getAllChallenges() {
+    @Operation(summary = "활성화 상태 여부에 따른 챌린지 전체 조회", description = "status가 true이면 현재 진행중인 챌린지 \n" +
+            "status가 false인 경우 종료된 챌린지가 조회됩니다.")
+    @GetMapping("/status")
+    public ResponseEntity<ApiResult<List<GetAllChallengeResponse>>> getAllChallengesByStatus(
+            @RequestParam(name = "status") boolean status) {
 
-        List<GetChallengeResponse> response = challengeService.getAllChallenges();
+        List<GetAllChallengeResponse> response = challengeService.getAllChallengesByStatus(status);
 
         return ResponseEntity.ok(ApiResult.success("챌린지 전체 조회 성공", response));
     }
@@ -94,14 +97,16 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 저장 성공", response));
     }
 
-    @Operation(summary = "나의 챌린지 전체 조회", description = "로그인한 사용자가 참여중인 모든 챌린지를 조회합니다.")
-    @GetMapping("/my-challenge")
-    public ResponseEntity<ApiResult<List<GetMyChallengeResponse>>> getAllMyChallenges(
+    @Operation(summary = "활성화 여부에 따른 나의 챌린지 전체 조회",
+            description = "status가 true이면 로그인한 사용자가 참여한 모든 진행중인 챌린지,\nfalse인 경우 종료된 챌린지가 조회됩니다.")
+    @GetMapping("/my-challenge/status")
+    public ResponseEntity<ApiResult<List<GetAllMyChallengeResponse>>> getAllMyChallengesByStatus(
+            @RequestParam(name = "status") boolean status,
             @RequestHeader(name = "Authorization") String bearerToken) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
 
-        List<GetMyChallengeResponse> response = myChallengeService.getAllMyChallenges(memberNo);
+        List<GetAllMyChallengeResponse> response = myChallengeService.getAllMyChallengesByStatus(memberNo, status);
 
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 전체 조회 성공", response));
     }

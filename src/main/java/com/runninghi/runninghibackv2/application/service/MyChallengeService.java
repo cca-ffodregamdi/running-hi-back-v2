@@ -49,21 +49,10 @@ public class MyChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetAllMyChallengeResponse> getMyActiveChallenges(Long memberNo) {
+    public List<GetAllMyChallengeResponse> getAllMyChallengesByStatus(Long memberNo, boolean status) {
 
         Member member = memberRepository.findByMemberNo(memberNo);
-        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMemberAndChallengeStatus(member, true);
-
-        return myChallenges.stream()
-                .map(GetAllMyChallengeResponse::from)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<GetAllMyChallengeResponse> getMyInactiveChallenges(Long memberNo) {
-
-        Member member = memberRepository.findByMemberNo(memberNo);
-        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMemberAndChallengeStatus(member, false);
+        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMemberAndChallengeStatus(member, status);
 
         return myChallenges.stream()
                 .map(GetAllMyChallengeResponse::from)
