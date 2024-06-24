@@ -26,7 +26,7 @@ public class GetReplyListResponse {
         @Schema(description = "댓글 삭제 여부", example = "false")
         Boolean isDeleted;
         @Schema(description = "댓글 작성자 본인 여부", example = "true")
-        Boolean isOwner;
+        Boolean isOwner = false;
         @Schema(description = "댓글 생성 일", example = "2024-03-27T13:23:12")
         LocalDateTime createDate;
         @Schema(description = "댓글 수정 일", example = "2024-03-27T13:23:12")
