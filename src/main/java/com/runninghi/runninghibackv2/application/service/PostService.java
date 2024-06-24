@@ -47,7 +47,6 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final GpxCoordinateExtractor gpxCoordinateExtractor;
-    private final ScoreRepository scoreRepository;
     private final PostQueryRepository postQueryRepository;
     private final MemberChallengeRepository memberChallengeRepository;
 
@@ -291,23 +290,10 @@ public class PostService {
         }
     }
 
-    public void createOrUpdateScore(Member member, GpsDataVO gpsDataVO) {
-        Optional<Score> score = scoreRepository.findByMember(member);
-
-        if (scoreRepository.findByMember(member).isEmpty()) {
-            scoreRepository.save(Score.builder()
-                    .distance(gpsDataVO.getDistance())
-                    .member(member)
-                    .build());
-            return;
-        }
-        score.get().addDistance(gpsDataVO.getDistance());
-    }
-
     private void updateRecordOfMyChallenges(Member member, GpsDataVO gpsDataVO) {
         List<MemberChallenge> myChallenges = memberChallengeRepository.findByMember(member);
 
-        if (myChallenges.size() == 0) return;
+        if (myChallenges.isEmpty()) return;
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
