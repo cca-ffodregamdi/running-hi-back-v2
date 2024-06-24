@@ -2,12 +2,13 @@ package com.runninghi.runninghibackv2.application.dto.reply.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.domain.Pageable;
 
 @Getter
+@Setter
 @ToString
 public class GetReplyListRequest {
 
@@ -33,11 +34,4 @@ public class GetReplyListRequest {
         this.postNo = postNo;
 
     }
-
-    public void setPageable(Pageable pageable) {
-        this.pageable = pageable;
-    }
-
-    public void setMemberNo(Long memberNo) { this.memberNo = memberNo;}
-
 }
