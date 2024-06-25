@@ -28,7 +28,7 @@ jobs:
             sudo ssh-keyscan ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
             
             # 배포 서버에서 DockerHub Login
-            sudo docker login -u ${{ secrets.DOCKERHUN_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
             
             # Pull Docker Image
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
