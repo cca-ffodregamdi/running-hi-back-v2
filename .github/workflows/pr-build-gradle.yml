@@ -15,8 +15,37 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  sync:
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout PR Branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Merge Dev Branch
+        run: |
+          git fetch origin dev
+          git merge origin dev
+
+      - name: Check for changes after merge
+        id: check_diff
+        run: |
+          # 차이점이 없으면 0(then 실행), 있으면 1 반환(else 실행)
+          if git diff --exit-code; then
+            echo "No changes after merge"
+            echo "has_changes=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected after merge"
+            echo "has_changed=true" >> $GITHUB_ENV
+          fi
+          
+      - name: Push if any changes
+        if: env.has_changes == 'true'
+        run: git push origin ${{ github.head_ref }}
+
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +56,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      ## MySQL 환경을 테스트 환경에서 설정합니다.
+      # MySQL 환경을 테스트 환경에서 설정합니다.
       - name: Setup MySQL
         uses: samin/mysql-action@v1
         with:
@@ -36,7 +65,7 @@ jobs:
           mysql user: ${{ secrets.MYSQL_USERNAME }}
           mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
-      ## resources 디렉토리 확인 및 생성, application.yml 설정
+      # resources 디렉토리 확인 및 생성, application.yml 설정
       - name: Setup application.yml
         run: |
           mkdir -p ./src/main/resources
@@ -44,7 +73,7 @@ jobs:
           echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
         shell: bash
 
-      ## firebase sdk 설정
+      # firebase sdk 설정
       - name: create-json
         id: create-json
         uses: jsdaniell/create-json@v1.2.3
@@ -52,13 +81,13 @@ jobs:
           name: "runninghi-firebase-adminsdk.json"
           json: ${{ secrets.FIREBASE_SDK }}
 
-      ## firebase 디렉토리 생성 및 JSON 파일 이동
+      # firebase 디렉토리 생성 및 JSON 파일 이동
       - name: Setup Firebase Directory and Move JSON
         run: |
           mkdir -p ./src/main/resources/firebase
           mv ./runninghi-firebase-adminsdk.json ./src/main/resources/firebase/
 
-      ## apple 설정
+      # apple 설정
       - name: apple setting
         run: |
           mkdir -p ./src/main/resources/apple
@@ -76,7 +105,7 @@ jobs:
         with:
           arguments: build
 
-      ## docker upload image
+      # docker upload image
       - name: docker image build
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev .
 
