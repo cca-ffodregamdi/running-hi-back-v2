@@ -27,7 +27,7 @@ jobs:
       - name: Merge Dev Branch
         run: |
           git fetch origin dev
-          git merge origin dev
+          git merge origin/dev
 
       - name: Check for changes after merge
         id: check_diff
