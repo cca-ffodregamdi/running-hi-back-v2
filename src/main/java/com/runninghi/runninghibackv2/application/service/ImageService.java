@@ -217,8 +217,8 @@ public class ImageService {
     }
 
     @Transactional
-    public void updateImage(String url) {
-        Image image = imageRepository.findImageByImageUrl(url)
+    public void updateImage(Long postNo, String url) {
+        Image image = imageRepository.findImageByPostNo(postNo)
                 .orElseThrow(EntityNotFoundException::new);
         image.updateImageUrl(url);
     }

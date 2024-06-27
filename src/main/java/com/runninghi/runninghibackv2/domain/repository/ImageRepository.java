@@ -9,4 +9,5 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     Optional<Image> findImageByImageUrl(String imageUrl);
 
+    Optional<Image> findImageByPostNo(Long postNo);
 }

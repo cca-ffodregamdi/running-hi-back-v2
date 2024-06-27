@@ -200,9 +200,9 @@ public class PostService {
         String mainData = getMainData(request.mainData(), post.getGpsDataVO());
 
         post.update(request, mainData);
-        imageService.updateImage(request.imageUrl());
+        imageService.updateImage(postNo, request.imageUrl());
 
-        return UpdatePostResponse.from(post);
+        return UpdatePostResponse.from(post, request.imageUrl());
     }
 
     @Transactional
