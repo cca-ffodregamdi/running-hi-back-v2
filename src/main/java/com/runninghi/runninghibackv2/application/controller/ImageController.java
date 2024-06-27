@@ -36,16 +36,16 @@ public class ImageController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "이미지 업로드 요청",
-            description = "이미지를 전달받아 업로드합니다. <br /> 이미지 개수 제한은 6개이며, 리스트 형태(MultipartFile)로 전달 받아 Storage에 저장하고 url을 반환합니다.",
+            description = "이미지를 전달받아 업로드합니다. <br /> MultipartFile 로 전달 받아 Storage에 저장하고 url을 반환합니다.",
             responses = @ApiResponse(responseCode = "200", description = UPLOAD_IMAGE_RESPONSE_MESSAGE)
     )
-    public ResponseEntity<ApiResult<List<CreateImageResponse>>> saveImages(@Parameter(description = "사용자 인증을 위한 BearerToken")
+    public ResponseEntity<ApiResult<CreateImageResponse>> saveImages(@Parameter(description = "사용자 인증을 위한 BearerToken")
                                                                            @RequestHeader("Authorization") String token,
-                                                                           @Parameter(description = "피드에 업로드할 이미지 리스트")
-                                                                           @RequestPart("images") List<MultipartFile> imageFiles) {
+                                                                           @Parameter(description = "피드에 업로드할 이미지")
+                                                                           @RequestPart("image") MultipartFile imageFiles) {
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(token);
-        List<CreateImageResponse> imageResponseList = imageService.saveImages(imageFiles, memberInfo.memberNo());
-        return ResponseEntity.ok().body(ApiResult.success(UPLOAD_IMAGE_RESPONSE_MESSAGE, imageResponseList));
+        CreateImageResponse imageResponse = imageService.saveImage(imageFiles, memberInfo.memberNo());
+        return ResponseEntity.ok().body(ApiResult.success(UPLOAD_IMAGE_RESPONSE_MESSAGE, imageResponse));
     }
 
     @GetMapping(value = "download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

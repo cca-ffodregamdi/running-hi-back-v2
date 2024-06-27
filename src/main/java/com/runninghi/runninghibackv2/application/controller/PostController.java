@@ -60,11 +60,12 @@ public class PostController {
     @GetMapping(value = "my-feed",produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "나의 게시글 리스트 조회", description = "나의 게시글 전체 리스트를 조회합니다. 공유 여부가 함께 조회됩니다.")
     public ResponseEntity<PageResult<GetMyPostsResponse>> getMyPosts(@RequestHeader("Authorization") String bearerToken,
-                                                                           @RequestParam(defaultValue = "0") int page) {
+                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "10") int size) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        Pageable pageable = PageRequest.of(page,10);
+        Pageable pageable = PageRequest.of(page,size);
 
         PageResultData<GetMyPostsResponse> response = postService.getMyPostsScroll(pageable, memberInfo.memberNo());
 
