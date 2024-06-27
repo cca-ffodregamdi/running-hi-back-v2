@@ -8,15 +8,15 @@ public record UpdatePostResponse(
         String postContent,
         @Schema(description = "대표 기록", example = "28분 32초")
         String mainData,
-        @Schema(description = "코스 난이도", example = "EASY")
-        String difficulty
+        @Schema(description = "이미지 url", example = "https://picsum.photos/200")
+        String imageUrl
 
 ) {
-    public static UpdatePostResponse from(Post post) {
+    public static UpdatePostResponse from(Post post, String imageUrl) {
         return new UpdatePostResponse(
                 post.getPostContent(),
                 post.getMainData(),
-                post.getDifficulty().toString()
+                imageUrl
         );
     }
 }

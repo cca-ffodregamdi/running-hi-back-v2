@@ -36,4 +36,8 @@ public class Image extends BaseTimeEntity{
     public void updatePostNo(Long postNo) {
         this.postNo = postNo;
     }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
