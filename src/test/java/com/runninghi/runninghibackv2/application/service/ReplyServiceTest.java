@@ -7,16 +7,11 @@ import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.application.dto.reply.request.DeleteReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.UpdateReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
@@ -83,7 +78,7 @@ class ReplyServiceTest {
                 .build();
 
         reply1 = Reply.builder()
-                .writer(member1)
+                .member(member1)
                 .post(post)
                 .replyContent("댓글 테스트 내용")
                 .reportedCount(0)
@@ -91,7 +86,7 @@ class ReplyServiceTest {
                 .build();
 
         reply2 = Reply.builder()
-                .writer(member2)
+                .member(member2)
                 .post(post)
                 .replyContent("댓글 테스트 내용2")
                 .reportedCount(1)
@@ -99,7 +94,7 @@ class ReplyServiceTest {
                 .build();
 
         reply3 = Reply.builder()
-                .writer(member1)
+                .member(member1)
                 .post(post)
                 .replyContent("댓글 테스트 내용3")
                 .reportedCount(0)
@@ -107,7 +102,7 @@ class ReplyServiceTest {
                 .build();
 
         reply4 = Reply.builder()
-                .writer(member1)
+                .member(member1)
                 .post(post)
                 .replyContent("댓글 테스트 내용4")
                 .reportedCount(4)
@@ -216,8 +211,8 @@ class ReplyServiceTest {
 
         // given
         Long replyNo = reply1.getReplyNo();
-        Long memberNo = reply1.getWriter().getMemberNo();
-        Role role = reply1.getWriter().getRole();
+        Long memberNo = reply1.getMember().getMemberNo();
+        Role role = reply1.getMember().getRole();
         DeleteReplyRequest request = DeleteReplyRequest.of(replyNo, role, memberNo);
 
         // when

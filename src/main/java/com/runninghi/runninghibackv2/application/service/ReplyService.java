@@ -19,6 +19,7 @@ import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
 import com.runninghi.runninghibackv2.domain.service.ReplyChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,15 +61,15 @@ public class ReplyService {
      * @return 댓글들
      */
     @Transactional(readOnly = true)
-    public PageResultData<GetReplyListResponse> getReplyListByMemberNo(GetReplyListByMemberRequest request) {
+    public PageResultData<GetReplyListResponse> getReplyListByMemberNo(Long memberNo, Sort sort) {
 
-        PageResultData<GetReplyListResponse> pageResultData = replyQueryRepository.findAllByMemberNo(request);
-        pageResultData.getContent()
-                .stream()
-                .filter(i -> i.getMemberNo().equals(request.getMemberNo()))
-                .forEach(i -> i.setIsOwner(true));
-
-        return replyQueryRepository.findAllByMemberNo(request);
+//        PageResultData<GetReplyListResponse> pageResultData = replyQueryRepository.findAllByMemberNo(request);
+//        pageResultData.getContent()
+//                .stream()
+//                .filter(i -> i.getMemberNo().equals(memberNo))
+//                .forEach(i -> i.setIsOwner(true));
+//        return replyQueryRepository.findAllByMemberNo(request);
+        return null;
     }
 
     /**
@@ -86,7 +87,7 @@ public class ReplyService {
                 .orElseThrow(EntityNotFoundException::new);
 
         Reply reply = Reply.builder()
-                .writer(member)
+                .member(member)
                 .post(post)
                 .replyContent(request.replyContent())
                 .build();
@@ -174,7 +175,7 @@ public class ReplyService {
     private void checkWriterOrAdmin (Long memberNo, Role role, Reply reply) {
 
         boolean checkResult =
-                replyChecker.memberCheck(memberNo, role, reply.getWriter().getMemberNo());
+                replyChecker.memberCheck(memberNo, role, reply.getMember().getMemberNo());
 
         if (!checkResult) throw new AccessDeniedException(ErrorCode.ACCESS_DENIED.getMessage());
 

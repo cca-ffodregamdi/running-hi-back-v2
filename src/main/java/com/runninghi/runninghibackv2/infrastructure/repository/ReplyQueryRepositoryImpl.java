@@ -84,7 +84,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .select(reply.replyNo.count())
                 .from(reply)
                 .where(
-                        reply.writer.memberNo.eq(request.getMemberNo()),
+                        reply.member.memberNo.eq(request.getMemberNo()),
                         reply.isDeleted.eq(false))
                 .fetchOne();
     }
@@ -105,7 +105,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
         return jpaQueryFactory
                 .select(reply.replyNo.count())
                 .from(reply)
-                .join(reply.writer, member)
+                .join(reply.member, member)
                 .join(reply.reportList, replyReport)
                 .where(
                         likeNickname(request.search()),
@@ -129,7 +129,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                         reply.updateDate
                 ))
                 .from(reply)
-                .join(reply.writer, member)
+                .join(reply.member, member)
                 .join(reply.reportList, replyReport)
                 .where(likeNickname(request.search()),
                         eqReportStatus(request.reportStatus()),
@@ -157,7 +157,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                         reply.updateDate))
                 .from(reply)
                 .join(reply.post, post)
-                .join(reply.writer, member)
+                .join(reply.member, member)
                 .where(
                         reply.post.postNo.eq(request.getPostNo()),
                         reply.isDeleted.eq(false))
@@ -180,9 +180,9 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                         reply.createDate,
                         reply.updateDate))
                 .from(reply)
-                .join(reply.writer, member)
+                .join(reply.member, member)
                 .where(
-                        reply.writer.memberNo.eq(request.getMemberNo()),
+                        reply.member.memberNo.eq(request.getMemberNo()),
                         reply.isDeleted.eq(false))
                 .orderBy(reply.replyNo.desc())
                 .offset(request.getPageable().getOffset())

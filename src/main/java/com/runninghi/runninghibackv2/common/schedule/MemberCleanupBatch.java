@@ -55,7 +55,7 @@ public class MemberCleanupBatch {
 
     private void deleteRelatedReplies(Member deactivateMember) {
         try {
-            replyRepository.deleteAllByWriter(deactivateMember);
+            replyRepository.deleteAllByMember(deactivateMember);
         } catch (Exception e) {
             e.printStackTrace();
             throw new SchedulingException();

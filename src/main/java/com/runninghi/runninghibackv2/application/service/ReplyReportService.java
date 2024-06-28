@@ -98,7 +98,7 @@ public class ReplyReportService {
 
         if(isAccepted) {
             status = ProcessingStatus.ACCEPTED;
-            Member reportedMember = reportedReply.getWriter();
+            Member reportedMember = reportedReply.getMember();
             reportedMember.addReportedCount();
             replyRepository.deleteById(replyNo);
 

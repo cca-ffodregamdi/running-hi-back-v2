@@ -7,10 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
+//    void findAllByWriter
     Long countByPost_PostNo(Long postNo);
 
     void deleteAllByPost(Post post);
 
-    void deleteAllByWriter(Member member);
+    void deleteAllByMember(Member member);
 
 }
