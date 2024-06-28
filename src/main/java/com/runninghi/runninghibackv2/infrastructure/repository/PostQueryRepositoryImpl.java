@@ -100,7 +100,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         long total;
 
         Point referencePoint = memberRepository.findByMemberNo(memberNo).getGeometry();
-        System.out.println("referencePoint = " + referencePoint);
 
         total = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
@@ -112,8 +111,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 )
                 .fetchCount();
 
-        posts = jpaQueryFactory.select(post)
-                .from(post)
+        posts = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
                         .and(post.geometry.isNotNull())
                         .and(Expressions.booleanTemplate(
@@ -127,8 +125,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetch();
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(image)
-                    .from(image)
+            Image mainImage = jpaQueryFactory.selectFrom(image)
                     .where(image.postNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
@@ -166,8 +163,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 )
                 .fetchCount();
 
-        System.out.println("total = " + total);
-
         posts = jpaQueryFactory.select(post)
                 .from(post)
                 .leftJoin(bookmark).on(bookmark.post.postNo.eq(post.postNo))
@@ -184,8 +179,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetch();
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(image)
-                    .from(image)
+            Image mainImage = jpaQueryFactory.selectFrom(image)
                     .where(image.postNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
@@ -206,6 +200,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         return new PageResultData<>(responses, pageable, total);
     }
+
 
 
 }
