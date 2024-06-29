@@ -38,6 +38,7 @@ public class TestData {
                 testDatabaseMapper.truncateTable(i);
             }
         }
+        testDatabaseMapper.enableForeignKeyChecks();
 
         testDatabaseMapper.insertMemberDummyData();
         testDatabaseMapper.insertPostDummyData();
