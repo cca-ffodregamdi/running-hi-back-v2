@@ -26,7 +26,7 @@ public record UpdateReplyResponse (
 
         return new UpdateReplyResponse(
                 reply.getReplyNo(),
-                reply.getWriter().getNickname(),
+                reply.getMember().getNickname(),
                 reply.getPost().getPostNo(),
                 reply.getReplyContent(),
                 reply.isDeleted(),
