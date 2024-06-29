@@ -207,7 +207,7 @@ class MemberCleanupBatchTests {
         List<Reply> replies = new ArrayList<>();
 
         Reply reply1 = Reply.builder()
-                .writer(member1)
+                .member(member1)
                 .post(post1)
                 .replyContent("첫 번째 댓글 내용입니다. : member1")
                 .reportedCount(0)
@@ -217,7 +217,7 @@ class MemberCleanupBatchTests {
 
         // 남아있는 댓글
         Reply reply2 = Reply.builder()
-                .writer(member2)
+                .member(member2)
                 .post(post2)
                 .replyContent("두 번째 댓글 내용입니다. : 남아있는 댓글입니다.")
                 .reportedCount(0)
@@ -226,7 +226,7 @@ class MemberCleanupBatchTests {
         replies.add(reply2);
 
         Reply reply3 = Reply.builder()
-                .writer(member2)
+                .member(member2)
                 .post(post1)
                 .replyContent("첫 번째 댓글 내용입니다. : member2")
                 .reportedCount(0)

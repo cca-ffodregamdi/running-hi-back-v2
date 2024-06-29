@@ -71,7 +71,7 @@ class ReplyReportServiceTests {
                 .build();
 
         reportedReply = Reply.builder()
-                .writer(reportedMember)
+                .member(reportedMember)
                 .post(reportedPost)
                 .replyContent("댓글 테스트 내용")
                 .reportedCount(0)

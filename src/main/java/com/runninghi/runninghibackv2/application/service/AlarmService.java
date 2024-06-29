@@ -7,7 +7,6 @@ import com.google.firebase.messaging.Notification;
 import com.runninghi.runninghibackv2.application.dto.alarm.ReplyFCMDTO;
 import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.repository.AlarmRepository;
-import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,7 @@ public class AlarmService {
                 .build();
 
         Message message = Message.builder()
-                .setToken(replyFCMDTO.getSavedReply().getWriter().getFcmToken())
+                .setToken(replyFCMDTO.getSavedReply().getMember().getFcmToken())
                 .setNotification(notification)
                 .build();
 

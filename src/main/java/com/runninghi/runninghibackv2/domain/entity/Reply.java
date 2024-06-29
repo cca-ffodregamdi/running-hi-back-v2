@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
-import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -26,7 +25,7 @@ public class Reply extends BaseTimeEntity {
     @JoinColumn(name = "MEMBER_NO")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @Comment("작성자")
-    private Member writer;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -51,15 +50,6 @@ public class Reply extends BaseTimeEntity {
     @Comment("댓글 신고 리스트")
     private final List<ReplyReport> reportList = new ArrayList<>();
 
-    private Reply(ReplyBuilder builder) {
-        this.replyNo = builder.replyNo;
-        this.writer = builder.writer;
-        this.post = builder.post;
-        this.replyContent = builder.replyContent;
-        this.reportedCount = builder.reportedCount;
-        this.isDeleted = builder.isDeleted;
-    }
-
     public void addReportedCount () {this.reportedCount++;}
 
     public void resetReportedCount() {
@@ -78,9 +68,9 @@ public class Reply extends BaseTimeEntity {
 
 
     @Builder
-    public Reply(Long replyNo, Member writer, Post post, String replyContent, int reportedCount, boolean isDeleted) {
+    public Reply(Long replyNo, Member member, Post post, String replyContent, int reportedCount, boolean isDeleted) {
         this.replyNo = replyNo;
-        this.writer = writer;
+        this.member = member;
         this.post = post;
         this.replyContent = replyContent;
         this.reportedCount = reportedCount;

@@ -15,7 +15,7 @@ public record GetPostReplyResponse (
 ) {
     public static GetPostReplyResponse from (Reply reply) {
         return new GetPostReplyResponse(
-                reply.getWriter().getNickname(),
+                reply.getMember().getNickname(),
                 reply.getReplyContent(),
                 reply.getCreateDate()
         );
