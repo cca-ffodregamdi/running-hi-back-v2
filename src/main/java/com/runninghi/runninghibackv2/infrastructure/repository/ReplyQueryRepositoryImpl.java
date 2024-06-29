@@ -19,7 +19,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -41,39 +40,74 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     private static final int REPORTED_COUNT = 1;
 
     @Override
+    public List<GetReplyListResponse> findAllByPostNo(GetReplyListRequest request) {
+        return jpaQueryFactory
+                .select(Projections.constructor(GetReplyListResponse.class,
+                        reply.replyNo,
+                        reply.member.memberNo,
+                        reply.member.nickname,
+                        reply.post.postNo,
+                        reply.replyContent,
+                        reply.reportedCount,
+                        reply.isDeleted,
+                        reply.createDate,
+                        reply.updateDate))
+                .from(reply)
+                .where(reply.post.postNo.eq(request.getPostNo()),
+                        reply.isDeleted.eq(false))
+                .orderBy(
+                        getOrderSpecifierList(request.getSort())
+                                .toArray(OrderSpecifier[]::new))
+                .fetch();
+    }
+
+    @Override
+    public List<GetReplyListResponse> findAllByMemberNo(Long memberNo, Sort sort) {
+        return jpaQueryFactory
+                .select(Projections.constructor(GetReplyListResponse.class,
+                        reply.replyNo,
+                        reply.member.memberNo,
+                        reply.member.nickname,
+                        reply.post.postNo,
+                        reply.replyContent,
+                        reply.reportedCount,
+                        reply.isDeleted,
+                        reply.createDate,
+                        reply.updateDate
+                        ))
+                .from(reply)
+                .where(reply.member.memberNo.eq(memberNo),
+                        reply.isDeleted.eq(false))
+                .orderBy(
+                getOrderSpecifierList(sort)
+                        .toArray(OrderSpecifier[]::new))
+                .fetch();
+    }
+
+    @Override
     public PageResultData<GetReportedReplyResponse> findAllReportedByPageableAndSearch(GetReportedReplyRequest request) {
 
         Long count = getReportedCount(request);
         if (count < 1) return null;
-        if (request.pageable().getPageNumber() > 1) checkReplyCount(count, request.pageable().getPageNumber(), request.pageable().getPageSize());
+        if (request.pageable().getPageNumber() > 1) checkReplyCountWithPaging(count, request.pageable().getPageNumber(), request.pageable().getPageSize());
         List<GetReportedReplyResponse> content = getReportedReplyList(request);
 
         return new PageResultData<>(content, request.pageable(), count);
     }
 
-    @Override
-    public PageResultData<GetReplyListResponse> findAllByPostNo(GetReplyListRequest request) {
 
-        Long count = getCountByPostNo(request);
-        if (count < 1) return new PageResultData<>(new ArrayList<>(), request.getPageable(), count);
-        if (request.getPage() > 1) checkReplyCount(count, request.getPage(), request.getSize());
-        List<GetReplyListResponse> content = getReplyListByPostNo(request);
-
-        return new PageResultData<>(content, request.getPageable(), count);
-    }
-
-    private void checkReplyCount(Long count, int page, int size) {
+    private void checkReplyCountWithPaging(Long count, int page, int size) {
         if (page > Math.ceil((double)count / size)) {
             throw new IllegalArgumentException();
         }
     }
 
     @Override
-    public PageResultData<GetReplyListResponse> findAllByMemberNo(GetReplyListByMemberRequest request) {
+    public PageResultData<GetReplyListResponse> findAllByMemberNoWithPaging(GetReplyListByMemberRequest request) {
 
         Long count = getCountByMemberNo(request);
         if (count < 1) throw new EntityNotFoundException();
-        if (request.getPage() > 1) checkReplyCount(count, request.getPage(), request.getSize());
+        if (request.getPage() > 1) checkReplyCountWithPaging(count, request.getPage(), request.getSize());
         List<GetReplyListResponse> content = getReplyListByMemberNo(request);
 
         return new PageResultData<>(content, request.getPageable(), count);
@@ -141,30 +175,6 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .limit( request.pageable().getPageSize())
                 .fetch();
 
-    }
-
-    private List<GetReplyListResponse> getReplyListByPostNo(GetReplyListRequest request) {
-        return jpaQueryFactory
-                .select(Projections.constructor(GetReplyListResponse.class,
-                        reply.replyNo,
-                        member.memberNo,
-                        member.nickname,
-                        reply.post.postNo,
-                        reply.replyContent,
-                        reply.reportedCount,
-                        reply.isDeleted,
-                        reply.createDate,
-                        reply.updateDate))
-                .from(reply)
-                .join(reply.post, post)
-                .join(reply.member, member)
-                .where(
-                        reply.post.postNo.eq(request.getPostNo()),
-                        reply.isDeleted.eq(false))
-                .orderBy(reply.replyNo.desc())
-                .offset(request.getPageable().getOffset())
-                .limit(request.getPageable().getPageSize())
-                .fetch();
     }
 
     private List<GetReplyListResponse> getReplyListByMemberNo(GetReplyListByMemberRequest request) {
