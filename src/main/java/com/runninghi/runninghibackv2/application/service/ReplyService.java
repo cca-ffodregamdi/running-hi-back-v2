@@ -3,7 +3,8 @@ package com.runninghi.runninghibackv2.application.service;
 import com.runninghi.runninghibackv2.application.dto.alarm.ReplyFCMDTO;
 import com.runninghi.runninghibackv2.application.dto.reply.request.*;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
-import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
+import com.runninghi.runninghibackv2.application.dto.reply.GetReplyList;
+import com.runninghi.runninghibackv2.application.dto.reply.response.GetContentResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
@@ -45,14 +46,14 @@ public class ReplyService {
      * @return 댓글들 리스트 ( 댓글 정보)
      */
     @Transactional(readOnly = true)
-    public List<GetReplyListResponse> getReplyList(GetReplyListRequest request) {
+    public GetContentResponse<List<GetReplyList>> getReplyList(GetReplyListRequest request) {
 
-        List<GetReplyListResponse> replyList =  replyQueryRepository.findAllByPostNo(request);
+        List<GetReplyList> replyList =  replyQueryRepository.findAllByPostNo(request);
         replyList.stream()
                 .filter(i -> i.getMemberNo().equals(request.getMemberNo()))
                 .forEach(i -> i.setIsOwner(true));
 
-        return replyList;
+        return new GetContentResponse<>(replyList);
     }
 
 
@@ -63,13 +64,13 @@ public class ReplyService {
      * @return 댓글들
      */
     @Transactional(readOnly = true)
-    public List<GetReplyListResponse> getReplyListByMemberNo(Long memberNo, Sort sort) {
+    public GetContentResponse<List<GetReplyList>> getReplyListByMemberNo(Long memberNo, Sort sort) {
 
-        List<GetReplyListResponse> replyList = replyQueryRepository.findAllByMemberNo(memberNo, sort);
+        List<GetReplyList> replyList = replyQueryRepository.findAllByMemberNo(memberNo, sort);
         replyList.stream()
             .filter(i -> i.getMemberNo().equals(memberNo))
             .forEach(i -> i.setIsOwner(true));
-        return replyList;
+        return new GetContentResponse<>(replyList);
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.application.dto.reply.response;
+package com.runninghi.runninghibackv2.application.dto.reply;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GetReplyListResponse {
+public class GetReplyList {
 
         @Schema(description = "댓글 번호", example = "2")
         Long replyNo;
@@ -32,7 +32,7 @@ public class GetReplyListResponse {
         @Schema(description = "댓글 수정 여부", example = "false")
         Boolean isUpdated;
 
-    public GetReplyListResponse(Long replyNo, Long memberNo, String memberName, Long postNo, String replyContent, int reportedCount, boolean isDeleted, LocalDateTime createDate, LocalDateTime updateDate) {
+    public GetReplyList(Long replyNo, Long memberNo, String memberName, Long postNo, String replyContent, int reportedCount, boolean isDeleted, LocalDateTime createDate, LocalDateTime updateDate) {
         this.replyNo = replyNo;
         this.memberNo = memberNo;
         this.memberName = memberName;

@@ -10,7 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReplyListByMemberRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReplyListRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
+import com.runninghi.runninghibackv2.application.dto.reply.GetReplyList;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.runninghi.runninghibackv2.domain.entity.QMember.member;
-import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
 import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 import static com.runninghi.runninghibackv2.domain.entity.QReplyReport.replyReport;
 
@@ -40,9 +39,9 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     private static final int REPORTED_COUNT = 1;
 
     @Override
-    public List<GetReplyListResponse> findAllByPostNo(GetReplyListRequest request) {
+    public List<GetReplyList> findAllByPostNo(GetReplyListRequest request) {
         return jpaQueryFactory
-                .select(Projections.constructor(GetReplyListResponse.class,
+                .select(Projections.constructor(GetReplyList.class,
                         reply.replyNo,
                         reply.member.memberNo,
                         reply.member.nickname,
@@ -62,9 +61,9 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     }
 
     @Override
-    public List<GetReplyListResponse> findAllByMemberNo(Long memberNo, Sort sort) {
+    public List<GetReplyList> findAllByMemberNo(Long memberNo, Sort sort) {
         return jpaQueryFactory
-                .select(Projections.constructor(GetReplyListResponse.class,
+                .select(Projections.constructor(GetReplyList.class,
                         reply.replyNo,
                         reply.member.memberNo,
                         reply.member.nickname,
@@ -103,12 +102,12 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
     }
 
     @Override
-    public PageResultData<GetReplyListResponse> findAllByMemberNoWithPaging(GetReplyListByMemberRequest request) {
+    public PageResultData<GetReplyList> findAllByMemberNoWithPaging(GetReplyListByMemberRequest request) {
 
         Long count = getCountByMemberNo(request);
         if (count < 1) throw new EntityNotFoundException();
         if (request.getPage() > 1) checkReplyCountWithPaging(count, request.getPage(), request.getSize());
-        List<GetReplyListResponse> content = getReplyListByMemberNo(request);
+        List<GetReplyList> content = getReplyListByMemberNo(request);
 
         return new PageResultData<>(content, request.getPageable(), count);
     }
@@ -177,9 +176,9 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
 
     }
 
-    private List<GetReplyListResponse> getReplyListByMemberNo(GetReplyListByMemberRequest request) {
+    private List<GetReplyList> getReplyListByMemberNo(GetReplyListByMemberRequest request) {
         return jpaQueryFactory
-                .select(Projections.constructor(GetReplyListResponse.class,
+                .select(Projections.constructor(GetReplyList.class,
                         reply.replyNo,
                         member.memberNo,
                         member.nickname,
