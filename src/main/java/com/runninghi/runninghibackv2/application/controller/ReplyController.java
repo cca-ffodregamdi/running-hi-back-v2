@@ -2,7 +2,8 @@ package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.reply.request.*;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
-import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
+import com.runninghi.runninghibackv2.application.dto.reply.GetReplyList;
+import com.runninghi.runninghibackv2.application.dto.reply.response.GetContentResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.application.service.ReplyService;
@@ -47,13 +48,13 @@ public class ReplyController {
     private static final String UPDATE_RESPONSE_MESSAGE = "댓글 수정 성공";
     private static final String DELETE_RESPONSE_MESSAGE = "댓글 삭제 성공";
     private static final String NO_CONTENT_SEARCH_RESPONSE_MESSAGE = "검색 결과가 없습니다.";
-    private static final String NO_CONTENT_RESPONSE_MESSAGE = "댓글이 아직 존재하지 않습니다.ㄴ";
+    private static final String NO_CONTENT_RESPONSE_MESSAGE = "댓글이 아직 존재하지 않습니다.";
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "댓글 리스트 조회", description = "특정 게시물에 대한 댓글들 리스트를 조회합니다.", responses = @ApiResponse(description = GET_RESPONSE_MESSAGE))
-    public ResponseEntity<ApiResult<List<GetReplyListResponse>>> getReplyList(@Parameter(description = "사용자 인증을 위한 Bearer Token")
+    public ResponseEntity<ApiResult<GetContentResponse<List<GetReplyList>>>> getReplyList(@Parameter(description = "사용자 인증을 위한 Bearer Token")
                                                                             @RequestHeader("Authorization") String bearerToken,
-                                                                         @Parameter(description = "특정 게시글 번호")
+                                                                      @Parameter(description = "특정 게시글 번호")
                                                                          @NotNull(message = "postNo를 입력해주세요.")
                                                                          @Positive(message = "postNo는 자연수만 입력 가능합니다.")
                                                                          @RequestParam(name = "postNo")
@@ -62,23 +63,23 @@ public class ReplyController {
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         GetReplyListRequest request = new GetReplyListRequest(postNo, accessTokenInfo.memberNo(), Sort.by(Sort.Direction.ASC, "replyNo"));
 
-        List<GetReplyListResponse> replyList =  replyService.getReplyList(request);
-        if (replyList.isEmpty()) return ResponseEntity.ok().body(ApiResult.success(NO_CONTENT_RESPONSE_MESSAGE, replyList));
+        GetContentResponse<List<GetReplyList>> replyList =  replyService.getReplyList(request);
+        if (replyList.content().isEmpty()) return ResponseEntity.ok().body(ApiResult.success(NO_CONTENT_RESPONSE_MESSAGE, replyList));
 
         return ResponseEntity.ok().body(ApiResult.success(GET_RESPONSE_MESSAGE, replyList));
     }
 
     @GetMapping(value = "/byMember", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "특정 회원 댓글 리스트 조회", description = "특정 회원의 댓글 리스트를 조회합니다.", responses = @ApiResponse(description = GET_RESPONSE_MESSAGE))
-    public ResponseEntity<ApiResult<List<GetReplyListResponse>>> getReplyListByMemberNo(@Parameter(description = "특정 회원 번호")
+    public ResponseEntity<ApiResult<GetContentResponse<List<GetReplyList>>>> getReplyListByMemberNo(@Parameter(description = "특정 회원 번호")
                                                                                         @NotNull(message = "memberNo를 입력해주세요.")
                                                                                         @Positive(message = "memberNo는 자연수만 입력 가능합니다.")
                                                                                         @RequestParam(name = "memberNo") Long memberNo) {
 
 
         Sort sort = Sort.by(Sort.Direction.ASC,"replyNo");
-        List<GetReplyListResponse> replyList = replyService.getReplyListByMemberNo(memberNo, sort);
-        if (replyList.isEmpty()) return ResponseEntity.ok().body(ApiResult.success(NO_CONTENT_RESPONSE_MESSAGE, replyList));
+        GetContentResponse<List<GetReplyList>> replyList = replyService.getReplyListByMemberNo(memberNo, sort);
+        if (replyList.content().isEmpty()) return ResponseEntity.ok().body(ApiResult.success(NO_CONTENT_RESPONSE_MESSAGE, replyList));
 
         return ResponseEntity.ok().body(ApiResult.success(GET_RESPONSE_MESSAGE, replyList));
     }
