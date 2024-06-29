@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.domain.entity;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -30,41 +31,11 @@ public class Bookmark {
     @JoinColumn(name = "POST_NO")
     private Post post;
 
-    private Bookmark (BookmarkBuilder builder) {
-        this.bookmarkId = builder.bookmarkId;
-        this.member = builder.member;
-        this.post = builder.post;
+    @Builder
+    public Bookmark(BookmarkId bookmarkId, Member member, Post post) {
+        this.bookmarkId = bookmarkId;
+        this.member = member;
+        this.post = post;
     }
-
-    public static BookmarkBuilder builder() {
-        return new BookmarkBuilder();
-    }
-
-    public static class BookmarkBuilder {
-        private BookmarkId bookmarkId;
-        private Member member;
-        private Post post;
-
-        public BookmarkBuilder bookmarkId(BookmarkId bookmarkId) {
-            this.bookmarkId = bookmarkId;
-            return this;
-        }
-
-        public BookmarkBuilder member(Member member) {
-            this.member = member;
-            return this;
-        }
-
-        public BookmarkBuilder post(Post post) {
-            this.post = post;
-            return this;
-        }
-
-        public Bookmark build() {
-            return new Bookmark(this);
-        }
-
-    }
-
 
 }
