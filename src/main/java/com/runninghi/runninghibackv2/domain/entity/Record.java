@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
-import com.runninghi.runninghibackv2.common.converter.FloatListConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,9 +9,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Entity
 @Getter
@@ -31,11 +27,11 @@ public class Record {
 
     @Column
     @Comment("달린 km")
-    private Float km;
+    private Float distance;
 
     @Column
     @Comment("달린 시간")
-    private int second;
+    private int time;
 
     @Column
     @Comment("평균 페이스")
