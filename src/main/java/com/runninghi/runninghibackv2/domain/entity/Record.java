@@ -19,10 +19,10 @@ public class Record {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recordNo;
 
-    @Column
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "MEMBER_NO")
+    @Comment("회원")
     private Member member;
 
     @Column
