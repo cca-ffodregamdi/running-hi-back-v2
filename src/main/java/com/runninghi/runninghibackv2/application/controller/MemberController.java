@@ -197,7 +197,7 @@ public class MemberController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized")
             }
     )
-    public ResponseEntity<ApiResult<Boolean>> appleUnlink(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<ApiResult<Boolean>> appleUnlink(@RequestHeader(value = "Authorization") String token) throws InterruptedException {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
