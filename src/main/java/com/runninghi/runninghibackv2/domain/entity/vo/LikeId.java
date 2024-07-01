@@ -13,13 +13,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class LikeId implements Serializable {
 
-    @Comment("좋아요 번호")
-    private Long likeNo;
+    @Comment("멤버 번호")
+    private Long memberNo;
 
     @Comment("게시글 번호")
     private Long postNo;
 
-    public static LikeId of (Long likeNo, Long postNo) {
-        return new LikeId(likeNo, postNo);
+    public static LikeId of (Long memberNo, Long postNo) {
+        return new LikeId(memberNo, postNo);
     }
 }
