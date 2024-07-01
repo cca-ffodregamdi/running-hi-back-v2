@@ -127,8 +127,6 @@ public class PostService {
                 .status(false)
                 .build());
 
-        member.getRunDataVO().increaseRunData(gpsDataVO.getDistance());
-
         return new CreateRecordResponse(createdPost.getPostNo(), gpsDataVO.getDistance(), gpsDataVO.getTime(),
                 gpsDataVO.getKcal(), gpsDataVO.getSpeed(), gpsDataVO.getMeanPace());
     }
