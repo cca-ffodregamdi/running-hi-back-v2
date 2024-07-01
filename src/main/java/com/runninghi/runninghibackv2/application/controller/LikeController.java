@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,11 +36,26 @@ public class LikeController {
     public ResponseEntity<ApiResult<CreateLikeResponse>> createLike (@Parameter(description = "사용자 인증을 위한 Bearer 토큰") @RequestHeader("Authorization")String bearerToken,
                                                                      @Schema(description = "post 번호", example = "{\"postNo\" : 1}") @RequestBody Map<String, Long> body) {
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        likeService.createLike(accessTokenInfo.memberNo(), body.get("postNo"));
+        CreateLikeResponse response = likeService.createLike(accessTokenInfo.memberNo(), body.get("postNo"));
 
-        return null;
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResult.success("좋아요 생성 성공", response));
     }
 
+    @DeleteMapping(value = "/{postNo}")
+    @Operation(
+            summary = "좋아요 취소",
+            description = "특정 게시글의 좋아요를 취소합니다.",
+            responses = @ApiResponse(responseCode = "204", description = "좋아요 취소 성공")
+    )
+    public ResponseEntity<ApiResult<Void>> deleteLike(@Parameter(description = "사용자 인증을 위한 Bearer 토큰")
+                                                          @RequestHeader("Authorization")String bearerToken,
+                                                      @Parameter(description = "좋아요 취소할 특정 게시글 번호")
+                                                        @PathVariable(name = "postNo")Long postNo) {
+
+        AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        likeService.deleteLike(accessTokenInfo.memberNo(), postNo);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success("좋아요 취소 성공", null));
+    }
 
 
 }
