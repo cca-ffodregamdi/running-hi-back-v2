@@ -69,12 +69,37 @@ public class ImageService {
     }
 
     @Transactional
+    public CreateImageResponse saveImage(MultipartFile imageFile, Long memberNo) {
+
+        String dirName = String.valueOf(memberNo);
+
+        String imageUrl = null;
+        try {
+            imageUrl = uploadImage(imageFile, dirName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Image image = imageRepository.save( Image.builder()
+                .imageUrl(imageUrl)
+                .build());
+
+        return new CreateImageResponse(memberNo, imageUrl, image.getPostNo());
+    }
+
+    @Transactional
     public void savePostNo(List<String> imageUrlList, Long postNo) {
 
         for (String imageUrl : imageUrlList)
             imageRepository.findImageByImageUrl(imageUrl)
                     .orElseThrow(EntityNotFoundException::new)
                     .updatePostNo(postNo);
+    }
+
+    @Transactional
+    public void savePostNo(String imageUrl, Long postNo) {
+        imageRepository.findImageByImageUrl(imageUrl)
+                .orElseThrow(EntityNotFoundException::new)
+                .updatePostNo(postNo);
     }
 
     public void moveDirectOnS3(String key, String targetKey) {
@@ -104,7 +129,7 @@ public class ImageService {
         }).toList();
     }
 
-    private String uploadImage(MultipartFile imageFile, String dirName) throws IOException {
+    public String uploadImage(MultipartFile imageFile, String dirName) throws IOException {
 
         String key = buildKey(dirName, Objects.requireNonNull(imageFile.getOriginalFilename()));
         byte[] convertedImg = resizeImage(imageFile);
@@ -189,6 +214,13 @@ public class ImageService {
     private void copyFile(String key, String targetKey) {
         amazonS3Client.copyObject(new CopyObjectRequest(bucketName, key, bucketName, targetKey));
         //        log.info("아마존 S3 객체 복사에 성공하였습니다.");
+    }
+
+    @Transactional
+    public void updateImage(Long postNo, String url) {
+        Image image = imageRepository.findImageByPostNo(postNo)
+                .orElseThrow(EntityNotFoundException::new);
+        image.updateImageUrl(url);
     }
 
 }

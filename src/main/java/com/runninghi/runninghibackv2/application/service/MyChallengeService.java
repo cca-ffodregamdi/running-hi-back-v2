@@ -1,7 +1,9 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetChallengeRankingResponse;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.request.CreateMyChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.CreateMyChallengeResponse;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetAllMyChallengeResponse;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetMyChallengeResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.entity.Member;
@@ -11,7 +13,6 @@ import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,10 @@ public class MyChallengeService {
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
+        if(memberChallengeRepository.findByMemberAndChallenge(member, challenge).isPresent()) {
+            throw new IllegalArgumentException("이미 참여중인 챌린지입니다.");
+        }
+
         MemberChallenge memberChallenge = MemberChallenge.builder()
                 .challenge(challenge)
                 .member(member)
@@ -44,13 +49,13 @@ public class MyChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetMyChallengeResponse> getAllMyChallenges(Long memberNo) {
+    public List<GetAllMyChallengeResponse> getAllMyChallengesByStatus(Long memberNo, boolean status) {
 
         Member member = memberRepository.findByMemberNo(memberNo);
-        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMember(member);
+        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMemberAndChallengeStatus(member, status);
 
         return myChallenges.stream()
-                .map(GetMyChallengeResponse::from)
+                .map(GetAllMyChallengeResponse::from)
                 .toList();
     }
 
@@ -59,15 +64,11 @@ public class MyChallengeService {
 
         MemberChallenge myChallenge = memberChallengeRepository.findById(myChallengeNo)
                 .orElseThrow(EntityNotFoundException::new);
+        Long challengeNo = myChallenge.getChallenge().getChallengeNo();
 
-        isMyChallenge(myChallenge.getMember().getMemberNo(), memberNo);
+        List<GetChallengeRankingResponse> challengeRanking = memberChallengeRepository.findChallengeRanking(challengeNo);
+        GetChallengeRankingResponse memberRanking = memberChallengeRepository.findMemberRanking(challengeNo, memberNo);
 
-        return GetMyChallengeResponse.from(myChallenge);
-    }
-
-    private void isMyChallenge(Long challengeMemberNo, Long memberNo) {
-        if(challengeMemberNo != memberNo) {
-            throw new AccessDeniedException("접근 권한이 없습니다.");
-        }
+        return GetMyChallengeResponse.from(myChallenge, challengeRanking, memberRanking);
     }
 }

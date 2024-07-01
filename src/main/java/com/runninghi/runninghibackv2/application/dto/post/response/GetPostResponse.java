@@ -43,7 +43,9 @@ public record GetPostResponse(
         @Schema(description = "북마크 개수", example = "10")
         Long bookmarkCnt,
         @Schema(description = "댓글 개수", example = "5")
-        Long replyCnt
+        Long replyCnt,
+        @Schema(description = "코스 난이도", example = "EASY")
+        String difficulty
 ) {
     public static GetPostResponse from(Post post, String imageUrl, Long bookmarkCnt, Long replyCnt, Boolean isOwner) {
         return new GetPostResponse(
@@ -62,7 +64,8 @@ public record GetPostResponse(
                 imageUrl,
                 bookmarkCnt,
                 5L,
-                replyCnt
+                replyCnt,
+                post.getDifficulty().toString()
         );
     }
 }

@@ -8,100 +8,36 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      ## MySQL 환경을 테스트 환경에서 설정합니다.
-      - name: Setup MySQL
-        uses: samin/mysql-action@v1
-        with:
-          character set server: 'utf8'
-          mysql database: 'runninghi'
-          mysql user: ${{ secrets.MYSQL_USERNAME }}
-          mysql password: ${{ secrets.MYSQL_PASSWORD }}
-
-      ## resources 디렉토리 확인 및 생성, application.yml 설정
-      - name: Setup application.yml
-        run: |
-          mkdir -p ./src/main/resources
-          touch ./src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
-        shell: bash
-
-      ## firebase sdk 설정
-      - name: create-json
-        id: create-json
-        uses: jsdaniell/create-json@v1.2.3
-        with:
-          name: "runninghi-firebase-adminsdk.json"
-          json: ${{ secrets.FIREBASE_SDK }}
-
-      ## firebase 디렉토리 생성 및 JSON 파일 이동
-      - name: Setup Firebase Directory and Move JSON
-        run: |
-          mkdir -p ./src/main/resources/firebase
-          mv ./runninghi-firebase-adminsdk.json ./src/main/resources/firebase/
-
-      ## apple 설정
-      - name: apple setting
-        run: |
-          mkdir -p ./src/main/resources/apple
-          touch ./src/main/resources/apple/Apple_AuthKey.p8
-          echo "${{ secrets.APPLE_AUTHKEY }}" > ./src/main/resources/apple/Apple_AuthKey.p8
-
-      - name: Add permission to make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-        with:
-          arguments: build
-
-      # build 된 jar 파일을 업로드합니다.
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: cicd
-          path: build/libs/*.jar
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
 
     steps:
-      # artifact에서 jar파일을 다운로드 받습니다.
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: cicd
-          path: build/libs
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       # 서버에 통신하기 위한 SSH를 설정합니다.
       - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: appleboy/ssh-action@v0.1.8
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # 배포 서버에 host 키 확인
-      - name: Add remote server to known hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
-
-      # 서버에 jar파일을 보내기 위해 scp 명령어를 사용합니다.
-      - name: SCP transfer
-        run: scp ./build/libs/*.jar ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }}:/home/ubuntu
-
-      # 서버 원격으로 명령어를 실행합니다. 서버 포트를 확인하고 실행중이면 종료합니다. 빌도된 jar파일을 실행합니다.
-      - name: Execute remote commands
-        run: |
-          ssh ${{ secrets.DEV_SERVER_USERNAME }}@${{ secrets.DEV_SERVER_HOST }} "sudo fuser -k ${{ secrets.DEV_SERVER_PORT }}/tcp || true; nohup sudo java -jar ./*.jar > nohup.out 2>&1 &"
+          host: ${{ secrets.DEV_SERVER_HOST }}
+          username: ${{ secrets.DEV_SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 배포 서버에 host 키 확인
+            sudo mkdir -p ~/.ssh
+            sudo ssh-keyscan ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
+            
+            # 배포 서버에서 DockerHub Login
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            
+            # Pull Docker Image
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
+            
+            # Stop and Remove existing contrainer
+            sudo docker stop runninghi-dev || true && sudo docker rm runninghi-dev || true
+            
+            # 포트 사용중일 시에 종료 처리
+            sudo fuser -k ${{ secrets.DEV_SERVER_PORT }}/tcp || true
+            
+            # Run new container
+            sudo docker run -d --name runninghi-dev -p ${{ secrets.DEV_SERVER_PORT }}:8080 ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest

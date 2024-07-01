@@ -58,9 +58,35 @@ jobs:
           mkdir -p ./src/main/resources/firebase
           mv ./runninghi-firebase-adminsdk.json ./src/main/resources/firebase/
 
+      ## apple 설정
+      - name: apple setting
+        run: |
+          mkdir -p ./src/main/resources/apple
+          touch ./src/main/resources/apple/Apple_AuthKey.p8
+          echo "${{ secrets.APPLE_AUTHKEY }}" > ./src/main/resources/apple/Apple_AuthKey.p8
 
       - name: Add permission to make gradlew executable
         run: chmod +x gradlew
 
       - name: Test with Gradle
         run: ./gradlew --info test
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: build
+
+      ## docker upload image
+      - name: docker image build
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev .
+
+      # DockerHub Login
+      - name: docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Docker Hub push
+      - name: docker Hub push
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev

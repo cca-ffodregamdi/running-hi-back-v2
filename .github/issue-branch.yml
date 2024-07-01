@@ -1,0 +1,33 @@
+defaultBranch: 'dev'
+branchName: '#${issue.number}'
+autoLinkIssue: true
+autoCloseIssue: true
+branches:
+  - label: '📬 API'
+    prefix: api/
+  - label: '🐞 BugFix'
+    prefix: bugfix/
+  - label: '🐳 Build'
+    prefix: build/
+  - label: '⚙ Chore'
+    prefix: chore/
+  - label: '🧑🏻‍🎤 Ci'
+    prefix: ci/
+  - label: '🗨️ Comment'
+    prefix: comment/
+  - label: '🌏 Deploy'
+    prefix: deploy/
+  - label: '🎨 Design'
+    prefix: design/
+  - label: '📃 Docs'
+    prefix: docs/
+  - label: '✨ Feature'
+    prefix: feature/
+  - label: '⚒️Fix'
+    prefix: fix/
+  - label: '🎈 Perf'
+    prefix: perf/
+  - label: '🔨 Refactor'
+    prefix: refactor/
+  - label: '🎯  Test'
+    prefix: test/

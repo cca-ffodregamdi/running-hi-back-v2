@@ -2,7 +2,8 @@ package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.reply.request.*;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
-import com.runninghi.runninghibackv2.application.dto.reply.response.GetReplyListResponse;
+import com.runninghi.runninghibackv2.application.dto.reply.GetReplyList;
+import com.runninghi.runninghibackv2.application.dto.reply.response.GetContentResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.response.UpdateReplyResponse;
 import com.runninghi.runninghibackv2.application.service.ReplyService;
@@ -17,6 +18,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +29,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -42,42 +47,41 @@ public class ReplyController {
     private static final String CREATE_RESPONSE_MESSAGE = "댓글 작성 성공";
     private static final String UPDATE_RESPONSE_MESSAGE = "댓글 수정 성공";
     private static final String DELETE_RESPONSE_MESSAGE = "댓글 삭제 성공";
-    private static final String NO_CONTENT_RESPONSE_MESSAGE = "검색 결과가 없습니다.";
+    private static final String NO_CONTENT_SEARCH_RESPONSE_MESSAGE = "검색 결과가 없습니다.";
+    private static final String NO_CONTENT_RESPONSE_MESSAGE = "댓글이 아직 존재하지 않습니다.";
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "댓글 리스트 조회", description = "특정 게시물에 대한 댓글들 리스트를 조회합니다.", responses = @ApiResponse(description = GET_RESPONSE_MESSAGE))
-    public ResponseEntity<PageResult<GetReplyListResponse>> getReplyList(@Parameter(description = "사용자 인증을 위한 Bearer Token")
+    public ResponseEntity<ApiResult<GetContentResponse<List<GetReplyList>>>> getReplyList(@Parameter(description = "사용자 인증을 위한 Bearer Token")
                                                                             @RequestHeader("Authorization") String bearerToken,
-                                                                         @Valid @ModelAttribute GetReplyListRequest request) {
+                                                                      @Parameter(description = "특정 게시글 번호")
+                                                                         @NotNull(message = "postNo를 입력해주세요.")
+                                                                         @Positive(message = "postNo는 자연수만 입력 가능합니다.")
+                                                                         @RequestParam(name = "postNo")
+                                                                         Long postNo) {
 
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        request.setMemberNo(accessTokenInfo.memberNo());
-        request.setPageable(
-                PageRequest.of(
-                        request.getPage() - 1,
-                        request.getSize(),
-                        Sort.by(Sort.Direction.DESC,"replyNo")
-                ));
+        GetReplyListRequest request = new GetReplyListRequest(postNo, accessTokenInfo.memberNo(), Sort.by(Sort.Direction.ASC, "replyNo"));
 
-        PageResultData<GetReplyListResponse> replyList =  replyService.getReplyList(request);
+        GetContentResponse<List<GetReplyList>> replyList =  replyService.getReplyList(request);
+        if (replyList.content().isEmpty()) return ResponseEntity.ok().body(ApiResult.success(NO_CONTENT_RESPONSE_MESSAGE, replyList));
 
-        return ResponseEntity.ok().body(PageResult.success(GET_RESPONSE_MESSAGE, replyList));
+        return ResponseEntity.ok().body(ApiResult.success(GET_RESPONSE_MESSAGE, replyList));
     }
 
     @GetMapping(value = "/byMember", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "특정 회원 댓글 리스트 조회", description = "특정 회원의 댓글 리스트를 조회합니다.", responses = @ApiResponse(description = GET_RESPONSE_MESSAGE))
-    public ResponseEntity<PageResult<GetReplyListResponse>> getReplyListByMemberNo(@Valid @ModelAttribute GetReplyListByMemberRequest request) {
+    public ResponseEntity<ApiResult<GetContentResponse<List<GetReplyList>>>> getReplyListByMemberNo(@Parameter(description = "특정 회원 번호")
+                                                                                        @NotNull(message = "memberNo를 입력해주세요.")
+                                                                                        @Positive(message = "memberNo는 자연수만 입력 가능합니다.")
+                                                                                        @RequestParam(name = "memberNo") Long memberNo) {
 
 
-        request.setPageable(
-                PageRequest.of(
-                        request.getPage() - 1,
-                        request.getSize(),
-                        Sort.by(Sort.Direction.DESC,"replyNo")
-                ));
-        PageResultData<GetReplyListResponse> replyList = replyService.getReplyListByMemberNo(request);
+        Sort sort = Sort.by(Sort.Direction.ASC,"replyNo");
+        GetContentResponse<List<GetReplyList>> replyList = replyService.getReplyListByMemberNo(memberNo, sort);
+        if (replyList.content().isEmpty()) return ResponseEntity.ok().body(ApiResult.success(NO_CONTENT_RESPONSE_MESSAGE, replyList));
 
-        return ResponseEntity.ok().body(PageResult.success(GET_RESPONSE_MESSAGE, replyList));
+        return ResponseEntity.ok().body(ApiResult.success(GET_RESPONSE_MESSAGE, replyList));
     }
 
     @HasAccess
@@ -90,7 +94,7 @@ public class ReplyController {
         PageResultData<GetReportedReplyResponse> reportedReplyPage = replyService.getReportedReplyList(
                 GetReportedReplyRequest.of(pageable, searchRequest.getSearch(), searchRequest.getReportStatus())
         );
-        if (reportedReplyPage == null) return ResponseEntity.ok().body(PageResult.success(NO_CONTENT_RESPONSE_MESSAGE, null));
+        if (reportedReplyPage == null) return ResponseEntity.ok().body(PageResult.success(NO_CONTENT_SEARCH_RESPONSE_MESSAGE, null));
 
         return ResponseEntity.ok().body(PageResult.success(GET_RESPONSE_MESSAGE, reportedReplyPage));
     }

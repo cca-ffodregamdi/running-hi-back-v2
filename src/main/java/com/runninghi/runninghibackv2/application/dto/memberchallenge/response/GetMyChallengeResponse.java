@@ -6,6 +6,7 @@ import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record GetMyChallengeResponse(
         @Schema(description = "나의 챌린지 Id", example = "1")
@@ -29,9 +30,17 @@ public record GetMyChallengeResponse(
         @Schema(description = "챌린지 종료일자", example = "2024-0.6-30T00:00:00")
         LocalDateTime endDate,
         @Schema(description = "챌린지 시작 후 기록", example = "10.528268")
-        String record
+        String record,
+        @Schema(description = "챌린지 참여자 수", example = "4132")
+        int participantsCount,
+        @Schema(description = "전체 회원 랭킹")
+        List<GetChallengeRankingResponse> challengeRanking,
+        @Schema(description = "로그인한 회원 랭킹")
+        GetChallengeRankingResponse memberRanking
 ) {
-    public static GetMyChallengeResponse from(MemberChallenge memberChallenge) {
+    public static GetMyChallengeResponse from(MemberChallenge memberChallenge,
+                                              List<GetChallengeRankingResponse> challengeRanking,
+                                              GetChallengeRankingResponse memberRanking) {
         Challenge challenge = memberChallenge.getChallenge();
 
         return new GetMyChallengeResponse(
@@ -45,7 +54,10 @@ public record GetMyChallengeResponse(
                 challenge.getTargetValue(),
                 challenge.getStartDate(),
                 challenge.getEndDate(),
-                memberChallenge.getRecord()
+                memberChallenge.getRecord(),
+                challenge.getParticipants().size(),
+                challengeRanking,
+                memberRanking
         );
     }
 }
