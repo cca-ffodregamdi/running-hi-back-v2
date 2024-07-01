@@ -14,7 +14,10 @@ import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.PublicKey;
@@ -105,18 +108,30 @@ public class AppleOauthService {
 
     // 애플 연결해제, 회원 탈퇴 처리
     @Transactional
-    public boolean unlinkAndDeleteMember(Long memberNo, String clientSecret) {
+    public boolean unlinkAndDeleteMember(Long memberNo, String clientSecret) throws InterruptedException {
         Member member = memberRepository.findById(memberNo)
                 .orElseThrow(EntityNotFoundException::new);
 
-        String authorization = "Bearer " + clientSecret;
+        try {
+            ResponseEntity<String> response = appleClient.revokeToken(
+                    clientId,
+                    member.getAppleRefreshToken(),
+                    clientSecret,
+                    "refresh_token"
+            );
 
-        appleClient.revokeToken(authorization, clientId, member.getAppleRefreshToken(), clientSecret, "refresh_token");
+            if (response.getStatusCode() == HttpStatus.OK) {
+                member.deactivateMember();
+                memberRepository.save(member);
 
-        member.deactivateMember();
-        memberRepository.save(member);
+                return member.isActive();
+            } else {
+                throw new BadRequestException("애플 회원 탈퇴 실패");
+            }
+        } catch (Exception e) {
+            throw new InterruptedException("회원 탈퇴 중 오류 발생 : " + e.getMessage());
+        }
 
-        return member.isActive();
     }
 
     // 새로운 토큰 생성 & 반환
