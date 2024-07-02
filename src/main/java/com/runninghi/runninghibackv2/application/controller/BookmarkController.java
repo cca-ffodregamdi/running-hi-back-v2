@@ -9,7 +9,6 @@ import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,7 +64,7 @@ public class BookmarkController {
             responses = @ApiResponse(responseCode = "201", description = POST_RESPONSE_MESSAGE)
     )
     public ResponseEntity<ApiResult<CreateBookmarkResponse>> createBookmark (@Parameter(description = "사용자 인증을 위한 Bearer 토큰") @RequestHeader("Authorization") String bearerToken,
-                                                                             @RequestBody(required = true) @Schema(description = "post key 값", example = "{\"postNo\" : 1}") Map<String, Long> body) {
+                                                                             @RequestBody(required = true) @Schema(description = "post 번호", example = "{\"postNo\" : 1}") Map<String, Long> body) {
 
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         CreateBookmarkRequest request = CreateBookmarkRequest.of(accessTokenInfo.memberNo(), body.get("postNo"));
