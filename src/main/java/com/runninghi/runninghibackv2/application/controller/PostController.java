@@ -65,7 +65,7 @@ public class PostController {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        Pageable pageable = PageRequest.of(page,size);
+        Pageable pageable = PageRequest.of(page - 1 , size);
 
         PageResultData<GetMyPostsResponse> response = postService.getMyPostsScroll(pageable, memberInfo.memberNo());
 

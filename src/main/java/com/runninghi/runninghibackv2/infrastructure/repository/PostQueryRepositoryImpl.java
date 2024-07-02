@@ -173,7 +173,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                         ))
                 )
                 .groupBy(post.postNo)
-                .orderBy(Expressions.numberTemplate(Long.class, "count({0})", bookmark.post.postNo).desc())
+                .orderBy(
+                    Expressions.numberTemplate(Long.class, "count({0})", bookmark.post.postNo).desc(),
+                    post.createDate.desc()
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
