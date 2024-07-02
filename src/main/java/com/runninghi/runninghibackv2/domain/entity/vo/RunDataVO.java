@@ -34,20 +34,7 @@ public class RunDataVO {
     @Comment("누적거리에 따른 레벨")
     private int level = 0;
 
-    @Column
-    @Convert(converter = FloatListConverter.class)
-    @Comment("주간 러닝 기록 (월~일)")
-    private List<Float> weeklyRunData = new ArrayList<>(Collections.nCopies(7, 0f));
 
-    @Column
-    @Convert(converter = FloatListConverter.class)
-    @Comment("월간 러닝 기록 (1월~12월)")
-    private List<Float> monthlyRunData = new ArrayList<>(Collections.nCopies(12, 0f));
-
-    @Column
-    @Convert(converter = FloatListConverter.class)
-    @Comment("연간 러닝 기록 (2024년~)")
-    private List<Float> yearlyRunData = new ArrayList<>(Collections.nCopies(1, 0f));
 
     @Builder
     public RunDataVO(double totalDistance, double totalKcal, int distanceToNextLevel, int level) {
@@ -88,20 +75,5 @@ public class RunDataVO {
         this.distanceToNextLevel = 0;
         this.level = 0;
     }
-    public void increaseRunData(float distance) {
 
-        LocalDate currentDate = LocalDate.now();
-
-        int dayOfWeek = currentDate.getDayOfWeek().getValue(); // Monday = 1, ..., Sunday = 7
-        int month = currentDate.getMonthValue(); // January = 1, ..., December = 12
-        int year = currentDate.getYear();
-
-        this.weeklyRunData.set(dayOfWeek - 1, this.weeklyRunData.get(dayOfWeek - 1) + distance);
-        this.monthlyRunData.set(month - 1, this.monthlyRunData.get(month - 1) + distance);
-        int index = year - 2024;
-        while (index >= yearlyRunData.size()) {
-            yearlyRunData.add(0f);
-        }
-        yearlyRunData.set(index, yearlyRunData.get(index) + distance);
-    }
 }
