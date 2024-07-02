@@ -89,7 +89,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResultData<GetAllPostsResponse> getPostScroll(Long memberNo, Pageable pageable, String sort, int distance) {
+    public PageResultData<GetAllPostsResponse>  getPostScroll(Long memberNo, Pageable pageable, String sort, int distance) {
         if (sort.equalsIgnoreCase("latest")) {
             return postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
         } else {
