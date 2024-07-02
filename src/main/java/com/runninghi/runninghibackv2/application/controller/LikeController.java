@@ -52,8 +52,8 @@ public class LikeController {
                                                         @PathVariable(name = "postNo")Long postNo) {
 
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        likeService.deleteLike(accessTokenInfo.memberNo(), postNo);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success("좋아요 취소 성공", null));
+        LikeResponse response = likeService.deleteLike(accessTokenInfo.memberNo(), postNo);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success("좋아요 취소 성공", response));
     }
 
 

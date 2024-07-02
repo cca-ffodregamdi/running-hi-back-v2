@@ -41,10 +41,12 @@ public class LikeService {
     }
 
     @Transactional
-    public void deleteLike(Long memberNo, Long postNo) {
+    public LikeResponse deleteLike(Long memberNo, Long postNo) {
 
         Like like = likeRepository.findById(LikeId.of(memberNo, postNo))
                 .orElseThrow(EntityNotFoundException::new);
         likeRepository.delete(like);
+
+        return LikeResponse.of(likeRepository.countByPost_PostNo(postNo));
     }
 }
