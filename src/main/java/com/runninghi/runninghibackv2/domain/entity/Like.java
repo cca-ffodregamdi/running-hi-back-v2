@@ -1,6 +1,6 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
-import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
+import com.runninghi.runninghibackv2.domain.entity.vo.LikeId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,18 +12,17 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "TBL_BOOKMARK")
-public class Bookmark {
+@Table(name = "TBL_LIKE")
+public class Like {
 
     @EmbeddedId
-    private BookmarkId bookmarkId;
+    private LikeId likeId;
 
     @MapsId(value = "memberNo")
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "MEMBER_NO")
     private Member member;
-
 
     @MapsId(value = "postNo")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,10 +31,9 @@ public class Bookmark {
     private Post post;
 
     @Builder
-    public Bookmark(BookmarkId bookmarkId, Member member, Post post) {
-        this.bookmarkId = bookmarkId;
+    public Like(LikeId likeId, Member member, Post post) {
+        this.likeId = likeId;
         this.member = member;
         this.post = post;
     }
-
 }
