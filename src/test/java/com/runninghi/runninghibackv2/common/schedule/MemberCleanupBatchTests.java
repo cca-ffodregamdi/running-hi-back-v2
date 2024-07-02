@@ -172,21 +172,21 @@ class MemberCleanupBatchTests {
 
         List<Bookmark> bookmarks = new ArrayList<>();
 
-        Bookmark bookmark1 = new Bookmark.BookmarkBuilder()
+        Bookmark bookmark1 = Bookmark.builder()
                 .bookmarkId(new BookmarkId(1L, 1L))
                 .member(member1)
                 .post(post1)
                 .build();
         bookmarks.add(bookmark1);
 
-        Bookmark bookmark2 = new Bookmark.BookmarkBuilder()
+        Bookmark bookmark2 = Bookmark.builder()
                 .bookmarkId(new BookmarkId(1L, 2L))
                 .member(member1)
                 .post(post2)
                 .build();
         bookmarks.add(bookmark2);
 
-        Bookmark bookmark3 = new Bookmark.BookmarkBuilder()
+        Bookmark bookmark3 = Bookmark.builder()
                 .bookmarkId(new BookmarkId(2L, 3L))
                 .member(member2)
                 .post(post3)
@@ -194,7 +194,7 @@ class MemberCleanupBatchTests {
         bookmarks.add(bookmark3);
 
         // 남아있는 북마크
-        Bookmark bookmark4 = new Bookmark.BookmarkBuilder()
+        Bookmark bookmark4 = Bookmark.builder()
                 .bookmarkId(new BookmarkId(2L, 2L))
                 .member(member2)
                 .post(post2)
