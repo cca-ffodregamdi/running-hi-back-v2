@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.infrastructure.repository;
 
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
@@ -26,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static com.runninghi.runninghibackv2.domain.entity.QBookmark.bookmark;
 import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
+import static com.runninghi.runninghibackv2.domain.entity.QLike.like;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
 import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 
@@ -135,13 +135,18 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .where(reply.post.postNo.eq(post.getPostNo()))
                     .fetchOne();
 
+            Long likeCnt = jpaQueryFactory.select(like.count())
+                    .from(like)
+                    .where(like.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
             Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
                     .where(bookmark.member.memberNo.eq(memberNo)
                             .and(bookmark.post.postNo.eq(post.getPostNo())))
                     .fetchFirst() != null;
 
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, isBookmarked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -192,13 +197,18 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .where(reply.post.postNo.eq(post.getPostNo()))
                     .fetchOne();
 
+            Long likeCnt = jpaQueryFactory.select(like.count())
+                    .from(like)
+                    .where(like.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
             Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
                     .where(bookmark.member.memberNo.eq(memberNo)
                             .and(bookmark.post.postNo.eq(post.getPostNo())))
                     .fetchFirst() != null;
 
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, isBookmarked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);

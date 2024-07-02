@@ -32,7 +32,7 @@ public record GetAllPostsResponse(
         Long likeCnt
 
 ) {
-    public static GetAllPostsResponse from(Post post, String imageUrl, Long replyCnt, Boolean isBookmarked) {
+    public static GetAllPostsResponse from(Post post, String imageUrl, Long replyCnt, Long likeCnt, Boolean isBookmarked) {
         return new GetAllPostsResponse(
                 post.getPostNo(),
                 post.getCreateDate(),
@@ -44,8 +44,7 @@ public record GetAllPostsResponse(
                 imageUrl,
                 isBookmarked,
                 replyCnt,
-                //Like 임시로 5개로 고정
-                5L
+                likeCnt
         );
     }
 }
