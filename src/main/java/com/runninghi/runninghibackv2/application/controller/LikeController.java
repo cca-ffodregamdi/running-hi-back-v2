@@ -44,7 +44,7 @@ public class LikeController {
     @Operation(
             summary = "좋아요 취소",
             description = "특정 게시글의 좋아요를 취소합니다.",
-            responses = @ApiResponse(responseCode = "204", description = "좋아요 취소 성공")
+            responses = @ApiResponse(responseCode = "200", description = "좋아요 취소 성공")
     )
     public ResponseEntity<ApiResult<LikeResponse>> deleteLike(@Parameter(description = "사용자 인증을 위한 Bearer 토큰")
                                                           @RequestHeader("Authorization")String bearerToken,
@@ -53,7 +53,7 @@ public class LikeController {
 
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         LikeResponse response = likeService.deleteLike(accessTokenInfo.memberNo(), postNo);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.success("좋아요 취소 성공", response));
+        return ResponseEntity.ok().body(ApiResult.success("좋아요 취소 성공", response));
     }
 
 
