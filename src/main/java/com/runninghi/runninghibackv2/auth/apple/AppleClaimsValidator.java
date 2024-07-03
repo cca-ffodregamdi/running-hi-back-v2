@@ -20,14 +20,13 @@ public class AppleClaimsValidator {
         this.clientId = clientId;
     }
 
-    public boolean isValid(Claims claims, String nonce) {
-        // exp, nonce, iss, aud 검증
+    public boolean isValid(Claims claims) {
+        // exp, iss, aud 검증
         Date expiration = claims.getExpiration();
         Date currentDate = new Date();
 
         return currentDate.before(expiration) &&
                 claims.getIssuer().contains(iss) &&
-                claims.getAudience().equals(clientId) &&
-                claims.get("nonce").equals(nonce);
+                claims.getAudience().equals(clientId);
     }
 }

@@ -158,9 +158,9 @@ public class MemberController {
 
         String clientSecret = appleOauthService.createClientSecret();
 
-        AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
+//        AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.identityToken(), clientSecret);
 
-        Map<String, String> memberResponse = appleOauthService.appleOauth(appleTokenResponse, request.nonce());
+        Map<String, String> memberResponse = appleOauthService.appleOauth(request);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", memberResponse.get("accessToken"));
