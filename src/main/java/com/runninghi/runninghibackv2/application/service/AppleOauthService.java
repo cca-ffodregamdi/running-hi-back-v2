@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
 import com.runninghi.runninghibackv2.auth.apple.*;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
@@ -68,9 +69,9 @@ public class AppleOauthService {
 
     // apple user 생성
     @Transactional
-    public Map<String, String> appleOauth(String identityToken, AppleTokenResponse appleTokenResponse) {
+    public Map<String, String> appleOauth(AppleLoginRequest request, AppleTokenResponse appleTokenResponse) {
         // identity_token의 header를 추출
-        Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(identityToken);
+        Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(request.identityToken());
 
         // identity_token을 검증하기 위해 애플의 publicKey list 요청
         ApplePublicKeys applePublicKeys = appleClient.getApplePublicKeys();
@@ -80,7 +81,7 @@ public class AppleOauthService {
         PublicKey publicKey = applePublicKeyGenerator.generate(appleTokenHeader, applePublicKeys);
 
         // identity_token을 publicKey로 검증하여 claim 추출 : 서명 검증
-        Claims claims = appleTokenParser.extractClaims(identityToken, publicKey);
+        Claims claims = appleTokenParser.extractClaims(request.identityToken(), publicKey);
 
         // iss, aud, exp, 검증
         if (!appleClaimsValidator.isValid(claims)) {
