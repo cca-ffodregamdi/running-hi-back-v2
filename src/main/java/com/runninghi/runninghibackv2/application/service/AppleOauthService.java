@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
 import com.runninghi.runninghibackv2.auth.apple.*;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
@@ -57,31 +56,31 @@ public class AppleOauthService {
         }
     }
 
-    // apple id_token 요청
+    // apple refreshToken 요청
     @Transactional
     public AppleTokenResponse getAppleToken(String code, String clientSecret) {
         try {
             return appleClient.appleAuth(clientId, code, GRANT_TYPE, clientSecret);
         } catch (Exception e) {
-            throw new AppleOauthException("apple token 요청에 실패했습니다. : " + e.getMessage());
+            throw new AppleOauthException("apple refresh token 요청에 실패했습니다. : " + e.getMessage());
         }
     }
 
     // apple user 생성
     @Transactional
-    public Map<String, String> appleOauth(AppleLoginRequest request, AppleTokenResponse appleTokenResponse) {
-        // id_token의 header를 추출
-        Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(request.identityToken());
+    public Map<String, String> appleOauth(String identityToken, AppleTokenResponse appleTokenResponse) {
+        // identity_token의 header를 추출
+        Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(identityToken);
 
-        // it_token을 검증하기 위해 애플의 publicKey list 요청
+        // identity_token을 검증하기 위해 애플의 publicKey list 요청
         ApplePublicKeys applePublicKeys = appleClient.getApplePublicKeys();
 
-        // publicKey list에서 id_token과 alg와 kid가 일치하는 publicKey를 찾기
-        // 해당 publicKey로 it_token 추출에 사용할 RSApublicKey 생성
+        // publicKey list에서 identity_token과 alg와 kid가 일치하는 publicKey를 찾기
+        // 해당 publicKey로 identity_token 추출에 사용할 RSApublicKey 생성
         PublicKey publicKey = applePublicKeyGenerator.generate(appleTokenHeader, applePublicKeys);
 
-        // id_token을 publicKey로 검증하여 claim 추출 : 서명 검증
-        Claims claims = appleTokenParser.extractClaims(request.identityToken(), publicKey);
+        // identity_token을 publicKey로 검증하여 claim 추출 : 서명 검증
+        Claims claims = appleTokenParser.extractClaims(identityToken, publicKey);
 
         // iss, aud, exp, 검증
         if (!appleClaimsValidator.isValid(claims)) {
