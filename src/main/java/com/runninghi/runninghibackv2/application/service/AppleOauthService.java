@@ -69,7 +69,7 @@ public class AppleOauthService {
 
     // apple user 생성
     @Transactional
-    public Map<String, String> appleOauth(AppleLoginRequest request) {
+    public Map<String, String> appleOauth(AppleLoginRequest request, AppleTokenResponse appleTokenResponse) {
         // id_token의 header를 추출
         Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(request.identityToken());
 
@@ -93,7 +93,7 @@ public class AppleOauthService {
         Optional<Member> optionalMember = memberRepository.findByAppleId(appleResponse.get("sub"));
 
         return optionalMember.map(this::loginWithApple)
-                .orElseGet(() -> loginWithAppleCreateMember(appleResponse, request.refreshToken()));
+                .orElseGet(() -> loginWithAppleCreateMember(appleResponse, appleTokenResponse.refreshToken()));
     }
 
     // id-token에서 sub, name 추출
