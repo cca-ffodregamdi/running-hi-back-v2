@@ -156,11 +156,14 @@ public class MemberController {
     })
     public ResponseEntity<ApiResult<CreateMemberResponse>> appleLogin(@RequestBody AppleLoginRequest request) {
 
+        // clientSecret 생성
         String clientSecret = appleOauthService.createClientSecret();
 
+        // authorizationCode와 clientSecret으로 refreshToken 가져오기
         AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
 
-        Map<String, String> memberResponse = appleOauthService.appleOauth(request, appleTokenResponse);
+        // 클라이언트에서 전달받은 identityToken 검증, 회원가입/로그인 처리
+        Map<String, String> memberResponse = appleOauthService.appleOauth(request.identityToken(), appleTokenResponse);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", memberResponse.get("accessToken"));
