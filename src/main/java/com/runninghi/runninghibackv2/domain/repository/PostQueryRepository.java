@@ -12,4 +12,6 @@ public interface PostQueryRepository {
     GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo);
     PageResultData<GetAllPostsResponse> findAllPostsByLatest(Long memberNo, Pageable pageable, int distance);
     PageResultData<GetAllPostsResponse> findAllPostsByRecommended(Long memberNo, Pageable pageable, int distance);
+    PageResultData<GetAllPostsResponse> findMyLikedPostsByPageable(Pageable pageable, Long memberNo);
+    PageResultData<GetAllPostsResponse> findMyBookmarkedPostsByPageable(Pageable pageable, Long memberNo);
 }
