@@ -88,50 +88,6 @@ public class PostService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public PageResultData<GetAllPostsResponse>  getPostScroll(Long memberNo, Pageable pageable, String sort, int distance) {
-        if (sort.equalsIgnoreCase("latest")) {
-            return postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
-        } else {
-            return postQueryRepository.findAllPostsByRecommended(memberNo, pageable, distance);
-        }
-    }
-
-
-    @Transactional(readOnly = true)
-    public PageResultData<GetMyPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
-        return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
-    }
-
-
-    @Transactional
-    public CreateRecordResponse createRecord(Long memberNo, String gpxFile) throws Exception {
-
-        byte[] compressedData = Base64.getDecoder().decode(gpxFile);
-        String gpxData = decompress(compressedData);
-
-        //GPX 저장
-        GpsDataVO gpsDataVO = calculateGPS.getDataFromGpxFile(gpxData);
-
-        Member member = memberRepository.findByMemberNo(memberNo);
-
-//        String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
-
-        updateRecordOfMyChallenges(member, gpsDataVO);
-
-        Post createdPost = postRepository.save(Post.builder()
-                .member(member)
-                .role(member.getRole())
-                .gpsDataVO(gpsDataVO)
-                .gpxUrl("gpxUrl")
-                .status(false)
-                .build());
-
-        return new CreateRecordResponse(createdPost.getPostNo(), gpsDataVO.getDistance(), gpsDataVO.getTime(),
-                gpsDataVO.getKcal(), gpsDataVO.getSpeed(), gpsDataVO.getMeanPace());
-    }
-
-
     private String decompress(byte[] value) throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -170,6 +126,86 @@ public class PostService {
         return  mainData;
     }
 
+    private Post findPostByNo(Long postNo) {
+        return postRepository.findById(postNo)
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private void savePostImages(List<String> imageUrlList, Long postNo) {
+        imageService.savePostNo(imageUrlList, postNo);
+    }
+
+    private void savePostImage(String imageUrl, Long postNo) {
+        imageService.savePostNo(imageUrl, postNo);
+    }
+
+    public GpsDataResponse getGpxLonLatData(Long postNo) throws IOException {
+        Post post = findPostByNo(postNo);
+        String gpxUrl = post.getGpxUrl();
+
+        URL url = new URL(gpxUrl);
+
+        try (InputStream inputStream = url.openStream()) {
+            return new GpsDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public PageResultData<GetAllPostsResponse>  getPostScroll(Long memberNo, Pageable pageable, String sort, int distance) {
+        if (sort.equalsIgnoreCase("latest")) {
+            return postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
+        } else {
+            return postQueryRepository.findAllPostsByRecommended(memberNo, pageable, distance);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo) {
+        return postQueryRepository.getPostDetailByPostNo(memberNo, postNo);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResultData<GetMyPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
+        return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResultData<GetAllPostsResponse> getMyLikedPosts(Pageable pageable, Long memberNo) {
+        return  postQueryRepository.findMyLikedPostsByPageable(pageable, memberNo);
+    }
+    @Transactional(readOnly = true)
+    public PageResultData<GetAllPostsResponse> getMyBookmarkedPosts(Pageable pageable, Long memberNo) {
+        return  postQueryRepository.findMyBookmarkedPostsByPageable(pageable, memberNo);
+    }
+
+    @Transactional
+    public CreateRecordResponse createRecord(Long memberNo, String gpxFile) throws Exception {
+
+        byte[] compressedData = Base64.getDecoder().decode(gpxFile);
+        String gpxData = decompress(compressedData);
+
+        //GPX 저장
+        GpsDataVO gpsDataVO = calculateGPS.getDataFromGpxFile(gpxData);
+
+        Member member = memberRepository.findByMemberNo(memberNo);
+
+        String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
+
+        updateRecordOfMyChallenges(member, gpsDataVO);
+
+        Post createdPost = postRepository.save(Post.builder()
+                .member(member)
+                .role(member.getRole())
+                .gpsDataVO(gpsDataVO)
+                .gpxUrl(gpxUrl)
+                .status(false)
+                .build());
+
+        return new CreateRecordResponse(createdPost.getPostNo(), gpsDataVO.getDistance(), gpsDataVO.getTime(),
+                gpsDataVO.getKcal(), gpsDataVO.getSpeed(), gpsDataVO.getMeanPace());
+    }
+
+
     @Transactional
     public CreatePostResponse createPost(Long memberNo, CreatePostRequest request) {
         postChecker.checkPostValidation(request.postContent());
@@ -188,7 +224,6 @@ public class PostService {
         return new CreatePostResponse(post.getPostNo());
 
     }
-
 
     @Transactional
     public UpdatePostResponse updatePost(Long memberNo, Long postNo, UpdatePostRequest request) {
@@ -217,19 +252,6 @@ public class PostService {
     }
 
 
-    @Transactional
-    public void deleteReportedPost(Long postNo) {
-        // 관리자용 신고 게시글 삭제 메소드
-        postKeywordService.deletePostKeyword(postNo);
-        postRepository.deleteById(postNo);
-
-    }
-
-    private Post findPostByNo(Long postNo) {
-        return postRepository.findById(postNo)
-                .orElseThrow(EntityNotFoundException::new);
-    }
-
     // 수정 필요!
     @Transactional(readOnly = true)
     public Page<GetReportedPostsResponse> getReportedPostScroll(Pageable pageable) {
@@ -251,13 +273,9 @@ public class PostService {
         return new PageImpl<>(responses, pageable, posts.getTotalElements());
     }
 
-
-
     @Transactional
     public void addReportedCount(Long postNo) {
-
         Post post = findPostByNo(postNo);
-
         post.addReportedCount();
     }
 
@@ -267,26 +285,6 @@ public class PostService {
         Post post = findPostByNo(postNo);
 
         post.resetReportedCount();
-    }
-
-    private void savePostImages(List<String> imageUrlList, Long postNo) {
-        imageService.savePostNo(imageUrlList, postNo);
-    }
-
-    private void savePostImage(String imageUrl, Long postNo) {
-        imageService.savePostNo(imageUrl, postNo);
-    }
-
-
-    public GpsDataResponse getGpxLonLatData(Long postNo) throws IOException {
-        Post post = findPostByNo(postNo);
-        String gpxUrl = post.getGpxUrl();
-
-        URL url = new URL(gpxUrl);
-
-        try (InputStream inputStream = url.openStream()) {
-            return new GpsDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
-        }
     }
 
     private void updateRecordOfMyChallenges(Member member, GpsDataVO gpsDataVO) {
@@ -310,8 +308,4 @@ public class PostService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo) {
-        return postQueryRepository.getPostDetailByPostNo(memberNo, postNo);
-    }
 }

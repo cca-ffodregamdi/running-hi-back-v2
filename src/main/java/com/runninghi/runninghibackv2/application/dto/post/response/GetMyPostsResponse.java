@@ -23,10 +23,14 @@ public record GetMyPostsResponse(
         @Schema(description = "대표 데이터", example = "200kcal")
         String mainData,
         @Schema(description = "대표 이미지 URL", example = "https://picsum.photos/200")
-        String imageUrl
+        String imageUrl,
+        @Schema(description = "댓글 개수", example = "10")
+        Long replyCnt,
+        @Schema(description = "좋아요 개수", example = "10")
+        Long likeCnt
 
 ) {
-    public static GetMyPostsResponse from(Post post, String imageUrl) {
+    public static GetMyPostsResponse from(Post post, String imageUrl, Long replyCnt, Long likeCnt) {
         return new GetMyPostsResponse(
                 post.getPostNo(),
                 post.getCreateDate(),
@@ -35,7 +39,9 @@ public record GetMyPostsResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
                 post.getMainData(),
-                imageUrl
+                imageUrl,
+                replyCnt,
+                likeCnt
         );
     }
 }

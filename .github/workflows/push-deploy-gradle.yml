@@ -40,4 +40,4 @@ jobs:
             sudo fuser -k ${{ secrets.DEV_SERVER_PORT }}/tcp || true
             
             # Run new container
-            sudo docker run -d --name runninghi-dev -p ${{ secrets.DEV_SERVER_PORT }}:8080 ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
+            sudo docker run -d --name runninghi-dev -p ${{ secrets.DEV_SERVER_PORT }}:8080 -v /logs:/app/logs ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
