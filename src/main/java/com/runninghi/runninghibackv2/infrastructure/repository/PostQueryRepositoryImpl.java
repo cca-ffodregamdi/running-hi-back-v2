@@ -41,16 +41,19 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private static final String DISTANCE_CONDITION = "ST_Distance_Sphere({0}, {1}) <= {2}";
 
-
     @Override
     public PageResultData<GetMyPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo) {
-        long total;
+        long total = jpaQueryFactory.selectFrom(post)
+                .where(post.member.memberNo.eq(memberNo))
+                .fetchCount();
 
         List<Post> posts = jpaQueryFactory.select(post)
                 .from(post)
                 .where(post.member.memberNo.eq(memberNo))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(post.createDate.desc())
                 .fetch();
-        total = jpaQueryFactory.selectFrom(post).fetchCount();
 
         List<GetMyPostsResponse> responses = posts.stream().map(post -> {
             Image mainImage = jpaQueryFactory.select(QImage.image)
@@ -61,11 +64,22 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
 
-            return GetMyPostsResponse.from(post, imageUrl);
+            Long replyCnt = jpaQueryFactory.select(reply.count())
+                    .from(reply)
+                    .where(reply.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            Long likeCnt = jpaQueryFactory.select(like.count())
+                    .from(like)
+                    .where(like.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            return GetMyPostsResponse.from(post, imageUrl, replyCnt, likeCnt);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
     }
+
 
     @Override
     public GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo) {
@@ -88,8 +102,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetchOne();
 
         Long replyCnt = replyRepository.countByPost_PostNo(postNo);
-
-
 
         return GetPostResponse.from(post, imageUrl, bookmarkCnt, replyCnt, isWriter);
     }
@@ -214,6 +226,91 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return new PageResultData<>(responses, pageable, total);
     }
 
+    @Override
+    public PageResultData<GetAllPostsResponse> findMyLikedPostsByPageable(Pageable pageable, Long memberNo) {
+        long total;
 
+        List<Post> posts = jpaQueryFactory.select(post)
+                .from(post)
+                .join(like).on(post.postNo.eq(like.post.postNo))
+                .where(like.member.memberNo.eq(memberNo))
+                .orderBy(post.createDate.desc())
+                .fetch();
+        total = jpaQueryFactory.selectFrom(post)
+                .join(like).on(post.postNo.eq(like.post.postNo))
+                .where(like.member.memberNo.eq(memberNo))
+                .fetchCount();
+
+        List<GetAllPostsResponse> responses = posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.select(QImage.image)
+                    .from(QImage.image)
+                    .where(QImage.image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
+
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+
+            Long replyCnt = jpaQueryFactory.select(reply.count())
+                    .from(reply)
+                    .where(reply.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            Long likeCnt = jpaQueryFactory.select(like.count())
+                    .from(like)
+                    .where(like.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
+                    .where(bookmark.member.memberNo.eq(memberNo)
+                            .and(bookmark.post.postNo.eq(post.getPostNo())))
+                    .fetchFirst() != null;
+
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked);
+        }).collect(Collectors.toList());
+
+        return new PageResultData<>(responses, pageable, total);
+    }
+
+
+    @Override
+    public PageResultData<GetAllPostsResponse> findMyBookmarkedPostsByPageable(Pageable pageable, Long memberNo) {
+        long total;
+
+        List<Post> posts = jpaQueryFactory.select(post)
+                .from(post)
+                .join(bookmark).on(post.postNo.eq(bookmark.post.postNo))
+                .where(bookmark.member.memberNo.eq(memberNo))
+                .orderBy(post.createDate.desc())
+                .fetch();
+
+        total = jpaQueryFactory.selectFrom(post)
+                .join(bookmark).on(post.postNo.eq(bookmark.post.postNo))
+                .where(bookmark.member.memberNo.eq(memberNo))
+                .fetchCount();
+
+        List<GetAllPostsResponse> responses = posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.select(QImage.image)
+                    .from(QImage.image)
+                    .where(QImage.image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
+
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+
+            Long replyCnt = jpaQueryFactory.select(reply.count())
+                    .from(reply)
+                    .where(reply.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            Long likeCnt = jpaQueryFactory.select(like.count())
+                    .from(like)
+                    .where(like.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, true);
+        }).collect(Collectors.toList());
+
+        return new PageResultData<>(responses, pageable, total);
+    }
 
 }
