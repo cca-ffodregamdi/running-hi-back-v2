@@ -20,14 +20,14 @@ public record GetChallengeResponse(
         @Schema(description = "챌린지 이미지", example = "test.jpg")
         String imageUrl,
         @Schema(description = "목표 수치", example = "100.0")
-        String targetValue,
+        String goal,
         @Schema(description = "챌린지 시작일자", example = "2024-06-01T00:00:00")
         LocalDateTime startDate,
         @Schema(description = "챌린지 종료일자", example = "2024-0.6-30T00:00:00")
         LocalDateTime endDate,
         @Schema(description = "챌린지 참여자 수", example = "4132")
         int participantsCount,
-        @Schema(description = "챌린지 랭킹", example = "10")
+        @Schema(description = "전체 회원 랭킹", example = "10")
         List<GetChallengeRankingResponse> ranking
 ) {
     public static GetChallengeResponse from(Challenge challenge, List<GetChallengeRankingResponse> ranking) {
@@ -37,7 +37,7 @@ public record GetChallengeResponse(
                 challenge.getContent(),
                 challenge.getChallengeCategory(),
                 challenge.getImageUrl(),
-                challenge.getTargetValue(),
+                challenge.getGoal(),
                 challenge.getStartDate(),
                 challenge.getEndDate(),
                 challenge.getParticipants().size(),

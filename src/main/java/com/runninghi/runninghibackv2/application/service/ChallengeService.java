@@ -29,7 +29,7 @@ public class ChallengeService {
                 .content(request.content())
                 .challengeCategory(request.challengeCategory())
                 .imageUrl(request.imageUrl())
-                .targetValue(request.targetValue())
+                .goal(request.goal())
                 .startDate(request.startDate())
                 .endDate(request.endDate())
                 .build();

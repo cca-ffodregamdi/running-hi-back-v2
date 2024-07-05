@@ -51,7 +51,7 @@ public record GetMyChallengeResponse(
                 challenge.getContent(),
                 challenge.getChallengeCategory(),
                 challenge.getImageUrl(),
-                challenge.getTargetValue(),
+                challenge.getGoal(),
                 challenge.getStartDate(),
                 challenge.getEndDate(),
                 memberChallenge.getRecord(),
