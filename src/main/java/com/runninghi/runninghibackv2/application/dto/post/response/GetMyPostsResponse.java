@@ -24,13 +24,17 @@ public record GetMyPostsResponse(
         String mainData,
         @Schema(description = "대표 이미지 URL", example = "https://picsum.photos/200")
         String imageUrl,
+        @Schema(description = "북마크 여부", example = "5")
+        Boolean isBookmarked,
+        @Schema(description = "요청자 본인의 좋아요 여부", example = "true")
+        Boolean isLiked,
         @Schema(description = "댓글 개수", example = "10")
         Long replyCnt,
         @Schema(description = "좋아요 개수", example = "10")
         Long likeCnt
 
 ) {
-    public static GetMyPostsResponse from(Post post, String imageUrl, Long replyCnt, Long likeCnt) {
+    public static GetMyPostsResponse from(Post post, String imageUrl, Long replyCnt, Long likeCnt, Boolean isBookmarked, Boolean isLiked) {
         return new GetMyPostsResponse(
                 post.getPostNo(),
                 post.getCreateDate(),
@@ -40,6 +44,8 @@ public record GetMyPostsResponse(
                 post.getMember().getProfileUrl(),
                 post.getMainData(),
                 imageUrl,
+                isBookmarked,
+                isLiked,
                 replyCnt,
                 likeCnt
         );

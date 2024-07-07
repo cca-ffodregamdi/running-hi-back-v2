@@ -26,13 +26,14 @@ public record GetAllPostsResponse(
         String imageUrl,
         @Schema(description = "북마크 여부", example = "5")
         Boolean isBookmarked,
+        @Schema(description = "요청자 본인의 좋아요 여부", example = "true")
+        Boolean isLiked,
         @Schema(description = "댓글 개수", example = "10")
         Long replyCnt,
         @Schema(description = "좋아요 개수", example = "10")
         Long likeCnt
-
 ) {
-    public static GetAllPostsResponse from(Post post, String imageUrl, Long replyCnt, Long likeCnt, Boolean isBookmarked) {
+    public static GetAllPostsResponse from(Post post, String imageUrl, Long replyCnt, Long likeCnt, Boolean isBookmarked, Boolean isLiked) {
         return new GetAllPostsResponse(
                 post.getPostNo(),
                 post.getCreateDate(),
@@ -43,6 +44,7 @@ public record GetAllPostsResponse(
                 post.getMainData(),
                 imageUrl,
                 isBookmarked,
+                isLiked,
                 replyCnt,
                 likeCnt
         );

@@ -167,7 +167,7 @@ public class ReplyService {
         return  replyQueryRepository.findAllReportedByPageableAndSearch(request);
     }
 
-    public Reply findReplyByReplyNo (Long replyNo) {
+    private Reply findReplyByReplyNo (Long replyNo) {
 
         return replyRepository.findById(replyNo)
                 .orElseThrow(EntityNotFoundException::new);

@@ -74,7 +74,18 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .where(like.post.postNo.eq(post.getPostNo()))
                     .fetchOne();
 
-            return GetMyPostsResponse.from(post, imageUrl, replyCnt, likeCnt);
+            Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
+                    .where(bookmark.member.memberNo.eq(memberNo)
+                            .and(bookmark.post.postNo.eq(post.getPostNo())))
+                    .fetchFirst() != null;
+
+            Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                    .where(
+                            like.post.postNo.eq(post.getPostNo()),
+                            like.member.memberNo.eq(memberNo))
+                    .fetchOne() != null;
+
+            return GetMyPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -157,8 +168,14 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             .and(bookmark.post.postNo.eq(post.getPostNo())))
                     .fetchFirst() != null;
 
+            Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                    .where(
+                            like.post.postNo.eq(post.getPostNo()),
+                            like.member.memberNo.eq(memberNo))
+                    .fetchOne() != null;
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -219,8 +236,14 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             .and(bookmark.post.postNo.eq(post.getPostNo())))
                     .fetchFirst() != null;
 
+            Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                    .where(
+                            like.post.postNo.eq(post.getPostNo()),
+                            like.member.memberNo.eq(memberNo))
+                    .fetchOne() != null;
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -265,7 +288,15 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             .and(bookmark.post.postNo.eq(post.getPostNo())))
                     .fetchFirst() != null;
 
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked);
+            Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                    .where(
+                            like.post.postNo.eq(post.getPostNo()),
+                            like.member.memberNo.eq(memberNo))
+                    .fetchOne() != null;
+
+
+
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -307,7 +338,19 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .where(like.post.postNo.eq(post.getPostNo()))
                     .fetchOne();
 
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, true);
+            Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
+                    .where(bookmark.member.memberNo.eq(memberNo)
+                            .and(bookmark.post.postNo.eq(post.getPostNo())))
+                    .fetchFirst() != null;
+
+            Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                    .where(
+                            like.post.postNo.eq(post.getPostNo()),
+                            like.member.memberNo.eq(memberNo))
+                    .fetchOne() != null;
+
+
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
