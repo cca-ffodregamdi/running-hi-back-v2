@@ -30,11 +30,10 @@ public class RecordController {
     @GetMapping("weekly")
     @Operation(summary = "주간 기록 & 게시글 확인", description = "기록 페이지에서 사용자의 러닝 기록을 주간 기준으로 확인합니다.")
     public ResponseEntity<ApiResult<GetWeeklyRecordResponse>> getWeeklyRecord(@RequestHeader("Authorization") String bearerToken,
-                                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String date) {
+                                                                              @RequestParam LocalDate date) {
 
-        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
-        GetWeeklyRecordResponse response = recordService.getWeeklyRecord(memberInfo.memberNo(), localDate);
+        GetWeeklyRecordResponse response = recordService.getWeeklyRecord(memberInfo.memberNo(), date);
 
         return ResponseEntity.ok(ApiResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
