@@ -10,14 +10,14 @@ import java.util.Date;
 public class AppleClaimsValidator {
 
     private final String iss;
-    private final String bundleId;
+    private final String clientId;
 
     public AppleClaimsValidator(
             @Value("${apple.iss}") String iss,
-            @Value("${apple.bundle-id}") String bundleId
+            @Value("${apple.client-id}") String clientId
     ) {
         this.iss = iss;
-        this.bundleId = bundleId;
+        this.clientId = clientId;
     }
 
     public boolean isValid(Claims claims) {
@@ -27,6 +27,6 @@ public class AppleClaimsValidator {
 
         return currentDate.before(expiration) &&
                 claims.getIssuer().contains(iss) &&
-                claims.getAudience().equals(bundleId); // 앱의 bundle id
+                claims.getAudience().equals(clientId); // 앱의 bundle id
     }
 }
