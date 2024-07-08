@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetAllPostsResponse;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetMyPostsResponse;
 import com.runninghi.runninghibackv2.application.dto.post.response.GetPostResponse;
+import com.runninghi.runninghibackv2.application.dto.post.response.GetRecordPostResponse;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.entity.Post;
@@ -20,6 +21,9 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +31,7 @@ import static com.runninghi.runninghibackv2.domain.entity.QBookmark.bookmark;
 import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 import static com.runninghi.runninghibackv2.domain.entity.QLike.like;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
+import static com.runninghi.runninghibackv2.domain.entity.QRecord.record;
 import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 
 @Repository
@@ -354,6 +359,81 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
+    }
+
+
+    @Override
+    public List<GetRecordPostResponse> findWeeklyRecord(Long memberNo, LocalDate date) {
+
+        LocalDateTime start = date.with(DayOfWeek.MONDAY).atStartOfDay();
+        LocalDateTime end = date.with(DayOfWeek.SUNDAY).atTime(23, 59, 59);
+
+        List<Post> posts = jpaQueryFactory.select(post)
+                .from(post)
+                .where(post.createDate.between(start,end)
+                    .and(post.member.memberNo.eq(memberNo)))
+                .fetch();
+
+        return posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.select(QImage.image)
+                    .from(QImage.image)
+                    .where(QImage.image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
+
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+
+            return GetRecordPostResponse.from(post, imageUrl);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GetRecordPostResponse> findMonthlyRecord(Long memberNo, LocalDate date) {
+        LocalDateTime start = date.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime end = date.withDayOfMonth(date.lengthOfMonth()).atTime(23, 59, 59);
+
+        List<Post> posts = jpaQueryFactory.select(post)
+                .from(post)
+                .where(post.createDate.between(start,end)
+                        .and(post.member.memberNo.eq(memberNo)))
+                .fetch();
+
+        return posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.select(QImage.image)
+                    .from(QImage.image)
+                    .where(QImage.image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
+
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+
+            return GetRecordPostResponse.from(post, imageUrl);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GetRecordPostResponse> findYearlyRecord(Long memberNo, LocalDate date) {
+        int year = date.getYear();
+        LocalDateTime start = LocalDateTime.of(year, 1,1,0,0,0);
+        LocalDateTime end = LocalDateTime.of(year, 12,31,23,59,59);
+
+        List<Post> posts = jpaQueryFactory.select(post)
+                .from(post)
+                .where(post.createDate.between(start,end)
+                        .and(post.member.memberNo.eq(memberNo)))
+                .fetch();
+
+        return posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.select(QImage.image)
+                    .from(QImage.image)
+                    .where(QImage.image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
+
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+
+            return GetRecordPostResponse.from(post, imageUrl);
+        }).collect(Collectors.toList());
     }
 
 }

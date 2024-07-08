@@ -45,8 +45,4 @@ public class Record {
     @Comment("날짜")
     private LocalDate date;
 
-
-
-
-
 }
