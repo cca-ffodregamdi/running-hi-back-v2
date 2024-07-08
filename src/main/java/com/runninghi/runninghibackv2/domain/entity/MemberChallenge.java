@@ -33,33 +33,34 @@ public class MemberChallenge extends BaseTimeEntity {
     private Member member;
 
     @Comment("챌린지 시작 후 누적 기록")
-    private String record;
+    private float record;
 
     @Builder
     public MemberChallenge(Long memberChallengeId, Challenge challenge, Member member) {
         this.memberChallengeId = memberChallengeId;
         this.challenge = challenge;
         this.member = member;
-        this.record = "0";
+        this.record = 0;
     }
 
     public void updateRecord(GpsDataVO gpsDataVO) {
         ChallengeCategory challengeCategory = this.challenge.getChallengeCategory();
-        float floatRecord = Float.parseFloat(this.record);
+        float floatRecord = this.record;
 
         if(challengeCategory == ChallengeCategory.DISTANCE) {
-            this.record = String.valueOf(floatRecord + gpsDataVO.getDistance());
+//            this.record = String.valueOf(floatRecord + gpsDataVO.getDistance());
+            this.record = floatRecord + gpsDataVO.getDistance();
         }
 
         if(challengeCategory == ChallengeCategory.SPEED) {
-            floatRecord = floatRecord == 0 ? gpsDataVO.getMeanPace() : (floatRecord + gpsDataVO.getMeanPace()) / 2;
-            this.record = String.valueOf(floatRecord);
+//            floatRecord = floatRecord == 0 ? gpsDataVO.getMeanPace() : (floatRecord + gpsDataVO.getMeanPace()) / 2;
+//            this.record = String.valueOf(floatRecord);
         }
     }
 
     public void updateRecord() {
-        int intRecord = Integer.parseInt(this.record);
-
-        this.record = String.valueOf(intRecord + 1);
+//        int intRecord = Integer.parseInt(this.record);
+//
+//        this.record = String.valueOf(intRecord + 1);
     }
 }
