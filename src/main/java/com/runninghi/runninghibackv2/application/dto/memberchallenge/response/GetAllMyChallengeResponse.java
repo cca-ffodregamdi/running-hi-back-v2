@@ -19,14 +19,14 @@ public record GetAllMyChallengeResponse(
         @Schema(description = "챌린지 종료일자", example = "2024-0.6-30T00:00:00")
         LocalDateTime endDate,
         @Schema(description = "챌린지 남은기간", example = "20")
-        Long RemainingTime,
+        Long remainingTime,
         @Schema(description = "챌린지 참여자 수", example = "4132")
         int participantsCount
 ) {
     public static GetAllMyChallengeResponse from(MemberChallenge memberChallenge) {
         Challenge challenge = memberChallenge.getChallenge();
         Duration duration = Duration.between(LocalDateTime.now(), challenge.getEndDate());
-        Long RemainingTime = duration.toDays() >= 0 ? duration.toDays() : 0;
+        Long remainingTime = duration.toDays() >= 0 ? duration.toDays() : 0;
 
         return new GetAllMyChallengeResponse(
                 memberChallenge.getMemberChallengeId(),
@@ -34,7 +34,7 @@ public record GetAllMyChallengeResponse(
                 challenge.getImageUrl(),
                 challenge.getStartDate(),
                 challenge.getEndDate(),
-                RemainingTime,
+                remainingTime,
                 challenge.getParticipants().size()
         );
     }
