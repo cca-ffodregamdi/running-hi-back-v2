@@ -16,6 +16,8 @@ public record UpdateChallengeRequest(
         String imageUrl,
         @Schema(description = "목표 수치", example = "100.0")
         float goal,
+        @Schema(description = "목표 상세정보", example = "10회 이상 달리기")
+        String goalDetail,
         @Schema(description = "챌린지 시작일자", example = "2024-06-01T00:00:00")
         LocalDateTime startDate,
         @Schema(description = "챌린지 종료일자", example = "2024-0.6-30T00:00:00")
