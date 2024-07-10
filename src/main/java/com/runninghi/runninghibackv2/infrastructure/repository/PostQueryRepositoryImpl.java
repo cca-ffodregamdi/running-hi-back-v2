@@ -111,6 +111,11 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .where(image.postNo.eq(postNo))
                 .fetchFirst();
 
+        Long likeCnt = jpaQueryFactory.select(like.count())
+                .from(like)
+                .where(like.post.postNo.eq(post.getPostNo()))
+                .fetchOne();
+
         Long bookmarkCnt = jpaQueryFactory
                 .select(bookmark.count())
                 .from(bookmark)
@@ -124,7 +129,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                         like.member.memberNo.eq(memberNo))
                 .fetchOne() != null;
 
-        return GetPostResponse.from(post, imageUrl, bookmarkCnt, replyCnt, isWriter, isLiked);
+        return GetPostResponse.from(post, imageUrl,likeCnt, bookmarkCnt, replyCnt, isWriter, isLiked);
     }
 
     @Override
