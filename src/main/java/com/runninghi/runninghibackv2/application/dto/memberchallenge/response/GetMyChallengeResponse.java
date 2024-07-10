@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.memberchallenge.response;
 
+import com.runninghi.runninghibackv2.application.dto.challenge.response.ChallengeResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
@@ -25,6 +26,8 @@ public record GetMyChallengeResponse(
         String imageUrl,
         @Schema(description = "목표 수치", example = "100.0")
         float goal,
+        @Schema(description = "목표 상세정보", example = "100.0km")
+        String goalDetail,
         @Schema(description = "챌린지 시작일자", example = "2024-06-01T00:00:00")
         LocalDateTime startDate,
         @Schema(description = "챌린지 종료일자", example = "2024-0.6-30T00:00:00")
@@ -37,7 +40,7 @@ public record GetMyChallengeResponse(
         List<GetChallengeRankingResponse> challengeRanking,
         @Schema(description = "로그인한 회원 랭킹")
         GetChallengeRankingResponse memberRanking
-) {
+) implements ChallengeResponse {
     public static GetMyChallengeResponse from(MemberChallenge memberChallenge,
                                               List<GetChallengeRankingResponse> challengeRanking,
                                               GetChallengeRankingResponse memberRanking) {
@@ -52,6 +55,7 @@ public record GetMyChallengeResponse(
                 challenge.getChallengeCategory(),
                 challenge.getImageUrl(),
                 challenge.getGoal(),
+                challenge.getGoalDetail(),
                 challenge.getStartDate(),
                 challenge.getEndDate(),
                 memberChallenge.getRecord(),
