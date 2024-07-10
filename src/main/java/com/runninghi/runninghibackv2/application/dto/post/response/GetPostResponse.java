@@ -45,9 +45,11 @@ public record GetPostResponse(
         @Schema(description = "댓글 개수", example = "5")
         Long replyCnt,
         @Schema(description = "코스 난이도", example = "EASY")
-        String difficulty
+        String difficulty,
+        @Schema(description = "좋아요 여부", example = "true")
+        Boolean isLiked
 ) {
-    public static GetPostResponse from(Post post, String imageUrl, Long bookmarkCnt, Long replyCnt, Boolean isOwner) {
+    public static GetPostResponse from(Post post, String imageUrl, Long bookmarkCnt, Long replyCnt, Boolean isOwner, Boolean isLiked) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
@@ -65,7 +67,8 @@ public record GetPostResponse(
                 bookmarkCnt,
                 5L,
                 replyCnt,
-                post.getDifficulty().toString()
+                post.getDifficulty().toString(),
+                isLiked
         );
     }
 }
