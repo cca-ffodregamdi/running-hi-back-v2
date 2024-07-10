@@ -49,7 +49,7 @@ public record GetPostResponse(
         @Schema(description = "좋아요 여부", example = "true")
         Boolean isLiked
 ) {
-    public static GetPostResponse from(Post post, String imageUrl, Long bookmarkCnt, Long replyCnt, Boolean isOwner, Boolean isLiked) {
+    public static GetPostResponse from(Post post, String imageUrl, Long likeCnt,Long bookmarkCnt, Long replyCnt, Boolean isOwner, Boolean isLiked) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
                 post.getMember().getProfileUrl(),
@@ -64,8 +64,8 @@ public record GetPostResponse(
                 post.getGpsDataVO().getMeanPace(),
                 post.getGpsDataVO().getKcal(),
                 imageUrl,
+                likeCnt,
                 bookmarkCnt,
-                5L,
                 replyCnt,
                 post.getDifficulty().toString(),
                 isLiked
