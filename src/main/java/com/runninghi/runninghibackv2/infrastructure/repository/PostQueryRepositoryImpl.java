@@ -118,8 +118,13 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetchOne();
 
         Long replyCnt = replyRepository.countByPost_PostNo(postNo);
+        Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                .where(
+                        like.post.postNo.eq(post.getPostNo()),
+                        like.member.memberNo.eq(memberNo))
+                .fetchOne() != null;
 
-        return GetPostResponse.from(post, imageUrl, bookmarkCnt, replyCnt, isWriter);
+        return GetPostResponse.from(post, imageUrl, bookmarkCnt, replyCnt, isWriter, isLiked);
     }
 
     @Override
