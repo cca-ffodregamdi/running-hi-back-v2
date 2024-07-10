@@ -21,6 +21,8 @@ public record GetChallengeResponse(
         String imageUrl,
         @Schema(description = "목표 수치", example = "100.0")
         float goal,
+        @Schema(description = "목표 상세정보", example = "10회 이상 달리기")
+        String goalDetail,
         @Schema(description = "챌린지 시작일자", example = "2024-06-01T00:00:00")
         LocalDateTime startDate,
         @Schema(description = "챌린지 종료일자", example = "2024-0.6-30T00:00:00")
@@ -29,7 +31,7 @@ public record GetChallengeResponse(
         int participantsCount,
         @Schema(description = "전체 회원 랭킹", example = "10")
         List<GetChallengeRankingResponse> ranking
-) {
+) implements ChallengeResponse {
     public static GetChallengeResponse from(Challenge challenge, List<GetChallengeRankingResponse> ranking) {
         return new GetChallengeResponse(
                 challenge.getChallengeNo(),
@@ -38,6 +40,7 @@ public record GetChallengeResponse(
                 challenge.getChallengeCategory(),
                 challenge.getImageUrl(),
                 challenge.getGoal(),
+                challenge.getGoalDetail(),
                 challenge.getStartDate(),
                 challenge.getEndDate(),
                 challenge.getParticipants().size(),

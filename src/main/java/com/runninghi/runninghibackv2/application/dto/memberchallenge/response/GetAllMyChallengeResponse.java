@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public record GetAllMyChallengeResponse(
+        @Schema(description = "연관된 챌린지 Id", example = "1")
+        Long challengeId,
         @Schema(description = "나의 챌린지 Id", example = "1")
         Long memberChallengeId,
         @Schema(description = "챌린지명", example = "1개월 내로 100km 달리기")
@@ -29,6 +31,7 @@ public record GetAllMyChallengeResponse(
         Long remainingTime = duration.toDays() >= 0 ? duration.toDays() : 0;
 
         return new GetAllMyChallengeResponse(
+                challenge.getChallengeNo(),
                 memberChallenge.getMemberChallengeId(),
                 challenge.getTitle(),
                 challenge.getImageUrl(),

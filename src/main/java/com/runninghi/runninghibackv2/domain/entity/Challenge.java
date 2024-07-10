@@ -45,6 +45,9 @@ public class Challenge extends BaseTimeEntity {
     @Comment("목표 수치")
     private float goal;
 
+    @Comment("목표 상세정보")
+    private String goalDetail;
+
     @Comment("챌린지 시작일자")
     private LocalDateTime startDate;
 
@@ -61,7 +64,7 @@ public class Challenge extends BaseTimeEntity {
 
     @Builder
     public Challenge(Long challengeNo, String title, String content, ChallengeCategory challengeCategory,
-                     String imageUrl, float goal, LocalDateTime startDate, LocalDateTime endDate,
+                     String imageUrl, float goal, String goalDetail, LocalDateTime startDate, LocalDateTime endDate,
                      boolean status, List<MemberChallenge> participants) {
         this.challengeNo = challengeNo;
         this.title = title;
@@ -69,6 +72,7 @@ public class Challenge extends BaseTimeEntity {
         this.challengeCategory = challengeCategory;
         this.imageUrl = imageUrl;
         this.goal = goal;
+        this.goalDetail = goalDetail;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
@@ -81,6 +85,7 @@ public class Challenge extends BaseTimeEntity {
         this.challengeCategory = request.challengeCategory();
         this.imageUrl = request.imageUrl();
         this.goal = request.goal();
+        this.goalDetail = request.goalDetail();
         this.startDate = request.startDate();
         this.endDate = request.endDate();
     }
