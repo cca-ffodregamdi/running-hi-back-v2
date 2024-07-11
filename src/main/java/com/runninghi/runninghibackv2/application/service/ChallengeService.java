@@ -57,25 +57,13 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public ChallengeResponse getChallengeById(Long challengeNo, Long memberNo) {
+    public GetChallengeResponse getChallengeById(Long challengeNo) {
 
         Challenge challenge = challengeRepository.findById(challengeNo)
                 .orElseThrow(EntityNotFoundException::new);
 
-        Member member = memberRepository.findByMemberNo(memberNo);
-
         List<GetChallengeRankingResponse> challengeRanking =
                 memberChallengeRepository.findChallengeRanking(challenge.getChallengeNo());
-
-        Optional<MemberChallenge> memberChallenge =
-                memberChallengeRepository.findByMemberAndChallenge(member, challenge);
-
-        if(memberChallenge.isPresent()) {
-            GetChallengeRankingResponse memberRanking =
-                    memberChallengeRepository.findMemberRanking(challengeNo, memberNo);
-
-            return GetMyChallengeResponse.from(memberChallenge.get(), challengeRanking, memberRanking);
-        }
 
         return GetChallengeResponse.from(challenge, challengeRanking);
     }
