@@ -66,24 +66,19 @@ public class ChallengeController {
     }
 
     /**
-     * 랭킹을 포함한 챌린지 상세 정보를 조회합니다.
+     * 챌린지 상세 정보를 조회합니다.
      * 랭킹 조회 시 전체 회원의 러닝 순위를 조회합니다. 기록이 높을수록 높은 순위를 부여합니다.
      * 동일한 값이 있을 경우 동일한 순위를 부여하고 다음 순위를 건너뜁니다.
-     * @return 참여중인 챌린지인지 여부에 따라 return 값이 다릅니다.
-     *         참여하지 않은 챌린지인 경우 Challenge 기본 정보가 반환됩니다.
-     *         참여중인 챌린지인 경우 기록 및 나의 순위 정보를 포함한 Challenge 정보가 반환됩니다.
+     * @return  전체 회원 랭킹을 포함한 Challenge 기본 정보가 반환됩니다.
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 존재하지 않을 경우 접근이 거부됩니다.
      */
     @Operation(summary = "챌린지 상세 조회", description = "챌린지 상세 정보를 조회합니다.")
     @GetMapping("/{challengeNo}")
-    public ResponseEntity<ApiResult<ChallengeResponse>> getChallengeById(
-            @PathVariable Long challengeNo,
-            @RequestHeader(name = "Authorization") String bearerToken) {
+    public ResponseEntity<ApiResult<GetChallengeResponse>> getChallengeById(
+            @PathVariable Long challengeNo) {
 
-        Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
-
-        ChallengeResponse response = challengeService.getChallengeById(challengeNo, memberNo);
+        GetChallengeResponse response = challengeService.getChallengeById(challengeNo);
 
         return ResponseEntity.ok(ApiResult.success("챌린지 상세 조회 성공", response));
     }
@@ -146,26 +141,27 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 전체 조회 성공", response));
     }
 
-//    /**
-//     * 회원이 참여한 챌린지 데이터입니다.
-//     * 랭킹을 포함한 나의 챌린지 상세 정보를 조회합니다.
-//     * 전체 회원 랭킹과 로그인한 회원의 랭킹을 조회합니다. 기록이 높을수록 높은 순위를 부여합니다.
-//     * 동일한 값이 있을 경우 동일한 순위를 부여하고 다음 순위를 건너뜁니다.
-//     * @return 랭킹을 포함한 Challenge 데이터를 반환합니다.
-//     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
-//     *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 존재하지 않을 경우 접근이 거부됩니다.
-//     */
-//    @Operation(summary = "나의 챌린지 상세 조회", description = "로그인한 사용자가 참여중인 챌린지 목록 화면에서 " +
-//            "선택한 챌린지의 정보를 조회합니다.")
-//    @GetMapping("/my-challenge/{myChallengeNo}")
-//    public ResponseEntity<ApiResult<GetMyChallengeResponse>> getMyChallengeById(
-//            @PathVariable Long myChallengeNo,
-//            @RequestHeader(name = "Authorization") String bearerToken) {
-//
-//        Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
-//
-//        GetMyChallengeResponse response = myChallengeService.getMyChallengeById(memberNo, myChallengeNo);
-//
-//        return ResponseEntity.ok(ApiResult.success("나의 챌린지 상세 조회 성공", response));
-//    }
+    /**
+     * 회원이 참여한 챌린지 데이터입니다.
+     * challengeNo와 memberNo로 MemberChallenge 데이터를 조회합니다.
+     * 회원 랭킹을 포함한 나의 챌린지 상세 정보를 조회합니다.
+     * 전체 회원 랭킹과 로그인한 회원의 랭킹을 조회합니다. 기록이 높을수록 높은 순위를 부여합니다.
+     * 동일한 값이 있을 경우 동일한 순위를 부여하고 다음 순위를 건너뜁니다.
+     * @return 회원의 기록, 랭킹을 포함한 Challenge 데이터를 반환합니다.
+     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
+     *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 존재하지 않을 경우 접근이 거부됩니다.
+     */
+    @Operation(summary = "나의 챌린지 상세 조회", description = "로그인한 사용자가 참여중인 챌린지 목록 화면에서 " +
+            "선택한 챌린지의 정보를 조회합니다.")
+    @GetMapping("/my-challenge/{challengeNo}")
+    public ResponseEntity<ApiResult<GetMyChallengeResponse>> getMyChallengeById(
+            @PathVariable Long challengeNo,
+            @RequestHeader(name = "Authorization") String bearerToken) {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
+
+        GetMyChallengeResponse response = myChallengeService.getMyChallengeByChallengeId(memberNo, challengeNo);
+
+        return ResponseEntity.ok(ApiResult.success("나의 챌린지 상세 조회 성공", response));
+    }
 }
