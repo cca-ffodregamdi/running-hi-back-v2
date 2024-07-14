@@ -71,7 +71,7 @@ public class AppleOauthService {
     @Transactional
     public Map<String, String> appleOauth(AppleLoginRequest request, AppleTokenResponse appleTokenResponse) {
         // identity_token의 header를 추출
-        Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(request.identityToken());
+        Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(request.identityCode());
 
         // identity_token을 검증하기 위해 애플의 publicKey list 요청
         ApplePublicKeys applePublicKeys = appleClient.getApplePublicKeys();
@@ -81,7 +81,7 @@ public class AppleOauthService {
         PublicKey publicKey = applePublicKeyGenerator.generate(appleTokenHeader, applePublicKeys);
 
         // identity_token을 publicKey로 검증하여 claim 추출 : 서명 검증
-        Claims claims = appleTokenParser.extractClaims(request.identityToken(), publicKey);
+        Claims claims = appleTokenParser.extractClaims(request.identityCode(), publicKey);
 
         // iss, aud, exp, 검증
         if (!appleClaimsValidator.isValid(claims)) {
