@@ -162,7 +162,7 @@ public class MemberController {
         // authorizationCode와 clientSecret으로 refreshToken 가져오기
         AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
 
-        // 클라이언트에서 전달받은 identityCode 검증, 회원가입/로그인 처리
+        // 클라이언트에서 전달받은 identityToken 검증, 회원가입/로그인 처리
         Map<String, String> memberResponse = appleOauthService.appleOauth(request, appleTokenResponse);
 
         HttpHeaders headers = new HttpHeaders();
