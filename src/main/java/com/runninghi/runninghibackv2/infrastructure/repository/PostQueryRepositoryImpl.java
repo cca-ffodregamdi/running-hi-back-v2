@@ -141,20 +141,20 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         total = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(post.geometry.isNotNull())
+                        .and(post.gpsDataVO.isNotNull())
                         .and(Expressions.booleanTemplate(
                                 DISTANCE_CONDITION,
-                                post.geometry, referencePoint, distance * 10000
+                                post.gpsDataVO.geometry, referencePoint, distance * 10000
                         ))
                 )
                 .fetchCount();
 
         posts = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(post.geometry.isNotNull())
+                        .and(post.gpsDataVO.geometry.isNotNull())
                         .and(Expressions.booleanTemplate(
                                 DISTANCE_CONDITION,
-                                post.geometry, referencePoint, distance * 10000
+                                post.gpsDataVO.geometry, referencePoint, distance * 10000
                         ))
                 )
                 .offset(pageable.getOffset())
@@ -207,7 +207,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .where(post.status.eq(true)
                         .and(Expressions.booleanTemplate(
                                 DISTANCE_CONDITION,
-                                post.geometry, referencePoint, distance * 10000
+                                post.gpsDataVO.geometry, referencePoint, distance * 10000
                         ))
                 )
                 .fetchCount();
@@ -218,7 +218,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .where(post.status.eq(true)
                         .and(Expressions.booleanTemplate(
                                 DISTANCE_CONDITION,
-                                post.geometry, referencePoint, distance * 10000
+                                post.gpsDataVO.geometry, referencePoint, distance * 10000
                         ))
                 )
                 .groupBy(post.postNo)

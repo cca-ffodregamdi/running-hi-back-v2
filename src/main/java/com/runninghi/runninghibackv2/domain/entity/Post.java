@@ -34,6 +34,10 @@ public class Post extends BaseTimeEntity {
     private Member member;
 
     @Column
+    @Comment("게시글 제목")
+    private String postTitle;
+
+    @Column
     @Nullable
     @Comment("게시글 내용")
     private String postContent;
@@ -51,13 +55,6 @@ public class Post extends BaseTimeEntity {
     private Role role;
 
     @Column
-    @Comment("지역명")
-    private String locationName;
-
-    @Column(columnDefinition = "POINT SRID 4326")
-    private Point geometry;
-
-    @Column
     @Comment("게시글 공유 여부")
     private Boolean status;
 
@@ -65,28 +62,26 @@ public class Post extends BaseTimeEntity {
     private GpsDataVO gpsDataVO;
 
     @Column
-    @Comment("gpx 파일 url")
+    @Comment("gps 파일 url")
     private String gpxUrl;
 
     @Column
     @Comment("메인페이지 표시 대표 데이터")
     private String mainData;
 
-
-
     @Builder
-    public Post(Member member, @Nullable String postContent, Difficulty difficulty, Role role, String locationName, Point geometry, Boolean status, String gpxUrl, GpsDataVO gpsDataVO, String mainData) {
+    public Post(Member member, @Nullable String postContent, Difficulty difficulty, Role role, String locationName,
+                Point geometry, Boolean status, String gpxUrl, GpsDataVO gpsDataVO, String mainData, String postTitle) {
         this.member = member;
         this.postContent = postContent;
         this.difficulty = difficulty;
         this.reportCnt = 0;
         this.role = role;
-        this.locationName = locationName;
-        this.geometry = geometry;
         this.status = status;
         this.gpxUrl = gpxUrl;
         this.gpsDataVO = gpsDataVO;
         this.mainData = mainData;
+        this.postTitle = postTitle;
     }
 
     public void shareToPost(CreatePostRequest request, String mainData) {
