@@ -50,7 +50,7 @@ public class TestData {
         testDatabaseMapper.insertPostReportDummyData();
         testDatabaseMapper.insertReplyReportDummyData();
         testDatabaseMapper.insertChallengeDummyData();
-//        testDatabaseMapper.insertMemberChallengeDummyData();
+        testDatabaseMapper.insertMemberChallengeDummyData();
         testDatabaseMapper.insertLikeDummyData();
         testDatabaseMapper.insertFaqDummyData();
         testDatabaseMapper.insertNoticeDummyData();
