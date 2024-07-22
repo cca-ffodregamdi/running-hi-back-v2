@@ -1,5 +1,7 @@
 package com.runninghi.runninghibackv2.common.exception;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.protobuf.Api;
 import com.runninghi.runninghibackv2.common.exception.custom.AppleOauthException;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthException;
@@ -104,6 +106,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ApiResult<Void>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResult.error(ErrorCode.BAD_REQUEST));
+    }
+
+    @ExceptionHandler(FirebaseMessagingException.class)
+    public ResponseEntity<ApiResult<Void>> handleFirebaseMessagingException(FirebaseMessagingException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResult.error(ErrorCode.FCM_SEND_FAIL));
     }
 
 }
