@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.domain.service;
 
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
+import org.checkerframework.checker.units.qual.A;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -65,26 +66,21 @@ public class GpsCalculator {
             trackPoints.add(new TrackPoint(lon, lat, time));
         }
     }
-    public GpsDataVO getDataFromGpxFile(String gpxData) {
-
-        trackPoints.clear(); // trackPoints 리스트 초기화
-        totalDistance = 0.0f; // totalDistance 초기화
-        totalTimeInSeconds = 0; // totalTimeInMinutes 초기화
-
-        processJson(gpxData);
-
-        float startLatitude = getStartLatitude();
-        float startLongitude = getStartLongitude();
-        float endLatitude = getEndLatitude();
-        float endLongitude = getEndLongitude();
-        float distance = calculateDistance();
-        int time = calculateTimeInSeconds();
-        int kcal = calculateKcal();
-        float speed = calculateSpeed();
-        int meanPace = calculateMeanPace();
-
-        return new GpsDataVO(startLatitude, startLongitude, endLatitude, endLongitude, distance, time, kcal, speed, meanPace);
-    }
+//    public GpsDataVO getDataFromGpxFile(String gpxData) {
+//
+//        trackPoints.clear(); // trackPoints 리스트 초기화
+//        totalDistance = 0.0f; // totalDistance 초기화
+//        totalTimeInSeconds = 0; // totalTimeInMinutes 초기화
+//
+//        processJson(gpxData);
+//
+//        float distance = calculateDistance();
+//        int time = calculateTimeInSeconds();
+//        int kcal = calculateKcal();
+//        int meanPace = calculateMeanPace();
+//
+//        return new GpsDataVO(distance, time, kcal, meanPace);
+//    }
 
     private float getStartLatitude() {
         return (float) trackPoints.get(0).lat;

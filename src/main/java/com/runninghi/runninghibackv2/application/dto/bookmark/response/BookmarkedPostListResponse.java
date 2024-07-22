@@ -8,14 +8,9 @@ public record BookmarkedPostListResponse(
         String postContent,
         String role,
         String locationName,
-        float startLatitude,
-        float startLongitude,
-        float endLatitude,
-        float endLongitude,
         float distance,
         float time,
         float kcal,
-        float speed,
         float meanPace,
         boolean isBookmarked
 
@@ -26,16 +21,11 @@ public record BookmarkedPostListResponse(
                 post.getPostNo(),
                 post.getMember().getMemberNo(),
                 post.getPostContent(),
-                post.getLocationName(),
+                post.getGpsDataVO().getLocationName(),
                 post.getRole().name(),
-                post.getGpsDataVO().getStartLatitude(),
-                post.getGpsDataVO().getStartLongitude(),
-                post.getGpsDataVO().getEndLatitude(),
-                post.getGpsDataVO().getEndLongitude(),
                 post.getGpsDataVO().getDistance(),
                 post.getGpsDataVO().getTime(),
                 post.getGpsDataVO().getKcal(),
-                post.getGpsDataVO().getSpeed(),
                 post.getGpsDataVO().getMeanPace(),
                 true
                 );

@@ -4,12 +4,14 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
+import com.runninghi.runninghibackv2.application.dto.post.request.RunDataRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
+import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import com.runninghi.runninghibackv2.domain.service.GpsCalculator;
 import com.runninghi.runninghibackv2.domain.service.GpxCoordinateExtractor;
@@ -28,6 +30,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
@@ -139,6 +142,11 @@ public class PostService {
         imageService.savePostNo(imageUrl, postNo);
     }
 
+    private String createPostTitle(RunDataRequest request) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M월 d일", Locale.KOREAN);
+        return request.getRunStartDate().format(formatter) + " " + request.getLocation() + " 러닝";
+    }
+
     public GpsDataResponse getGpxLonLatData(Long postNo) throws IOException {
         Post post = findPostByNo(postNo);
         String gpxUrl = post.getGpxUrl();
@@ -180,17 +188,18 @@ public class PostService {
     }
 
     @Transactional
-    public CreateRecordResponse createRecord(Long memberNo, String gpxFile) throws Exception {
+    public CreateRecordResponse createRecord(Long memberNo, String gpxFile, RunDataRequest request) throws Exception {
 
         byte[] compressedData = Base64.getDecoder().decode(gpxFile);
         String gpxData = decompress(compressedData);
 
-        //GPX 저장
-        GpsDataVO gpsDataVO = calculateGPS.getDataFromGpxFile(gpxData);
+        GpsDataVO gpsDataVO = new GpsDataVO(request.getLocation(), null, request.getRunStartDate(), request.getDistance(),
+                request.getTime(), request.getKcal(), request.getMeanPace(), request.getSectionPace(), request.getSectionKcal());
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
-        String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
+        //AWS S3 오류 확인 필요
+        //String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
 
         updateRecordOfMyChallenges(member, gpsDataVO);
 
@@ -198,12 +207,13 @@ public class PostService {
                 .member(member)
                 .role(member.getRole())
                 .gpsDataVO(gpsDataVO)
-                .gpxUrl(gpxUrl)
+                .gpxUrl("gpxUrl")
+                .difficulty(Difficulty.valueOf(request.getDifficulty()))
                 .status(false)
+                .postTitle(createPostTitle(request))
                 .build());
 
-        return new CreateRecordResponse(createdPost.getPostNo(), gpsDataVO.getDistance(), gpsDataVO.getTime(),
-                gpsDataVO.getKcal(), gpsDataVO.getSpeed(), gpsDataVO.getMeanPace());
+        return new CreateRecordResponse(createdPost.getPostNo());
     }
 
 

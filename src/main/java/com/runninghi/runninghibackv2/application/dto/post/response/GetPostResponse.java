@@ -58,7 +58,7 @@ public record GetPostResponse(
                 post.getPostContent(),
                 post.getRole(),
                 isOwner,
-                post.getLocationName(),
+                post.getGpsDataVO().getLocationName(),
                 post.getGpsDataVO().getDistance(),
                 post.getGpsDataVO().getTime(),
                 post.getGpsDataVO().getMeanPace(),

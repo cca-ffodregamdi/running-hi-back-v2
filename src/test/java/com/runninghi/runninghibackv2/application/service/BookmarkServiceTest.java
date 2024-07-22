@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,20 +63,21 @@ class BookmarkServiceTest {
                 .role(Role.USER)
                 .build();
 
-        GpsDataVO gpxDataVO = new GpsDataVO(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 42000, 200, 0.1f, 300);
+        GpsDataVO gpsDataVO = new GpsDataVO("도쿄", null, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150));
+
         post1 = Post.builder()
                 .member(member1)
                 .postContent("게시글 내용1")
                 .role(Role.USER)
                 .locationName("로스엔젤리스")
-                .gpsDataVO(gpxDataVO)
+                .gpsDataVO(gpsDataVO)
                 .build();
         post2 = Post.builder()
                 .member(member1)
                 .postContent("게시글 내용2")
                 .role(Role.USER)
                 .locationName("도쿄")
-                .gpsDataVO(gpxDataVO)
+                .gpsDataVO(gpsDataVO)
                 .build();
 
         BookmarkId bookmarkId1 = BookmarkId.of(member1.getMemberNo(), post1.getPostNo());

@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
+import com.runninghi.runninghibackv2.application.dto.post.request.RunDataRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.application.service.PostService;
@@ -146,20 +147,21 @@ public class PostController {
     */
 
 
-    @PostMapping(value = "/gpx", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/gpx", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "러닝 데이터 저장", description = "러닝이 끝난 직후 gpx 파일을 저장하고 데이터 (거리, 속도, 시간, 등) 을 반환합니다. ")
     public ResponseEntity<ApiResult<CreateRecordResponse>> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
-                                                                               @RequestPart("gpx") String gpxFile) throws Exception {
+                                                                               @RequestPart("file") String gpxFile,
+                                                                               @RequestPart("data") RunDataRequest runDataRequest) throws Exception {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreateRecordResponse response = postService.createRecord(memberInfo.memberNo(), gpxFile);
+        CreateRecordResponse response = postService.createRecord(memberInfo.memberNo(), gpxFile, runDataRequest);
 
         return ResponseEntity.ok(ApiResult.success(CREATE_RESPONSE_MESSAGE, response));
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "게시글 공유", description = "러닝 데이터를 게시글로 공유합니다. \n 게시글 제목, 내용, 사진url을 추가로 받습니다.")
+    @Operation(summary = "저장된 러닝 데이터 게시글 공유", description = "러닝 데이터를 게시글로 공유합니다. \n 게시글 제목, 내용, 사진url을 추가로 받습니다.")
     public ResponseEntity<ApiResult<CreatePostResponse>> createRecord(@RequestHeader("Authorization") String bearerToken,
                                                                         @RequestBody CreatePostRequest request) {
 
@@ -196,7 +198,7 @@ public class PostController {
         return ResponseEntity.ok(ApiResult.success(DELETE_RESPONSE_MESSAGE, response));
     }
 
-    //    @GetMapping(value = "/coordinate/{postNo}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @GetMapping(value = "/coordinate/{postNo}", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @Operation(summary = "GPX 경도, 위도 조회", description = " '나도 이 코스 달리기' 선택시 반환되는 데이터입니다. \n 지도 상 표기를 위해 경도-위도 값이 튜플 형태로 반환됩니다.")
 //    public ResponseEntity<ApiResult<GpsDataResponse>> getGPXData(@PathVariable Long postNo) throws IOException {
 //

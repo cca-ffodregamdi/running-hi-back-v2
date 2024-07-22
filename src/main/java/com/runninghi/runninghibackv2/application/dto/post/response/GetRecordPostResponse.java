@@ -32,7 +32,7 @@ public class GetRecordPostResponse {
                 return new GetRecordPostResponse(
                         post.getPostNo(),
                         post.getCreateDate(),
-                        post.getLocationName(),
+                        post.getGpsDataVO().getLocationName(),
                         post.getGpsDataVO().getDistance(),
                         post.getGpsDataVO().getTime(),
                         imageUrl,
