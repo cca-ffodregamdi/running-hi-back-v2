@@ -87,7 +87,7 @@ public class AlarmService {
 
         alarmRepository.save(alarm);
 
-        sendAlarm(request, member.getFcmToken());
+//        sendAlarm(request, member.getFcmToken());
     }
 
     private void sendAlarm(CreateAlarmRequest request, String fcmToken) throws FirebaseMessagingException {
