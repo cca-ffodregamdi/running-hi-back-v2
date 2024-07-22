@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
+import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -58,6 +59,15 @@ public class Alarm {
         this.isRead = false;
         this.createDate = createDate;
         this.readDate = readDate;
+    }
+
+    public static GetAllAlarmResponse toResponse(Alarm alarm) {
+        return new GetAllAlarmResponse(
+                alarm.getTitle(),
+                alarm.getContent(),
+                alarm.isRead(),
+                alarm.createDate
+        );
     }
 
 }
