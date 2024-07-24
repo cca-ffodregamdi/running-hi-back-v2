@@ -72,13 +72,14 @@ public class AlarmService {
 
         List<Alarm> alarmList = alarmRepository.findAllByMember_MemberNo(memberNo);
         return alarmList.stream()
+                .filter(alarm -> !alarm.isRead())
                 .map(Alarm::toResponse)
                 .toList();
     }
 
-    public void createAlarm(CreateAlarmRequest request, Long memberNo) throws FirebaseMessagingException {
+    public void createAlarm(CreateAlarmRequest request) throws FirebaseMessagingException {
 
-        Member member = memberRepository.findByMemberNo(memberNo);
+        Member member = memberRepository.findByMemberNo(request.memberNo());
         Alarm alarm = Alarm.builder()
                 .member(member)
                 .title(request.title())
