@@ -9,6 +9,8 @@ public record CreateAlarmRequest(
         String title,
         @Schema(description = "알림 내용", example = "알림 내용")
         @NotBlank(message = "알림 내용을 입력해주세요.")
-        String content
+        String content,
+        @Schema(description = "알림 생성 대상자 번호", example = "1")
+        Long memberNo
 ) {
 }
