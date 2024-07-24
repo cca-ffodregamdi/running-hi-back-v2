@@ -27,6 +27,8 @@ public class GetRecordPostResponse {
         boolean status;
         @Schema(description = "코스 난이도", example = "EASY")
         String difficulty;
+        @Schema(description = "코스 제목", example = "3월 5일 서울 러닝")
+        String title;
 
         public static GetRecordPostResponse from(Post post, String imageUrl) {
                 return new GetRecordPostResponse(
@@ -37,7 +39,8 @@ public class GetRecordPostResponse {
                         post.getGpsDataVO().getTime(),
                         imageUrl,
                         post.getStatus(),
-                        post.getDifficulty().toString()
+                        post.getDifficulty().toString(),
+                        post.getPostTitle()
                 );
 
         }
