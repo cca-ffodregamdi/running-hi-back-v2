@@ -14,16 +14,19 @@ import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import com.runninghi.runninghibackv2.domain.service.GpsCalculator;
-import com.runninghi.runninghibackv2.domain.service.GpxCoordinateExtractor;
+import com.runninghi.runninghibackv2.domain.service.GpsCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.URL;
@@ -49,7 +52,7 @@ public class PostService {
     private final ImageService imageService;
     private final MemberRepository memberRepository;
     private final JPAQueryFactory jpaQueryFactory;
-    private final GpxCoordinateExtractor gpxCoordinateExtractor;
+    private final GpsCoordinateExtractor gpsCoordinateExtractor;
     private final PostQueryRepository postQueryRepository;
     private final MemberChallengeRepository memberChallengeRepository;
 
@@ -57,6 +60,7 @@ public class PostService {
     private String bucketName;
 
     private final AmazonS3Client amazonS3Client;
+    private static final Logger logger = LoggerFactory.getLogger(PostService.class);
 
     private String buildKey(String dirName) {
 
@@ -68,44 +72,20 @@ public class PostService {
         return dirName + "/" + newFileName + ".txt";
     }
 
-    private String uploadGpxToS3(String gpxData, String dirName) throws IOException {
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(gpxData.getBytes());
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             BufferedInputStream bis = new BufferedInputStream(inputStream);
-             BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
+    public String uploadGpsToS3(MultipartFile file, String dirName) throws IOException {
+        String key = buildKey(dirName);
 
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = bis.read(buffer)) != -1) {
-                bos.write(buffer, 0, bytesRead);
-            }
-            bos.flush();
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType("text/plain");
+        objectMetadata.setContentLength(file.getSize());
 
-            String key = buildKey(dirName);
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType("text/plain");
-            metadata.setContentLength(outputStream.size());
-            amazonS3Client.putObject(bucketName, key, new ByteArrayInputStream(outputStream.toByteArray()), metadata);
-
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(file.getBytes())) {
+            amazonS3Client.putObject(bucketName, key, byteArrayInputStream, objectMetadata);
             return amazonS3Client.getUrl(bucketName, key).toString();
+        } catch (IOException e) {
+            logger.error("GPS TXT 파일 S3 업로드 에러: ", e);
+            throw e;
         }
-    }
-
-    private String decompress(byte[] value) throws Exception {
-
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-
-        GZIPInputStream gzipInStream = new GZIPInputStream(new ByteArrayInputStream(value));
-
-        int size = 0;
-        byte[] buffer = new byte[1024];
-        while ( (size = gzipInStream.read(buffer)) > 0 ) {
-            outStream.write(buffer, 0, size);
-        }
-        outStream.flush();
-        outStream.close();
-
-        return new String(outStream.toByteArray());
     }
 
     private String getMainData(int dataNo, GpsDataVO gpsDataVO) {
@@ -149,12 +129,12 @@ public class PostService {
 
     public GpsDataResponse getGpxLonLatData(Long postNo) throws IOException {
         Post post = findPostByNo(postNo);
-        String gpxUrl = post.getGpxUrl();
+        String gpsUrl = post.getGpsUrl();
 
-        URL url = new URL(gpxUrl);
+        URL url = new URL(gpsUrl);
 
         try (InputStream inputStream = url.openStream()) {
-            return new GpsDataResponse(gpxCoordinateExtractor.extractCoordinates(inputStream));
+            return new GpsDataResponse(gpsCoordinateExtractor.extractCoordinates(inputStream));
         }
     }
 
@@ -188,18 +168,14 @@ public class PostService {
     }
 
     @Transactional
-    public CreateRecordResponse createRecord(Long memberNo, String gpxFile, RunDataRequest request) throws Exception {
-
-        byte[] compressedData = Base64.getDecoder().decode(gpxFile);
-        String gpxData = decompress(compressedData);
+    public CreateRecordResponse createRecord(Long memberNo, MultipartFile file, RunDataRequest request) throws Exception {
 
         GpsDataVO gpsDataVO = new GpsDataVO(request.getLocation(), null, request.getRunStartDate(), request.getDistance(),
                 request.getTime(), request.getKcal(), request.getMeanPace(), request.getSectionPace(), request.getSectionKcal());
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
-        //AWS S3 오류 확인 필요
-        //String gpxUrl = uploadGpxToS3(gpxData, member.getMemberNo().toString());
+        String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
         updateRecordOfMyChallenges(member, gpsDataVO);
 
@@ -207,7 +183,7 @@ public class PostService {
                 .member(member)
                 .role(member.getRole())
                 .gpsDataVO(gpsDataVO)
-                .gpxUrl("gpxUrl")
+                .gpxUrl(gpsUrl)
                 .difficulty(Difficulty.valueOf(request.getDifficulty()))
                 .status(false)
                 .postTitle(createPostTitle(request))

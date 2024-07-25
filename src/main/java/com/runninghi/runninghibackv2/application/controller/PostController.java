@@ -25,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -147,15 +148,15 @@ public class PostController {
     */
 
 
-    @PostMapping(value = "/gpx", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/gps", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "러닝 데이터 저장", description = "러닝이 끝난 직후 gpx 파일을 저장하고 데이터 (거리, 속도, 시간, 등) 을 반환합니다. ")
     public ResponseEntity<ApiResult<CreateRecordResponse>> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
-                                                                               @RequestPart("file") String gpxFile,
+                                                                               @RequestPart("file") MultipartFile file,
                                                                                @RequestPart("data") RunDataRequest runDataRequest) throws Exception {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreateRecordResponse response = postService.createRecord(memberInfo.memberNo(), gpxFile, runDataRequest);
+        CreateRecordResponse response = postService.createRecord(memberInfo.memberNo(), file, runDataRequest);
 
         return ResponseEntity.ok(ApiResult.success(CREATE_RESPONSE_MESSAGE, response));
     }
