@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class GpxCoordinateExtractor {
+public class GpsCoordinateExtractor {
 
     public List<double[]> extractCoordinates(InputStream inputStream) throws IOException {
         List<double[]> lonLatList = new ArrayList<>();

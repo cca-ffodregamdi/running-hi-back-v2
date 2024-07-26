@@ -63,7 +63,7 @@ public class Post extends BaseTimeEntity {
 
     @Column
     @Comment("gps 파일 url")
-    private String gpxUrl;
+    private String gpsUrl;
 
     @Column
     @Comment("메인페이지 표시 대표 데이터")
@@ -78,7 +78,7 @@ public class Post extends BaseTimeEntity {
         this.reportCnt = 0;
         this.role = role;
         this.status = status;
-        this.gpxUrl = gpxUrl;
+        this.gpsUrl = gpxUrl;
         this.gpsDataVO = gpsDataVO;
         this.mainData = mainData;
         this.postTitle = postTitle;

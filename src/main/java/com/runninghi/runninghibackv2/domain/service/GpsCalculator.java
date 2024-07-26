@@ -36,27 +36,8 @@ public class GpsCalculator {
     private int totalTimeInSeconds = 0;
     private static final double R = 6371;
 
-
-    public String decompress(byte[] value) throws Exception {
-
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-
-        GZIPInputStream gzipInStream = new GZIPInputStream(
-                new BufferedInputStream(new ByteArrayInputStream(value)));
-
-        int size = 0;
-        byte[] buffer = new byte[1024];
-        while ( (size = gzipInStream.read(buffer)) > 0 ) {
-            outStream.write(buffer, 0, size);
-        }
-        outStream.flush();
-        outStream.close();
-
-        return new String(outStream.toByteArray());
-    }
-
-    private void processJson(String gpxData) {
-        JSONArray trkptList = new JSONArray(gpxData);
+    private void processJson(String gpsData) {
+        JSONArray trkptList = new JSONArray(gpsData);
 
         for (int i = 0; i < trkptList.length(); i++) {
             JSONObject trkptElement = trkptList.getJSONObject(i);
