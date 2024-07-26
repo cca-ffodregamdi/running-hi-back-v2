@@ -32,9 +32,7 @@
             (null, '2024-01-10 17:09:38', true, 'name5', '러너5', 'USER', false, 1000, 5000, 30, 2, 0, false, ST_GeomFromText('POINT(129.602 37.1931)', 4326, 'axis-order=long-lat'));
     </insert>
 
-    <insert id="insertPostDummyData" >
-        insert into tbl_post (post_no, create_date, update_date, difficulty, distance ,kcal, mean_pace, time, gpx_url, location_name, post_content, report_cnt, role, status, member_no, main_data, geometry)
-        values
+    <insert id="insertPostDummyData">
         INSERT INTO tbl_post (post_no, member_no, create_date, update_date, difficulty, distance, kcal, mean_pace, time, gpx_url, location_name, post_content, report_cnt, role, status, main_data, post_title, geometry)
         VALUES
             (1, 870, '2024-06-06 16:36:12', null, 0, 12.3, 250, 300, 4500, null, '부산', '테스트1', 0, 0, true, '200Kcal', '6월 6일 부산 러닝', ST_GeomFromText('POINT(126.543 36.9876)', 4326, 'axis-order=long-lat')),
