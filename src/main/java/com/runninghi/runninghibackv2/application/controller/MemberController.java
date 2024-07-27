@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,11 +30,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "회원 API", description = "회원 관련 API")
 public class MemberController {
-
+    
     private final MemberService memberService;
     private final KakaoOauthService kakaoOauthService;
     private final AppleOauthService appleOauthService;
@@ -60,6 +62,8 @@ public class MemberController {
             }
     )
     public ResponseEntity<ApiResult<CreateMemberResponse>> kakaoLogin(@RequestBody KakaoLoginRequest request) {
+        log.info("카카오 로그인 요청이 들어왔습니다. 카카오 토큰: {}", request.kakaoToken());
+
         Map<String, String> memberResponse = kakaoOauthService.kakaoOauth(request.kakaoToken());
 
         HttpHeaders headers = new HttpHeaders();
@@ -67,10 +71,11 @@ public class MemberController {
         headers.add("Refresh-Token", memberResponse.get("refreshToken"));
 
         CreateMemberResponse response = CreateMemberResponse.from(memberResponse.getOrDefault("memberNo", null));
+        log.info("카카오 로그인 성공. 회원 번호: {}", response.memberNo());
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(ApiResult.success("Success Kakao Login", response));
+                .body(ApiResult.success("성공적인 카카오 로그인", response));
     }
 
     /**
@@ -92,13 +97,16 @@ public class MemberController {
             responses = { @ApiResponse(responseCode = "200", description = "Success Kakao Unlink") }
     )
     public ResponseEntity<ApiResult<Boolean>> kakaoUnlink(@RequestHeader(value = "Authorization") String token) {
+        log.info("카카오 연결 해제 요청이 들어왔습니다. 토큰: {}", token);
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        log.debug("추출된 멤버 번호: {}", memberNo);
 
         boolean isActive = kakaoOauthService.unlinkAndDeleteMember(memberNo);
+        log.info("카카오 연결 해제 성공. 회원 번호: {}", memberNo);
 
         return ResponseEntity.ok()
-                .body(ApiResult.success("Success Kakao Unlink", isActive));
+                .body(ApiResult.success("성공적인 카카오 연결 해제", isActive));
     }
 
     /**
@@ -123,10 +131,14 @@ public class MemberController {
             @RequestHeader(value = "Authorization") String token,
             @RequestBody UpdateMemberInfoRequest request
     ) throws BadRequestException {
+        log.info("회원 정보 수정 요청이 들어왔습니다. 토큰: {}", token);
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        log.debug("추출된 멤버 번호: {}", memberNo);
 
         UpdateMemberInfoResponse response = memberService.updateMemberInfo(memberNo, request);
+
+        log.info("회원 정보 수정 성공. 회원 번호: {}", memberNo);
 
         return ResponseEntity.ok(ApiResult.success("회원 정보 업데이트 성공", response));
     }
@@ -155,9 +167,11 @@ public class MemberController {
                     })
     })
     public ResponseEntity<ApiResult<CreateMemberResponse>> appleLogin(@RequestBody AppleLoginRequest request) {
+        log.info("애플 로그인 요청이 들어왔습니다. 인증 코드: {}", request.authorizationCode());
 
         // clientSecret 생성
         String clientSecret = appleOauthService.createClientSecret();
+        log.info("애플 로그인용 클라이언트 시크릿 생성됨");
 
         // authorizationCode와 clientSecret으로 refreshToken 가져오기
         AppleTokenResponse appleTokenResponse = appleOauthService.getAppleToken(request.authorizationCode(), clientSecret);
@@ -170,6 +184,8 @@ public class MemberController {
         headers.add("Refresh-Token", memberResponse.get("refreshToken"));
 
         CreateMemberResponse response = CreateMemberResponse.from(memberResponse.getOrDefault("memberNo", null));
+
+        log.info("애플 로그인 성공. 회원 번호: {}", response.memberNo());
 
         return ResponseEntity.ok()
                 .headers(headers)
@@ -201,12 +217,16 @@ public class MemberController {
             }
     )
     public ResponseEntity<ApiResult<Boolean>> appleUnlink(@RequestHeader(value = "Authorization") String token) throws InterruptedException {
+        log.info("애플 회원 탈퇴 요청을 받았습니다. 토큰: {}", token);
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        log.debug("추출된 멤버 번호: {}", memberNo);
 
         String clientSecret = appleOauthService.createClientSecret();
+        log.debug("애플 탈퇴를 위한 클라이언트 시크릿 생성됨.");
 
         boolean isActive = appleOauthService.unlinkAndDeleteMember(memberNo, clientSecret);
+        log.info("애플 탈퇴 처리 완료. 회원 번호: {}", memberNo);
 
         return ResponseEntity.ok(ApiResult.success("Success Apple Unlink", isActive));
     }
@@ -231,10 +251,13 @@ public class MemberController {
             responses = { @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공") }
     )
     public ResponseEntity<ApiResult<GetMemberResponse>> getMemberInfo(@RequestHeader(value = "Authorization") String token) {
+        log.info("회원 정보 조회 요청을 받았습니다. 토큰: {}", token);
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        log.debug("추출된 멤버 번호: {}", memberNo);
 
         GetMemberResponse response = memberService.getMemberInfo(memberNo);
+        log.info("회원 정보 조회 성공.");
 
         return ResponseEntity.ok(ApiResult.success("회원 정보 조회 성공", response));
 
@@ -258,10 +281,13 @@ public class MemberController {
     public ResponseEntity<ApiResult<Void>> saveFCMToken(@RequestHeader(value = "Authorization") String token,
                                                   @RequestHeader(value = "FcmToken") String fcmToken,
                                                   @PathVariable(value = "alarmConsent") boolean alarmConsent) {
+        log.info("FCM 토큰 저장 요청을 받았습니다. 토큰: {}, FcmToken: {}, 알림 동의 여부: {}", token, fcmToken, alarmConsent);
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        log.debug("추출된 멤버 번호: {}", memberNo);
 
         memberService.saveFCMToken(memberNo, fcmToken, alarmConsent);
+        log.info("FCM 토큰 및 알림 동의 여부 저장 완료.");
 
         return ResponseEntity.ok().body(ApiResult.success("FCM 토큰 저장 성공", null));
     }
@@ -294,16 +320,18 @@ public class MemberController {
                                     schema = @Schema(example = "{\"timeStamp\": \"2024-05-23T07:36:26.119Z\", \"status\": \"UNAUTHORIZED\", \"message\": \"자동 로그인 : 유효하지않은 엑세스 토큰입니다.\", \"data\": null}"))),
             })
     public ResponseEntity<ApiResult<Boolean>> autoLoginWithAccessToken(@RequestHeader(value = "Authorization") String token) {
+        log.info("액세스 토큰 유효성 검사 요청을 받았습니다. 토큰: {}", token);
+
         try {
             if (jwtTokenProvider.validateAutoLoginAccessToken(token)) {
-                // Access Token이 유효한 경우
+                log.info("액세스 토큰이 유효합니다.");
                 return ResponseEntity.ok(ApiResult.success("자동 로그인 : 엑세스 토큰 유효성 검사 성공", true));
             } else {
-                // Access Token이 만료된 경우
+                log.warn("액세스 토큰이 만료되었습니다.");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResult.error(HttpStatus.FORBIDDEN, "자동 로그인 : 만료된 엑세스 토큰입니다.", false));
             }
         } catch (InvalidTokenException e) {
-            // Access Token이 유효하지 않은 경우
+            log.error("액세스 토큰이 유효하지 않습니다.", e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 유효하지않은 엑세스 토큰입니다."));
         }
     }
@@ -337,9 +365,11 @@ public class MemberController {
                             schema = @Schema(example = "{\"timeStamp\": \"2024-05-23T07:36:26.119Z\", \"status\": \"UNAUTHORIZED\", \"message\": \"자동 로그인 : 유효하지않은 리프레시 토큰입니다.\", \"data\": null}"))),
             })
     public ResponseEntity<ApiResult<Boolean>> autoLoginWithRefreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
+        log.info("리프레시 토큰 유효성 검사 및 액세스 토큰 갱신 요청을 받았습니다. 리프레시 토큰: {}", refreshToken);
+
         try {
             if (jwtTokenProvider.validateAutoLoginRefreshToken(refreshToken)) {
-                // Refresh Token이 유효한 경우 새로운 Access Token 발급
+                log.info("리프레시 토큰이 유효합니다. 새로운 액세스 토큰 발급.");
                 String newAccessToken = jwtTokenProvider.renewAccessToken(refreshToken);
 
                 HttpHeaders headers = new HttpHeaders();
@@ -349,11 +379,11 @@ public class MemberController {
                         .headers(headers)
                         .body((ApiResult.success("새로운 액세스 토큰 발급", true)));
             } else {
-                // Refresh Token이 만료된 경우
+                log.warn("리프레시 토큰이 만료되었습니다.");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResult.error(HttpStatus.FORBIDDEN, "자동 로그인 : 만료된 토큰입니다. 다시 로그인해주세요.", false));
             }
         } catch (InvalidTokenException e) {
-            // Refresh Token이 유효하지 않은 경우
+            log.error("리프레시 토큰이 유효하지 않습니다.", e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "자동 로그인 : 유효하지않은 토큰입니다.", null));
         }
     }
@@ -379,12 +409,21 @@ public class MemberController {
                             schema = @Schema(implementation = GetMemberNoResponse.class))),
             })
     public ResponseEntity<ApiResult<GetMemberNoResponse>> getMemberNoFromToken(@RequestHeader(value = "Authorization") String token) {
+        log.info("액세스 토큰 유효성 검사 및 멤버 번호 반환 요청을 받았습니다. 토큰: {}", token);
 
-        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        try {
+            Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+            log.debug("추출된 멤버 번호: {}", memberNo);
 
-        GetMemberNoResponse response = GetMemberNoResponse.from(memberNo);
+            GetMemberNoResponse response = GetMemberNoResponse.from(memberNo);
 
-        return ResponseEntity.ok(ApiResult.success("회원 id 조회 성공", response));
+            log.info("멤버 번호 조회 성공. 멤버 번호: {}", memberNo);
+            return ResponseEntity.ok(ApiResult.success("회원 id 조회 성공", response));
+
+        } catch (Exception e) {
+            log.error("액세스 토큰 유효성 검사 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.error(HttpStatus.UNAUTHORIZED, "액세스 토큰 유효성 검사 중 오류 발생"));
+        }
     }
 
 
