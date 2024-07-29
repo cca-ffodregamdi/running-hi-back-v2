@@ -38,12 +38,9 @@ public class AlarmController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResult<Void>> createAlarm(@Parameter(description = "사용자 인증을 위한 Bearer Token")
-                                                            @RequestHeader(value = "Authorization") String token,
-                                                       @Valid @RequestBody CreateAlarmRequest request) throws FirebaseMessagingException {
+    public ResponseEntity<ApiResult<Void>> createAlarm(@Valid @RequestBody CreateAlarmRequest request) throws FirebaseMessagingException {
 
-        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
-        alarmService.createAlarm(request, memberNo);
+        alarmService.createAlarm(request);
 
         return ResponseEntity.ok().body(ApiResult.success("알림 생성 성공", null));
     }
