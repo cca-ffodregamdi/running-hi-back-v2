@@ -15,6 +15,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -25,10 +26,11 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppleOauthService {
-
+    
     private static final int NICKNAME_DIGIT_LENGTH = 8;
     private static final int RANDOM_NUMBER_RANGE = 10;
     private static final String GRANT_TYPE = "authorization_code";
@@ -50,9 +52,12 @@ public class AppleOauthService {
     // client secret 생성
     @Transactional
     public String createClientSecret() {
+        log.info("Apple 클라이언트 시크릿 생성 요청");
+
         try {
             return appleClientSecretProvider.createClientSecret();
         } catch (Exception e) {
+            log.error("Apple 클라이언트 시크릿 생성에 실패했습니다. 오류: {}", e.getMessage(), e);
             throw new AppleOauthException("apple client secret 생성에 실패했습니다. : " + e.getMessage());
         }
     }
@@ -60,9 +65,12 @@ public class AppleOauthService {
     // apple refreshToken 요청
     @Transactional
     public AppleTokenResponse getAppleToken(String code, String clientSecret) {
+        log.info("Apple 토큰 요청. 인가 코드: {}, 클라이언트 시크릿: {}", code, clientSecret);
+
         try {
             return appleClient.appleAuth(clientId, code, GRANT_TYPE, clientSecret);
         } catch (Exception e) {
+            log.error("Apple 토큰 요청에 실패했습니다. 오류: {}", e.getMessage(), e);
             throw new AppleOauthException("apple refresh token 요청에 실패했습니다. : " + e.getMessage());
         }
     }
@@ -70,6 +78,8 @@ public class AppleOauthService {
     // apple user 생성
     @Transactional
     public Map<String, String> appleOauth(AppleLoginRequest request, AppleTokenResponse appleTokenResponse) {
+        log.info("Apple OAuth 요청을 받았습니다. 요청: {}, 토큰 응답: {}", request, appleTokenResponse);
+
         // identity_token의 header를 추출
         Map<String, String> appleTokenHeader = appleTokenParser.parseHeader(request.identityToken());
 
@@ -85,6 +95,7 @@ public class AppleOauthService {
 
         // iss, aud, exp, 검증
         if (!appleClaimsValidator.isValid(claims)) {
+            log.error("Apple Claims 유효성 검사 실패. 잘못된 Apple 토큰입니다.");
             throw new AppleOauthException("Apple Claims 유효성 검사 실패 : 잘못된 apple 토큰입니다.");
         }
 
@@ -99,10 +110,13 @@ public class AppleOauthService {
     // id-token에서 sub, name 추출
     @Transactional
     public Map<String, String> extractAppleResponse(Claims claims) {
+        log.debug("Apple Claims에서 응답 추출. Claims: {}", claims);
+
         Map<String, String> appleResponse = new HashMap<>();
 
         appleResponse.put("sub", Objects.toString(claims.get("sub"), "N/A"));
         appleResponse.put("name", Objects.toString(claims.get("name"), "N/A"));
+        log.debug("추출된 Apple 응답: {}", appleResponse);
 
         return appleResponse;
     }
@@ -110,8 +124,13 @@ public class AppleOauthService {
     // 애플 연결해제, 회원 탈퇴 처리
     @Transactional
     public boolean unlinkAndDeleteMember(Long memberNo, String clientSecret) throws InterruptedException {
+        log.info("애플 회원 탈퇴 요청. 회원 번호: {}", memberNo);
+
         Member member = memberRepository.findById(memberNo)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> {
+                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
+                    return new EntityNotFoundException();
+                });
 
         try {
             ResponseEntity<String> response = appleClient.revokeToken(
@@ -124,12 +143,15 @@ public class AppleOauthService {
             if (response.getStatusCode() == HttpStatus.OK) {
                 member.deactivateMember();
                 memberRepository.save(member);
+                log.info("애플 회원 탈퇴 및 비활성화 성공. 회원 번호: {}", memberNo);
 
                 return member.isActive();
             } else {
+                log.error("애플 회원 탈퇴 실패. 응답 코드: {}", response.getStatusCode());
                 throw new BadRequestException("애플 회원 탈퇴 실패");
             }
         } catch (Exception e) {
+            log.error("회원 탈퇴 중 오류 발생. 오류: {}", e.getMessage(), e);
             throw new InterruptedException("회원 탈퇴 중 오류 발생 : " + e.getMessage());
         }
 
@@ -137,6 +159,8 @@ public class AppleOauthService {
 
     // 새로운 토큰 생성 & 반환
     private Map<String, String> generateTokens(Member member, boolean isNewMember) {
+        log.info("새로운 토큰 생성 요청. 회원 번호: {}", member.getMemberNo());
+
         AccessTokenInfo accessTokenInfo = new AccessTokenInfo(member.getMemberNo(), member.getRole());
         RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getAppleId(), member.getRole());
 
@@ -153,17 +177,22 @@ public class AppleOauthService {
         if (isNewMember)
             response.put("memberNo", member.getMemberNo().toString());
 
+        log.info("토큰 생성 완료. 응답: {}", response);
+
         return response;
     }
 
     // 로그인 메서드
     private Map<String, String> loginWithApple(Member member) {
+        log.info("애플 로그인 처리. 회원 번호: {}", member.getMemberNo());
+
         member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
         return generateTokens(member, false);
     }
 
     // 회원 생성 및 로그인 메서드
     private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToken) {
+        log.info("새로운 애플 회원 생성 및 로그인 처리. 애플 응답: {}", appleResponse);
 
         Member member = Member.builder()
                 .appleId(appleResponse.get("sub"))
@@ -177,6 +206,8 @@ public class AppleOauthService {
                 .build();
 
         memberRepository.saveAndFlush(member);
+        log.info("새로운 애플 회원 생성 완료. 회원 번호: {}", member.getMemberNo());
+
         return generateTokens(member, true);
     }
 
@@ -192,7 +223,9 @@ public class AppleOauthService {
             stringBuilder.append(random.nextInt(RANDOM_NUMBER_RANGE));
         }
 
-        return stringBuilder.toString();
+        String randomDigits = stringBuilder.toString();
+        log.debug("생성된 무작위 숫자 문자열: {}", randomDigits);
+        return randomDigits;
     }
 
 }

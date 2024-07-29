@@ -11,6 +11,7 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import java.security.SecureRandom;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KakaoOauthService {
@@ -31,7 +33,6 @@ public class KakaoOauthService {
     private static final int RANDOM_NUMBER_RANGE = 10;
     private static final String KAKAO_USER_INFO_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
     private static final String KAKAO_UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink";
-
 
     @Value("${kakao.admin-key}")
     private String adminKey;
@@ -54,12 +55,16 @@ public class KakaoOauthService {
         try {
             KakaoProfileResponse kakaoProfileResponse = getKakaoProfile(kakaoToken);
             if (kakaoProfileResponse == null) {
+                log.error("카카오 프로필 정보를 가져오는 데 실패했습니다.");
                 throw new KakaoOauthException();
             }
+            log.info("카카오 프로필 정보를 성공적으로 가져왔습니다. 프로필: {}", kakaoProfileResponse);
+
             Optional<Member> optionalMember = memberRepository.findByKakaoId(kakaoProfileResponse.getKakaoId().toString());
 
             return optionalMember.map(this::loginWithKakao).orElseGet(() -> loginWithKakaoCreateMember(kakaoProfileResponse));
         } catch (Exception e) {
+            log.error("카카오 OAuth 처리 중 오류 발생: {}", e.getMessage(), e);
             throw new KakaoOauthException("카카오 OAuth 오류입니다. : " + e.getMessage());
         }
     }
@@ -71,6 +76,8 @@ public class KakaoOauthService {
      * @return 카카오 사용자의 프로필 정보
      */
     private KakaoProfileResponse getKakaoProfile(String kakaoAccessToken){
+        log.info("카카오 프로필 정보를 요청합니다. 액세스 토큰: {}", kakaoAccessToken);
+
         // http header 설정 : access token 을 넣어서 user 정보에 접근할 수 있도록 한다.
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -82,10 +89,14 @@ public class KakaoOauthService {
 
         HttpEntity<?> request = new HttpEntity<>(body, headers);
 
-        return restTemplate.postForObject(KAKAO_USER_INFO_REQUEST_URL, request, KakaoProfileResponse.class);
-    }
+        KakaoProfileResponse response = restTemplate.postForObject(KAKAO_USER_INFO_REQUEST_URL, request, KakaoProfileResponse.class);
+        log.info("카카오 프로필 정보를 성공적으로 가져왔습니다. 응답: {}", response);
+
+        return response;    }
 
     private Map<String, String> generateTokens(Member member, boolean isNewMember) {
+        log.info("토큰 생성 시작. 회원 번호: {}, 새 회원 여부: {}", member.getMemberNo(), isNewMember);
+
         AccessTokenInfo accessTokenInfo = new AccessTokenInfo(member.getMemberNo(), member.getRole());
         RefreshTokenInfo refreshTokenInfo = new RefreshTokenInfo(member.getKakaoId(), member.getRole());
 
@@ -101,18 +112,22 @@ public class KakaoOauthService {
 
         if (isNewMember)
             response.put("memberNo", member.getMemberNo().toString());
+        log.info("새 회원 생성 후 멤버 번호 추가: {}", member.getMemberNo());
 
         return response;
     }
 
     // 로그인 메서드
     private Map<String, String> loginWithKakao(Member member) {
+        log.info("카카오 로그인을 수행합니다. 회원 번호: {}", member.getMemberNo());
+
         member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
         return generateTokens(member, false);
     }
 
     // 회원 생성 및 로그인 메서드
     private Map<String, String> loginWithKakaoCreateMember(KakaoProfileResponse kakaoProfile) {
+        log.info("새 회원을 생성하고 로그인합니다. 프로필: {}", kakaoProfile);
 
         Member member = Member.builder()
                 .kakaoId(kakaoProfile.getKakaoId().toString())
@@ -125,6 +140,8 @@ public class KakaoOauthService {
                 .build();
 
         memberRepository.saveAndFlush(member);
+        log.info("새 회원을 성공적으로 저장했습니다. 회원 번호: {}", member.getMemberNo());
+
         return generateTokens(member, true);
     }
 
@@ -138,8 +155,13 @@ public class KakaoOauthService {
      */
     @Transactional
     public boolean unlinkAndDeleteMember(Long memberNo) {
+        log.info("회원의 카카오 계정 연결 해제 요청을 받았습니다. 회원 번호: {}", memberNo);
+
         Member member = memberRepository.findById(memberNo)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> {
+                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
+                    return new EntityNotFoundException();
+                });
 
         // http header 설정 : access token 을 넣어서 user 정보에 접근할 수 있도록 한다.
         HttpHeaders headers = new HttpHeaders();
@@ -155,12 +177,14 @@ public class KakaoOauthService {
         ResponseEntity<String> response =  restTemplate.exchange(KAKAO_UNLINK_URL, HttpMethod.POST, request, String.class);
 
         if (!response.getStatusCode().is2xxSuccessful()) {
+            log.error("카카오 계정 연결 해제 요청이 실패했습니다. 응답 상태: {}", response.getStatusCode());
             throw new KakaoOauthException();
         }
 
         // 멤버의 활성화 상태를 false로 변경, deactivateDate 설정
         member.deactivateMember();
         memberRepository.save(member);
+        log.info("회원의 카카오 계정 연결 해제 및 삭제 완료. 회원 번호: {}", memberNo);
 
         return member.isActive();
     }
@@ -177,7 +201,10 @@ public class KakaoOauthService {
             stringBuilder.append(random.nextInt(RANDOM_NUMBER_RANGE));
         }
 
-        return stringBuilder.toString();
+        String randomDigits = stringBuilder.toString();
+        log.debug("무작위 숫자 생성: {}", randomDigits);
+
+        return randomDigits;
     }
 
 }
