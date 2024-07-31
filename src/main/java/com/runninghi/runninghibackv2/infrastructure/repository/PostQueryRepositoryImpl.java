@@ -129,7 +129,12 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                         like.member.memberNo.eq(memberNo))
                 .fetchOne() != null;
 
-        return GetPostResponse.from(post, imageUrl,likeCnt, bookmarkCnt, replyCnt, isWriter, isLiked);
+        Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
+                .where(bookmark.member.memberNo.eq(memberNo)
+                        .and(bookmark.post.postNo.eq(post.getPostNo())))
+                .fetchFirst() != null;
+
+        return GetPostResponse.from(post, imageUrl,likeCnt, bookmarkCnt, replyCnt, isWriter, isLiked, isBookmarked);
     }
 
     @Override
