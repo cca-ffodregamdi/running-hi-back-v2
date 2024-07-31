@@ -54,6 +54,7 @@ public class TestData {
         testDatabaseMapper.insertLikeDummyData();
         testDatabaseMapper.insertFaqDummyData();
         testDatabaseMapper.insertNoticeDummyData();
+        testDatabaseMapper.insertRecordDummyData();
 
         return ResponseEntity.ok(ApiResult.success("DB 초기화, test용 dummy data 생성 성공", null));
     }
