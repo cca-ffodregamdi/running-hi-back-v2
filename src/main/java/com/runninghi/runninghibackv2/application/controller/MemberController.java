@@ -2,6 +2,7 @@ package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.KakaoLoginRequest;
+import com.runninghi.runninghibackv2.application.dto.member.request.UpdateCurrentLocationRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.*;
 import com.runninghi.runninghibackv2.application.service.AppleOauthService;
@@ -426,5 +427,46 @@ public class MemberController {
         }
     }
 
+    /**
+     * 사용자의 현재 위치를 업데이트하거나 새로 생성하는 API입니다.
+     *
+     * @param token 사용자 인증을 위한 액세스 토큰. 요청 헤더에 "Authorization" 키로 포함되어야 합니다.
+     * @param request 사용자의 현재 위치 정보 (x, y 좌표)
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 위치 정보 업데이트 또는 생성이 성공한 경우 저장된 위치 정보가 응답 본문에 포함됩니다.
+     * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 액세스 토큰이 포함되어야 합니다.
+     *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
+     */
+    @PutMapping(value = "/location", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "사용자 위치 정보 업데이트 또는 생성",
+            description = "사용자의 현재 위치를 업데이트하거나 새로 생성합니다. " +
+                    "이미 위치 정보가 있는 경우 업데이트하고, 없는 경우 새로 생성합니다.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Access 토큰", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "위치 정보 업데이트 또는 생성 성공",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = UpdateCurrentLocationResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패")
+            })
+    public ResponseEntity<ApiResult<UpdateCurrentLocationResponse>> updateOrCreateLocation(
+            @RequestHeader(value = "Authorization") String token,
+            @RequestBody UpdateCurrentLocationRequest request) {
 
+        log.info("사용자 위치 정보 업데이트 또는 생성 요청을 받았습니다. 좌표: ({}, {})", request.x(), request.y());
+
+        try {
+            Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+            log.debug("토큰에서 추출한 멤버 번호: {}", memberNo);
+
+            UpdateCurrentLocationResponse response = memberService.updateCurrentLocation(memberNo, request);
+
+            return ResponseEntity.ok(ApiResult.success("위치 정보 업데이트 성공", response));
+
+        } catch (Exception e) {
+            log.error("위치 정보 업데이트 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResult.error(HttpStatus.UNAUTHORIZED, "인증 실패 또는 위치 정보 업데이트 중 오류 발생"));
+        }
+    }
 }
