@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.runninghi.runninghibackv2.common.dummy.TestDatabaseMapper">
+    <insert id="insertImageDummyData">
+        insert into tbl_image (image_no, create_date, update_date, image_url, post_no)
+        values  (1, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/231003-1-min.png?alt=media', 1),
+                (2, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/231005-1-min.png?alt=media', 2),
+                (3, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/231010-1-min.png?alt=media', 3),
+                (4, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/231014-1-min.png?alt=media', 4),
+                (5, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/231017-1-min.png?alt=media', 5),
+                (6, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/231023-1-min.png?alt=media', 6),
+                (7, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/231003-2-min.png?alt=media', 7),
+                (8, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/231003-3-min.png?alt=media', 8),
+                (9, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231102-1.JPG?alt=media', 9),
+                (10, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231102-2.JPG?alt=media', 10),
+                (11, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231207-1.JPG?alt=media', 11),
+                (12, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231207-2.JPG?alt=media', 12),
+                (13, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240117-1.JPG?alt=media', 13),
+                (14, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240301-1.JPG?alt=media', 14),
+                (15, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240301-2.JPG?alt=media', 15),
+                (16, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240502-1.JPG?alt=media', 16),
+                (17, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240503-1.JPG?alt=media', 17),
+                (18, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240505-1.JPG?alt=media', 18),
+                (19, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240508-1.JPG?alt=media', 19),
+                (20, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240509-1.JPG?alt=media', 20),
+                (21, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240511-1.JPG?alt=media', 21),
+                (22, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240301-3.JPG?alt=media', 22),
+                (23, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240306-1.JPG?alt=media', 23),
+                (24, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240307-1.JPG?alt=media', 24),
+                (25, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240401-1.JPG?alt=media', 25),
+                (26, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240401-2.JPG?alt=media', 26),
+                (27, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240503-2.JPG?alt=media', 27),
+                (28, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20240505-2.JPG?alt=media', 28),
+                (29, null, null, 'https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231102-1.JPG?alt=media', 29);
+    </insert>
+</mapper>
