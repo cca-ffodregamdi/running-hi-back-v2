@@ -2,7 +2,7 @@
 name: " issue--✂️refactoring"
 about: 코드 변경 사항 적용 시 이슈 작성
 title: 'Refactoring - '
-labels: "✨ Feature, \U0001F528 Refactor"
+labels: "\U0001F528 Refactor"
 assignees: ''
 
 ---
