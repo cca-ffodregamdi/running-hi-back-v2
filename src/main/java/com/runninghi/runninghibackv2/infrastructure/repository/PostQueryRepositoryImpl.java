@@ -129,7 +129,12 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                         like.member.memberNo.eq(memberNo))
                 .fetchOne() != null;
 
-        return GetPostResponse.from(post, imageUrl,likeCnt, bookmarkCnt, replyCnt, isWriter, isLiked);
+        Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
+                .where(bookmark.member.memberNo.eq(memberNo)
+                        .and(bookmark.post.postNo.eq(post.getPostNo())))
+                .fetchFirst() != null;
+
+        return GetPostResponse.from(post, imageUrl,likeCnt, bookmarkCnt, replyCnt, isWriter, isLiked, isBookmarked);
     }
 
     @Override
@@ -228,6 +233,138 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .fetch();
+
+        List<GetAllPostsResponse> responses = posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.selectFrom(image)
+                    .where(image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
+
+            Long replyCnt = jpaQueryFactory.select(reply.count())
+                    .from(reply)
+                    .where(reply.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            Long likeCnt = jpaQueryFactory.select(like.count())
+                    .from(like)
+                    .where(like.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
+                    .where(bookmark.member.memberNo.eq(memberNo)
+                            .and(bookmark.post.postNo.eq(post.getPostNo())))
+                    .fetchFirst() != null;
+
+            Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                    .where(
+                            like.post.postNo.eq(post.getPostNo()),
+                            like.member.memberNo.eq(memberNo))
+                    .fetchOne() != null;
+
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+        }).collect(Collectors.toList());
+
+        return new PageResultData<>(responses, pageable, total);
+    }
+
+    @Override
+    public PageResultData<GetAllPostsResponse> findAllPostsByLikeCnt(Long memberNo, Pageable pageable, int distance) {
+        List<Post> posts;
+        long total;
+
+        Point referencePoint = memberRepository.findByMemberNo(memberNo).getGeometry();
+
+        total = jpaQueryFactory.selectFrom(post)
+                .where(post.status.eq(true)
+                        .and(Expressions.booleanTemplate(
+                                DISTANCE_CONDITION,
+                                post.gpsDataVO.geometry, referencePoint, distance * 100
+                        ))
+                )
+                .fetchCount();
+
+        posts = jpaQueryFactory.select(post)
+                .from(post)
+                .leftJoin(like).on(like.post.postNo.eq(post.postNo))
+                .where(post.status.eq(true)
+                        .and(Expressions.booleanTemplate(
+                                DISTANCE_CONDITION,
+                                post.gpsDataVO.geometry, referencePoint, distance * 100
+                        ))
+                )
+                .groupBy(post.postNo)
+                .orderBy(
+                        Expressions.numberTemplate(Long.class, "count({0})", like.post.postNo).desc(),
+                        post.createDate.desc()
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<GetAllPostsResponse> responses = posts.stream().map(post -> {
+            Image mainImage = jpaQueryFactory.selectFrom(image)
+                    .where(image.postNo.eq(post.getPostNo()))
+                    .limit(1)
+                    .fetchOne();
+
+            Long replyCnt = jpaQueryFactory.select(reply.count())
+                    .from(reply)
+                    .where(reply.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            Long likeCnt = jpaQueryFactory.select(like.count())
+                    .from(like)
+                    .where(like.post.postNo.eq(post.getPostNo()))
+                    .fetchOne();
+
+            Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
+                    .where(bookmark.member.memberNo.eq(memberNo)
+                            .and(bookmark.post.postNo.eq(post.getPostNo())))
+                    .fetchFirst() != null;
+
+            Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                    .where(
+                            like.post.postNo.eq(post.getPostNo()),
+                            like.member.memberNo.eq(memberNo))
+                    .fetchOne() != null;
+
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+        }).collect(Collectors.toList());
+
+        return new PageResultData<>(responses, pageable, total);
+    }
+
+    @Override
+    public PageResultData<GetAllPostsResponse> findAllPostsByDistance(Long memberNo, Pageable pageable, int distance) {
+        List<Post> posts;
+        long total;
+
+        Point referencePoint = memberRepository.findByMemberNo(memberNo).getGeometry();
+
+        total = jpaQueryFactory.selectFrom(post)
+                .where(post.status.eq(true)
+                        .and(post.gpsDataVO.isNotNull())
+                        .and(Expressions.booleanTemplate(
+                                DISTANCE_CONDITION,
+                                post.gpsDataVO.geometry, referencePoint, distance * 100
+                        ))
+                )
+                .fetchCount();
+
+        posts = jpaQueryFactory.selectFrom(post)
+                .where(post.status.eq(true)
+                        .and(post.gpsDataVO.geometry.isNotNull())
+                        .and(Expressions.booleanTemplate(
+                                DISTANCE_CONDITION,
+                                post.gpsDataVO.geometry, referencePoint, distance * 100
+                        ))
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(Expressions.numberTemplate(Double.class, "ST_Distance({0}, {1})", post.gpsDataVO.geometry, referencePoint).asc())
                 .fetch();
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {

@@ -141,10 +141,15 @@ public class PostService {
     @Transactional(readOnly = true)
     public PageResultData<GetAllPostsResponse>  getPostScroll(Long memberNo, Pageable pageable, String sort, int distance) {
         if (sort.equalsIgnoreCase("latest")) {
-
             return postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
-        } else {
+        } else if (sort.equalsIgnoreCase("recommended")) {
             return postQueryRepository.findAllPostsByRecommended(memberNo, pageable, distance);
+        } else if (sort.equalsIgnoreCase("like")){
+            return postQueryRepository.findAllPostsByLikeCnt(memberNo, pageable, distance);
+        } else if (sort.equalsIgnoreCase("distance")){
+            return postQueryRepository.findAllPostsByDistance(memberNo, pageable, distance);
+        } else {
+            return postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
         }
     }
 
