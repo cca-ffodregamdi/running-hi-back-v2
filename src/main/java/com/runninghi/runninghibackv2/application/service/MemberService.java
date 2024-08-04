@@ -85,13 +85,14 @@ public class MemberService {
         log.info("FCM 토큰 저장 완료. 회원 번호: {}", memberNo);
     }
 
+    @Transactional
     public UpdateCurrentLocationResponse updateCurrentLocation(Long memberNo, UpdateCurrentLocationRequest request) {
-        log.info("위치 정보 업데이트 요청. 회원 번호: {}, 좌표: ({}, {})", memberNo, request.x(), request.y());
+        log.info("위치 정보 업데이트 요청. 회원 번호: {}, 좌표: ({}, {})", memberNo, request.latitude(), request.longitude());
 
         Member member = findMemberByNoWithLogging(memberNo);
 
         GeometryFactory gf = new GeometryFactory();
-        Point geometry = gf.createPoint(new Coordinate(request.x(), request.y()));
+        Point geometry = gf.createPoint(new Coordinate(request.longitude(), request.latitude())); // longitude 경도 == x, latitude 위도 == y
 
         member.updateGeometry(geometry);
         memberRepository.save(member);
