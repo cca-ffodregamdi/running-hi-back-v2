@@ -436,7 +436,7 @@ public class MemberController {
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 액세스 토큰이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
      */
-    @PutMapping(value = "/location", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/api/v1/member/geometry", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "사용자 위치 정보 업데이트 또는 생성",
             description = "사용자의 현재 위치를 업데이트하거나 새로 생성합니다. " +
                     "이미 위치 정보가 있는 경우 업데이트하고, 없는 경우 새로 생성합니다.",
