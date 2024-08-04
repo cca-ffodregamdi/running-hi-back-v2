@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.runninghi.runninghibackv2.common.dummy.TestDatabaseMapper">
+
+    <insert id="insertPostReportDummyData">
+        INSERT INTO tbl_post_report (category, content, status, reporter_no, reported_post_no, post_content)
+        VALUES
+            ('SPAM', '스팸 게시글입니다.', 'INPROGRESS', 2, 1, (SELECT post_content FROM tbl_post WHERE post_no = 1)),
+            ('ILLEGAL', '부적절한 내용이 포함된 게시글입니다.', 'INPROGRESS', 1, 2, (SELECT post_content FROM tbl_post WHERE post_no = 2)),
+            ('ILLEGAL', '부적절한 내용이 포함된 게시글입니다.', 'INPROGRESS', 2, 2, (SELECT post_content FROM tbl_post WHERE post_no = 2));
+    </insert>
+
+    <insert id="insertReplyReportDummyData">
+        INSERT INTO tbl_reply_report (category, content, status, reporter_no, reported_reply_no, reply_content)
+        VALUES
+            ('SPAM', '스팸 댓글입니다.', 'INPROGRESS', 1, 2, '스팸댓글'),
+            ('ILLEGAL', '부적절한 내용이 포함된 댓글입니다.', 'INPROGRESS', 2, 1, '부적절적절'),
+            ('ILLEGAL', '부적절한 내용이 포함된 댓글입니다.', 'INPROGRESS', 2, 3, '부적부적절');
+    </insert>
+
+</mapper>
