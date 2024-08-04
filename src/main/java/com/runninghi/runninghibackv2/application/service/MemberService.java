@@ -93,6 +93,7 @@ public class MemberService {
 
         GeometryFactory gf = new GeometryFactory();
         Point geometry = gf.createPoint(new Coordinate(request.longitude(), request.latitude())); // longitude 경도 == x, latitude 위도 == y
+        geometry.setSRID(4326);
 
         member.updateGeometry(geometry);
         memberRepository.save(member);
