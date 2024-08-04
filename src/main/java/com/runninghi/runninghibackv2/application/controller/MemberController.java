@@ -431,7 +431,7 @@ public class MemberController {
      * 사용자의 현재 위치를 업데이트하거나 새로 생성하는 API입니다.
      *
      * @param token 사용자 인증을 위한 액세스 토큰. 요청 헤더에 "Authorization" 키로 포함되어야 합니다.
-     * @param request 사용자의 현재 위치 정보 (x, y 좌표)
+     * @param request 사용자의 현재 위치 정보 (latitude, longitude 좌표)
      * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 위치 정보 업데이트 또는 생성이 성공한 경우 저장된 위치 정보가 응답 본문에 포함됩니다.
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 액세스 토큰이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 인증되지 않았을 경우 접근이 거부됩니다.
@@ -453,7 +453,7 @@ public class MemberController {
             @RequestHeader(value = "Authorization") String token,
             @RequestBody UpdateCurrentLocationRequest request) {
 
-        log.info("사용자 위치 정보 업데이트 또는 생성 요청을 받았습니다. 좌표: ({}, {})", request.x(), request.y());
+        log.info("사용자 위치 정보 업데이트 또는 생성 요청을 받았습니다. 좌표: ({}, {})", request.latitude(), request.longitude());
 
         try {
             Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);

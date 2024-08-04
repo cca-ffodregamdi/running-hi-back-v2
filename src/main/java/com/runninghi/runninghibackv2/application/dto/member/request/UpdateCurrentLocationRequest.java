@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public record UpdateCurrentLocationRequest(
-        double x,
-        double y
+        double latitude,
+        double longitude
 ) {
 }
