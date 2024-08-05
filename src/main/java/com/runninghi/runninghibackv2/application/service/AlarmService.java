@@ -12,6 +12,7 @@ import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.AlarmRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -88,7 +89,7 @@ public class AlarmService {
 
         alarmRepository.save(alarm);
 
-//        sendAlarm(request, member.getFcmToken());
+        sendAlarm(request, member.getFcmToken());
     }
 
     private void sendAlarm(CreateAlarmRequest request, String fcmToken) throws FirebaseMessagingException {
@@ -105,4 +106,13 @@ public class AlarmService {
 
         firebaseMessaging.send(message);
     }
+
+    public void readAlarm(Long alarmNo) {
+
+        Alarm alarm = alarmRepository.findById(alarmNo)
+                .orElseThrow(EntityNotFoundException::new);
+
+        alarm.readAlarm();
+    }
+
 }

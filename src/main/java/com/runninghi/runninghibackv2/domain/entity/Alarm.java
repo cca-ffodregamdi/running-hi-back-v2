@@ -76,4 +76,8 @@ public class Alarm {
         );
     }
 
+    public void readAlarm() {
+        this.isRead = true;
+    }
+
 }
