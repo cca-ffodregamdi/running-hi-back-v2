@@ -12,7 +12,6 @@ import org.hibernate.annotations.Comment;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -152,6 +151,10 @@ public class Member extends BaseTimeEntity {
     public void updateFCMToken(String fcmToken) {this.fcmToken = fcmToken; }
 
     public void updateAlarmConsent(boolean alarmConsent) {this.alarmConsent = alarmConsent;}
+
+    public void updateGeometry(Point geometry) {
+        this.geometry = geometry;
+    }
 
     public void cleanupDeactivateMemberData() {
         this.account = null;
