@@ -1,7 +1,9 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.member.request.UpdateCurrentLocationRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
+import com.runninghi.runninghibackv2.application.dto.member.response.UpdateCurrentLocationResponse;
 import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
@@ -10,6 +12,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,4 +84,23 @@ public class MemberService {
 
         log.info("FCM 토큰 저장 완료. 회원 번호: {}", memberNo);
     }
+
+    @Transactional
+    public UpdateCurrentLocationResponse updateCurrentLocation(Long memberNo, UpdateCurrentLocationRequest request) {
+        log.info("위치 정보 업데이트 요청. 회원 번호: {}, 좌표: ({}, {})", memberNo, request.latitude(), request.longitude());
+
+        Member member = findMemberByNoWithLogging(memberNo);
+
+        GeometryFactory gf = new GeometryFactory();
+        Point geometry = gf.createPoint(new Coordinate(request.longitude(), request.latitude())); // longitude 경도 == x, latitude 위도 == y
+        geometry.setSRID(4326);
+
+        member.updateGeometry(geometry);
+        memberRepository.save(member);
+
+        log.info("위치 정보 업데이트 완료. 회원 번호: {}, 좌표: ({}, {})", memberNo, geometry.getX(), geometry.getY());
+
+        return UpdateCurrentLocationResponse.from(memberNo, geometry);
+    }
+
 }
