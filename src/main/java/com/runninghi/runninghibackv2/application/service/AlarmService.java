@@ -101,6 +101,8 @@ public class AlarmService {
                         .setToken(fcmToken)
                         .setNotification(notification)
                         .build();
+
+
         firebaseMessaging.send(message);
     }
 }
