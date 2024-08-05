@@ -40,7 +40,7 @@ public class TestData {
         }
         testDatabaseMapper.enableForeignKeyChecks();
 
-        testDatabaseMapper.insertMemberDummyData();
+//        testDatabaseMapper.insertMemberDummyData();
         testDatabaseMapper.insertPostDummyData();
         testDatabaseMapper.insertAlarmDummyData();
         testDatabaseMapper.insertFeedbackDummyData();

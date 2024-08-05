@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/alarm")
+@RequestMapping("/api/v1/alarm")
 @Tag(name = "알림 API", description = "알림 관련 API")
 public class AlarmController {
 
@@ -43,6 +43,14 @@ public class AlarmController {
         alarmService.createAlarm(request);
 
         return ResponseEntity.ok().body(ApiResult.success("알림 생성 성공", null));
+    }
+
+    @PutMapping(value = "/{alarmNo}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResult<Void>> readAlarm(@PathVariable("alarmNo") Long alarmNo) throws FirebaseMessagingException {
+
+        alarmService.readAlarm(alarmNo);
+
+        return ResponseEntity.ok().body(ApiResult.success("알림 읽음 처리 성공", null));
     }
 
 }

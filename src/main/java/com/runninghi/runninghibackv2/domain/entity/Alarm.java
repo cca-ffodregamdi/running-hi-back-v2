@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
 import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
+import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -36,6 +37,11 @@ public class Alarm {
     @Comment(value = "알림 내용")
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "alarm_type", nullable = false)
+    @Comment(value = "알림 타입")
+    private AlarmType alarmType;
+
     @Column(name = "is_read", nullable = false)
     @ColumnDefault(value = "false")
     @Comment(value = "확인 여부")
@@ -68,6 +74,10 @@ public class Alarm {
                 alarm.isRead(),
                 alarm.createDate
         );
+    }
+
+    public void readAlarm() {
+        this.isRead = true;
     }
 
 }
