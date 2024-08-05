@@ -1,9 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
-import com.runninghi.runninghibackv2.application.dto.member.request.KakaoLoginRequest;
-import com.runninghi.runninghibackv2.application.dto.member.request.UpdateCurrentLocationRequest;
-import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
+import com.runninghi.runninghibackv2.application.dto.member.request.*;
 import com.runninghi.runninghibackv2.application.dto.member.response.*;
 import com.runninghi.runninghibackv2.application.service.AppleOauthService;
 import com.runninghi.runninghibackv2.application.service.KakaoOauthService;
@@ -467,6 +464,43 @@ public class MemberController {
             log.error("위치 정보 업데이트 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResult.error(HttpStatus.UNAUTHORIZED, "인증 실패 또는 위치 정보 업데이트 중 오류 발생"));
+        }
+    }
+
+    /**
+     * 관리자가 로그인하여 JWT 토큰을 발급받는 API입니다.
+     *
+     * @param request 관리자의 사용자 이름과 비밀번호를 포함한 로그인 요청 데이터
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 로그인 성공 시 JWT 토큰이 응답 본문에 포함됩니다.
+     * @apiNote 이 메서드는 로그인 시 유효한 사용자 이름과 비밀번호를 포함해야 하며, 인증 실패 시 적절한 오류 메시지를 반환합니다.
+     */
+    @PostMapping("/api/v1/login/admin")
+    @Operation(summary = "관리자 페이지 로그인",
+            description = "관리자가 로그인하여 JWT 토큰을 발급받습니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "관리자 로그인 성공, JWT 토큰 발급",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = AdminLoginResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패, 잘못된 관리자 이름 또는 비밀번호")
+            })
+    public ResponseEntity<ApiResult<AdminLoginResponse>> login(@RequestBody AdminLoginRequest request) {
+        log.info("관리자 로그인 요청: 사용자 account = {}", request.account());
+
+        try {
+            Map<String, String> tokens = memberService.adminLogin(request);
+            log.info("관리자 로그인 성공: 사용자 account = {}", request.account());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", tokens.get("accessToken"));
+            headers.add("Refresh-Token", tokens.get("refreshToken"));
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(ApiResult.success("관리자 로그인 성공", null));
+        } catch (Exception e) {
+            log.error("관리자 로그인 실패: 사용자 account = {}", request.account(), e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResult.error(HttpStatus.UNAUTHORIZED, "잘못된 사용자 이름 또는 비밀번호"));
         }
     }
 }

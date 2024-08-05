@@ -2,10 +2,7 @@ package com.runninghi.runninghibackv2.common.exception;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.protobuf.Api;
-import com.runninghi.runninghibackv2.common.exception.custom.AppleOauthException;
-import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
-import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthException;
-import com.runninghi.runninghibackv2.common.exception.custom.SchedulingException;
+import com.runninghi.runninghibackv2.common.exception.custom.*;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
@@ -113,4 +110,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResult.error(ErrorCode.FCM_SEND_FAIL));
     }
 
+    @ExceptionHandler(AdminLoginException.class)
+    public ResponseEntity<ApiResult<Void>> handleAdminLoginException(AdminLoginException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResult.error(HttpStatus.FORBIDDEN, e.getMessage()));
+    }
 }
