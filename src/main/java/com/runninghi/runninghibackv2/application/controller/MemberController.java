@@ -494,9 +494,11 @@ public class MemberController {
             headers.add("Authorization", tokens.get("accessToken"));
             headers.add("Refresh-Token", tokens.get("refreshToken"));
 
+            AdminLoginResponse response = new AdminLoginResponse(jwtTokenProvider.getMemberNoFromToken(tokens.get("accessToken")));
+
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(ApiResult.success("관리자 로그인 성공", null));
+                    .body(ApiResult.success("관리자 로그인 성공", response));
         } catch (Exception e) {
             log.error("관리자 로그인 실패: 사용자 account = {}", request.account(), e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
