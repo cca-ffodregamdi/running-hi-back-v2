@@ -50,7 +50,7 @@ public class AlarmController {
 
         alarmService.readAlarm(alarmNo);
 
-        return ResponseEntity.ok().body(ApiResult.success("알림 읽음 처리", null));
+        return ResponseEntity.ok().body(ApiResult.success("알림 읽음 처리 성공", null));
     }
 
 }
