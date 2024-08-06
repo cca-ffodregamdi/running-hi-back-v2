@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.runninghi.runninghibackv2.application.dto.member.request.AdminLoginRequest;
+import com.runninghi.runninghibackv2.application.dto.member.request.AdminSignInRequest;
+import com.runninghi.runninghibackv2.application.dto.member.request.AdminSignUpRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateCurrentLocationRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
@@ -22,6 +23,7 @@ import org.apache.coyote.BadRequestException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,9 @@ public class MemberService {
     private static final String INVALID_NICKNAME_MESSAGE = "유효하지 않은 닉네임입니다.";
     private static final String MEMBER_NOT_FOUND_DETAIL_MESSAGE = "회원 번호 %d에 해당하는 회원을 찾을 수 없습니다.";
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Value("${admin.invitation-code}")
+    private String adminInvitationCode;
 
     private Member findMemberByNoWithLogging(Long memberNo) {
         log.info("회원 조회 요청. 회원 번호: {}", memberNo);
@@ -114,7 +119,8 @@ public class MemberService {
         return UpdateCurrentLocationResponse.from(memberNo, geometry);
     }
 
-    public Map<String, String> adminLogin(AdminLoginRequest request) throws RuntimeException {
+    @Transactional
+    public Map<String, String> signinAdmin(AdminSignInRequest request) throws RuntimeException {
         log.info("관리자 로그인 시도: 사용자 account = {}", request.account());
 
         Member member = memberRepository.findByAccount(request.account())
@@ -145,5 +151,28 @@ public class MemberService {
         tokens.put("refreshToken", refreshToken);
 
         return tokens;
+    }
+
+    @Transactional
+    public void signupAdmin(AdminSignUpRequest request) {
+        if (memberRepository.findByAccount(request.account()).isPresent()) {
+            throw new IllegalArgumentException("이미 가입된 account입니다.");
+        }
+
+        Role role = Role.ADMIN;
+        if (request.invitationCode() != null && request.invitationCode().equals(adminInvitationCode)) {
+            role = Role.ADMIN;
+        } else if (request.invitationCode() != null) {
+            throw new IllegalArgumentException("잘못된 초대 코드입니다.");
+        }
+
+        Member newMember = Member.builder()
+                .account(request.account())
+                .password(PasswordUtils.hashPassword(request.password()))
+                .role(role)
+                .isActive(true)
+                .build();
+
+        memberRepository.save(newMember);
     }
 }
