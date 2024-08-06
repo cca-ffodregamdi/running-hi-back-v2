@@ -43,10 +43,6 @@ public class Post extends BaseTimeEntity {
     private String postContent;
 
     @Column
-    @Comment("러닝코스 난이도")
-    private Difficulty difficulty;
-
-    @Column
     @Comment("신고 횟수")
     private int reportCnt;
 
@@ -70,11 +66,10 @@ public class Post extends BaseTimeEntity {
     private String mainData;
 
     @Builder
-    public Post(Member member, @Nullable String postContent, Difficulty difficulty, Role role, String locationName,
+    public Post(Member member, @Nullable String postContent, Role role, String locationName,
                 Point geometry, Boolean status, String gpxUrl, GpsDataVO gpsDataVO, String mainData, String postTitle) {
         this.member = member;
         this.postContent = postContent;
-        this.difficulty = difficulty;
         this.reportCnt = 0;
         this.role = role;
         this.status = status;
@@ -86,7 +81,6 @@ public class Post extends BaseTimeEntity {
 
     public void shareToPost(CreatePostRequest request, String mainData) {
         this.postContent = request.postContent();
-        this.difficulty = Difficulty.valueOf(request.difficulty());
         this.status = true;
         this.mainData = mainData;
     }

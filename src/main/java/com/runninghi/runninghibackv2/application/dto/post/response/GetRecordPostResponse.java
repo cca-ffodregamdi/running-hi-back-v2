@@ -39,7 +39,7 @@ public class GetRecordPostResponse {
                         post.getGpsDataVO().getTime(),
                         imageUrl,
                         post.getStatus(),
-                        post.getDifficulty().toString(),
+                        post.getGpsDataVO().getDifficulty().toString(),
                         post.getPostTitle()
                 );
 

@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
-import com.runninghi.runninghibackv2.application.dto.post.request.RunDataRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.application.service.PostService;
@@ -17,7 +16,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -148,15 +146,14 @@ public class PostController {
     */
 
 
-    @PostMapping(value = "/gps")
-    @Operation(summary = "러닝 데이터 저장", description = "러닝이 끝난 직후 gpx 파일을 저장하고 데이터 (거리, 속도, 시간, 등) 을 반환합니다. ")
+    @PostMapping(value = "/gps", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "러닝 데이터 저장", description = "러닝이 끝난 직후 txt 형식의 gps 파일을 저장합니다. ")
     public ResponseEntity<ApiResult<CreateRecordResponse>> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
-                                                                               @RequestPart("file") MultipartFile file,
-                                                                               @RequestPart("data") RunDataRequest runDataRequest) throws Exception {
+                                                                               @RequestPart("file") MultipartFile file) throws IOException {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
 
-        CreateRecordResponse response = postService.createRecord(memberInfo.memberNo(), file, runDataRequest);
+        CreateRecordResponse response = postService.createRecord(memberInfo.memberNo(), file);
 
         return ResponseEntity.ok(ApiResult.success(CREATE_RESPONSE_MESSAGE, response));
     }
