@@ -1,10 +1,7 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetChallengeRankingResponse;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.*;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.request.CreateMyChallengeRequest;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.CreateMyChallengeResponse;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetAllMyChallengeResponse;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetMyChallengeResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
@@ -49,14 +46,16 @@ public class MyChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetAllMyChallengeResponse> getAllMyChallengesByStatus(Long memberNo, boolean status) {
+    public GetAllMyChallengeResponse getAllMyChallengesByStatus(Long memberNo, boolean status) {
 
         Member member = memberRepository.findByMemberNo(memberNo);
-        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMemberAndChallengeStatus(member, status);
-
-        return myChallenges.stream()
-                .map(GetAllMyChallengeResponse::from)
+        List<MyChallengeListResponse> myChallengeList =
+                memberChallengeRepository.findByMemberAndChallengeStatus(member, status).stream()
+                .map(MyChallengeListResponse::from)
                 .toList();
+        int myChallengeCount = myChallengeList.size();
+
+        return new GetAllMyChallengeResponse(myChallengeList, myChallengeCount);
     }
 
     @Transactional(readOnly = true)

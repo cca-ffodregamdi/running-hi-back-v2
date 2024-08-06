@@ -54,13 +54,13 @@ public class ChallengeController {
     @Operation(summary = "활성화 상태 여부에 따른 챌린지 전체 조회", description = "status가 true이면 현재 진행중인 챌린지 \n" +
             "status가 false인 경우 종료된 챌린지가 조회됩니다.")
     @GetMapping("/status")
-    public ResponseEntity<ApiResult<List<GetAllChallengeResponse>>> getAllChallengesByStatus(
+    public ResponseEntity<ApiResult<GetAllChallengeResponse>> getAllChallengesByStatus(
             @RequestParam(name = "status") boolean status,
             @RequestHeader(name = "Authorization") String bearerToken) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
 
-        List<GetAllChallengeResponse> response = challengeService.getAllChallengesByStatus(status, memberNo);
+        GetAllChallengeResponse response = challengeService.getAllChallengesByStatus(status, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("챌린지 전체 조회 성공", response));
     }
@@ -130,13 +130,13 @@ public class ChallengeController {
     @Operation(summary = "활성화 여부에 따른 나의 챌린지 전체 조회",
             description = "status가 true이면 로그인한 사용자가 참여한 모든 진행중인 챌린지,\nfalse인 경우 종료된 챌린지가 조회됩니다.")
     @GetMapping("/my-challenge/status")
-    public ResponseEntity<ApiResult<List<GetAllMyChallengeResponse>>> getAllMyChallengesByStatus(
+    public ResponseEntity<ApiResult<GetAllMyChallengeResponse>> getAllMyChallengesByStatus(
             @RequestParam(name = "status") boolean status,
             @RequestHeader(name = "Authorization") String bearerToken) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
 
-        List<GetAllMyChallengeResponse> response = myChallengeService.getAllMyChallengesByStatus(memberNo, status);
+        GetAllMyChallengeResponse response = myChallengeService.getAllMyChallengesByStatus(memberNo, status);
 
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 전체 조회 성공", response));
     }
