@@ -82,6 +82,9 @@ dependencies {
     implementation 'org.hibernate:hibernate-spatial:6.2.5.Final'
     implementation 'com.querydsl:querydsl-spatial'
 
+    // Bcrypt 추가
+    implementation 'org.mindrot:jbcrypt:0.4'
+
 }
 
 tasks.named('test') {
