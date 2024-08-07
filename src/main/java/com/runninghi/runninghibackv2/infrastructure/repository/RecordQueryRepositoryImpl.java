@@ -5,6 +5,7 @@ import com.runninghi.runninghibackv2.application.dto.post.response.GetRecordPost
 import com.runninghi.runninghibackv2.application.dto.record.response.GetMonthlyRecordResponse;
 import com.runninghi.runninghibackv2.application.dto.record.response.GetWeeklyRecordResponse;
 import com.runninghi.runninghibackv2.application.dto.record.response.GetYearlyRecordResponse;
+import com.runninghi.runninghibackv2.application.dto.record.response.RecordData;
 import com.runninghi.runninghibackv2.domain.entity.Record;
 import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.RecordQueryRepository;
@@ -13,9 +14,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.runninghi.runninghibackv2.domain.entity.QRecord.record;
 
@@ -26,10 +28,9 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
     private final PostQueryRepository postQueryRepository;
 
-    @Override
     public GetWeeklyRecordResponse getWeeklyRecord(Long memberNo, LocalDate date) {
-        LocalDate start = date.with(DayOfWeek.MONDAY);
-        LocalDate end = date.with(DayOfWeek.SUNDAY);
+        LocalDate start = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate end = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
 
         List<Record> records = jpaQueryFactory.select(record)
                 .from(record)
@@ -37,25 +38,41 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                         .and(record.member.memberNo.eq(memberNo)))
                 .fetch();
 
-        List<Float> weeklyRecordData = new ArrayList<>(Collections.nCopies(7, 0.0f));
+        Map<Integer, RecordData> weeklyRecordMap = new HashMap<>();
         int totalTime = 0;
         float totalDistance = 0.0f;
         int totalKcal = 0;
 
         for (Record record : records) {
             int dayOfWeekIndex = record.getDate().getDayOfWeek().getValue() - 1; // Monday=0, Sunday=6
-            weeklyRecordData.set(dayOfWeekIndex, weeklyRecordData.get(dayOfWeekIndex) + record.getDistance());
+
+            RecordData existingData = weeklyRecordMap.getOrDefault(dayOfWeekIndex, new RecordData(0, 0, 0, 0));
+            RecordData newData = new RecordData(
+                    existingData.getDistance() + record.getDistance(),
+                    existingData.getTime() + record.getTime(),
+                    0,
+                    existingData.getKcal() + record.getKcal()
+            );
+            weeklyRecordMap.put(dayOfWeekIndex, newData);
 
             totalTime += record.getTime();
             totalDistance += record.getDistance();
             totalKcal += record.getKcal();
         }
 
-        int meanPace = (totalDistance > 0) ? Math.round(totalTime / totalDistance) * 60 : 0;
+        List<RecordData> weeklyRecordData = IntStream.range(0, 7)
+                .mapToObj(i -> {
+                    RecordData data = weeklyRecordMap.getOrDefault(i, new RecordData(0, 0, 0, 0));
+                    int meanPace = (data.getDistance() > 0) ? Math.round(data.getTime() / data.getDistance()) : 0;
+                    return new RecordData(data.getDistance(), data.getTime(), meanPace, data.getKcal());
+                })
+                .collect(Collectors.toList());
+
+        int overallMeanPace = (totalDistance > 0) ? Math.round(totalTime / totalDistance) : 0;
 
         List<GetRecordPostResponse> postList = postQueryRepository.findWeeklyRecord(memberNo, date);
 
-        return new GetWeeklyRecordResponse(weeklyRecordData, totalTime, meanPace, totalKcal, postList);
+        return new GetWeeklyRecordResponse(weeklyRecordData, totalTime, overallMeanPace, totalKcal, postList);
     }
 
     @Override
@@ -70,25 +87,40 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                 .fetch();
 
         int daysInMonth = date.lengthOfMonth();
-        List<Float> dailyRecordData = new ArrayList<>(Collections.nCopies(daysInMonth, 0.0f));
+        Map<Integer, RecordData> dailyRecordMap = new HashMap<>();
         int totalTime = 0;
         float totalDistance = 0.0f;
         int totalKcal = 0;
 
         for (Record record : records) {
             int dayOfMonthIndex = record.getDate().getDayOfMonth() - 1;
-            dailyRecordData.set(dayOfMonthIndex, dailyRecordData.get(dayOfMonthIndex) + record.getDistance());
+            RecordData existingData = dailyRecordMap.getOrDefault(dayOfMonthIndex, new RecordData(0, 0, 0, 0));
+            RecordData newData = new RecordData(
+                    existingData.getDistance() + record.getDistance(),
+                    existingData.getTime() + record.getTime(),
+                    0,
+                    existingData.getKcal() + record.getKcal()
+            );
+            dailyRecordMap.put(dayOfMonthIndex, newData);
 
             totalTime += record.getTime();
             totalDistance += record.getDistance();
             totalKcal += record.getKcal();
         }
 
-        int meanPace = (totalDistance > 0) ? Math.round(totalTime / totalDistance) * 60 : 0;
+        List<RecordData> dailyRecordData = IntStream.range(0, daysInMonth)
+                .mapToObj(i -> {
+                    RecordData data = dailyRecordMap.getOrDefault(i, new RecordData(0, 0, 0, 0));
+                    int meanPace = (data.getDistance() > 0) ? Math.round(data.getTime() / data.getDistance()) : 0;
+                    return new RecordData(data.getDistance(), data.getTime(), meanPace, data.getKcal());
+                })
+                .collect(Collectors.toList());
+
+        int overallMeanPace = (totalDistance > 0) ? Math.round(totalTime / totalDistance) : 0;
 
         List<GetRecordPostResponse> postList = postQueryRepository.findMonthlyRecord(memberNo, date);
 
-        return new GetMonthlyRecordResponse(dailyRecordData, totalTime, meanPace, totalKcal, postList);
+        return new GetMonthlyRecordResponse(dailyRecordData, totalTime, overallMeanPace, totalKcal, postList);
     }
 
     @Override
@@ -103,24 +135,39 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                         .and(record.member.memberNo.eq(memberNo)))
                 .fetch();
 
-        List<Float> monthlyRecordData = new ArrayList<>(Collections.nCopies(12, 0.0f));
+        Map<Integer, RecordData> monthlyRecordMap = new HashMap<>();
         int totalTime = 0;
         float totalDistance = 0.0f;
         int totalKcal = 0;
 
         for (Record record : records) {
             int monthIndex = record.getDate().getMonthValue() - 1;
-            monthlyRecordData.set(monthIndex, monthlyRecordData.get(monthIndex) + record.getDistance());
+            RecordData existingData = monthlyRecordMap.getOrDefault(monthIndex, new RecordData(0, 0, 0, 0));
+            RecordData newData = new RecordData(
+                    existingData.getDistance() + record.getDistance(),
+                    existingData.getTime() + record.getTime(),
+                    0,
+                    existingData.getKcal() + record.getKcal()
+            );
+            monthlyRecordMap.put(monthIndex, newData);
 
             totalTime += record.getTime();
             totalDistance += record.getDistance();
             totalKcal += record.getKcal();
         }
 
-        int meanPace = (totalDistance > 0) ? Math.round(totalTime / totalDistance) * 60 : 0;
+        List<RecordData> monthlyRecordData = IntStream.range(0, 12)
+                .mapToObj(i -> {
+                    RecordData data = monthlyRecordMap.getOrDefault(i, new RecordData(0, 0, 0, 0));
+                    int meanPace = (data.getDistance() > 0) ? Math.round(data.getTime() / data.getDistance()) : 0;
+                    return new RecordData(data.getDistance(), data.getTime(), meanPace, data.getKcal());
+                })
+                .collect(Collectors.toList());
+
+        int overallMeanPace = (totalDistance > 0) ? Math.round(totalTime / totalDistance) : 0;
 
         List<GetRecordPostResponse> postList = postQueryRepository.findYearlyRecord(memberNo, date);
 
-        return new GetYearlyRecordResponse(monthlyRecordData, totalTime, meanPace, totalKcal, postList);
+        return new GetYearlyRecordResponse(monthlyRecordData, totalTime, overallMeanPace, totalKcal, postList);
     }
 }

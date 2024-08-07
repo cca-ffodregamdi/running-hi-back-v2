@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.domain.entity.vo;
 
 import com.runninghi.runninghibackv2.common.converter.IntegerListConverter;
+import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
@@ -24,7 +25,7 @@ public class GpsDataVO implements Serializable {
     private String locationName;
 
     @Column(columnDefinition = "POINT SRID 4326")
-    private Point geometry;
+    private Point startPoint;
 
     @Column
     @Comment("러닝 시작 시각")
@@ -56,10 +57,15 @@ public class GpsDataVO implements Serializable {
     @Convert(converter = IntegerListConverter.class)
     List<Integer> sectionKcal;
 
-    public GpsDataVO(String locationName, Point geometry, LocalDateTime runStartTime, float distance, int time, int kcal,
-                     int meanPace, List<Integer> sectionPace, List<Integer> sectionKcal) {
+    @Column
+    @Comment("러닝코스 난이도")
+    private Difficulty difficulty;
+
+    @Builder
+    public GpsDataVO(String locationName, Point startPoint, LocalDateTime runStartTime, float distance, int time, int kcal,
+                     int meanPace, List<Integer> sectionPace, List<Integer> sectionKcal, Difficulty difficulty) {
         this.locationName = locationName;
-        this.geometry = geometry;
+        this.startPoint = startPoint;
         this.runStartTime = runStartTime;
         this.distance = distance;
         this.time = time;
@@ -67,6 +73,7 @@ public class GpsDataVO implements Serializable {
         this.meanPace = meanPace;
         this.sectionPace = sectionPace;
         this.sectionKcal = sectionKcal;
+        this.difficulty = difficulty;
     }
 
 }

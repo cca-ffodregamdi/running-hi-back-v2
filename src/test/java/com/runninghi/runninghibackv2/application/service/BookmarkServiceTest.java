@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.application.dto.bookmark.response.Bookmarke
 import com.runninghi.runninghibackv2.domain.entity.Bookmark;
 import com.runninghi.runninghibackv2.domain.entity.vo.BookmarkId;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
+import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
 import com.runninghi.runninghibackv2.domain.repository.BookmarkRepository;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import com.runninghi.runninghibackv2.domain.entity.Member;
@@ -17,6 +18,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +49,8 @@ class BookmarkServiceTest {
     private Post post1;
     private Post post2;
     private Bookmark bookmark1;
+    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+    Point point = geometryFactory.createPoint(new Coordinate(126.978,37.566));
 
     @BeforeEach
     void clear() {
@@ -63,7 +70,7 @@ class BookmarkServiceTest {
                 .role(Role.USER)
                 .build();
 
-        GpsDataVO gpsDataVO = new GpsDataVO("도쿄", null, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150));
+        GpsDataVO gpsDataVO = new GpsDataVO("도쿄", point, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150), Difficulty.EASY);
 
         post1 = Post.builder()
                 .member(member1)

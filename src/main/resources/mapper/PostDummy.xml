@@ -3,7 +3,7 @@
 <mapper namespace="com.runninghi.runninghibackv2.common.dummy.TestDatabaseMapper">
 
     <insert id="insertPostDummyData">
-        INSERT INTO tbl_post (post_no, member_no, create_date, update_date, difficulty, distance, kcal, mean_pace, time, gps_url, location_name, post_content, report_cnt, role, status, main_data, post_title, geometry)
+        INSERT INTO tbl_post (post_no, member_no, create_date, update_date, difficulty, distance, kcal, mean_pace, time, gps_url, location_name, post_content, report_cnt, role, status, main_data, post_title, start_point)
         VALUES
             -- 현진 카카오
             (1, 870, '2024-06-06 16:36:12', null, 0, 12.3, 200, 300, 5160, null, '서울', '오늘도 상쾌한 러닝 성공!', 0, 0, true, '1시간 26분', '6월 6일 서울 러닝', ST_GeomFromText('POINT(126.978 37.566)', 4326, 'axis-order=long-lat')),
