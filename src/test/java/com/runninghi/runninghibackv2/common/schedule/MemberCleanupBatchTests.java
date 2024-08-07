@@ -9,8 +9,10 @@ import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -18,9 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SpringBootTest
@@ -60,6 +60,8 @@ class MemberCleanupBatchTests {
     private KeywordRepository keywordRepository;
 
     private LocalDateTime dateTime;
+    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+    Point point = geometryFactory.createPoint(new Coordinate(126.978,37.566));
 
     @BeforeEach
     @AfterEach
@@ -142,8 +144,7 @@ class MemberCleanupBatchTests {
                 .postContent("첫 번째 게시글 내용입니다.")
                 .role(Role.USER)
                 .locationName("서울")
-                .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO("도쿄", null, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150)))
+                .gpsDataVO(new GpsDataVO("도쿄", point, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150), Difficulty.EASY))
                 .build();
         posts.add(post1);
 
@@ -153,8 +154,7 @@ class MemberCleanupBatchTests {
                 .postContent("두 번째 게시글 내용입니다. : 남아있는 게시글 입니다.")
                 .role(Role.ADMIN)
                 .locationName("부산")
-                .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO("도쿄", null, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150)))
+                .gpsDataVO(new GpsDataVO("도쿄", point, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150), Difficulty.EASY))
                 .build();
         posts.add(post2);
 
@@ -163,8 +163,7 @@ class MemberCleanupBatchTests {
                 .postContent("세 번째 게시글 내용입니다.")
                 .role(Role.USER)
                 .locationName("대구")
-                .difficulty(Difficulty.EASY)
-                .gpsDataVO(new GpsDataVO("도쿄", null, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150)))
+                .gpsDataVO(new GpsDataVO("도쿄", point, LocalDateTime.now(), 100f, 42000, 200, 300, Arrays.asList(100, 200, 300), Arrays.asList(50, 100, 150), Difficulty.EASY))
                 .build();
         posts.add(post3);
 

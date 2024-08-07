@@ -69,7 +69,7 @@ public record GetPostResponse(
                 likeCnt,
                 bookmarkCnt,
                 replyCnt,
-                post.getDifficulty().toString(),
+                post.getGpsDataVO().getDifficulty().toString(),
                 isLiked,
                 isBookmarked
         );

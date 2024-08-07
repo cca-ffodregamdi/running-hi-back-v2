@@ -2,9 +2,10 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
-import com.runninghi.runninghibackv2.application.dto.post.request.RunDataRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
@@ -13,11 +14,13 @@ import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
 import com.runninghi.runninghibackv2.domain.repository.*;
-import com.runninghi.runninghibackv2.domain.service.GpsCalculator;
 import com.runninghi.runninghibackv2.domain.service.GpsCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,13 +33,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.GZIPInputStream;
+import java.util.stream.StreamSupport;
+import org.locationtech.jts.geom.Point;
 
 import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 
@@ -44,7 +49,6 @@ import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final GpsCalculator calculateGPS;
     private final PostChecker postChecker;
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
@@ -61,6 +65,8 @@ public class PostService {
 
     private final AmazonS3Client amazonS3Client;
     private static final Logger logger = LoggerFactory.getLogger(PostService.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     private String buildKey(String dirName) {
 
@@ -122,20 +128,50 @@ public class PostService {
         imageService.savePostNo(imageUrl, postNo);
     }
 
-    private String createPostTitle(RunDataRequest request) {
+    private String createPostTitle(GpsDataVO request) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M월 d일", Locale.KOREAN);
-        return request.getRunStartDate().format(formatter) + " " + request.getLocation() + " 러닝";
+        return request.getRunStartTime().format(formatter) + " " + request.getLocationName() + " 러닝";
     }
 
-    public GpsDataResponse getGpxLonLatData(Long postNo) throws IOException {
-        Post post = findPostByNo(postNo);
-        String gpsUrl = post.getGpsUrl();
-
-        URL url = new URL(gpsUrl);
-
-        try (InputStream inputStream = url.openStream()) {
-            return new GpsDataResponse(gpsCoordinateExtractor.extractCoordinates(inputStream));
+    private String readFileContent(MultipartFile file) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            return reader.lines().collect(Collectors.joining("\n"));
         }
+    }
+    private List<Integer> getIntegerList(JsonNode node) {
+        return StreamSupport.stream(node.spliterator(), false)
+                .map(JsonNode::asInt)
+                .collect(Collectors.toList());
+    }
+
+    public GpsDataVO getRunDataFromTxt(MultipartFile file) throws IOException {
+        String content = readFileContent(file);
+        JsonNode rootNode = objectMapper.readTree(content);
+
+        JsonNode runInfoNode = rootNode.get("runInfo");
+        JsonNode sectionDataNode = rootNode.get("sectionData");
+        JsonNode gpsDataNode = rootNode.get("gpsData");
+
+        Point startPoint = null;
+        if (gpsDataNode.isArray() && gpsDataNode.size() > 0) {
+            JsonNode firstGpsPoint = gpsDataNode.get(0);
+            double lon = firstGpsPoint.get("lon").asDouble();
+            double lat = firstGpsPoint.get("lat").asDouble();
+            startPoint = geometryFactory.createPoint(new Coordinate(lon, lat));
+        }
+
+        return GpsDataVO.builder()
+                .locationName(runInfoNode.get("location").asText())
+                .startPoint(startPoint)
+                .runStartTime(LocalDateTime.parse(runInfoNode.get("runStartDate").asText()))
+                .distance((float) runInfoNode.get("distance").asDouble())
+                .time(runInfoNode.get("time").asInt())
+                .kcal(runInfoNode.get("kcal").asInt())
+                .meanPace(runInfoNode.get("meanPace").asInt())
+                .sectionPace(getIntegerList(sectionDataNode.get("pace")))
+                .sectionKcal(getIntegerList(sectionDataNode.get("kcal")))
+                .difficulty(Difficulty.valueOf(runInfoNode.get("difficulty").asText()))
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -173,14 +209,12 @@ public class PostService {
     }
 
     @Transactional
-    public CreateRecordResponse createRecord(Long memberNo, MultipartFile file, RunDataRequest request) throws Exception {
-
-        GpsDataVO gpsDataVO = new GpsDataVO(request.getLocation(), null, request.getRunStartDate(), request.getDistance(),
-                request.getTime(), request.getKcal(), request.getMeanPace(), request.getSectionPace(), request.getSectionKcal());
+    public CreateRecordResponse createRecord(Long memberNo, MultipartFile file) throws IOException {
+        GpsDataVO gpsDataVO = getRunDataFromTxt(file);
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
-        String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
+//        String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
         updateRecordOfMyChallenges(member, gpsDataVO);
 
@@ -188,10 +222,9 @@ public class PostService {
                 .member(member)
                 .role(member.getRole())
                 .gpsDataVO(gpsDataVO)
-                .gpxUrl(gpsUrl)
-                .difficulty(Difficulty.valueOf(request.getDifficulty()))
+                .gpxUrl("gpsUrl")
                 .status(false)
-                .postTitle(createPostTitle(request))
+                .postTitle(createPostTitle(gpsDataVO))
                 .build());
 
         return new CreateRecordResponse(createdPost.getPostNo());
