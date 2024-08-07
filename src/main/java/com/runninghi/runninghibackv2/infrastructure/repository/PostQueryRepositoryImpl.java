@@ -47,8 +47,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private static final String DISTANCE_CONDITION = "ST_Distance_Sphere({0}, {1}) <= {2}";
 
-    @Value("${image.null}")
-    private String nullUrl;
+    @Value("${image}")
+    String nullUrl;
 
     @Override
     public PageResultData<GetMyPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo) {
