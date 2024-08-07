@@ -4,10 +4,7 @@ import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateCha
 import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.response.*;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetChallengeRankingResponse;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetMyChallengeResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
-import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.repository.ChallengeQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.ChallengeRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
@@ -18,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,11 +45,15 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetAllChallengeResponse> getAllChallengesByStatus(boolean status, Long memberNo) {
+    public GetAllChallengeResponse getAllChallengesByStatus(boolean status, Long memberNo) {
 
-        return challengeQueryRepository.findChallengesByStatusAndMember(status, memberNo).stream()
-                .map(GetAllChallengeResponse::from)
+        List<ChallengeListResponse> challengeList =
+                challengeQueryRepository.findChallengesByStatusAndMember(status, memberNo).stream()
+                .map(ChallengeListResponse::from)
                 .toList();
+        int challengeCount = challengeList.size();
+
+        return new GetAllChallengeResponse(challengeList, challengeCount);
     }
 
     @Transactional(readOnly = true)
