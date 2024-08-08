@@ -18,6 +18,7 @@ import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -45,6 +46,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     private final MemberRepository memberRepository;
 
     private static final String DISTANCE_CONDITION = "ST_Distance_Sphere({0}, {1}) <= {2}";
+
+    @Value("${image}")
+    String nullUrl;
 
     @Override
     public PageResultData<GetMyPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo) {
@@ -528,7 +532,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .limit(1)
                     .fetchOne();
 
-            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : nullUrl;
 
             return GetRecordPostResponse.from(post, imageUrl);
         }).collect(Collectors.toList());
@@ -552,7 +556,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .limit(1)
                     .fetchOne();
 
-            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : nullUrl;
 
             return GetRecordPostResponse.from(post, imageUrl);
         }).collect(Collectors.toList());
@@ -577,7 +581,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .limit(1)
                     .fetchOne();
 
-            String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : nullUrl;
 
             return GetRecordPostResponse.from(post, imageUrl);
         }).collect(Collectors.toList());

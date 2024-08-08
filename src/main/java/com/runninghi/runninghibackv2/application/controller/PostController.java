@@ -148,7 +148,7 @@ public class PostController {
 
     @PostMapping(value = "/gps", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "러닝 데이터 저장", description = "러닝이 끝난 직후 txt 형식의 gps 파일을 저장합니다. ")
-    public ResponseEntity<ApiResult<CreateRecordResponse>> createRecordAndPost(@RequestHeader("Authorization") String bearerToken,
+    public ResponseEntity<ApiResult<CreateRecordResponse>> createGPSRecord(@RequestHeader("Authorization") String bearerToken,
                                                                                @RequestPart("file") MultipartFile file) throws IOException {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
@@ -160,7 +160,7 @@ public class PostController {
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "저장된 러닝 데이터 게시글 공유", description = "러닝 데이터를 게시글로 공유합니다. \n 게시글 제목, 내용, 사진url을 추가로 받습니다.")
-    public ResponseEntity<ApiResult<CreatePostResponse>> createRecord(@RequestHeader("Authorization") String bearerToken,
+    public ResponseEntity<ApiResult<CreatePostResponse>> postGPSRecord(@RequestHeader("Authorization") String bearerToken,
                                                                         @RequestBody CreatePostRequest request) {
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);

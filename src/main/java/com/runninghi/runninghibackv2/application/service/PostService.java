@@ -214,7 +214,7 @@ public class PostService {
 
         Member member = memberRepository.findByMemberNo(memberNo);
 
-//        String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
+        String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
         updateRecordOfMyChallenges(member, gpsDataVO);
 
@@ -222,7 +222,7 @@ public class PostService {
                 .member(member)
                 .role(member.getRole())
                 .gpsDataVO(gpsDataVO)
-                .gpxUrl("gpsUrl")
+                .gpxUrl(gpsUrl)
                 .status(false)
                 .postTitle(createPostTitle(gpsDataVO))
                 .build());
