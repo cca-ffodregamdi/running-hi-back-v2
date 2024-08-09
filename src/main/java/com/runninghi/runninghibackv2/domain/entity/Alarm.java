@@ -38,7 +38,7 @@ public class Alarm {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "alarm_type", nullable = false)
+    @Column(name = "alarm_type", nullable = true)
     @Comment(value = "알림 타입")
     private AlarmType alarmType;
 
@@ -57,11 +57,12 @@ public class Alarm {
     private LocalDateTime readDate;
 
     @Builder
-    public Alarm(Long id, Member member, String title, String content, boolean isRead, LocalDateTime createDate, LocalDateTime readDate) {
+    public Alarm(Long id, Member member, String title, String content, AlarmType alarmType, boolean isRead, LocalDateTime createDate, LocalDateTime readDate) {
         this.id = id;
         this.member = member;
         this.title = title;
         this.content = content;
+        this.alarmType = alarmType;
         this.isRead = false;
         this.createDate = createDate;
         this.readDate = readDate;
