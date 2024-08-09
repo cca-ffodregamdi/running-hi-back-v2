@@ -49,8 +49,7 @@ public class MemberCleanupBatch {
         try {
             alarmRepository.deleteAllByMember_MemberNo(deactivateMember.getMemberNo());
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 알림 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -58,8 +57,7 @@ public class MemberCleanupBatch {
         try {
             replyRepository.deleteAllByMember(deactivateMember);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 댓글 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -67,8 +65,7 @@ public class MemberCleanupBatch {
         try {
             bookmarkRepository.deleteAllByMember(deactivateMember);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 북마크 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -76,8 +73,7 @@ public class MemberCleanupBatch {
         try {
             feedbackRepository.deleteAllByFeedbackWriter(deactivateMember);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 피드백/건의사항 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -108,7 +104,7 @@ public class MemberCleanupBatch {
                 postRepository.deleteAllInBatch(posts);
             }
         } catch (Exception e) {
-            throw new SchedulingException("게시물 삭제 중 오류가 발생했습니다.", e);
+            throw new SchedulingException("회원 탈퇴 : 게시물 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
