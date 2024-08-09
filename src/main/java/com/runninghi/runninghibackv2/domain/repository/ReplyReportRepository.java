@@ -21,5 +21,5 @@ public interface ReplyReportRepository extends JpaRepository<ReplyReport, Long> 
 
     void deleteAllByReporter(Member member);
 
-    int deleteAllByReportedReply(Reply reportedReply);
+    void deleteAllByReportedReply(Reply reportedReply);
 }
