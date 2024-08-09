@@ -21,7 +21,7 @@ public class PostChecker {
 
     public void isWriter(Long memberNo, Long postWriterNo) {
         if (!postWriterNo.equals(memberNo)) {
-            log.warn("권한 없음: 게시글 작성자와 다른 memberNo");
+            log.warn("권한 없음: 게시글 작성자와 다른 memberNo. 게시글 작성자: {}, 요청자: {}", postWriterNo, memberNo);
             throw new AccessDeniedException("권한이 없습니다.");
         }
     }
