@@ -84,10 +84,7 @@ public class MemberCleanupBatch {
                 for (Post post : posts) {
                     // 관련된 신고 기록 삭제
                     List<Reply> replies = replyRepository.findAllByPost(post);
-                    for (Reply reply : replies) {
-                        System.out.println(replyReportRepository.deleteAllByReportedReply(reply));
-
-                    }
+                    for (Reply reply : replies) { replyReportRepository.deleteAllByReportedReply(reply); }
 
                     // 키워드, 북마크, 댓글 등을 일괄 삭제
                     postKeywordRepository.deleteAllByPost(post);
