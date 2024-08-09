@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
+import com.runninghi.runninghibackv2.common.exception.custom.S3UploadException;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.*;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
@@ -18,6 +19,7 @@ import com.runninghi.runninghibackv2.domain.service.GpsCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
@@ -45,6 +47,7 @@ import org.locationtech.jts.geom.Point;
 
 import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -64,7 +67,6 @@ public class PostService {
     private String bucketName;
 
     private final AmazonS3Client amazonS3Client;
-    private static final Logger logger = LoggerFactory.getLogger(PostService.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
@@ -89,39 +91,44 @@ public class PostService {
             amazonS3Client.putObject(bucketName, key, byteArrayInputStream, objectMetadata);
             return amazonS3Client.getUrl(bucketName, key).toString();
         } catch (IOException e) {
-            logger.error("GPS TXT 파일 S3 업로드 에러: ", e);
-            throw e;
+            log.error("GPS txt 파일 업로드 중 오류 발생: {}", e.getMessage(), e);
+            throw new S3UploadException(e.getMessage());
         }
     }
 
     private String getMainData(int dataNo, GpsDataVO gpsDataVO) {
-
         String mainData = null;
 
-        switch (dataNo) {
-            case 0:
-                mainData = gpsDataVO.getDistance() + "km";
-                break;
-            case 1:
-                mainData = gpsDataVO.getTime()/60 + "분 " + gpsDataVO.getTime()%60 + "초";
-                break;
-            case 2:
-                mainData = gpsDataVO.getKcal() + "Kcal";
-                break;
-            case 3:
-                mainData = gpsDataVO.getMeanPace()/60 + "' " + gpsDataVO.getMeanPace()%60 + "\"";
-                break;
+        try {
+            switch (dataNo) {
+                case 0:
+                    mainData = gpsDataVO.getDistance() + "km";
+                    break;
+                case 1:
+                    mainData = gpsDataVO.getTime()/60 + "분 " + gpsDataVO.getTime()%60 + "초";
+                    break;
+                case 2:
+                    mainData = gpsDataVO.getKcal() + "Kcal";
+                    break;
+                case 3:
+                    mainData = gpsDataVO.getMeanPace()/60 + "' " + gpsDataVO.getMeanPace()%60 + "\"";
+                    break;
+                case 4:
+                    break;
+                default:
+                    log.warn("Invalid dataNo: {}", dataNo);
+                    break;
+            }
+        } catch (Exception e) {
+            log.error("MainDataNo: {}에 대한 데이터 처리 중 오류 발생", dataNo, e);
+            throw new IllegalArgumentException(e.getMessage());
         }
-        return  mainData;
+        return mainData;
     }
 
     private Post findPostByNo(Long postNo) {
         return postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
-    }
-
-    private void savePostImages(List<String> imageUrlList, Long postNo) {
-        imageService.savePostNo(imageUrlList, postNo);
     }
 
     private void savePostImage(String imageUrl, Long postNo) {
@@ -134,8 +141,16 @@ public class PostService {
     }
 
     private String readFileContent(MultipartFile file) throws IOException {
+
+        log.info("런데이터 GPS 파일 읽기 시작: {}", LocalDateTime.now());
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
-            return reader.lines().collect(Collectors.joining("\n"));
+            String content = reader.lines().collect(Collectors.joining("\n"));
+            log.info("런데이터 GPS 파일 읽기 완료: {}", LocalDateTime.now());
+            return content;
+        }  catch (IOException e) {
+            log.error("런데이터 GPS 파일 읽기 중 오류 발생: {}", LocalDateTime.now(), e);
+            throw e;
         }
     }
     private List<Integer> getIntegerList(JsonNode node) {
@@ -176,63 +191,89 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PageResultData<GetAllPostsResponse>  getPostScroll(Long memberNo, Pageable pageable, String sort, int distance) {
-        if (sort.equalsIgnoreCase("latest")) {
-            return postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
-        } else if (sort.equalsIgnoreCase("recommended")) {
-            return postQueryRepository.findAllPostsByRecommended(memberNo, pageable, distance);
-        } else if (sort.equalsIgnoreCase("like")){
-            return postQueryRepository.findAllPostsByLikeCnt(memberNo, pageable, distance);
-        } else if (sort.equalsIgnoreCase("distance")){
-            return postQueryRepository.findAllPostsByDistance(memberNo, pageable, distance);
-        } else {
-            return postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
+        log.info("게시물 전체 조회 요청. 회원번호: {}, 정렬기준: {}, 거리: {}", memberNo, sort, distance);
+
+        PageResultData<GetAllPostsResponse> result;
+        try {
+            switch (sort.toLowerCase()) {
+                case "latest":
+                    result = postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
+                    break;
+                case "recommended":
+                    result = postQueryRepository.findAllPostsByRecommended(memberNo, pageable, distance);
+                    break;
+                case "like":
+                    result = postQueryRepository.findAllPostsByLikeCnt(memberNo, pageable, distance);
+                    break;
+                case "distance":
+                    result = postQueryRepository.findAllPostsByDistance(memberNo, pageable, distance);
+                    break;
+                default:
+                    log.warn("알 수 없는 정렬 기준: {}. 기본값(최신순)으로 조회합니다.", sort);
+                    result = postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
+            }
+            return result;
+        } catch (Exception e) {
+            log.error("게시물 스크롤 조회 중 오류 발생", e);
+            throw e;
         }
     }
 
     @Transactional(readOnly = true)
     public GetPostResponse getPostDetailByPostNo(Long memberNo, Long postNo) {
+        log.info("게시물 상세 조회. 회원번호: {}, 게시물번호: {}", memberNo, postNo);
         return postQueryRepository.getPostDetailByPostNo(memberNo, postNo);
     }
 
     @Transactional(readOnly = true)
     public PageResultData<GetMyPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
+        log.info("내 게시물 리스트 조회. 회원번호: {}", memberNo);
         return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
     }
 
     @Transactional(readOnly = true)
     public PageResultData<GetAllPostsResponse> getMyLikedPosts(Pageable pageable, Long memberNo) {
+        log.info("나의 좋아요된 게시글 리스트 조회. 회원번호: {}", memberNo);
         return  postQueryRepository.findMyLikedPostsByPageable(pageable, memberNo);
     }
     @Transactional(readOnly = true)
     public PageResultData<GetAllPostsResponse> getMyBookmarkedPosts(Pageable pageable, Long memberNo) {
+        log.info("나의 북마크된 게시글 리스트 조회. 회원번호: {}", memberNo);
         return  postQueryRepository.findMyBookmarkedPostsByPageable(pageable, memberNo);
     }
 
     @Transactional
     public CreateRecordResponse createRecord(Long memberNo, MultipartFile file) throws IOException {
-        GpsDataVO gpsDataVO = getRunDataFromTxt(file);
+        log.info("GPS 기록 생성 시작. 회원번호: {}", memberNo);
+        try {
+            GpsDataVO gpsDataVO = getRunDataFromTxt(file);
 
-        Member member = memberRepository.findByMemberNo(memberNo);
+            Member member = memberRepository.findByMemberNo(memberNo);
 
-        String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
+            String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
-        updateRecordOfMyChallenges(member, gpsDataVO);
+            updateRecordOfMyChallenges(member, gpsDataVO);
 
-        Post createdPost = postRepository.save(Post.builder()
-                .member(member)
-                .role(member.getRole())
-                .gpsDataVO(gpsDataVO)
-                .gpxUrl(gpsUrl)
-                .status(false)
-                .postTitle(createPostTitle(gpsDataVO))
-                .build());
-
-        return new CreateRecordResponse(createdPost.getPostNo());
+            Post createdPost = postRepository.save(Post.builder()
+                    .member(member)
+                    .role(member.getRole())
+                    .gpsDataVO(gpsDataVO)
+                    .gpxUrl(gpsUrl)
+                    .status(false)
+                    .postTitle(createPostTitle(gpsDataVO))
+                    .build());
+            return new CreateRecordResponse(createdPost.getPostNo());
+        } catch (Exception e) {
+            log.error("GPS 기록 생성 중 오류 발생. 회원번호: {}", memberNo, e);
+            throw e;
+        }
     }
 
 
     @Transactional
     public CreatePostResponse createPost(Long memberNo, CreatePostRequest request) {
+        log.info("게시물 생성 시작. 회원번호: {}, 임시 게시물번호: {}", memberNo, request.postNo());
+
         postChecker.checkPostValidation(request.postContent());
 
         Post post = postRepository.findById(request.postNo())
@@ -244,40 +285,54 @@ public class PostService {
 
         String mainData = getMainData(request.mainData(), post.getGpsDataVO());
 
-        post.shareToPost(request, mainData);
+        try {
+            post.shareToPost(request, mainData);
+        } catch (Exception e) {
+            log.error("게시글 생성 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, request.postNo(), e);
+            throw e;
+        }
 
         return new CreatePostResponse(post.getPostNo());
-
     }
 
     @Transactional
     public UpdatePostResponse updatePost(Long memberNo, Long postNo, UpdatePostRequest request) {
+        log.info("게시물 수정 시작. 회원번호: {}, 게시물 번호: {}", memberNo, postNo);
+
         Post post = findPostByNo(postNo);
         postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
         String mainData = getMainData(request.mainData(), post.getGpsDataVO());
 
-        post.update(request, mainData);
-        imageService.updateImage(postNo, request.imageUrl());
+        try {
+            post.update(request, mainData);
+            imageService.updateImage(postNo, request.imageUrl());
+        } catch (Exception e) {
+            log.error("게시글 수정 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, postNo, e);
+            throw e;
+        }
 
         return UpdatePostResponse.from(post, request.imageUrl());
     }
 
     @Transactional
     public DeletePostResponse deletePost(Long memberNo, Long postNo) {
-
+        log.info("게시물 삭제 시작. 회원번호: {}, 게시물 번호: {}", memberNo, postNo);
         Post post = findPostByNo(postNo);
 
         postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
-        postKeywordService.deletePostKeyword(postNo);
-        postRepository.deleteById(postNo);
+        try {
+            postRepository.deleteById(postNo);
+        } catch (Exception e) {
+            log.error("게시글 삭제 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, postNo, e);
+            throw e;
+        }
 
         return DeletePostResponse.from(postNo);
     }
 
 
-    // 수정 필요!
     @Transactional(readOnly = true)
     public Page<GetReportedPostsResponse> getReportedPostScroll(Pageable pageable) {
 
