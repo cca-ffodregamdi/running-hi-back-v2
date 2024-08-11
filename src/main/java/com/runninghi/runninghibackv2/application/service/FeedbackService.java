@@ -155,6 +155,19 @@ public class FeedbackService {
         return UpdateFeedbackReplyResponse.from(updatedFeedback);
     }
 
+    @Transactional(readOnly = true)
+    public FeedbackPageResponse<GetFeedbackResponse> getFeedbackScrollByAdminWithReply(Pageable pageable, Long memberNo, Boolean reply) {
+        Member member = findMemberByNo(memberNo);
+
+        feedbackChecker.isAdmin(member.getRole());
+
+        Page<Feedback> feedbackPage = feedbackRepository.findByHasReply(reply, pageable);
+
+        Page<GetFeedbackResponse> response = feedbackPage.map(GetFeedbackResponse::from);
+
+        return FeedbackPageResponse.from(response);
+    }
+
     private Member findMemberByNo(Long memberNo) {
         return memberRepository.findById(memberNo)
                 .orElseThrow(EntityNotFoundException::new);
@@ -164,4 +177,5 @@ public class FeedbackService {
         return feedbackRepository.findById(feedbackNo)
                 .orElseThrow(EntityNotFoundException::new);
     }
+
 }
