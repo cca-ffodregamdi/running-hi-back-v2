@@ -211,7 +211,8 @@ public class FeedbackController {
                     @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "사용자 인증을 위한 Bearer 토큰", required = true),
                     @Parameter(in = ParameterIn.QUERY, name = "page", description = "페이지 번호"),
                     @Parameter(in = ParameterIn.QUERY, name = "size", description = "한 페이지당 항목 수"),
-                    @Parameter(in = ParameterIn.QUERY, name = "sort", description = "정렬 순서 ('asc' 또는 'desc')")
+                    @Parameter(in = ParameterIn.QUERY, name = "sort", description = "정렬 순서 ('asc' 또는 'desc')"),
+                    @Parameter(in = ParameterIn.QUERY, name = "reply", description = "답변 여부 (true 또는 false, 선택적)")
             },
             responses = { @ApiResponse(responseCode = "200", description = "피드백 리스트 조회 성공 : 관리자") }
     )
@@ -219,17 +220,23 @@ public class FeedbackController {
             @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
-            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort,
+            @RequestParam(required = false) Boolean hasReply
     ) {
-
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
-        FeedbackPageResponse<GetFeedbackResponse> response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
+        FeedbackPageResponse<GetFeedbackResponse> response;
+        if (hasReply == null) {
+            response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
+        } else {
+            response = feedbackService.getFeedbackScrollByAdminWithReply(pageable, memberNo, hasReply);
+        }
 
         return ResponseEntity.ok(ApiResult.success("피드백 리스트 조회 성공 : 관리자", response));
     }
+
 
     /**
      * 사용자가 본인의 피드백을 삭제하는 API입니다.
