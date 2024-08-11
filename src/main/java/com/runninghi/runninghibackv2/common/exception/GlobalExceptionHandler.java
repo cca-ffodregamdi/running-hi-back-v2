@@ -114,4 +114,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResult<Void>> handleAdminLoginException(AdminLoginException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResult.error(HttpStatus.FORBIDDEN, e.getMessage()));
     }
+
+    @ExceptionHandler(S3UploadException.class)
+    public ResponseEntity<ApiResult<Void>> handleS3ImageUploadException(S3UploadException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResult.error(ErrorCode.INTER_SERVER_ERROR));
+    }
+
+
 }
