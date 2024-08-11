@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.repository;
 
+import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.domain.entity.ReplyReport;
@@ -17,4 +18,8 @@ public interface ReplyReportRepository extends JpaRepository<ReplyReport, Long> 
     List<ReplyReport> findAllByReportedReply(Reply reply);
 
     void deleteAllByReportedReply_Post(Post post);
+
+    void deleteAllByReporter(Member member);
+
+    void deleteAllByReportedReply(Reply reportedReply);
 }
