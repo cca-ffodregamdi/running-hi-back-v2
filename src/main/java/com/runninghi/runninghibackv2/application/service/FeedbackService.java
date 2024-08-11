@@ -156,12 +156,12 @@ public class FeedbackService {
     }
 
     @Transactional(readOnly = true)
-    public FeedbackPageResponse<GetFeedbackResponse> getFeedbackScrollByAdminWithReply(Pageable pageable, Long memberNo, Boolean reply) {
+    public FeedbackPageResponse<GetFeedbackResponse> getFeedbackScrollByAdminWithReply(Pageable pageable, Long memberNo, Boolean hasReply) {
         Member member = findMemberByNo(memberNo);
 
         feedbackChecker.isAdmin(member.getRole());
 
-        Page<Feedback> feedbackPage = feedbackRepository.findByHasReply(reply, pageable);
+        Page<Feedback> feedbackPage = feedbackRepository.findByHasReply(hasReply, pageable);
 
         Page<GetFeedbackResponse> response = feedbackPage.map(GetFeedbackResponse::from);
 

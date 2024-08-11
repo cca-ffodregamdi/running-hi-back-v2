@@ -221,17 +221,17 @@ public class FeedbackController {
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @Positive int size,
             @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort,
-            @RequestParam(required = false) Boolean reply
+            @RequestParam(required = false) Boolean hasReply
     ) {
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
         FeedbackPageResponse<GetFeedbackResponse> response;
-        if (reply == null) {
+        if (hasReply == null) {
             response = feedbackService.getFeedbackScrollByAdmin(pageable, memberNo);
         } else {
-            response = feedbackService.getFeedbackScrollByAdminWithReply(pageable, memberNo, reply);
+            response = feedbackService.getFeedbackScrollByAdminWithReply(pageable, memberNo, hasReply);
         }
 
         return ResponseEntity.ok(ApiResult.success("피드백 리스트 조회 성공 : 관리자", response));
