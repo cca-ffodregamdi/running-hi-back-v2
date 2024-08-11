@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.common.schedule;
 import com.runninghi.runninghibackv2.common.exception.custom.SchedulingException;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
+import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.domain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -37,8 +38,8 @@ public class MemberCleanupBatch {
                 deleteRelatedAlarms(deactivateMember);
                 deleteRelatedFeedbacks(deactivateMember);
                 deleteRelatedBookmarks(deactivateMember);
-                deleteRelatedReplies(deactivateMember);
                 deleteRelatedPosts(deactivateMember);
+                deleteRelatedReplies(deactivateMember);
                 deactivateMember.cleanupDeactivateMemberData();
             }
         }
@@ -48,8 +49,7 @@ public class MemberCleanupBatch {
         try {
             alarmRepository.deleteAllByMember_MemberNo(deactivateMember.getMemberNo());
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 알림 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -57,8 +57,7 @@ public class MemberCleanupBatch {
         try {
             replyRepository.deleteAllByMember(deactivateMember);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 댓글 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -66,8 +65,7 @@ public class MemberCleanupBatch {
         try {
             bookmarkRepository.deleteAllByMember(deactivateMember);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 북마크 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -75,8 +73,7 @@ public class MemberCleanupBatch {
         try {
             feedbackRepository.deleteAllByFeedbackWriter(deactivateMember);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 피드백/건의사항 삭제 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -85,18 +82,28 @@ public class MemberCleanupBatch {
             List<Post> posts = postRepository.findAllByMember(deactivateMember);
             if (!posts.isEmpty()) {
                 for (Post post : posts) {
+                    // 관련된 신고 기록 삭제
+                    List<Reply> replies = replyRepository.findAllByPost(post);
+                    for (Reply reply : replies) { replyReportRepository.deleteAllByReportedReply(reply); }
+
+                    // 키워드, 북마크, 댓글 등을 일괄 삭제
                     postKeywordRepository.deleteAllByPost(post);
                     bookmarkRepository.deleteAllByPost(post);
-                    replyReportRepository.deleteAllByReportedReply_Post(post);
                     replyRepository.deleteAllByPost(post);
+                    replyReportRepository.deleteAllByReportedReply_Post(post);
                     postReportRepository.deleteAllByReportedPost(post);
                 }
+
+                // Reporter와 관련된 모든 신고 삭제
+                replyReportRepository.deleteAllByReporter(deactivateMember);
+
+                // 게시물 일괄 삭제
                 postRepository.deleteAllInBatch(posts);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SchedulingException();
+            throw new SchedulingException("회원 탈퇴 : 게시물 삭제 중 오류가 발생했습니다.", e);
         }
     }
+
 
 }
