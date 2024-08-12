@@ -16,6 +16,8 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     Page<Feedback> findAllBy(Pageable pageable);
 
+    Page<Feedback> findByHasReply(Boolean hasReply, Pageable pageable);
+
     List<Feedback> findAllByFeedbackWriter(Member deactivateMember);
 
     void deleteAllByFeedbackWriter(Member deactivateMemberNo);
