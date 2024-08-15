@@ -16,12 +16,14 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AlarmService {
 
@@ -30,51 +32,30 @@ public class AlarmService {
     private final AlarmRepository alarmRepository;
     private final MemberRepository memberRepository;
 
-    private final String POST_FCM_MESSAGE = "회원님의 게시글에 댓글이 등록되었습니다.";
-    private final String POST_FCM_TITLE = "댓글 알림";
+    private final String POST__REPLY_FCM_TITLE = "회원님의 게시글에 댓글이 등록되었습니다.";
+//    private final String POST_FCM_MESSAGE = "회원님의 게시글에 댓글이 등록되었습니다.";
 
     /**
      * 댓글 관련 푸쉬 알림 발송 메소드
      * 댓글 작성 시, 게시글 작성자에게 알림 발송.
      * @param replyFCMDTO 저장된 댓글
      */
-    public void sendReplyPushNotification(ReplyFCMDTO replyFCMDTO) {
+    public void sendReplyPushNotification(ReplyFCMDTO replyFCMDTO) throws FirebaseMessagingException {
 
-        List<Alarm> alarmList = new ArrayList<>();
+        CreateAlarmRequest alarmRequest = CreateAlarmRequest.of(POST__REPLY_FCM_TITLE, replyFCMDTO.getSavedReply().getMember().getMemberNo());
 
-        Notification notification = Notification.builder()
-                .setTitle(POST_FCM_TITLE)
-                .setBody(POST_FCM_MESSAGE)
-                .build();
-
-        Message message = Message.builder()
-                .setToken(replyFCMDTO.getSavedReply().getMember().getFcmToken())
-                .setNotification(notification)
-                .build();
-
-        ApiFuture<String> stringApiFuture = firebaseMessaging.sendAsync(message);
-        System.out.println("stringApiFuture : " + stringApiFuture); // 알림 전송 결과 로깅 필요
-
-        // 게시글 알림 추가
-        alarmList.add(
-                Alarm.builder()
-                        .member(replyFCMDTO.getSavedReply().getPost().getMember())
-                        .title(POST_FCM_TITLE)
-                        .content(POST_FCM_MESSAGE)
-                        .build()
-        );
-
-        alarmRepository.saveAll(alarmList);
-
+        createAlarm(alarmRequest);
+        sendAlarm(alarmRequest, replyFCMDTO.getSavedReply().getMember().getFcmToken());
     }
 
 
+    @Transactional(readOnly = true)
     public List<GetAllAlarmResponse> getAllAlarm(Long memberNo) {
 
         List<Alarm> alarmList = alarmRepository.findAllByMember_MemberNo(memberNo);
         return alarmList.stream()
                 .filter(alarm -> !alarm.isRead())
-                .map(Alarm::toResponse)
+                .map(GetAllAlarmResponse::ofAlarmEntity)
                 .toList();
     }
 
@@ -84,7 +65,6 @@ public class AlarmService {
         Alarm alarm = Alarm.builder()
                 .member(member)
                 .title(request.title())
-                .content(request.content())
                 .build();
 
         alarmRepository.save(alarm);
@@ -96,13 +76,11 @@ public class AlarmService {
 
         Notification notification = Notification.builder()
                         .setTitle(request.title())
-                        .setBody(request.content())
                         .build();
         Message message = Message.builder()
                         .setToken(fcmToken)
                         .setNotification(notification)
                         .build();
-
 
         firebaseMessaging.send(message);
     }
