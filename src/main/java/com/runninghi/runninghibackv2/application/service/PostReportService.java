@@ -2,6 +2,8 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.postreport.response.*;
+import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.entity.Member;
@@ -62,15 +64,14 @@ public class PostReportService {
 
     // 게시글 신고 전체 조회
     @Transactional(readOnly = true)
-    public Page<GetAllPostReportsResponse> getPostReports(Pageable pageable) {
-
+    public PageResultData<GetAllPostReportsResponse> getPostReports(Pageable pageable) {
         Page<PostReport> postReports = postReportRepository.findAll(pageable);
 
-        List<GetAllPostReportsResponse> responses = postReports.stream()
+        List<GetAllPostReportsResponse> responses = postReports.getContent().stream()
                 .map(GetAllPostReportsResponse::from)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(responses, pageable, postReports.getTotalElements());
+        return new PageResultData<>(responses, pageable, postReports.getTotalElements());
     }
 
     // 게시글 신고 상세 조회

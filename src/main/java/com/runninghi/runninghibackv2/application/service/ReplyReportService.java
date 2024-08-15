@@ -1,14 +1,12 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.runninghi.runninghibackv2.application.dto.postreport.response.GetAllPostReportsResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.request.CreateReplyReportRequest;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.CreateReplyReportResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.DeleteReplyReportResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.GetReplyReportResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.HandleReplyReportResponse;
-import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Member;
-import com.runninghi.runninghibackv2.domain.entity.PostReport;
 import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.domain.entity.ReplyReport;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
@@ -19,7 +17,6 @@ import com.runninghi.runninghibackv2.domain.service.ReplyReportChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +60,7 @@ public class ReplyReportService {
 
     // 댓글 신고 전체 조회
     @Transactional(readOnly = true)
-    public Page<GetReplyReportResponse> getReplyReports(Pageable pageable) {
+    public PageResultData<GetReplyReportResponse> getReplyReports(Pageable pageable) {
 
         Page<ReplyReport> replyReports = replyReportRepository.findAll(pageable);
 
@@ -71,7 +68,7 @@ public class ReplyReportService {
                 .map(GetReplyReportResponse::from)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(responses, pageable, replyReports.getTotalElements());
+        return new PageResultData<>(responses, pageable, replyReports.getTotalElements());
     }
 
     // 댓글 신고 상세 조회

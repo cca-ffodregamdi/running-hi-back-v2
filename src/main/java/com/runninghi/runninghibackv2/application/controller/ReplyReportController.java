@@ -49,13 +49,14 @@ public class ReplyReportController {
     @HasAccess
     @Operation(summary = "댓글 신고 전체 조회", description = "저장된 모든 댓글 신고를 조회합니다.")
     @GetMapping()
-    public ResponseEntity<ApiResult<Page<GetReplyReportResponse>>> getReplyReports(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
+    public ResponseEntity<PageResult<GetReplyReportResponse>> getReplyReports(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
                                                      @RequestParam(defaultValue = "10") @Positive int size,
                                                      @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
-        Page<GetReplyReportResponse> response = replyReportService.getReplyReports(pageable);
 
-        return ResponseEntity.ok(ApiResult.success("댓글신고 전체 조회 성공", response));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
+        PageResultData<GetReplyReportResponse> response = replyReportService.getReplyReports(pageable);
+
+        return ResponseEntity.ok(PageResult.success("댓글신고 전체 조회 성공", response));
     }
 
     @HasAccess

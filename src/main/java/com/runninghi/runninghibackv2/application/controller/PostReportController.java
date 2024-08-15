@@ -6,13 +6,14 @@ import com.runninghi.runninghibackv2.application.service.PostReportService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
+import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -47,14 +48,14 @@ public class PostReportController {
     @HasAccess
     @Operation(summary = "게시글 신고 전체 조회", description = "저장된 모든 게시글 신고를 조회합니다.")
     @GetMapping()
-    public ResponseEntity<ApiResult<Page<GetAllPostReportsResponse>>> getPostReports(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
-                                                                                     @RequestParam(defaultValue = "10") @Positive int size,
-                                                                                     @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
+    public ResponseEntity<PageResult<GetAllPostReportsResponse>> getPostReports(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
+                                                                                 @RequestParam(defaultValue = "10") @Positive int size,
+                                                                                 @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
-        Page<GetAllPostReportsResponse> response = postReportService.getPostReports(pageable);
+        PageResultData<GetAllPostReportsResponse> response = postReportService.getPostReports(pageable);
 
-        return ResponseEntity.ok(ApiResult.success("게시글 신고 전체 조회 성공", response));
+        return ResponseEntity.ok(PageResult.success("게시글 신고 전체 조회 성공", response));
     }
 
     @HasAccess
