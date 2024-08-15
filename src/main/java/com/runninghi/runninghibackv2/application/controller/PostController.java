@@ -52,7 +52,6 @@ public class PostController {
      * 3. 나의 게시글 조회 (최신순) <p>
      * 4. 나의 좋아요 게시글 조회 (최신순) <p>
      * 5. 나의 북마크 게시글 조회 (최신순) <p>
-     * 6. 신고된 게시글 조회 (관리자만 조회 가능)
      */
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -131,21 +130,6 @@ public class PostController {
         PageResultData<GetAllPostsResponse> response = postService.getMyBookmarkedPosts(pageable, memberInfo.memberNo());
 
         return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
-    }
-
-    @HasAccess
-    @GetMapping(value = "/reported", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "신고된 게시글 조회", description = "신고된 게시글만 볼 수 있습니다.")
-    public ResponseEntity<ApiResult<Page<GetReportedPostsResponse>>> getReportedPostList(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
-                                                                                         @RequestParam(defaultValue = "10") @Positive int size,
-                                                                                         @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
-        log.info("나의 북마크된 게시글 리스트 조회 요청이 들어왔습니다. page: {}, size: {}", page, size);
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
-
-        Page<GetReportedPostsResponse> response = postService.getReportedPostScroll(pageable);
-
-        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
 
