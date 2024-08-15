@@ -35,6 +35,7 @@ class FaqServiceTests {
 
     @BeforeEach
     void setUp() {
+        faqRepository.deleteAllInBatch();
         CreateFaqRequest request = new CreateFaqRequest("Test Question", "Test Answer");
         CreateFaqResponse response = faqService.createFaq(request);
         faqNo = response.faqNo();
