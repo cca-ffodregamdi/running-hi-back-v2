@@ -1,10 +1,7 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.postreport.request.CreatePostReportRequest;
-import com.runninghi.runninghibackv2.application.dto.postreport.response.CreatePostReportResponse;
-import com.runninghi.runninghibackv2.application.dto.postreport.response.DeletePostReportResponse;
-import com.runninghi.runninghibackv2.application.dto.postreport.response.GetPostReportResponse;
-import com.runninghi.runninghibackv2.application.dto.postreport.response.HandlePostReportResponse;
+import com.runninghi.runninghibackv2.application.dto.postreport.response.*;
 import com.runninghi.runninghibackv2.application.service.PostReportService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
@@ -28,6 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/post-reports")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", methods = RequestMethod.GET)
 public class PostReportController {
 
     private final PostReportService postReportService;
@@ -49,11 +47,14 @@ public class PostReportController {
     @HasAccess
     @Operation(summary = "게시글 신고 전체 조회", description = "저장된 모든 게시글 신고를 조회합니다.")
     @GetMapping()
-    public ResponseEntity<ApiResult<List<GetPostReportResponse>>> getPostReports() {
+    public ResponseEntity<ApiResult<Page<GetAllPostReportsResponse>>> getPostReports(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
+                                                                                     @RequestParam(defaultValue = "10") @Positive int size,
+                                                                                     @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
 
-        List<GetPostReportResponse> response = postReportService.getPostReports();
+        Page<GetAllPostReportsResponse> response = postReportService.getPostReports(pageable);
 
-        return ResponseEntity.ok(ApiResult.success("게시글신고 전체 조회 성공", response));
+        return ResponseEntity.ok(ApiResult.success("게시글 신고 전체 조회 성공", response));
     }
 
     @HasAccess
@@ -67,16 +68,12 @@ public class PostReportController {
     }
 
     @HasAccess
-    @Operation(summary = "게시글의 모든 신고 내역 조회", description = "특정 게시글의 모든 신고 내역을 페이지 형태로 조회합니다.")
+    @Operation(summary = "게시글의 모든 신고 내역 조회", description = "특정 게시글의 모든 신고 내역을 조회합니다.")
     @GetMapping("/post")
-    public ResponseEntity<ApiResult<Page<GetPostReportResponse>>> getPostReportsByPostId(
-            @RequestParam Long postNo,
-            @RequestParam(defaultValue = "0") @PositiveOrZero int page,
-            @RequestParam(defaultValue = "10") @Positive int size,
-            @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
+    public ResponseEntity<ApiResult<List<GetAllPostReportsResponse>>> getPostReportsByPostId(
+            @RequestParam Long postNo) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
-        Page<GetPostReportResponse> response = postReportService.getPostReportScrollByPostId(postNo, pageable);
+        List<GetAllPostReportsResponse> response = postReportService.getPostReportScrollByPostId(postNo);
 
         return ResponseEntity.ok(ApiResult.success("게시글의 모든 신고 내역 조회 성공", response));
     }

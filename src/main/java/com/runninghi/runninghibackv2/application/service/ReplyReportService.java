@@ -1,11 +1,14 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.application.dto.postreport.response.GetAllPostReportsResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.request.CreateReplyReportRequest;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.CreateReplyReportResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.DeleteReplyReportResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.GetReplyReportResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.HandleReplyReportResponse;
+import com.runninghi.runninghibackv2.common.response.PageResult;
 import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.PostReport;
 import com.runninghi.runninghibackv2.domain.entity.Reply;
 import com.runninghi.runninghibackv2.domain.entity.ReplyReport;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
@@ -16,11 +19,13 @@ import com.runninghi.runninghibackv2.domain.service.ReplyReportChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,11 +63,15 @@ public class ReplyReportService {
 
     // 댓글 신고 전체 조회
     @Transactional(readOnly = true)
-    public List<GetReplyReportResponse> getReplyReports() {
+    public Page<GetReplyReportResponse> getReplyReports(Pageable pageable) {
 
-        return replyReportRepository.findAll().stream()
+        Page<ReplyReport> replyReports = replyReportRepository.findAll(pageable);
+
+        List<GetReplyReportResponse> responses = replyReports.stream()
                 .map(GetReplyReportResponse::from)
-                .toList();
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, replyReports.getTotalElements());
     }
 
     // 댓글 신고 상세 조회
@@ -77,13 +86,16 @@ public class ReplyReportService {
 
     // 신고된 댓글의 모든 신고 내역 조회
     @Transactional(readOnly = true)
-    public Page<GetReplyReportResponse> getReplyReportScrollByReplyId(Long replyNo, Pageable pageable) {
+    public List<GetReplyReportResponse> getReplyReportScrollByReplyId(Long replyNo) {
 
         Reply reportedReply = replyRepository.findById(replyNo)
                 .orElseThrow(EntityNotFoundException::new);
 
-        return replyReportRepository.findAllByReportedReply(reportedReply, pageable)
-                .map(GetReplyReportResponse::from);
+        List<ReplyReport> replyReports = replyReportRepository.findAllByReportedReply(reportedReply);
+
+        return replyReports.stream()
+                .map(GetReplyReportResponse::from)
+                .collect(Collectors.toList());
     }
 
     // 댓글 신고 수락/거절 처리

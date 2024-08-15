@@ -1,8 +1,8 @@
 package com.runninghi.runninghibackv2.application.dto.postreport.response;
 
+import com.runninghi.runninghibackv2.domain.entity.PostReport;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
-import com.runninghi.runninghibackv2.domain.entity.PostReport;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record GetPostReportResponse(
@@ -19,10 +19,11 @@ public record GetPostReportResponse(
         @Schema(description = "신고된 게시글 번호", example = "1")
         Long reportedPostNo,
         @Schema(description = "신고된 게시글 내용", example = "1")
-        String postContent
+        String postContent,
+        @Schema(description = "대표 이미지 URL", example = "https://picsum.photos/200")
+        String imageUrl
 ) {
-    public static GetPostReportResponse from(PostReport postReport) {
-        Long postNo = postReport.getReportedPost() != null ? postReport.getReportedPost().getPostNo() : null;
+    public static GetPostReportResponse from(PostReport postReport, String imageUrl) {
 
         return new GetPostReportResponse(
                 postReport.getPostReportNo(),
@@ -30,7 +31,9 @@ public record GetPostReportResponse(
                 postReport.getContent(),
                 postReport.getStatus(),
                 postReport.getReporter().getMemberNo(),
-                postNo,
-                postReport.getPostContent());
+                postReport.getReportedPost().getPostNo(),
+                postReport.getPostContent(),
+                imageUrl
+        );
     }
 }

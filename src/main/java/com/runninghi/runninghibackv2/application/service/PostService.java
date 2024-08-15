@@ -332,27 +332,6 @@ public class PostService {
         return DeletePostResponse.from(postNo);
     }
 
-
-    @Transactional(readOnly = true)
-    public Page<GetReportedPostsResponse> getReportedPostScroll(Pageable pageable) {
-
-        Page<Post> posts = postRepository.findAllByReportCntIsGreaterThan(0, pageable);
-
-        List<Long> postNos = posts.getContent().stream().map(Post::getPostNo).collect(Collectors.toList());
-
-        Image mainImage = jpaQueryFactory.select(image)
-                .from(image)
-                .where(image.postNo.in(postNos))
-                .limit(1)
-                .fetchOne();
-
-        List<GetReportedPostsResponse> responses = posts.stream()
-                .map(post -> GetReportedPostsResponse.from(post, mainImage.getImageUrl()))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, posts.getTotalElements());
-    }
-
     @Transactional
     public void addReportedCount(Long postNo) {
         Post post = findPostByNo(postNo);
