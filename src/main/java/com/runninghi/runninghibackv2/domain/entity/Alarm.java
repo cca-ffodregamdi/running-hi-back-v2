@@ -33,14 +33,22 @@ public class Alarm {
     @Comment(value = "알림 제목")
     private String title;
 
-    @Column(name = "content", nullable = false, length = 500)
-    @Comment(value = "알림 내용")
-    private String content;
+//    @Column(name = "content", nullable = false, length = 500)
+//    @Comment(value = "알림 내용")
+//    private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "alarm_type", nullable = true)
     @Comment(value = "알림 타입")
     private AlarmType alarmType;
+
+    @Column(name = "target_page", nullable = false)
+    @Comment(value = "이동해야 할 페이지")
+    private String targetPage;
+
+    @Column(name = "target_id")
+    @Comment(value = "관련 식별 값")
+    private Long targetId;
 
     @Column(name = "is_read", nullable = false)
     @ColumnDefault(value = "false")
@@ -57,24 +65,16 @@ public class Alarm {
     private LocalDateTime readDate;
 
     @Builder
-    public Alarm(Long id, Member member, String title, String content, AlarmType alarmType, boolean isRead, LocalDateTime createDate, LocalDateTime readDate) {
+    public Alarm(Long id, Member member, String title, AlarmType alarmType, String targetPage, Long targetId, boolean isRead, LocalDateTime createDate, LocalDateTime readDate) {
         this.id = id;
         this.member = member;
         this.title = title;
-        this.content = content;
         this.alarmType = alarmType;
-        this.isRead = false;
+        this.targetPage = targetPage;
+        this.targetId = targetId;
+        this.isRead = isRead;
         this.createDate = createDate;
         this.readDate = readDate;
-    }
-
-    public static GetAllAlarmResponse toResponse(Alarm alarm) {
-        return new GetAllAlarmResponse(
-                alarm.getTitle(),
-                alarm.getContent(),
-                alarm.isRead(),
-                alarm.createDate
-        );
     }
 
     public void readAlarm() {
