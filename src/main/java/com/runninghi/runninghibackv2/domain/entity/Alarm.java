@@ -1,7 +1,9 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
+import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
 import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
+import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -42,9 +44,10 @@ public class Alarm {
     @Comment(value = "알림 타입")
     private AlarmType alarmType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "target_page", nullable = false)
     @Comment(value = "이동해야 할 페이지")
-    private String targetPage;
+    private TargetPage targetPage;
 
     @Column(name = "target_id")
     @Comment(value = "관련 식별 값")
@@ -65,16 +68,15 @@ public class Alarm {
     private LocalDateTime readDate;
 
     @Builder
-    public Alarm(Long id, Member member, String title, AlarmType alarmType, String targetPage, Long targetId, boolean isRead, LocalDateTime createDate, LocalDateTime readDate) {
+    public Alarm(Long id, Member member, String title, AlarmType alarmType, TargetPage targetPage, Long targetId) {
         this.id = id;
         this.member = member;
         this.title = title;
         this.alarmType = alarmType;
         this.targetPage = targetPage;
         this.targetId = targetId;
-        this.isRead = isRead;
-        this.createDate = createDate;
-        this.readDate = readDate;
+        this.isRead = false;
+        this.createDate = LocalDateTime.now();
     }
 
     public void readAlarm() {

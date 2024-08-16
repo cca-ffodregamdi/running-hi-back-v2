@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -10,6 +9,8 @@ import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRe
 import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
 import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
+import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
 import com.runninghi.runninghibackv2.domain.repository.AlarmRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -32,8 +32,7 @@ public class AlarmService {
     private final AlarmRepository alarmRepository;
     private final MemberRepository memberRepository;
 
-    private final String POST__REPLY_FCM_TITLE = "회원님의 게시글에 댓글이 등록되었습니다.";
-//    private final String POST_FCM_MESSAGE = "회원님의 게시글에 댓글이 등록되었습니다.";
+    private final String POST_REPLY_FCM_TITLE = "회원님의 게시글에 댓글이 등록되었습니다.";
 
     /**
      * 댓글 관련 푸쉬 알림 발송 메소드
@@ -42,7 +41,13 @@ public class AlarmService {
      */
     public void sendReplyPushNotification(ReplyFCMDTO replyFCMDTO) throws FirebaseMessagingException {
 
-        CreateAlarmRequest alarmRequest = CreateAlarmRequest.of(POST__REPLY_FCM_TITLE, replyFCMDTO.getSavedReply().getMember().getMemberNo());
+        CreateAlarmRequest alarmRequest = CreateAlarmRequest.of(
+                POST_REPLY_FCM_TITLE,
+                replyFCMDTO.getSavedReply().getMember().getMemberNo(),
+                AlarmType.REPLY,
+                TargetPage.POST,
+                replyFCMDTO.getSavedReply().getReplyNo()
+        );
 
         createAlarm(alarmRequest);
         sendAlarm(alarmRequest, replyFCMDTO.getSavedReply().getMember().getFcmToken());
@@ -65,6 +70,9 @@ public class AlarmService {
         Alarm alarm = Alarm.builder()
                 .member(member)
                 .title(request.title())
+                .alarmType(request.alarmType())
+                .targetPage(request.targetPage())
+                .targetId(request.targetId())
                 .build();
 
         alarmRepository.save(alarm);
@@ -85,6 +93,7 @@ public class AlarmService {
         firebaseMessaging.send(message);
     }
 
+    @Transactional(readOnly = true)
     public void readAlarm(Long alarmNo) {
 
         Alarm alarm = alarmRepository.findById(alarmNo)
