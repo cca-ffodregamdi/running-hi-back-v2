@@ -159,10 +159,10 @@ public class MemberService {
             throw new IllegalArgumentException("이미 가입된 account입니다.");
         }
 
-        Role role = Role.ADMIN;
+        Role role;
         if (request.invitationCode() != null && request.invitationCode().equals(adminInvitationCode)) {
             role = Role.ADMIN;
-        } else if (request.invitationCode() != null) {
+        } else {
             throw new IllegalArgumentException("잘못된 초대 코드입니다.");
         }
 
