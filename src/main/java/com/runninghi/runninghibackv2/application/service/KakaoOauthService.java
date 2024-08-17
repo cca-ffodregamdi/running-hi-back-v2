@@ -135,6 +135,7 @@ public class KakaoOauthService {
                 .nickname("러너 " + generateRandomDigits())
                 .isActive(true)
                 .isBlacklisted(false)
+                .isTermsAgreed(false)
                 .role(Role.USER)
                 .runDataVO(new RunDataVO(0.0,0.0,10,0))
                 .build();
