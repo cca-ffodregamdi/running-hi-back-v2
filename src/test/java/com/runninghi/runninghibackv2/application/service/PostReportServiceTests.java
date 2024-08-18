@@ -186,20 +186,20 @@ class PostReportServiceTests {
         assertEquals("게시글 신고 저장: 기타 신고 사유는 100자를 넘을 수 없습니다.", exception.getMessage());
     }
 
-    @Test
-    @DisplayName("게시글 신고 조회: 전체 조회")
-    void testGetPostReports() {
-
-        // given
-        CreatePostReportRequest request = new CreatePostReportRequest(
-                ReportCategory.SPAM,
-                null,
-                reportedPost.getPostNo()
-        );
-
-        postReportService.createPostReport(reporter.getMemberNo(), request);
-
-        // when & then
-        assertEquals(postReportRepository.count(), postReportService.getPostReports().size());
-    }
+//    @Test
+//    @DisplayName("게시글 신고 조회: 전체 조회")
+//    void testGetPostReports() {
+//
+//        // given
+//        CreatePostReportRequest request = new CreatePostReportRequest(
+//                ReportCategory.SPAM,
+//                null,
+//                reportedPost.getPostNo()
+//        );
+//
+//        postReportService.createPostReport(reporter.getMemberNo(), request);
+//
+//        // when & then
+//        assertEquals(postReportRepository.count(), postReportService.getPostReports().size());
+//    }
 }

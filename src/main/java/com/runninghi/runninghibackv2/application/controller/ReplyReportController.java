@@ -9,6 +9,8 @@ import com.runninghi.runninghibackv2.application.dto.replyreport.response.Create
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.GetReplyReportResponse;
 import com.runninghi.runninghibackv2.application.dto.replyreport.response.HandleReplyReportResponse;
 import com.runninghi.runninghibackv2.application.service.ReplyReportService;
+import com.runninghi.runninghibackv2.common.response.PageResult;
+import com.runninghi.runninghibackv2.common.response.PageResultData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
@@ -47,11 +49,14 @@ public class ReplyReportController {
     @HasAccess
     @Operation(summary = "댓글 신고 전체 조회", description = "저장된 모든 댓글 신고를 조회합니다.")
     @GetMapping()
-    public ResponseEntity<ApiResult> getReplyReports() {
+    public ResponseEntity<PageResult<GetReplyReportResponse>> getReplyReports(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
+                                                     @RequestParam(defaultValue = "10") @Positive int size,
+                                                     @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
 
-        List<GetReplyReportResponse> response = replyReportService.getReplyReports();
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
+        PageResultData<GetReplyReportResponse> response = replyReportService.getReplyReports(pageable);
 
-        return ResponseEntity.ok(ApiResult.success("댓글신고 전체 조회 성공", response));
+        return ResponseEntity.ok(PageResult.success("댓글신고 전체 조회 성공", response));
     }
 
     @HasAccess
@@ -67,13 +72,9 @@ public class ReplyReportController {
     @HasAccess
     @Operation(summary = "댓글의 모든 신고 내역 조회", description = "특정 댓글의 모든 신고 내역을 페이지 형태로 조회합니다.")
     @GetMapping("/reply")
-    public ResponseEntity<ApiResult> getReplyReportsByReplyId(@RequestParam Long replyNo,
-                                                              @RequestParam(defaultValue = "0") @PositiveOrZero int page,
-                                                              @RequestParam(defaultValue = "10") @Positive int size,
-                                                              @RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
+    public ResponseEntity<ApiResult<List<GetReplyReportResponse>>> getReplyReportsByReplyId(@RequestParam Long replyNo) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort), "createDate"));
-        Page<GetReplyReportResponse> response = replyReportService.getReplyReportScrollByReplyId(replyNo, pageable);
+        List<GetReplyReportResponse> response = replyReportService.getReplyReportScrollByReplyId(replyNo);
 
         return ResponseEntity.ok(ApiResult.success("댓글의 모든 신고 내역 조회 성공", response));
     }

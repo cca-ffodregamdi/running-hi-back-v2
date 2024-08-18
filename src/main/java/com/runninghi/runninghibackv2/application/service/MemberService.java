@@ -4,9 +4,7 @@ import com.runninghi.runninghibackv2.application.dto.member.request.AdminSignInR
 import com.runninghi.runninghibackv2.application.dto.member.request.AdminSignUpRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateCurrentLocationRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.UpdateMemberInfoRequest;
-import com.runninghi.runninghibackv2.application.dto.member.response.GetMemberResponse;
-import com.runninghi.runninghibackv2.application.dto.member.response.UpdateCurrentLocationResponse;
-import com.runninghi.runninghibackv2.application.dto.member.response.UpdateMemberInfoResponse;
+import com.runninghi.runninghibackv2.application.dto.member.response.*;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
@@ -159,10 +157,10 @@ public class MemberService {
             throw new IllegalArgumentException("이미 가입된 account입니다.");
         }
 
-        Role role = Role.ADMIN;
+        Role role;
         if (request.invitationCode() != null && request.invitationCode().equals(adminInvitationCode)) {
             role = Role.ADMIN;
-        } else if (request.invitationCode() != null) {
+        } else {
             throw new IllegalArgumentException("잘못된 초대 코드입니다.");
         }
 
@@ -174,5 +172,37 @@ public class MemberService {
                 .build();
 
         memberRepository.save(newMember);
+    }
+
+    @Transactional(readOnly = true)
+    public GetIsTermsAgreedResponse getTermsAgreement(Long memberNo) {
+        log.info("약관 동의 여부 조회 시도: 사용자 memberNo = {}", memberNo);
+
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(() -> {
+                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
+                    return new EntityNotFoundException();
+                });
+
+        log.info("약관 동의 여부 조회 완료: 사용자 memberNo = {}", memberNo);
+
+        return GetIsTermsAgreedResponse.of(member.isTermsAgreed());
+    }
+
+    @Transactional
+    public TermsAgreementResponse acceptTermsAgreement(Long memberNo) {
+        log.info("약관 동의 처리 시도: 사용자 memberNo = {}", memberNo);
+
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(() -> {
+                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
+                    return new EntityNotFoundException();
+                });
+
+        member.updateTermsAgreed(true);
+
+        log.info("약관 동의 처리 완료: 사용자 memberNo = {}", memberNo);
+
+        return TermsAgreementResponse.of(member.isTermsAgreed());
     }
 }

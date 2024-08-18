@@ -1,11 +1,11 @@
 package com.runninghi.runninghibackv2.application.dto.postreport.response;
 
-import com.runninghi.runninghibackv2.domain.entity.PostReport;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.enumtype.ReportCategory;
+import com.runninghi.runninghibackv2.domain.entity.PostReport;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record GetPostReportResponse(
+public record GetAllPostReportsResponse(
         @Schema(description = "게시글 신고 Id", example = "1")
         Long postReportNo,
         @Schema(description = "신고 사유 카테고리", example = "SPAM")
@@ -19,21 +19,18 @@ public record GetPostReportResponse(
         @Schema(description = "신고된 게시글 번호", example = "1")
         Long reportedPostNo,
         @Schema(description = "신고된 게시글 내용", example = "1")
-        String postContent,
-        @Schema(description = "대표 이미지 URL", example = "https://picsum.photos/200")
-        String imageUrl
+        String postContent
 ) {
-    public static GetPostReportResponse from(PostReport postReport, String imageUrl) {
+    public static GetAllPostReportsResponse from(PostReport postReport) {
 
-        return new GetPostReportResponse(
+        return new GetAllPostReportsResponse(
                 postReport.getPostReportNo(),
                 postReport.getCategory(),
                 postReport.getContent(),
                 postReport.getStatus(),
                 postReport.getReporter().getMemberNo(),
                 postReport.getReportedPost().getPostNo(),
-                postReport.getPostContent(),
-                imageUrl
+                postReport.getPostContent()
         );
     }
 }

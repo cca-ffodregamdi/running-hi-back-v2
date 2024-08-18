@@ -538,4 +538,59 @@ public class MemberController {
                     .body(ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 처리 중 오류가 발생했습니다."));
         }
     }
+
+    /**
+     * 사용자의 약관 동의 여부를 조회하는 API입니다.
+     *
+     * <p>이 API는 사용자의 약관 동의 여부를 조회합니다. 클라이언트는 사용자 ID를 요청 파라미터로 전달해야 합니다.</p>
+     * @param token 사용자 인증을 위한 Bearer 토큰. 요청 헤더에서 'Authorization'으로 제공되어야 합니다. 필수 파라미터입니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 약관 동의 여부(Boolean)가 응답 본문에 포함됩니다.
+     */
+    @GetMapping(value = "/api/v1/member/terms-agreement", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "약관 동의 여부 조회",
+            description = "사용자의 약관 동의 여부를 조회합니다. " +
+                    "클라이언트는 Authorization 헤더에 Bearer 토큰을 포함하여 해당 엔드포인트를 호출해야 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "약관 동의 여부 조회 성공")
+    })
+    public ResponseEntity<ApiResult<GetIsTermsAgreedResponse>> getTermsAgreement(@RequestHeader(value = "Authorization") String token) {
+        log.info("약관 동의 여부 조회 요청: 토큰 = {}", token);
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        log.debug("추출된 멤버 번호: {}", memberNo);
+
+        GetIsTermsAgreedResponse response = memberService.getTermsAgreement(memberNo);
+
+        log.info("약관 동의 여부 조회 성공. 동의 여부: {}", response.isTermsAgreed());
+        return ResponseEntity.ok(ApiResult.success("약관 동의 여부 조회 성공", response));
+    }
+
+    /**
+     * 사용자의 약관 동의 여부를 업데이트하는 API입니다.
+     *
+     * <p>이 API는 사용자의 약관 동의 여부를 업데이트합니다.
+     * 클라이언트는 사용자 ID와 동의 여부를 요청 본문에 담아서 해당 엔드포인트를 호출해야 합니다.</p>
+     *
+     * @param token 사용자 인증을 위한 Bearer 토큰. 요청 헤더에서 'Authorization'으로 제공되어야 합니다. 필수 파라미터입니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 업데이트된 약관 동의 여부(Boolean)가 응답 본문에 포함됩니다.
+     */
+    @PutMapping(value = "/api/v1/member/terms-agreement/consent", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "약관 동의 여부 업데이트",
+            description = "사용자의 약관 동의 여부를 업데이트합니다. " +
+                    "동의 여부를 요청 본문에 담아서 해당 엔드포인트를 호출해야 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "약관 동의 여부 업데이트 성공"),
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
+    })
+    public ResponseEntity<ApiResult<TermsAgreementResponse>> updateTermsAgreement(@RequestHeader(value = "Authorization") String token) {
+
+        log.info("약관 동의 여부 업데이트 요청: 토큰 = {}", token);
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        log.debug("추출된 멤버 번호: {}", memberNo);
+
+        TermsAgreementResponse response = memberService.acceptTermsAgreement(memberNo);
+        log.info("약관 동의 여부 업데이트 성공: memberNo = {}, 업데이트된 동의 여부 = {}", memberNo, response.isTermsAgreed());
+        return ResponseEntity.ok(ApiResult.success("약관 동의 여부 업데이트 성공", response));
+    }
+
 }

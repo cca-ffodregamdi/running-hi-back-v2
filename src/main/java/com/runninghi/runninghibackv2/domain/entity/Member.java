@@ -89,18 +89,22 @@ public class Member extends BaseTimeEntity {
     @Comment("탈퇴 신청 날짜")
     private LocalDateTime deactivateDate;
 
-   @Embedded
-   private RunDataVO runDataVO;
+    @Embedded
+    private RunDataVO runDataVO;
 
     @Column(columnDefinition = "POINT SRID 4326")
     @Comment("초기 설정 지역 위경도")
     private Point geometry;
 
+    @Column
+    @Comment("약관 동의 여부")
+    private boolean isTermsAgreed = false;
+
     @Builder
     public Member(Long memberNo, String account, String password, String nickname, String profileUrl, String kakaoId, String name,
                   String appleId, int reportCnt, boolean isActive, boolean isBlacklisted, Role role, String refreshToken,
                   String appleRefreshToken, String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate,
-                  RunDataVO runDataVO, Point geometry) {
+                  RunDataVO runDataVO, Point geometry, boolean isTermsAgreed) {
         this.memberNo = memberNo;
         this.account = account;
         this.password = password;
@@ -120,6 +124,7 @@ public class Member extends BaseTimeEntity {
         this.deactivateDate = deactivateDate;
         this.runDataVO = runDataVO;
         this.geometry = geometry;
+        this.isTermsAgreed = isTermsAgreed;
     }
 
     // 리프레시 토큰 업데이트
@@ -142,6 +147,11 @@ public class Member extends BaseTimeEntity {
     public void activateMember() {
         this.isActive = true;
         this.deactivateDate = null;
+    }
+
+    // 약관 동의 업데이트
+    public void updateTermsAgreed(boolean termsAgreed) {
+        this.isTermsAgreed = termsAgreed;
     }
 
     public void addReportedCount() {

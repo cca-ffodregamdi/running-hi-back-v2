@@ -31,7 +31,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AppleOauthService {
     
-    private static final int NICKNAME_DIGIT_LENGTH = 8;
+    private static final int NICKNAME_DIGIT_LENGTH = 6;
     private static final int RANDOM_NUMBER_RANGE = 10;
     private static final String GRANT_TYPE = "authorization_code";
 
@@ -201,6 +201,7 @@ public class AppleOauthService {
                 .nickname("러너 " + generateRandomDigits())
                 .isActive(true)
                 .isBlacklisted(false)
+                .isTermsAgreed(false)
                 .role(Role.USER)
                 .runDataVO(new RunDataVO(0.0,0.0,10,0))
                 .build();
