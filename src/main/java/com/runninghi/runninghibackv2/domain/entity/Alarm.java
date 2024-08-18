@@ -68,7 +68,7 @@ public class Alarm {
     private LocalDateTime readDate;
 
     @Builder
-    public Alarm(Long id, Member member, String title, AlarmType alarmType, TargetPage targetPage, Long targetId) {
+    public Alarm(Long id, Member member, String title, AlarmType alarmType, TargetPage targetPage, Long targetId, LocalDateTime readDate) {
         this.id = id;
         this.member = member;
         this.title = title;
@@ -77,6 +77,7 @@ public class Alarm {
         this.targetId = targetId;
         this.isRead = false;
         this.createDate = LocalDateTime.now();
+        this.readDate = LocalDateTime.now();
     }
 
     public void readAlarm() {

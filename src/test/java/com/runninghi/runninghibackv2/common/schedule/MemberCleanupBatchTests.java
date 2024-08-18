@@ -113,33 +113,30 @@ class MemberCleanupBatchTests {
         List<Alarm> alarms = new ArrayList<>();
 
         Alarm alarm1 = Alarm.builder()
-                .alarmType(AlarmType.NOTIFICATION)
+                .alarmType(AlarmType.CHALLENGE)
                 .member(member1)
                 .title("테스트 알림 1")
-                .content("테스트 알림 내용 1")
-                .isRead(false)
-                .createDate(LocalDateTime.now().minusDays(1))
+                .targetPage(TargetPage.CHALLENGE)
+                .targetId(1L)
                 .build();
         alarms.add(alarm1);
 
         Alarm alarm2 = Alarm.builder()
-                .alarmType(AlarmType.NOTIFICATION)
+                .alarmType(AlarmType.FEEDBACK)
                 .member(member1)
                 .title("테스트 알림 2")
-                .content("테스트 알림 내용 2")
-                .isRead(true)
-                .createDate(LocalDateTime.now().minusDays(2))
+                .targetPage(TargetPage.CHALLENGE)
+                .targetId(2L)
                 .readDate(LocalDateTime.now().minusDays(1))
                 .build();
         alarms.add(alarm2);
 
         Alarm alarm3 = Alarm.builder()
-                .alarmType(AlarmType.NOTIFICATION)
+                .alarmType(AlarmType.REPLY)
                 .member(member2)
                 .title("테스트 알림 3")
-                .content("테스트 알림 내용 3 : 남아있는 테스트 알림입니다.")
-                .isRead(true)
-                .createDate(LocalDateTime.now().minusDays(2))
+                .targetPage(TargetPage.POST)
+                .targetId(3L)
                 .readDate(LocalDateTime.now().minusDays(1))
                 .build();
         alarms.add(alarm3);
