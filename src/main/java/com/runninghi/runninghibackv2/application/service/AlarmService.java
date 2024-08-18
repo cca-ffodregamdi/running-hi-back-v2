@@ -6,7 +6,6 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
-import com.runninghi.runninghibackv2.common.exception.custom.DisagreeAlarmConsent;
 import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.AlarmRepository;
@@ -46,11 +45,6 @@ public class AlarmService {
     public void createPushAlarm(CreateAlarmRequest request) throws FirebaseMessagingException {
 
         Member member = memberRepository.findByMemberNo(request.getTargetMemberNo());
-
-        if (!member.isAlarmConsent()) {
-            throw new DisagreeAlarmConsent();
-        }
-
         Alarm alarm = Alarm.builder()
                 .member(member)
                 .title(request.getTitle())
@@ -61,7 +55,9 @@ public class AlarmService {
 
         alarmRepository.save(alarm);
 
-        sendPushAlarm(request);
+        if (member.isAlarmConsent()) { // 알림 동의했을 시 발송, 아닐 시 stop
+            sendPushAlarm(request);
+        }
     }
 
     private void sendPushAlarm (CreateAlarmRequest request) throws FirebaseMessagingException {
