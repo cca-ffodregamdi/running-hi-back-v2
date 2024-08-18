@@ -13,9 +13,11 @@ import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -75,6 +77,18 @@ public class AlarmService {
                 .orElseThrow(EntityNotFoundException::new);
 
         alarm.readAlarm();
+
+    }
+
+    @Transactional
+    public void deleteAlarm(Long alarmNo) {
+        alarmRepository.deleteById(alarmNo);
+    }
+
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void cleanUpReadAlarm() {
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        alarmRepository.deleteReadAlarmsOlderThan(thirtyDaysAgo);
     }
 
 
