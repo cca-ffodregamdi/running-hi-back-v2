@@ -81,6 +81,7 @@ public class Alarm {
 
     public void readAlarm() {
         this.isRead = true;
+        this.readDate = LocalDateTime.now();
     }
 
 }
