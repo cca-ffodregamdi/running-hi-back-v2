@@ -6,6 +6,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
+import com.runninghi.runninghibackv2.common.exception.custom.DisagreeAlarmConsent;
 import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.AlarmRepository;
@@ -34,6 +35,7 @@ public class AlarmService {
     @Transactional(readOnly = true)
     public List<GetAllAlarmResponse> getAllPushAlarms(Long memberNo) {
 
+        // 알람이 없으면 어차피 리스트는 텅! 이므로 알림동의 여부 파악 x
         List<Alarm> alarmList = alarmRepository.findAllByMember_MemberNo(memberNo);
         return alarmList.stream()
                 .filter(alarm -> !alarm.isRead())
@@ -44,6 +46,11 @@ public class AlarmService {
     public void createPushAlarm(CreateAlarmRequest request) throws FirebaseMessagingException {
 
         Member member = memberRepository.findByMemberNo(request.getTargetMemberNo());
+
+        if (!member.isAlarmConsent()) {
+            throw new DisagreeAlarmConsent();
+        }
+
         Alarm alarm = Alarm.builder()
                 .member(member)
                 .title(request.getTitle())

@@ -17,7 +17,8 @@ public enum ErrorCode {
     VALIDATION_FAIL(HttpStatus.BAD_REQUEST, "COMMON ERR-400-VALIDATION", "입력값이 올바른 형식이 아닙니다."),
     SCHEDULING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SCHEDULING ERR-500", "스케줄링 오류가 발생했습니다."),
     APPLE_OAUTH_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON ERR-500-APPLE", "애플 OAuth 오류입니다."),
-    FCM_SEND_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON ERR-500-FCM", "FCM 전송에 실패하였습니다.");
+    FCM_SEND_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON ERR-500-FCM", "FCM 전송에 실패하였습니다."),
+    DISAGREE_ALARM_CONSENT(HttpStatus.BAD_REQUEST, "COMMON ERR-400-ALARM", "알림에 동의하지 않은 회원입니다.");
 
     private final HttpStatus status;
     private final String code;

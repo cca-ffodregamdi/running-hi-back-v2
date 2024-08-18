@@ -120,5 +120,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResult.error(ErrorCode.INTER_SERVER_ERROR));
     }
 
+    @ExceptionHandler(DisagreeAlarmConsent.class)
+    public ResponseEntity<ApiResult<Void>> handleDisagreeAlarmConsentException(DisagreeAlarmConsent e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResult.error(ErrorCode.DISAGREE_ALARM_CONSENT));
+    }
+
 
 }
