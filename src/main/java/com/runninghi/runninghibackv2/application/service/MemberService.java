@@ -205,4 +205,21 @@ public class MemberService {
 
         return TermsAgreementResponse.of(member.isTermsAgreed());
     }
+
+    public GetIsLocationResponse getLocationSetting(Long memberNo) {
+        log.info("지역 설정 여부 조회 시도: 사용자 memberNo = {}", memberNo);
+
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(() -> {
+                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
+                    return new EntityNotFoundException();
+                });
+
+        boolean isLocation = member.getGeometry() != null;
+
+        log.info("지역 설정 여부 조회 처리 완료: 사용자 memberNo = {}", memberNo);
+
+        return GetIsLocationResponse.of(isLocation);
+
+    }
 }
