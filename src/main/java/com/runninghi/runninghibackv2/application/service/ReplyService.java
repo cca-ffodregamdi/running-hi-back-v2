@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.runninghi.runninghibackv2.application.dto.alarm.ReplyFCMDTO;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.*;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.GetReplyList;
@@ -12,11 +13,10 @@ import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.Reply;
+import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
-import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
-import com.runninghi.runninghibackv2.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
-import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
+import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
+import com.runninghi.runninghibackv2.domain.repository.*;
 import com.runninghi.runninghibackv2.domain.service.ReplyChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +37,11 @@ public class ReplyService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
 
     private final AlarmService alarmService;
+
+    private final String POST_REPLY_FCM_TITLE = "회원님의 게시글에 댓글이 등록되었습니다.";
 
     /**
      * 게시글 조회 시 해당 게시글에 대한 댓글들 조회 메소드
@@ -79,9 +82,7 @@ public class ReplyService {
      * @return 댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 생성 일, 수정 일
      */
     @Transactional
-    public CreateReplyResponse createReply(CreateReplyRequest request, Long memberNo) {
-
-        ReplyFCMDTO replyFCMDTO = new ReplyFCMDTO();
+    public CreateReplyResponse createReply(CreateReplyRequest request, Long memberNo) throws FirebaseMessagingException {
 
         Member member = memberRepository.findByMemberNo(memberNo);
         Post post = postRepository.findById(request.postNo())
@@ -96,10 +97,17 @@ public class ReplyService {
         Reply savedReply = replyRepository.save(reply);
 
         // 게시물 작성자에게 푸쉬 알림
-//        replyFCMDTO.setSavedReply(savedReply);
-//        alarmService.sendReplyPushNotification(replyFCMDTO);
+        CreateAlarmRequest alarmRequest = CreateAlarmRequest.builder()
+                        .title(POST_REPLY_FCM_TITLE)
+                        .targetMemberNo(savedReply.getPost().getMember().getMemberNo())
+                        .alarmType(AlarmType.REPLY)
+                        .targetPage(TargetPage.POST)
+                        .targetId(savedReply.getPost().getPostNo())
+                        .fcmToken(savedReply.getMember().getFcmToken())
+                        .build();
+        alarmService.createPushAlarm(alarmRequest);
 
-        return new CreateReplyResponse(3);
+        return new CreateReplyResponse(likeRepository.countByPost_PostNo(post.getPostNo()));
     }
 
     /**

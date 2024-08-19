@@ -120,5 +120,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResult.error(ErrorCode.INTER_SERVER_ERROR));
     }
 
-
 }

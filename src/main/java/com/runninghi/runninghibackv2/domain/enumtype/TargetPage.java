@@ -1,9 +1,10 @@
 package com.runninghi.runninghibackv2.domain.enumtype;
 
-public enum AlarmType {
-    REPLY,
-    LEVEL_UP,
-    UPDATE,
+public enum TargetPage {
+    MAIN,
+    POST,
     CHALLENGE,
+    RECORD,
+    MYPAGE,
     FEEDBACK;
 }

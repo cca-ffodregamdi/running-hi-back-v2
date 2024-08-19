@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.runninghi.runninghibackv2.application.dto.reply.request.*;
 import com.runninghi.runninghibackv2.application.dto.reply.response.CreateReplyResponse;
 import com.runninghi.runninghibackv2.application.dto.reply.GetReplyList;
@@ -108,7 +109,7 @@ public class ReplyController {
     )
     public ResponseEntity<ApiResult<CreateReplyResponse>> createReply(@Parameter(description = "사용자 인증을 위한 Bearer Token")
                                                                       @RequestHeader("Authorization") String bearerToken,
-                                                                      @RequestBody CreateReplyRequest request) {
+                                                                      @RequestBody CreateReplyRequest request) throws FirebaseMessagingException {
         AccessTokenInfo accessTokenInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         CreateReplyResponse response = replyService.createReply(request, accessTokenInfo.memberNo());
 
