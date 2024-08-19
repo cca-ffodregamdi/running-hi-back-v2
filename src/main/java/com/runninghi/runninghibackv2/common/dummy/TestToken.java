@@ -45,7 +45,7 @@ public class TestToken {
                                 .name(adminName)
                                 .nickname("관리자 : 테스트용 관리자입니다.")
                                 .role(Role.ADMIN)
-                                .runDataVO(new RunDataVO(0.0,0.0,10,1))
+                                .runDataVO(new RunDataVO(0.0,0.0,2,1))
                                 .geometry(point)
                                 .build();
                         testMemberRepository.saveAndFlush(newAdmin);
@@ -61,7 +61,7 @@ public class TestToken {
                                 .nickname("유저 : 테스트용 유저입니다.")
                                 .isActive(true)
                                 .role(Role.USER)
-                                .runDataVO(new RunDataVO(0.0,0.0,10,1))
+                                .runDataVO(new RunDataVO(0.0,0.0,2,1))
                                 .geometry(point)
                                 .build();
                         testMemberRepository.saveAndFlush(newUser);

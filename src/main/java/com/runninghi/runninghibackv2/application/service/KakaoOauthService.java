@@ -137,7 +137,7 @@ public class KakaoOauthService {
                 .isBlacklisted(false)
                 .isTermsAgreed(false)
                 .role(Role.USER)
-                .runDataVO(new RunDataVO(0.0,0.0,10,0))
+                .runDataVO(new RunDataVO(0.0,0.0,2,0))
                 .build();
 
         memberRepository.saveAndFlush(member);
