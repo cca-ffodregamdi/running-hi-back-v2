@@ -29,18 +29,25 @@ public class AlarmService {
     private final FirebaseMessaging firebaseMessaging;
 
     private final AlarmRepository alarmRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
     public List<GetAllAlarmResponse> getAllPushAlarms(Long memberNo) {
 
         // 알람이 없으면 어차피 리스트는 텅! 이므로 알림동의 여부 파악 x
         List<Alarm> alarmList = alarmRepository.findAllByMember_MemberNo(memberNo);
-        return alarmList.stream()
+        List<GetAllAlarmResponse> alarmResponseList = alarmList.stream()
                 .filter(alarm -> !alarm.isRead())
                 .map(GetAllAlarmResponse::ofAlarmEntity)
                 .toList();
+
+        for (Alarm alarm : alarmList) {
+            alarm.readAlarm();
+        }
+
+        return alarmResponseList;
     }
+
+    private final MemberRepository memberRepository;
 
     public void createPushAlarm(CreateAlarmRequest request) throws FirebaseMessagingException {
 

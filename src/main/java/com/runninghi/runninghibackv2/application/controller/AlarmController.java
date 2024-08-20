@@ -45,12 +45,12 @@ public class AlarmController {
         return ResponseEntity.ok().body(ApiResult.success("알림 생성 성공", null));
     }
 
-    @PutMapping(value = "/{alarmNo}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResult<Void>> readAlarm(@PathVariable("alarmNo") Long alarmNo) throws FirebaseMessagingException {
+    @DeleteMapping(value = "/{alarmNo}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResult<Void>> deleteAlarm(@PathVariable("alarmNo") Long alarmNo) throws FirebaseMessagingException {
 
-        alarmService.readAlarm(alarmNo);
+        alarmService.deleteAlarm(alarmNo);
 
-        return ResponseEntity.ok().body(ApiResult.success("알림 읽음 처리 성공", null));
+        return ResponseEntity.ok().body(ApiResult.success("알림 삭제 성공", null));
     }
 
 }
