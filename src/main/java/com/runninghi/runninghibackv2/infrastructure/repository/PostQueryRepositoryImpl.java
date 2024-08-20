@@ -32,7 +32,6 @@ import static com.runninghi.runninghibackv2.domain.entity.QBookmark.bookmark;
 import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 import static com.runninghi.runninghibackv2.domain.entity.QLike.like;
 import static com.runninghi.runninghibackv2.domain.entity.QPost.post;
-import static com.runninghi.runninghibackv2.domain.entity.QRecord.record;
 import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 
 @Repository
@@ -45,7 +44,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     private final PostChecker postChecker;
     private final MemberRepository memberRepository;
 
-    private static final String DISTANCE_CONDITION = "ST_Distance_Sphere({0}, {1}) <= {2}";
+//    private static final String DISTANCE_CONDITION = "ST_Distance_Sphere({0}, {1}) <= {2}";
 
     @Value("${image}")
     String nullUrl;
@@ -142,7 +141,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public PageResultData<GetAllPostsResponse> findAllPostsByLatest(Long memberNo, Pageable pageable, int distance) {
+    public PageResultData<GetAllPostsResponse> findAllPostsByLatest(Long memberNo, Pageable pageable) {
         List<Post> posts;
         long total;
 
@@ -150,21 +149,21 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         total = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(post.gpsDataVO.isNotNull())
-                        .and(Expressions.booleanTemplate(
-                                DISTANCE_CONDITION,
-                                post.gpsDataVO.startPoint, referencePoint, distance * 10000
-                        ))
+//                        .and(post.gpsDataVO.isNotNull())
+//                        .and(Expressions.booleanTemplate(
+//                                DISTANCE_CONDITION,
+//                                post.gpsDataVO.startPoint, referencePoint, distance * 10000
+//                        ))
                 )
                 .fetchCount();
 
         posts = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(post.gpsDataVO.startPoint.isNotNull())
-                        .and(Expressions.booleanTemplate(
-                                DISTANCE_CONDITION,
-                                post.gpsDataVO.startPoint, referencePoint, distance * 10000
-                        ))
+//                        .and(post.gpsDataVO.startPoint.isNotNull())
+//                        .and(Expressions.booleanTemplate(
+//                                DISTANCE_CONDITION,
+//                                post.gpsDataVO.startPoint, referencePoint, distance * 10000
+//                        ))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -206,7 +205,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public PageResultData<GetAllPostsResponse> findAllPostsByRecommended(Long memberNo, Pageable pageable, int distance) {
+    public PageResultData<GetAllPostsResponse> findAllPostsByRecommended(Long memberNo, Pageable pageable) {
         List<Post> posts;
         long total;
 
@@ -214,10 +213,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         total = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(Expressions.booleanTemplate(
-                                DISTANCE_CONDITION,
-                                post.gpsDataVO.startPoint, referencePoint, distance * 10000
-                        ))
+//                        .and(Expressions.booleanTemplate(
+//                                DISTANCE_CONDITION,
+//                                post.gpsDataVO.startPoint, referencePoint, distance * 10000
+//                        ))
                 )
                 .fetchCount();
 
@@ -225,10 +224,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .from(post)
                 .leftJoin(bookmark).on(bookmark.post.postNo.eq(post.postNo))
                 .where(post.status.eq(true)
-                        .and(Expressions.booleanTemplate(
-                                DISTANCE_CONDITION,
-                                post.gpsDataVO.startPoint, referencePoint, distance * 10000
-                        ))
+//                        .and(Expressions.booleanTemplate(
+//                                DISTANCE_CONDITION,
+//                                post.gpsDataVO.startPoint, referencePoint, distance * 10000
+//                        ))
                 )
                 .groupBy(post.postNo)
                 .orderBy(
@@ -274,7 +273,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public PageResultData<GetAllPostsResponse> findAllPostsByLikeCnt(Long memberNo, Pageable pageable, int distance) {
+    public PageResultData<GetAllPostsResponse> findAllPostsByLikeCnt(Long memberNo, Pageable pageable) {
         List<Post> posts;
         long total;
 
@@ -282,10 +281,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         total = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(Expressions.booleanTemplate(
-                                DISTANCE_CONDITION,
-                                post.gpsDataVO.startPoint, referencePoint, distance * 100
-                        ))
+//                        .and(Expressions.booleanTemplate(
+//                                DISTANCE_CONDITION,
+//                                post.gpsDataVO.startPoint, referencePoint, distance * 100
+//                        ))
                 )
                 .fetchCount();
 
@@ -293,10 +292,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .from(post)
                 .leftJoin(like).on(like.post.postNo.eq(post.postNo))
                 .where(post.status.eq(true)
-                        .and(Expressions.booleanTemplate(
-                                DISTANCE_CONDITION,
-                                post.gpsDataVO.startPoint, referencePoint, distance * 100
-                        ))
+//                        .and(Expressions.booleanTemplate(
+//                                DISTANCE_CONDITION,
+//                                post.gpsDataVO.startPoint, referencePoint, distance * 100
+//                        ))
                 )
                 .groupBy(post.postNo)
                 .orderBy(
@@ -342,7 +341,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public PageResultData<GetAllPostsResponse> findAllPostsByDistance(Long memberNo, Pageable pageable, int distance) {
+    public PageResultData<GetAllPostsResponse> findAllPostsByDistance(Long memberNo, Pageable pageable) {
         List<Post> posts;
         long total;
 
@@ -350,21 +349,21 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         total = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(post.gpsDataVO.isNotNull())
-                        .and(Expressions.booleanTemplate(
-                                DISTANCE_CONDITION,
-                                post.gpsDataVO.startPoint, referencePoint, distance * 100
-                        ))
+//                        .and(post.gpsDataVO.isNotNull())
+//                        .and(Expressions.booleanTemplate(
+//                                DISTANCE_CONDITION,
+//                                post.gpsDataVO.startPoint, referencePoint, distance * 100
+//                        ))
                 )
                 .fetchCount();
 
         posts = jpaQueryFactory.selectFrom(post)
                 .where(post.status.eq(true)
-                        .and(post.gpsDataVO.startPoint.isNotNull())
-                        .and(Expressions.booleanTemplate(
-                                DISTANCE_CONDITION,
-                                post.gpsDataVO.startPoint, referencePoint, distance * 100
-                        ))
+//                        .and(post.gpsDataVO.startPoint.isNotNull())
+//                        .and(Expressions.booleanTemplate(
+//                                DISTANCE_CONDITION,
+//                                post.gpsDataVO.startPoint, referencePoint, distance * 100
+//                        ))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

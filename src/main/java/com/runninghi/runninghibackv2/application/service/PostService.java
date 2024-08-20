@@ -191,27 +191,27 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResultData<GetAllPostsResponse>  getPostScroll(Long memberNo, Pageable pageable, String sort, int distance) {
-        log.info("게시물 전체 조회 요청. 회원번호: {}, 정렬기준: {}, 거리: {}", memberNo, sort, distance);
+    public PageResultData<GetAllPostsResponse>  getPostScroll(Long memberNo, Pageable pageable, String sort) {
+        log.info("게시물 전체 조회 요청. 회원번호: {}, 정렬기준: {}", memberNo, sort);
 
         PageResultData<GetAllPostsResponse> result;
         try {
             switch (sort.toLowerCase()) {
                 case "latest":
-                    result = postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
+                    result = postQueryRepository.findAllPostsByLatest(memberNo, pageable);
                     break;
                 case "recommended":
-                    result = postQueryRepository.findAllPostsByRecommended(memberNo, pageable, distance);
+                    result = postQueryRepository.findAllPostsByRecommended(memberNo, pageable);
                     break;
                 case "like":
-                    result = postQueryRepository.findAllPostsByLikeCnt(memberNo, pageable, distance);
+                    result = postQueryRepository.findAllPostsByLikeCnt(memberNo, pageable);
                     break;
                 case "distance":
-                    result = postQueryRepository.findAllPostsByDistance(memberNo, pageable, distance);
+                    result = postQueryRepository.findAllPostsByDistance(memberNo, pageable);
                     break;
                 default:
                     log.warn("알 수 없는 정렬 기준: {}. 기본값(최신순)으로 조회합니다.", sort);
-                    result = postQueryRepository.findAllPostsByLatest(memberNo, pageable, distance);
+                    result = postQueryRepository.findAllPostsByLatest(memberNo, pageable);
             }
             return result;
         } catch (Exception e) {

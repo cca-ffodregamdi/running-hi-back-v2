@@ -59,15 +59,15 @@ public class PostController {
     public ResponseEntity<PageResult<GetAllPostsResponse>> getAllPosts(@RequestHeader("Authorization") String bearerToken,
                                                                        @RequestParam(defaultValue = "1") @PositiveOrZero int page,
                                                                        @RequestParam(defaultValue = "10") @Positive int size,
-                                                                       @RequestParam(defaultValue = "latest") String sort,
-                                                                       @RequestParam(defaultValue = "1") @Positive int distance) {
+                                                                       @RequestParam(defaultValue = "latest") String sort) {
+//                                                                       @RequestParam(defaultValue = "1") @Positive int distance) {
 
         log.info("게시글 리스트 조회 요청이 들어왔습니다.");
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
         Pageable pageable = PageRequest.of(page - 1 , size);
 
-        PageResultData<GetAllPostsResponse> response = postService.getPostScroll(memberInfo.memberNo(), pageable, sort, distance);
+        PageResultData<GetAllPostsResponse> response = postService.getPostScroll(memberInfo.memberNo(), pageable, sort);
 
         return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
     }
