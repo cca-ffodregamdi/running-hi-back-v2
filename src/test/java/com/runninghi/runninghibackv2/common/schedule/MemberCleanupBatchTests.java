@@ -94,7 +94,7 @@ class MemberCleanupBatchTests {
                 .alarmConsent(true)
                 .name("kakaoName")
                 .isActive(false)
-                .runDataVO(new RunDataVO(1000,0.0,10,1))
+                .runDataVO(new RunDataVO(1000,0.0,2,1))
                 .build();
         members.add(member1);
 
@@ -103,7 +103,7 @@ class MemberCleanupBatchTests {
                 .alarmConsent(true)
                 .name("nyam")
                 .isActive(true)
-                .runDataVO(new RunDataVO(1000,0.0,10,1))
+                .runDataVO(new RunDataVO(1000,0.0,2,1))
                 .build();
         members.add(member2);
 
