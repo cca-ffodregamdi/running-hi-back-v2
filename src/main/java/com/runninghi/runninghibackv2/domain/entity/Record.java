@@ -2,6 +2,7 @@ package com.runninghi.runninghibackv2.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -45,4 +46,13 @@ public class Record {
     @Comment("날짜")
     private LocalDate date;
 
+    @Builder
+    public Record(Member member, Float distance, int time, int meanPaceSec, int kcal, LocalDate date) {
+        this.member = member;
+        this.distance = distance;
+        this.time = time;
+        this.meanPaceSec = meanPaceSec;
+        this.kcal = kcal;
+        this.date = date;
+    }
 }

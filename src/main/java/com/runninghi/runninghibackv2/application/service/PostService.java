@@ -62,6 +62,7 @@ public class PostService {
     private final GpsCoordinateExtractor gpsCoordinateExtractor;
     private final PostQueryRepository postQueryRepository;
     private final MemberChallengeRepository memberChallengeRepository;
+    private final RecordService recordService;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -253,6 +254,7 @@ public class PostService {
             String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
             updateRecordOfMyChallenges(member, gpsDataVO);
+            recordService.createRecord(member, gpsDataVO);
 
             Post createdPost = postRepository.save(Post.builder()
                     .member(member)
