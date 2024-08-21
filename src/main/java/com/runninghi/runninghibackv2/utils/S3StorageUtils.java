@@ -3,7 +3,6 @@ package com.runninghi.runninghibackv2.utils;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
-import com.google.common.io.Files;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -24,7 +23,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class S3StorageUtils {
 
-    private AmazonS3Client amazonS3Client;
+    private final AmazonS3Client amazonS3Client;
     private static final int SECURE_STRING_BYTE_SIZE = 16; // 16 byte -> 영문 + 숫자 조합 22자리
 
     @Value("${cloud.aws.s3.bucket}")
@@ -70,6 +69,13 @@ public class S3StorageUtils {
         return Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
     }
 
+    /**
+     * MultipartFile에서 File로 변경해주는 메소드입니다.
+     * 추후에 File은 꼭 삭제해주어야 합니다.
+     * @param file 클라이언트로부터 받은 MultipartFile 입니다.
+     * @return File 변환된 File입니다.
+     * @throws IOException
+     */
     private File convertMultipartFileToFile(MultipartFile file) throws IOException {
         File convertedFile = File.createTempFile("temp", "." + extractFileExtension(file));
         try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
