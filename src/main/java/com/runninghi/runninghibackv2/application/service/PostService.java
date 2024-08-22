@@ -207,9 +207,9 @@ public class PostService {
                 case "like":
                     result = postQueryRepository.findAllPostsByLikeCnt(memberNo, pageable);
                     break;
-                case "distance":
-                    result = postQueryRepository.findAllPostsByDistance(memberNo, pageable);
-                    break;
+//                case "distance":
+//                    result = postQueryRepository.findAllPostsByDistance(memberNo, pageable);
+//                    break;
                 default:
                     log.warn("알 수 없는 정렬 기준: {}. 기본값(최신순)으로 조회합니다.", sort);
                     result = postQueryRepository.findAllPostsByLatest(memberNo, pageable);
