@@ -64,9 +64,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetch();
 
         List<GetMyPostsResponse> responses = posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(QImage.image)
-                    .from(QImage.image)
-                    .where(QImage.image.postNo.eq(post.getPostNo()))
+            Image mainImage = jpaQueryFactory.select(image)
+                    .from(image)
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -111,7 +111,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         String imageUrl = jpaQueryFactory
                 .select(image.imageUrl)
                 .from(image)
-                .where(image.postNo.eq(postNo))
+                .where(image.targetNo.eq(postNo))
                 .fetchFirst();
 
         Long likeCnt = jpaQueryFactory.select(like.count())
@@ -172,7 +172,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
             Image mainImage = jpaQueryFactory.selectFrom(image)
-                    .where(image.postNo.eq(post.getPostNo()))
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -240,7 +240,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
             Image mainImage = jpaQueryFactory.selectFrom(image)
-                    .where(image.postNo.eq(post.getPostNo()))
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -308,7 +308,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
             Image mainImage = jpaQueryFactory.selectFrom(image)
-                    .where(image.postNo.eq(post.getPostNo()))
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -372,7 +372,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
             Image mainImage = jpaQueryFactory.selectFrom(image)
-                    .where(image.postNo.eq(post.getPostNo()))
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -420,9 +420,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetchCount();
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(QImage.image)
-                    .from(QImage.image)
-                    .where(QImage.image.postNo.eq(post.getPostNo()))
+            Image mainImage = jpaQueryFactory.select(image)
+                    .from(image)
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -475,9 +475,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetchCount();
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(QImage.image)
-                    .from(QImage.image)
-                    .where(QImage.image.postNo.eq(post.getPostNo()))
+            Image mainImage = jpaQueryFactory.select(image)
+                    .from(image)
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -525,9 +525,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetch();
 
         return posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(QImage.image)
-                    .from(QImage.image)
-                    .where(QImage.image.postNo.eq(post.getPostNo()))
+            Image mainImage = jpaQueryFactory.select(image)
+                    .from(image)
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -549,9 +549,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetch();
 
         return posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(QImage.image)
-                    .from(QImage.image)
-                    .where(QImage.image.postNo.eq(post.getPostNo()))
+            Image mainImage = jpaQueryFactory.select(image)
+                    .from(image)
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 
@@ -574,9 +574,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .fetch();
 
         return posts.stream().map(post -> {
-            Image mainImage = jpaQueryFactory.select(QImage.image)
-                    .from(QImage.image)
-                    .where(QImage.image.postNo.eq(post.getPostNo()))
+            Image mainImage = jpaQueryFactory.select(image)
+                    .from(image)
+                    .where(image.targetNo.eq(post.getPostNo()))
                     .limit(1)
                     .fetchOne();
 

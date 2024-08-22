@@ -83,7 +83,7 @@ public class PostReportService {
 
         Image mainImage = jpaQueryFactory.select(image)
                 .from(image)
-                .where(image.postNo.in(postReport.getReportedPost().getPostNo()))
+                .where(image.targetNo.in(postReport.getReportedPost().getPostNo()))
                 .limit(1)
                 .fetchOne();
 
