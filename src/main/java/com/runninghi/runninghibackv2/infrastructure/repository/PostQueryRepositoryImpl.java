@@ -60,7 +60,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .where(post.member.memberNo.eq(memberNo))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(post.createDate.desc())
+                .orderBy(post.createDate.desc(), post.postNo.desc())
                 .fetch();
 
         List<GetMyPostsResponse> responses = posts.stream().map(post -> {
@@ -167,7 +167,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(post.createDate.desc())
+                .orderBy(post.createDate.desc(), post.postNo.desc())
                 .fetch();
 
         List<GetAllPostsResponse> responses = posts.stream().map(post -> {
@@ -232,7 +232,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .groupBy(post.postNo)
                 .orderBy(
                     Expressions.numberTemplate(Long.class, "count({0})", bookmark.post.postNo).desc(),
-                    post.createDate.desc()
+                    post.postNo.desc()
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -300,7 +300,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .groupBy(post.postNo)
                 .orderBy(
                         Expressions.numberTemplate(Long.class, "count({0})", like.post.postNo).desc(),
-                        post.createDate.desc()
+                        post.postNo.desc()
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -412,7 +412,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .from(post)
                 .join(like).on(post.postNo.eq(like.post.postNo))
                 .where(like.member.memberNo.eq(memberNo))
-                .orderBy(post.createDate.desc())
+                .orderBy(post.createDate.desc(), post.postNo.desc())
                 .fetch();
         total = jpaQueryFactory.selectFrom(post)
                 .join(like).on(post.postNo.eq(like.post.postNo))
@@ -466,7 +466,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .from(post)
                 .join(bookmark).on(post.postNo.eq(bookmark.post.postNo))
                 .where(bookmark.member.memberNo.eq(memberNo))
-                .orderBy(post.createDate.desc())
+                .orderBy(post.createDate.desc(), post.postNo.desc())
                 .fetch();
 
         total = jpaQueryFactory.selectFrom(post)
