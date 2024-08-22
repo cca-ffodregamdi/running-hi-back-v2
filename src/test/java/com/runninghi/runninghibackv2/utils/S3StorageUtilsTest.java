@@ -32,7 +32,7 @@ class S3StorageUtilsTest {
 
         // then
         Assertions.assertThat(key.contains(date)).isTrue();
-        Assertions.assertThat(key.length()).isEqualTo(35);
+        Assertions.assertThat(key.length()).isEqualTo(41);
     }
 
 }

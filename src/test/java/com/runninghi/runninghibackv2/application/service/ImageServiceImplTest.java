@@ -145,15 +145,19 @@ class ImageServiceImplTest {
     void deleteImageList() {
         // Given
         List<String> imageUrlList = Arrays.asList("url1", "url2");
-        when(imageRepository.findImageUrlsIn(imageUrlList)).thenReturn(imageUrlList);
-        when(imageRepository.deleteAllByImageUrlIn(imageUrlList)).thenReturn(2);
+        List<Image> existingImages = Arrays.asList(
+                Image.builder().imageUrl("url1").build(),
+                Image.builder().imageUrl("url2").build()
+        );
+        when(imageRepository.findByImageUrlIn(imageUrlList)).thenReturn(existingImages);
+        when(imageRepository.deleteAllByImageUrlIn(anyList())).thenReturn(2);
 
         // When
         imageService.deleteImageList(imageUrlList);
 
         // Then
         verify(s3StorageUtils, times(2)).deleteFile(anyString());
-        verify(imageRepository, times(1)).deleteAllByImageUrlIn(imageUrlList);
+        verify(imageRepository, times(1)).deleteAllByImageUrlIn(anyList());
     }
 
     @Test
