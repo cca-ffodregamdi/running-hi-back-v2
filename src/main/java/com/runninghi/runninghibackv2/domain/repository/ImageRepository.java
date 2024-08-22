@@ -14,14 +14,13 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     Optional<Image> findImageByImageUrl(String imageUrl);
 
-    Optional<Image> findImageByPostNo(Long postNo);
+    Optional<Image> findImageByTargetNo(Long targetNo);
 
-    @Query("DELETE FROM Image i WHERE i.imageUrl IN :urls")
+    @Query("DELETE FROM Image i WHERE i.imageUrl IN :imageUrls")
     @Modifying
-    int deleteAllByImageUrlIn(@Param("urls") List<String> imageUrls);
+    int deleteAllByImageUrlIn(@Param("imageUrls") List<String> imageUrls);
 
-    @Query("SELECT i.imageUrl FROM Image i WHERE i.imageUrl IN :urls")
-    List<String> findImageUrlsIn(@Param("urls") List<String> imageUrls);
+    List<Image> findByImageUrlIn(List<String> imageUrls);
 
     @Query("SELECT i.imageUrl FROM Image i WHERE i.targetNo IS NULL AND i.createDate < :date")
     List<String> findUnassignedImagesBeforeDate(@Param("date") LocalDateTime date);

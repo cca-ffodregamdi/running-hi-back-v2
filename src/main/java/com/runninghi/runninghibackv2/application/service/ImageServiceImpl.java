@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Objects;
 
 
-
 @Slf4j
 @Service
 @Transactional
@@ -124,12 +123,16 @@ public class ImageServiceImpl implements ImageService{
 
     @Override
     public void deleteImageList(List<String> imageUrlList) {
-        // 먼저 실제 DB에 존재하는 이미지 URL만 필터링
-        List<String> existingUrls = imageRepository.findImageUrlsIn(imageUrlList);
+
+        List<Image> existingImages = imageRepository.findByImageUrlIn(imageUrlList);
+
+        List<String> existingUrls = existingImages.stream()
+                .map(Image::getImageUrl)
+                .toList();
 
         // S3에서 이미지 삭제
-        for (String url : existingUrls) {
-            s3StorageUtils.deleteFile(url);
+        for (String imageUrl : existingUrls) {
+            s3StorageUtils.deleteFile(imageUrl);
         }
 
         // DB에서 이미지 정보 일괄 삭제
