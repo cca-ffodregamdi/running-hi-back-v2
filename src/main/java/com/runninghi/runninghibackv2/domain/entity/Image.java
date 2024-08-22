@@ -50,6 +50,10 @@ public class Image{
         this.targetNo = targetNo;
     }
 
+    public void updateImageTarget(ImageTarget imageTarget) {
+        this.imageTarget = imageTarget;
+    }
+
     public void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }

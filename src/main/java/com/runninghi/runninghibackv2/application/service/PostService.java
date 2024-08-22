@@ -10,11 +10,16 @@ import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequ
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
 import com.runninghi.runninghibackv2.common.exception.custom.S3UploadException;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
-import com.runninghi.runninghibackv2.domain.entity.*;
+import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
+import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
-import com.runninghi.runninghibackv2.domain.repository.*;
+import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
+import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
+import com.runninghi.runninghibackv2.domain.repository.PostRepository;
 import com.runninghi.runninghibackv2.domain.service.GpsCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,19 +27,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.net.URL;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -43,9 +47,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.locationtech.jts.geom.Point;
-
-import static com.runninghi.runninghibackv2.domain.entity.QImage.image;
 
 @Slf4j
 @Service
@@ -56,7 +57,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
     private final UpdatePostService updateService;
-    private final ImageService imageService;
+    private final PostImageService postImageService;
     private final MemberRepository memberRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final GpsCoordinateExtractor gpsCoordinateExtractor;
@@ -133,7 +134,7 @@ public class PostService {
     }
 
     private void savePostImage(String imageUrl, Long postNo) {
-        imageService.savePostNo(imageUrl, postNo);
+        postImageService.savePostNo(imageUrl, postNo);
     }
 
     private String createPostTitle(GpsDataVO request) {
@@ -308,7 +309,7 @@ public class PostService {
 
         try {
             post.update(request, mainData);
-            imageService.updateImage(postNo, request.imageUrl());
+            postImageService.updateImage(postNo, request.imageUrl());
         } catch (Exception e) {
             log.error("게시글 수정 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, postNo, e);
             throw e;

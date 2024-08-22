@@ -107,6 +107,9 @@ public class ImageServiceImpl implements ImageService{
     public byte[] resizeImage(MultipartFile multipartFile) throws IOException {
 
         BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
+        if (originalImage == null) {
+            throw new IOException();
+        }
         BufferedImage resizedImage =
                 Scalr.resize(originalImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_TO_WIDTH, IMAGE_RESIZE_TARGET_WIDTH, Scalr.THRESHOLD_QUALITY_BALANCED);
         String fileExtension = imageChecker.getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
@@ -115,6 +118,7 @@ public class ImageServiceImpl implements ImageService{
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ImageIO.write(resizedImage, fileExtension, outputStream);
 
+        log.info("성공적으로 이미지가 리사이징되었습니다.");
         return outputStream.toByteArray();
     }
 
