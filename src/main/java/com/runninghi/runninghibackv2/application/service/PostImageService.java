@@ -38,7 +38,7 @@ public class PostImageService {
 
     public void updateImage(Long postNo, String newImageUrl) {
 
-        Image image = imageRepository.findImageByPostNo(postNo)
+        Image image = imageRepository.findImageByTargetNo(postNo)
                 .orElseThrow(EntityNotFoundException::new);
 
         image.updateImageUrl(newImageUrl);
