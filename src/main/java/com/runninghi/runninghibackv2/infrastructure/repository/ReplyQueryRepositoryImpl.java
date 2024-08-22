@@ -7,18 +7,17 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.runninghi.runninghibackv2.application.dto.reply.GetReplyList;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReplyListByMemberRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReplyListRequest;
 import com.runninghi.runninghibackv2.application.dto.reply.request.GetReportedReplyRequest;
-import com.runninghi.runninghibackv2.application.dto.reply.GetReplyList;
 import com.runninghi.runninghibackv2.application.dto.reply.response.GetReportedReplyResponse;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
 import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -30,11 +29,11 @@ import static com.runninghi.runninghibackv2.domain.entity.QMember.member;
 import static com.runninghi.runninghibackv2.domain.entity.QReply.reply;
 import static com.runninghi.runninghibackv2.domain.entity.QReplyReport.replyReport;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(ReplyQueryRepositoryImpl.class);
     private final JPAQueryFactory jpaQueryFactory;
     private static final int REPORTED_COUNT = 1;
 
@@ -45,6 +44,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                         reply.replyNo,
                         reply.member.memberNo,
                         reply.member.nickname,
+                        reply.member.profileUrl,
                         reply.post.postNo,
                         reply.replyContent,
                         reply.reportedCount,

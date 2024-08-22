@@ -12,6 +12,8 @@ public class GetReportedReplyResponse {
         Long replyNo;
         @Schema(description = "댓글 작성자 닉네임", example = "러너1")
         String memberName;
+        @Schema(description = "댓글 작성자 프로필 사진", example = "profileImage.png")
+        String profileImage;
         @Schema(description = "게시글 번호", example = "1")
         Long postNo;
         @Schema(description = "댓글 내용", example = "댓글 내용")
@@ -25,9 +27,10 @@ public class GetReportedReplyResponse {
         @Schema(description = "댓글 수정 여부", example = "false")
         Boolean isUpdated;
 
-        public GetReportedReplyResponse(Long replyNo, String memberName, Long postNo, String replyContent, int reportedCount, Boolean isDeleted, LocalDateTime createDate, LocalDateTime updateDate) {
+        public GetReportedReplyResponse(Long replyNo, String memberName, String profileImage, Long postNo, String replyContent, int reportedCount, Boolean isDeleted, LocalDateTime createDate, LocalDateTime updateDate) {
                 this.replyNo = replyNo;
                 this.memberName = memberName;
+                this.profileImage = profileImage;
                 this.postNo = postNo;
                 this.replyContent = replyContent;
                 this.reportedCount = reportedCount;
