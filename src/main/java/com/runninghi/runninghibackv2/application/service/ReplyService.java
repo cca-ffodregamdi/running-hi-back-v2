@@ -53,8 +53,8 @@ public class ReplyService {
 
         List<GetReplyList> replyList =  replyQueryRepository.findAllByPostNo(request);
         replyList.stream()
-                .filter(i -> i.getMemberNo().equals(request.getMemberNo()))
-                .forEach(i -> i.setIsOwner(true));
+                .filter(reply -> reply.getMemberNo().equals(request.getMemberNo()))
+                .forEach(reply -> reply.setIsOwner(true));
 
         return new GetContentResponse<>(replyList);
     }
