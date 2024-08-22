@@ -1,4 +1,4 @@
-package com.runninghi.runninghibackv2.utils;
+package com.runninghi.runninghibackv2.common.utils;
 
 import java.security.SecureRandom;
 import java.util.Base64;

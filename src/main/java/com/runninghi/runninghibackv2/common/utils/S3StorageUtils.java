@@ -1,9 +1,11 @@
-package com.runninghi.runninghibackv2.utils;
+package com.runninghi.runninghibackv2.common.utils;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -13,12 +15,15 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class S3StorageUtils {
@@ -54,7 +59,7 @@ public class S3StorageUtils {
         return amazonS3Client.getUrl(bucketName, key).toString();
     }
 
-    public String buildKey(String dirName, MultipartFile file) {
+    public String buildKey(MultipartFile file, String dirName) {
 
         String extension = extractFileExtension(file);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -93,8 +98,24 @@ public class S3StorageUtils {
         deleteFile(sourceKey);
     }
 
-    public void deleteFile(String key) {
-        amazonS3Client.deleteObject(bucketName, key);
+    public void deleteFile(String fileUrl) {
+        String key = extractKeyFromUrl(fileUrl);
+        try {
+            amazonS3Client.deleteObject(bucketName, key);
+        } catch (AmazonServiceException e) {
+            throw new RuntimeException("Failed to delete file from S3", e);
+        }
+    }
+
+    private String extractKeyFromUrl(String fileUrl) {
+        try {
+            URL url = new URL(fileUrl);
+            String path = url.getPath();
+            // 버킷 이름 다음의 '/'부터가 실제 키입니다.
+            return path.substring(path.indexOf('/', 1) + 1);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid S3 URL: " + fileUrl, e);
+        }
     }
 
     public byte[] downloadFile(String key) throws IOException {

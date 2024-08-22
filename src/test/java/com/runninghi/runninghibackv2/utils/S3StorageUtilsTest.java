@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.utils;
 
+import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class S3StorageUtilsTest {
         String date = sdf.format(new Date());
 
         // when
-        String key = s3StorageUtils.buildKey("/test", file);
+        String key = s3StorageUtils.buildKey(file, "/test");
         System.out.println(key);
 
         // then
