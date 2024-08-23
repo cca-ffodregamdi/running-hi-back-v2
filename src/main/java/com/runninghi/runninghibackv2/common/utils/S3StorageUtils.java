@@ -32,7 +32,7 @@ public class S3StorageUtils {
     private static final int SECURE_STRING_BYTE_SIZE = 16; // 16 byte -> 영문 + 숫자 조합 22자리
 
     @Value("${cloud.aws.s3.bucket}")
-    private static String bucketName;
+    private String bucketName;
 
 
     public String uploadFile(MultipartFile file, String key) throws IOException {
@@ -49,6 +49,7 @@ public class S3StorageUtils {
 
     public String uploadFile(byte[] fileContent, String key) throws IOException {
 
+        log.info("이미지를 {}로 업로드합니다.", key);
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         objectMetadata.setContentLength(fileContent.length);
