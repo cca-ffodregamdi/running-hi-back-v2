@@ -11,10 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -32,7 +29,7 @@ public class S3StorageUtils {
     private static final int SECURE_STRING_BYTE_SIZE = 16; // 16 byte -> 영문 + 숫자 조합 22자리
 
     @Value("${cloud.aws.s3.bucket}")
-    private static String bucketName;
+    private String bucketName;
 
 
     public String uploadFile(MultipartFile file, String key) throws IOException {
@@ -41,22 +38,36 @@ public class S3StorageUtils {
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
 
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, file.getInputStream(), metadata);
-        amazonS3Client.putObject(putObjectRequest);
-
-        return amazonS3Client.getUrl(bucketName, key).toString();
+        try (InputStream inputStream = file.getInputStream()) {
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, inputStream, metadata);
+            amazonS3Client.putObject(putObjectRequest);
+            log.info("S3에 성공적으로 업로드되었습니다. Bucket: {}, Key: {}", bucketName, key);
+            return amazonS3Client.getUrl(bucketName, key).toString();
+        } catch (AmazonServiceException e) {
+            log.error("S3에 업로드 중 오류가 발생하였습니다.. Bucket: {}, Key: {}", bucketName, key, e);
+            throw new RuntimeException("S3에 업로드 중 오류가 발생하였습니다.", e);
+        }
     }
 
     public String uploadFile(byte[] fileContent, String key) throws IOException {
 
+        log.info("이미지를 {}로 업로드합니다.", key);
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         objectMetadata.setContentLength(fileContent.length);
 
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, new ByteArrayInputStream(fileContent), objectMetadata);
-        amazonS3Client.putObject(putObjectRequest);
-
-        return amazonS3Client.getUrl(bucketName, key).toString();
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent)) {
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, inputStream, objectMetadata);
+            amazonS3Client.putObject(putObjectRequest);
+            log.info("S3에 성공적으로 업로드되었습니다. Bucket: {}, Key: {}", bucketName, key);
+            return amazonS3Client.getUrl(bucketName, key).toString();
+        } catch (IOException e) {
+            log.error("파일 변환 중 오류가 발생하였습니다. Bucket: {}, Key: {}", bucketName, key, e);
+            throw new RuntimeException("파일 변환 중 오류가 발생하였습니다.", e);
+        } catch (AmazonServiceException e) {
+            log.error("S3에 업로드 중 에러가 발생하였습니다. Bucket: {}, Key: {}", bucketName, key, e);
+            throw new RuntimeException("Failed to upload file to S3", e);
+        }
     }
 
     public String buildKey(MultipartFile file, String dirName) {
@@ -102,26 +113,44 @@ public class S3StorageUtils {
         String key = extractKeyFromUrl(fileUrl);
         try {
             amazonS3Client.deleteObject(bucketName, key);
+            log.info("S3에서 파일을 성공적으로 삭제하였습니다. Bucket: {}, Key: {}", bucketName, key);
         } catch (AmazonServiceException e) {
+            log.error("삭제 중 오류가 발생하였습니다. Bucket: {}, Key: {}", bucketName, key, e);
             throw new RuntimeException("Failed to delete file from S3", e);
         }
     }
 
-    private String extractKeyFromUrl(String fileUrl) {
+    public String extractKeyFromUrl(String fileUrl) {
         try {
             URL url = new URL(fileUrl);
             String path = url.getPath();
-            // 버킷 이름 다음의 '/'부터가 실제 키입니다.
-            return path.substring(path.indexOf('/', 1) + 1);
+
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+
+            if (path.isEmpty()) {
+                throw new IllegalArgumentException("URL 내에 키 값이 포함되어야 합니다.");
+            }
+
+            return path;
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Invalid S3 URL: " + fileUrl, e);
+            throw new IllegalArgumentException("잘못된 URL입니다.");
         }
     }
 
     public byte[] downloadFile(String key) throws IOException {
-        S3Object s3Object = amazonS3Client.getObject(bucketName, key);
-        S3ObjectInputStream out = s3Object.getObjectContent();
-        return IOUtils.toByteArray(out);
+        try {
+            S3Object s3Object = amazonS3Client.getObject(bucketName, key);
+            try (S3ObjectInputStream inputStream = s3Object.getObjectContent()) {
+                byte[] content = IOUtils.toByteArray(inputStream);
+                log.info("S3에서 성공적으로 다운로드하였습니다. Bucket: {}, Key: {}", bucketName, key);
+                return content;
+            }
+        } catch (AmazonServiceException e) {
+            log.error("다운로드 중 오류가 발생하였습니다. Bucket: {}, Key: {}", bucketName, key, e);
+            throw new RuntimeException("다운로드 중 오류가 발생하였습니다.", e);
+        }
     }
 
     public String getEncodedFileName(String key) {
