@@ -9,6 +9,8 @@ public record GetMemberResponse(
         Long memberNo,
         @Schema(description = "닉네임", example = "러너 23139403")
         String nickname,
+        @Schema(description = "프로필 이미지", example = "https://firebase...")
+        String profileImageUrl,
         @Schema(description = "레벨", example = "5")
         int level,
         @Schema(description = "회원이 달린 총 거리", example = "200.3")
@@ -19,7 +21,7 @@ public record GetMemberResponse(
         double totalKcal
 ) {
     public static GetMemberResponse from(Member member) {
-        return new GetMemberResponse(member.getMemberNo(), member.getNickname(), member.getRunDataVO().getLevel(),
+        return new GetMemberResponse(member.getMemberNo(), member.getNickname(), member.getProfileImageUrl(), member.getRunDataVO().getLevel(),
                 member.getRunDataVO().getTotalDistance(), member.getRunDataVO().getDistanceToNextLevel(),
                 member.getRunDataVO().getTotalKcal());
     }

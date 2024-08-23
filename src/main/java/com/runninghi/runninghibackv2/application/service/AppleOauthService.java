@@ -49,6 +49,9 @@ public class AppleOauthService {
     @Value("${apple.client-id}")
     private String clientId;
 
+    @Value("${cloud.aws.s3.default-profile}")
+    private String defaultProfileImageUrl;
+
     // client secret 생성
     @Transactional
     public String createClientSecret() {
@@ -199,6 +202,7 @@ public class AppleOauthService {
                 .name(appleResponse.get("name"))
                 .appleRefreshToken(appleRefreshToken)
                 .nickname("러너 " + generateRandomDigits())
+                .profileImageUrl(defaultProfileImageUrl)
                 .isActive(true)
                 .isBlacklisted(false)
                 .isTermsAgreed(false)

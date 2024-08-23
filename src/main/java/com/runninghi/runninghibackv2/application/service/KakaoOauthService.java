@@ -29,13 +29,16 @@ import java.util.*;
 @RequiredArgsConstructor
 public class KakaoOauthService {
 
-    private static final int NICKNAME_DIGIT_LENGTH = 8;
+    private static final int NICKNAME_DIGIT_LENGTH = 5;
     private static final int RANDOM_NUMBER_RANGE = 10;
     private static final String KAKAO_USER_INFO_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
     private static final String KAKAO_UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink";
 
     @Value("${kakao.admin-key}")
     private String adminKey;
+
+    @Value("${cloud.aws.s3.default-profile}")
+    private String defaultProfileImageUrl;
 
     private final RestTemplate restTemplate;
     private final JwtTokenProvider jwtTokenProvider;
@@ -85,7 +88,7 @@ public class KakaoOauthService {
 
         // 필요한 사용자 정보 가져오기
         MultiValueMapAdapter<String, String> body = new LinkedMultiValueMap<>();
-        body.add("property_keys", "[\"id\", \"properties.nickname\"]");
+        body.add("property_keys", "[\"id\", \"properties.profileNickname\"]");
 
         HttpEntity<?> request = new HttpEntity<>(body, headers);
 
@@ -132,6 +135,7 @@ public class KakaoOauthService {
         Member member = Member.builder()
                 .kakaoId(kakaoProfile.getKakaoId().toString())
                 .name(kakaoProfile.getNickname())
+                .profileImageUrl(defaultProfileImageUrl)
                 .nickname("러너 " + generateRandomDigits())
                 .isActive(true)
                 .isBlacklisted(false)

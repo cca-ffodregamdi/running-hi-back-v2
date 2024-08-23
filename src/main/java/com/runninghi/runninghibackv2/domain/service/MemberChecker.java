@@ -11,4 +11,8 @@ public class MemberChecker {
             throw new BadRequestException();
         }
     }
+
+    public boolean isCustomProfileImage(String currentProfileImageUrl, String defaultProfileImageUrl) {
+        return currentProfileImageUrl != null && !currentProfileImageUrl.isEmpty() && !currentProfileImageUrl.equals(defaultProfileImageUrl);
+    }
 }

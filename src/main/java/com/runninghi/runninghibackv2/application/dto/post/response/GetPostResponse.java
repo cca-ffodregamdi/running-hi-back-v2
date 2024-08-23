@@ -1,14 +1,10 @@
 package com.runninghi.runninghibackv2.application.dto.post.response;
 
-import com.runninghi.runninghibackv2.application.dto.reply.response.GetPostReplyResponse;
-import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
-import com.runninghi.runninghibackv2.domain.entity.Keyword;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record GetPostResponse(
 
@@ -56,7 +52,7 @@ public record GetPostResponse(
     public static GetPostResponse from(Post post, String imageUrl, Long likeCnt,Long bookmarkCnt, Long replyCnt, Boolean isOwner, Boolean isLiked, Boolean isBookmarked) {
         return new GetPostResponse(
                 post.getMember().getNickname(),
-                post.getMember().getProfileUrl(),
+                post.getMember().getProfileImageUrl(),
                 post.getMember().getRunDataVO().getLevel(),
                 post.getCreateDate(),
                 post.getPostContent(),

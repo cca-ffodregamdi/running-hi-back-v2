@@ -20,12 +20,12 @@ public interface MemberChallengeRepository extends JpaRepository<MemberChallenge
     List<MemberChallenge> findByMemberAndChallengeStatus(@Param("member") Member member, @Param("status") boolean status);
 
     @Query("SELECT m.memberChallengeId AS memberChallengeId, m.record AS record, m.member.nickname AS nickname," +
-            "m.member.profileUrl AS profileUrl, RANK() OVER (ORDER BY m.record DESC) AS rank " +
+            "m.member.profileImageUrl AS profileImageUrl, RANK() OVER (ORDER BY m.record DESC) AS rank " +
             "FROM MemberChallenge m WHERE m.challenge.challengeNo = :challengeNo")
     List<GetChallengeRankingResponse> findChallengeRanking(@Param("challengeNo") Long challengeNo);
 
     @Query("SELECT m.memberChallengeId AS memberChallengeId, m.record AS record, m.member.nickname AS nickname, " +
-            "m.member.profileUrl AS profileUrl, " +
+            "m.member.profileImageUrl AS profileImageUrl, " +
             "(SELECT COUNT(*) + 1 FROM MemberChallenge m2 WHERE m2.challenge.challengeNo = :challengeNo AND m2.record > m.record) AS rank " +
             "FROM MemberChallenge m WHERE m.challenge.challengeNo = :challengeNo AND m.member.memberNo = :memberNo")
     GetChallengeRankingResponse findMemberRanking(@Param("challengeNo") Long challengeNo, @Param("memberNo") Long memberNo);

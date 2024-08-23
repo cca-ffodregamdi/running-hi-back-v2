@@ -18,7 +18,7 @@ public class GetReplyList {
         @Schema(description = "댓글 작성자 닉네임", example = "러너1")
         String memberName;
         @Schema(description = "프로필 이미지", example = "회원 프로필 사진")
-        String profileUrl;
+        String profileImageUrl;
         @Schema(description = "게시글 번호", example = "1")
         Long postNo;
         @Schema(description = "댓글 내용", example = "댓글 내용")
@@ -34,11 +34,11 @@ public class GetReplyList {
         @Schema(description = "댓글 수정 여부", example = "false")
         Boolean isUpdated;
 
-    public GetReplyList(Long replyNo, Long memberNo, String memberName, String profileUrl, Long postNo, String replyContent, int reportedCount, boolean isDeleted, LocalDateTime createDate, LocalDateTime updateDate) {
+    public GetReplyList(Long replyNo, Long memberNo, String memberName, String profileImageUrl, Long postNo, String replyContent, int reportedCount, boolean isDeleted, LocalDateTime createDate, LocalDateTime updateDate) {
         this.replyNo = replyNo;
         this.memberNo = memberNo;
         this.memberName = memberName;
-        this.profileUrl = profileUrl;
+        this.profileImageUrl = profileImageUrl;
         this.postNo = postNo;
         this.replyContent = replyContent;
         this.reportedCount = reportedCount;
