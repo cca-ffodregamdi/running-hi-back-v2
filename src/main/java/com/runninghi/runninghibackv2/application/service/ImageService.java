@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.runninghi.runninghibackv2.application.dto.image.response.CreateImageResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

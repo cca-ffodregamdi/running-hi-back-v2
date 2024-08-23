@@ -44,7 +44,7 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                         reply.replyNo,
                         reply.member.memberNo,
                         reply.member.nickname,
-                        reply.member.profileUrl,
+                        reply.member.profileImageUrl,
                         reply.post.postNo,
                         reply.replyContent,
                         reply.reportedCount,

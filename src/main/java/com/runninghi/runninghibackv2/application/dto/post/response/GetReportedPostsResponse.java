@@ -5,7 +5,6 @@ import com.runninghi.runninghibackv2.domain.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record GetReportedPostsResponse(
         @Schema(description = "게시글 번호", example = "1")
@@ -32,7 +31,7 @@ public record GetReportedPostsResponse(
                 post.getPostContent(),
                 post.getRole(),
                 post.getMember().getNickname(),
-                post.getMember().getProfileUrl(),
+                post.getMember().getProfileImageUrl(),
                 post.getGpsDataVO().getKcal(),
                 imageUrl
         );

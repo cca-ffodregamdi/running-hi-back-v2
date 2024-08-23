@@ -6,8 +6,10 @@ import com.runninghi.runninghibackv2.application.service.AppleOauthService;
 import com.runninghi.runninghibackv2.application.service.KakaoOauthService;
 import com.runninghi.runninghibackv2.application.service.MemberService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.exception.custom.ImageException;
 import com.runninghi.runninghibackv2.common.exception.custom.InvalidTokenException;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
+import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -25,7 +27,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @Slf4j
@@ -619,5 +623,81 @@ public class MemberController {
         return ResponseEntity.ok(ApiResult.success("지역 설정 여부 조회 성공", response));
     }
 
+    /**
+     * 사용자의 프로필 이미지를 수정하는 API입니다.
+     *
+     * <p>이 API는 사용자의 프로필 이미지를 업데이트합니다. 클라이언트는 사용자 인증 토큰과 함께 새로운 이미지 파일을 요청 본문에 포함해야 합니다.</p>
+     * @param token 사용자 인증을 위한 Bearer 토큰. 요청 헤더에서 'Authorization'으로 제공되어야 합니다. 필수 파라미터입니다.
+     * @param file 업로드할 새로운 프로필 이미지 파일. MultipartFile 형식으로 제공되어야 합니다. 필수 파라미터입니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 업데이트된 프로필 이미지 URL이 응답 본문에 포함됩니다.
+     */
+    @PutMapping(value = "/api/v1/member/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "프로필 이미지 수정",
+            description = "사용자의 프로필 이미지를 수정합니다. " +
+                    "클라이언트는 Authorization 헤더에 Bearer 토큰을 포함하고, 요청 본문에 새로운 이미지 파일을 포함하여 해당 엔드포인트를 호출해야 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 이미지 수정 성공"),
+    })
+    public ResponseEntity<ApiResult<UpdateProfileImageResponse>> updateProfileImage(
+            @RequestHeader(value = "Authorization") String token,
+            @RequestPart(value = "file") MultipartFile file) {
+        log.info("프로필 이미지 수정 요청: 토큰 = {}, 파일 이름 = {}", token, file.getOriginalFilename());
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        log.debug("추출된 멤버 번호: {}", memberNo);
+
+        if (file.isEmpty()) {
+            log.warn("업로드된 파일이 비어있습니다. 멤버 번호: {}", memberNo);
+            return ResponseEntity.badRequest().body(ApiResult.error(ErrorCode.BAD_REQUEST.getStatus(),"파일이 비어있습니다."));
+        }
+
+        try {
+            UpdateProfileImageResponse response = memberService.updateProfileImage(memberNo, file);
+            log.info("프로필 이미지 수정 성공. 새 이미지 URL: {}", response.profileImageUrl());
+            return ResponseEntity.ok(ApiResult.success("프로필 이미지 수정 성공", response));
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 파일 형식: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResult.error(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "잘못된 파일 형식입니다."));
+        } catch (IOException e) {
+            log.error("프로필 이미지 수정 중 오류 발생", e);
+            return ResponseEntity.internalServerError().body(ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+        }
+    }
+
+
+    /**
+     * 사용자의 프로필 이미지를 삭제하고 기본 이미지로 변경하는 API입니다.
+     *
+     * <p>이 API는 사용자의 프로필 이미지를 삭제하고 기본 이미지로 설정합니다. 클라이언트는 사용자 인증 토큰을 요청 헤더에 포함해야 합니다.</p>
+     * @param token 사용자 인증을 위한 Bearer 토큰. 요청 헤더에서 'Authorization'으로 제공되어야 합니다. 필수 파라미터입니다.
+     * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 기본 프로필 이미지 URL이 응답 본문에 포함됩니다.
+     */
+    @DeleteMapping(value = "/api/v1/member/profile-image", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "프로필 이미지 삭제 및 기본 이미지 설정",
+            description = "사용자의 프로필 이미지를 삭제하고 기본 이미지로 설정합니다. " +
+                    "클라이언트는 Authorization 헤더에 Bearer 토큰을 포함하여 해당 엔드포인트를 호출해야 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 이미지 삭제 및 기본 이미지 설정 성공"),
+    })
+    public ResponseEntity<ApiResult<DeleteProfileImageResponse>> deleteProfileImage(
+            @RequestHeader(value = "Authorization") String token) {
+        log.info("프로필 이미지 삭제 및 기본 이미지 설정 요청: 토큰 = {}", token);
+
+        try {
+            Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+            log.debug("추출된 멤버 번호: {}", memberNo);
+
+            DeleteProfileImageResponse response = memberService.deleteProfileImage(memberNo);
+            log.info("프로필 이미지 삭제 및 기본 이미지 설정 성공. 기본 이미지 URL: {}", response.profileImageUrl());
+
+            return ResponseEntity.ok(ApiResult.success("프로필 이미지 삭제 및 기본 이미지 설정 성공", response));
+        } catch (ImageException e) {
+            log.error("프로필 이미지 삭제 실패: 이미지 삭제 중 오류 발생.");
+            return ResponseEntity.internalServerError().body(ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+        } catch (Exception e) {
+            log.error("프로필 이미지 삭제 중 예기치 않은 오류 발생.");
+            return ResponseEntity.internalServerError().body(ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+        }
+    }
 
 }

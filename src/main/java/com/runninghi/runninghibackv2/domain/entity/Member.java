@@ -37,7 +37,7 @@ public class Member extends BaseTimeEntity {
 
     @Column
     @Comment("프로필 이미지 url")
-    private String profileUrl;
+    private String profileImageUrl;
 
     @Column
     @Comment("카카오 로그인 : id")
@@ -101,7 +101,7 @@ public class Member extends BaseTimeEntity {
     private boolean isTermsAgreed = false;
 
     @Builder
-    public Member(Long memberNo, String account, String password, String nickname, String profileUrl, String kakaoId, String name,
+    public Member(Long memberNo, String account, String password, String nickname, String profileImageUrl, String kakaoId, String name,
                   String appleId, int reportCnt, boolean isActive, boolean isBlacklisted, Role role, String refreshToken,
                   String appleRefreshToken, String fcmToken, boolean alarmConsent, LocalDateTime deactivateDate,
                   RunDataVO runDataVO, Point geometry, boolean isTermsAgreed) {
@@ -109,7 +109,7 @@ public class Member extends BaseTimeEntity {
         this.account = account;
         this.password = password;
         this.nickname = nickname;
-        this.profileUrl = profileUrl;
+        this.profileImageUrl = profileImageUrl;
         this.kakaoId = kakaoId;
         this.name = name;
         this.appleId = appleId;
@@ -164,6 +164,10 @@ public class Member extends BaseTimeEntity {
 
     public void updateGeometry(Point geometry) {
         this.geometry = geometry;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void cleanupDeactivateMemberData() {

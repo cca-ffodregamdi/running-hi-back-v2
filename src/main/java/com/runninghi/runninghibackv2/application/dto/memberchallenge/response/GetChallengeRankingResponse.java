@@ -4,6 +4,6 @@ public interface GetChallengeRankingResponse {
     Long getMemberChallengeId();
     float getRecord();
     String getNickname();
-    String getProfileUrl();
+    String getProfileImageUrl();
     int getRank();
 }

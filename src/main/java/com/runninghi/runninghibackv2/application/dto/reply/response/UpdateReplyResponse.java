@@ -11,7 +11,7 @@ public record UpdateReplyResponse (
         @Schema(description = "댓글 작성자 닉네임", example = "러너1")
         String memberName,
         @Schema(description = "댓글 작성자 프로필 이미지", example = "profile.png")
-        String profileUrl,
+        String profileImageUrl,
         @Schema(description = "게시글 번호", example = "1")
         Long postNo,
         @Schema(description = "댓글 내용", example = "댓글 내용")
@@ -29,7 +29,7 @@ public record UpdateReplyResponse (
         return new UpdateReplyResponse(
                 reply.getReplyNo(),
                 reply.getMember().getNickname(),
-                reply.getMember().getProfileUrl(),
+                reply.getMember().getProfileImageUrl(),
                 reply.getPost().getPostNo(),
                 reply.getReplyContent(),
                 reply.isDeleted(),

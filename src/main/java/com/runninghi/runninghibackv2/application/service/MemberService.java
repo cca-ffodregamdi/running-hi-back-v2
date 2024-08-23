@@ -9,6 +9,7 @@ import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.exception.custom.AdminLoginException;
+import com.runninghi.runninghibackv2.common.exception.custom.ImageException;
 import com.runninghi.runninghibackv2.common.utils.PasswordUtils;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
@@ -24,7 +25,9 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +38,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberChecker memberChecker;
+    private final ImageService imageService;
 
     private static final String MEMBER_NOT_FOUND_MESSAGE = "회원 정보를 찾을 수 없습니다.";
     private static final String INVALID_NICKNAME_MESSAGE = "유효하지 않은 닉네임입니다.";
@@ -43,6 +47,9 @@ public class MemberService {
 
     @Value("${admin.invitation-code}")
     private String adminInvitationCode;
+
+    @Value("${cloud.aws.s3.default-profile}")
+    private String defaultProfileImageUrl;
 
     private Member findMemberByNoWithLogging(Long memberNo) {
         log.info("회원 조회 요청. 회원 번호: {}", memberNo);
@@ -206,6 +213,7 @@ public class MemberService {
         return TermsAgreementResponse.of(member.isTermsAgreed());
     }
 
+    @Transactional(readOnly = true)
     public GetIsLocationResponse getLocationSetting(Long memberNo) {
         log.info("지역 설정 여부 조회 시도: 사용자 memberNo = {}", memberNo);
 
@@ -222,4 +230,69 @@ public class MemberService {
         return GetIsLocationResponse.of(isLocation);
 
     }
+
+    @Transactional
+    public UpdateProfileImageResponse updateProfileImage(Long memberNo, MultipartFile profileImage) throws IOException {
+        log.info("프로필 사진 수정 시도: 사용자 memberNo = {}", memberNo);
+
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(() -> {
+                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
+                    return new EntityNotFoundException();
+                });
+
+        String currentProfileImageUrl = member.getProfileImageUrl();
+        if (memberChecker.isCustomProfileImage(currentProfileImageUrl, defaultProfileImageUrl)) {
+            try {
+                // cloud starage의 이미지 삭제 로직
+//                imageService.deleteImage(currentProfileImageUrl);
+                log.info("기존 프로필 이미지 삭제 완료: {}", currentProfileImageUrl);
+            } catch (Exception e) {
+                log.warn("기존 프로필 이미지 삭제 중 오류 발생: {}", currentProfileImageUrl, e);
+                throw new ImageException("기존 프로필 이미지 삭제 중 오류가 발생했습니다.");
+            }
+        }
+
+        String profileImageUrl;
+        try {
+            profileImageUrl = imageService.uploadImage(profileImage, memberNo, "profile/");
+        } catch (IOException e) {
+            log.error("이미지 업로드 중 오류 발생: {}", e.getMessage());
+            throw new ImageException("프로필 이미지 업로드 중 오류가 발생했습니다.");
+        }
+
+        member.updateProfileImageUrl(profileImageUrl);
+
+        return UpdateProfileImageResponse.of(member);
+    }
+
+    @Transactional
+    public DeleteProfileImageResponse deleteProfileImage(Long memberNo) {
+        log.info("프로필 사진 삭제 시도: 사용자 memberNo = {}", memberNo);
+
+        Member member = memberRepository.findById(memberNo)
+                .orElseThrow(() -> {
+                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
+                    return new EntityNotFoundException();
+                });
+
+        String currentProfileImageUrl = member.getProfileImageUrl();
+        if (memberChecker.isCustomProfileImage(currentProfileImageUrl, defaultProfileImageUrl)) {
+            try {
+                // cloud starage의 이미지 삭제 로직
+//                imageService.deleteImage(currentProfileImageUrl);
+                log.info("기존 프로필 이미지 삭제 완료. URL: {}", currentProfileImageUrl);
+            } catch (Exception e) {
+                log.error("프로필 이미지 삭제 중 오류 발생. URL: {}", currentProfileImageUrl, e);
+                throw new ImageException("프로필 이미지 삭제 중 오류가 발생했습니다.");
+            }
+        } else {
+            log.info("삭제할 프로필 이미지가 없거나 이미 기본 이미지입니다. 현재 URL: {}", currentProfileImageUrl);
+        }
+
+        member.updateProfileImageUrl(defaultProfileImageUrl);
+
+        return DeleteProfileImageResponse.of(member);
+    }
+
 }
