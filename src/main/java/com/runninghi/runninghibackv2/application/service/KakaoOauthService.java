@@ -88,7 +88,7 @@ public class KakaoOauthService {
 
         // 필요한 사용자 정보 가져오기
         MultiValueMapAdapter<String, String> body = new LinkedMultiValueMap<>();
-        body.add("property_keys", "[\"id\", \"properties.profileNickname\"]");
+        body.add("property_keys", "[\"id\", \"properties.nickname\"]");
 
         HttpEntity<?> request = new HttpEntity<>(body, headers);
 
@@ -112,9 +112,8 @@ public class KakaoOauthService {
         Map<String, String> response = new HashMap<>();
         response.put("accessToken", accessToken);
         response.put("refreshToken", refreshToken);
+        response.put("memberNo", member.getMemberNo().toString());
 
-        if (isNewMember)
-            response.put("memberNo", member.getMemberNo().toString());
         log.info("새 회원 생성 후 멤버 번호 추가: {}", member.getMemberNo());
 
         return response;
@@ -125,6 +124,7 @@ public class KakaoOauthService {
         log.info("카카오 로그인을 수행합니다. 회원 번호: {}", member.getMemberNo());
 
         member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
+
         return generateTokens(member, false);
     }
 
