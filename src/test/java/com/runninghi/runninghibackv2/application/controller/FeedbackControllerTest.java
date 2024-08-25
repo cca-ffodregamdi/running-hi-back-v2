@@ -64,7 +64,7 @@ class FeedbackControllerTest {
         token = "mocked-jwt-token";
         title = "title";
         content = "content";
-        nickname = "profileNickname";
+        nickname = "nickname";
         responseStatus = "OK";
         feedbackNo = 1L;
         memberNo = 1L;
