@@ -245,7 +245,7 @@ public class MemberService {
         if (memberChecker.isCustomProfileImage(currentProfileImageUrl, defaultProfileImageUrl)) {
             try {
                 // cloud starage의 이미지 삭제 로직
-//                imageService.deleteImage(currentProfileImageUrl);
+                imageService.deleteImageFromStorage(currentProfileImageUrl);
                 log.info("기존 프로필 이미지 삭제 완료: {}", currentProfileImageUrl);
             } catch (Exception e) {
                 log.warn("기존 프로필 이미지 삭제 중 오류 발생: {}", currentProfileImageUrl, e);
@@ -280,7 +280,7 @@ public class MemberService {
         if (memberChecker.isCustomProfileImage(currentProfileImageUrl, defaultProfileImageUrl)) {
             try {
                 // cloud starage의 이미지 삭제 로직
-//                imageService.deleteImage(currentProfileImageUrl);
+                imageService.deleteImageFromStorage(currentProfileImageUrl);
                 log.info("기존 프로필 이미지 삭제 완료. URL: {}", currentProfileImageUrl);
             } catch (Exception e) {
                 log.error("프로필 이미지 삭제 중 오류 발생. URL: {}", currentProfileImageUrl, e);

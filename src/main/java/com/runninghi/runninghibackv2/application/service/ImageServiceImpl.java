@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
 import com.runninghi.runninghibackv2.domain.service.ImageChecker;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
@@ -26,7 +27,7 @@ import java.util.Objects;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ImageServiceImpl implements ImageService{
+public class ImageServiceImpl implements ImageService {
 
     private final ImageChecker imageChecker;
     private final ImageRepository imageRepository;
@@ -40,9 +41,10 @@ public class ImageServiceImpl implements ImageService{
 
     /**
      * 이미지를 단순히 S3에 업로드하고 반환된 url을 String 형태로 반환해주는 메서드입니다.
+     *
      * @param fileList MultipartFile List
      * @param memberNo 회원 식별 값. s3 업로드 시에 경로에 사용.(경로 통일)
-     * @param dirName S3에 업로드할 때 지정되는 Path
+     * @param dirName  S3에 업로드할 때 지정되는 Path
      * @return 이미지 url 리스트
      * @throws IOException file -> byte[] 변환 과정에서 IO 예외 발생 처리
      */
@@ -60,9 +62,10 @@ public class ImageServiceImpl implements ImageService{
 
     /**
      * 이미지 한 장을 단순히 S3에 업로드하고 반환된 url을 String 형태로 반환해주는 메서드입니다.
+     *
      * @param multipartFile MultipartFile
-     * @param memberNo 회원 식별 값. s3 업로드 시에 경로에 사용.(경로 통일)
-     * @param dirName S3에 업로드할 때 지정되는 Path
+     * @param memberNo      회원 식별 값. s3 업로드 시에 경로에 사용.(경로 통일)
+     * @param dirName       S3에 업로드할 때 지정되는 Path
      * @return 이미지 url
      * @throws IOException file -> byte[] 변환 과정에서 IO 예외 발생 처리
      */
@@ -142,15 +145,21 @@ public class ImageServiceImpl implements ImageService{
     }
 
     @Override
-    public void deleteImage(String imageUrl) {
-
-        Image image = imageRepository.findImageByImageUrl(imageUrl)
-                .orElseThrow(IllegalArgumentException::new);
+    public void deleteImageFromStorage(String imageUrl) {
 
         s3StorageUtils.deleteFile(imageUrl);
-        imageRepository.delete(image);
+        log.info("{} 이미지가 Storage 에서 이미지가 삭제되었습니다.", imageUrl);
+    }
 
-        log.info("DB와 Storage 에서 이미지가 삭제되었습니다.");
+    @Override
+    public void deleteImageFromDB(String imageUrl) {
+        Image image = imageRepository.findImageByImageUrl(imageUrl)
+                .orElseThrow(() -> {
+                            log.error("존재하지 않는 이미지입니다. imageUrl={}", imageUrl);
+                            throw new EntityNotFoundException();
+                        });
+        imageRepository.delete(image);
+        log.info("{} 이미지가 DB에서 삭제되었습니다.", imageUrl);
     }
 
     @Scheduled(cron = "0 0 1 * * ?") // 매일 새벽 1시에 실행

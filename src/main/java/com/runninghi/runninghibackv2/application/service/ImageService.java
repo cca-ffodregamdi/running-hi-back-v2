@@ -13,5 +13,7 @@ public interface ImageService {
     void saveImage(String imageUrl);
     byte[] resizeImage(MultipartFile multipartFile) throws IOException;
     void deleteImageList(List<String> imageUrlList);
-    void deleteImage(String imageUrl);
+    void deleteImageFromStorage(String imageUrl);
+    void deleteImageFromDB(String imageUrl);
+
 }
