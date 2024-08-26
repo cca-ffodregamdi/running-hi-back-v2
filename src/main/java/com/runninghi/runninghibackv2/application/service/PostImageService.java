@@ -18,6 +18,7 @@ import java.util.List;
 public class PostImageService {
 
     private final ImageRepository imageRepository;
+    private final ImageService imageService;
     private final ImageTarget imageTarget = ImageTarget.POST;
 
     public void savePostNo(List<String> imageUrlList, Long postNo) {
@@ -36,12 +37,4 @@ public class PostImageService {
         log.info("{} 번의 이미지가 {} 의 {} 번의 엔테티로 할당되었습니다,", image.getId(), image.getImageTarget(), image.getTargetNo());
     }
 
-    public void updateImage(Long postNo, String newImageUrl) {
-
-        Image image = imageRepository.findImageByTargetNo(postNo)
-                .orElseThrow(EntityNotFoundException::new);
-
-        image.updateImageUrl(newImageUrl);
-        log.info("{} post 의 이미지가 변경되었습니다.", postNo);
-    }
 }
