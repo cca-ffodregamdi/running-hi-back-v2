@@ -29,8 +29,11 @@ public class PostImageService {
     }
 
     public void savePostNo(String imageUrl, Long postNo) {
+        log.info("이미지 저장을 시도합니다. imageUrl: {}, postNo: {}", imageUrl, postNo );
         Image image = imageRepository.findImageByImageUrl(imageUrl)
-                .orElseThrow(EntityNotFoundException::new);
+                        .orElse(Image.builder()
+                                .imageUrl(imageUrl)
+                                .build());
 
         image.updateImageTarget(imageTarget);
         image.updateTargetNo(postNo);
