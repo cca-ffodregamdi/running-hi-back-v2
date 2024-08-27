@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
 import com.runninghi.runninghibackv2.domain.service.ImageChecker;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -166,14 +167,35 @@ class ImageServiceImplTest {
         // Given
         String imageUrl = "url";
         Image image = Image.builder().imageUrl(imageUrl).build();
+
         when(imageRepository.findImageByImageUrl(imageUrl)).thenReturn(Optional.of(image));
+        doNothing().when(s3StorageUtils).deleteFile(imageUrl);
 
         // When
-        imageService.deleteImage(imageUrl);
+        imageService.deleteImageFromStorage(imageUrl);
+        imageService.deleteImageFromDB(imageUrl);
 
         // Then
+        // Verify the interactions with the mocks
         verify(s3StorageUtils, times(1)).deleteFile(imageUrl);
         verify(imageRepository, times(1)).delete(image);
+    }
+
+    @Test
+    @DisplayName("이미지 삭제 테스트 - 이미지가 존재하지 않을 때 예외 발생")
+    void deleteImage_NotFound() {
+        // Given
+        String imageUrl = "nonExistentUrl";
+
+        when(imageRepository.findImageByImageUrl(imageUrl)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(EntityNotFoundException.class, () -> {
+            imageService.deleteImageFromDB(imageUrl);
+        });
+
+        // Verify that the delete method was never called
+        verify(imageRepository, never()).delete(any(Image.class));
     }
 
     @Test

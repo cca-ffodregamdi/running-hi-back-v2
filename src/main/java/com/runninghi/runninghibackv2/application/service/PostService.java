@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
@@ -57,7 +58,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostKeywordService postKeywordService;
     private final UpdatePostService updateService;
-    private final PostImageService postImageService;
+    private final ImageService imageService;
     private final MemberRepository memberRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final GpsCoordinateExtractor gpsCoordinateExtractor;
@@ -134,7 +135,7 @@ public class PostService {
     }
 
     private void savePostImage(String imageUrl, Long postNo) {
-        postImageService.savePostNo(imageUrl, postNo);
+        imageService.saveTargetNo(imageUrl, ImageTarget.POST, postNo);
     }
 
     private String createPostTitle(GpsDataVO request) {
@@ -309,7 +310,7 @@ public class PostService {
 
         try {
             post.update(request, mainData);
-            postImageService.updateImage(postNo, request.imageUrl());
+            imageService.updateImage(postNo, request.imageUrl());
         } catch (Exception e) {
             log.error("게시글 수정 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, postNo, e);
             throw e;
