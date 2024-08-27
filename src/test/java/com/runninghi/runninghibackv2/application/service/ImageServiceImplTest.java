@@ -4,6 +4,7 @@ import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
 import com.runninghi.runninghibackv2.domain.service.ImageChecker;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -189,7 +190,7 @@ class ImageServiceImplTest {
         when(imageRepository.findImageByImageUrl(imageUrl)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             imageService.deleteImageFromDB(imageUrl);
         });
 
