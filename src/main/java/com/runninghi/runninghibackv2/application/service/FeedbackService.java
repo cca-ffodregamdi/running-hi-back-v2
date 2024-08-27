@@ -30,7 +30,7 @@ public class FeedbackService {
     private final FeedbackChecker feedbackChecker;
     private final AlarmService alarmService;
 
-    private final String FEEDBACK_REPLY_FCM_TITLE = "회원님의 피드백/문의사항에 답변이 등록되었습니다.";
+    private static final String FEEDBACK_REPLY_FCM_TITLE = "회원님의 피드백/문의사항에 답변이 등록되었습니다.";
 
     @Transactional
     public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo
