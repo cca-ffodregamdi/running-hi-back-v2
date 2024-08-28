@@ -16,9 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -27,8 +31,19 @@ import java.util.List;
 public class AlarmService {
 
     private final FirebaseMessaging firebaseMessaging;
-
     private final AlarmRepository alarmRepository;
+    private final MemberRepository memberRepository;
+    private final Map<Long, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
+
+    public SseEmitter sseSubscribe(Long memberNo) {
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        sseEmitters.put(memberNo, emitter);
+        log.info("{}의 SSE 구독을 시작합니다. SSE Connected: {}", memberNo, sseEmitters.size());
+
+        emitter.onCompletion(() -> sseEmitters.remove(memberNo));
+        emitter.onTimeout(() -> sseEmitters.remove(memberNo));
+        return emitter;
+    }
 
     @Transactional(readOnly = true)
     public List<GetAllAlarmResponse> getAllPushAlarms(Long memberNo) {
@@ -47,8 +62,6 @@ public class AlarmService {
         return alarmResponseList;
     }
 
-    private final MemberRepository memberRepository;
-
     public void createPushAlarm(CreateAlarmRequest request) throws FirebaseMessagingException {
 
         Member member = memberRepository.findByMemberNo(request.getTargetMemberNo());
@@ -62,9 +75,11 @@ public class AlarmService {
 
         alarmRepository.save(alarm);
 
-        if (member.isAlarmConsent()) { // 알림 동의했을 시 발송, 아닐 시 stop
-            sendPushAlarm(request);
-        }
+//        if (member.isAlarmConsent()) { // 알림 동의했을 시 발송, 아닐 시 stop
+//            sendPushAlarm(request);
+//        }
+
+        sendSseAlarm(request); // 알림 동의 여부 상관 없이 발송
     }
 
     private void sendPushAlarm (CreateAlarmRequest request) throws FirebaseMessagingException {
@@ -78,6 +93,19 @@ public class AlarmService {
                         .build();
 
         firebaseMessaging.send(message);
+    }
+
+    private void sendSseAlarm(CreateAlarmRequest request) {
+        SseEmitter emitter = sseEmitters.get(request.getTargetMemberNo());
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("alarm")
+                        .data(request));
+            } catch (IOException e) {
+                sseEmitters.remove(request.getTargetMemberNo());
+            }
+        }
     }
 
     @Transactional(readOnly = true)
@@ -100,7 +128,5 @@ public class AlarmService {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
         alarmRepository.deleteReadAlarmsOlderThan(thirtyDaysAgo);
     }
-
-
 
 }
