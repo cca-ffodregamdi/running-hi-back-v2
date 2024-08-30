@@ -25,7 +25,7 @@ public class RunDataVO {
 
     @Column
     @Comment("누적거리에 따른 레벨")
-    private int level = 0;
+    private int level = 1;
 
     @Builder
     public RunDataVO(double totalDistance, double totalKcal, int distanceToNextLevel, int level) {
