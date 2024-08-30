@@ -257,6 +257,7 @@ public class PostService {
 
             updateRecordOfMyChallenges(member, gpsDataVO);
             recordService.createRecord(member, gpsDataVO);
+            member.getRunDataVO().updateTotalDistanceKcalAndLevel(gpsDataVO.getDistance(), gpsDataVO.getKcal());
 
             Post createdPost = postRepository.save(Post.builder()
                     .member(member)
