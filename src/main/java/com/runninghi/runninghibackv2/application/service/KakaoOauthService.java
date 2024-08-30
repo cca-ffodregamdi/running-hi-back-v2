@@ -39,7 +39,7 @@ public class KakaoOauthService {
     private static final int RANDOM_NUMBER_RANGE = 10;
     private static final String KAKAO_USER_INFO_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
     private static final String KAKAO_UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink";
-    private static final String SIGNUP_FCM_TITLE = "환영합니다! 러닝을 시작하여 2레벨에 도전하세요!";
+    private static final String SIGNUP_FCM_TITLE = "환영합니다! 러닝을 시작하여 다음 레벨에 도전하세요!";
 
     @Value("${kakao.admin-key}")
     private String adminKey;

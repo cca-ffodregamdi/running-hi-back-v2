@@ -39,7 +39,7 @@ public class AppleOauthService {
     private static final int NICKNAME_DIGIT_LENGTH = 6;
     private static final int RANDOM_NUMBER_RANGE = 10;
     private static final String GRANT_TYPE = "authorization_code";
-    private static final String SIGNUP_FCM_TITLE = "환영합니다! 러닝을 시작하여 2레벨에 도전하세요!";
+    private static final String SIGNUP_FCM_TITLE = "환영합니다! 러닝을 시작하여 다음 레벨에 도전하세요!";
 
     private final AppleTokenParser appleTokenParser;
     private final AppleClient appleClient;

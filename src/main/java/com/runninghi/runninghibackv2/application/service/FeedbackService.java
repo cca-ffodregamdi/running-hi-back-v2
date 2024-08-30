@@ -139,7 +139,7 @@ public class FeedbackService {
 
     @Transactional
     public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo)
-            throws BadRequestException, FirebaseMessagingException {
+            throws BadRequestException {
 
         Member member = findMemberByNo(memberNo);
         feedbackChecker.isAdmin(member.getRole());
