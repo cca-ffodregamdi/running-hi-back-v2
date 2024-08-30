@@ -1,18 +1,23 @@
 package com.runninghi.runninghibackv2.domain.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
-@Service
+@Slf4j
+@Component
 public class ImageChecker {
 
     private final static int IMAGE_MAX_LENGTH = 6;
 
     public String checkImageFile(String fileName) {
         if (isFileNameInvalid(fileName)) {
-            throw new IllegalArgumentException("파일 이름이 유효하지 않습니다.");
+            log.error("파일 이름이 유효하지 않습니다. fileName: {}", fileName);
+            throw new IllegalArgumentException();
         }
 
         String extension = getFileExtension(fileName);
@@ -20,6 +25,7 @@ public class ImageChecker {
         if (isImageExtension(extension)) {
             return extension;
         } else {
+            log.error("지원하는 이미지 파일이 아닙니다. fileName: {}", fileName);
             throw new IllegalArgumentException("이미지 파일이 아닙니다.");
         }
     }
@@ -51,5 +57,20 @@ public class ImageChecker {
         }
 
         return false;
+    }
+
+    public String getFileNameFromUrl(String url) {
+        if (url == null || url.lastIndexOf('.') == -1) {
+            return null; // 확장자를 찾을 수 없으면 null 반환
+        }
+
+        String fileName = url.substring(url.lastIndexOf('/') + 1);
+//        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+
+        return fileName;
+    }
+
+    public boolean isSameImage(String image1, String image2) {
+        return Objects.equals(image1, image2);
     }
 }
