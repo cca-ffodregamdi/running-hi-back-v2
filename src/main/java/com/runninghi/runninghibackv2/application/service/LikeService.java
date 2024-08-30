@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.application.service;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.like.response.LikeResponse;
 import com.runninghi.runninghibackv2.domain.entity.Like;
@@ -29,7 +28,7 @@ public class LikeService {
     private static final String LIKE_FCM_TITLE = "새로운 댓글이 도착했습니다.";
 
     @Transactional
-    public LikeResponse createLike(Long memberNo, Long postNo) throws FirebaseMessagingException {
+    public LikeResponse createLike(Long memberNo, Long postNo) {
 
         Member member = memberRepository.findById(memberNo)
                 .orElseThrow(EntityNotFoundException::new);

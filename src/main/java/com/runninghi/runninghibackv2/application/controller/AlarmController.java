@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
 import com.runninghi.runninghibackv2.application.service.AlarmService;
@@ -47,7 +46,7 @@ public class AlarmController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResult<Void>> createPushAlarm(@Valid @RequestBody CreateAlarmRequest request) throws FirebaseMessagingException {
+    public ResponseEntity<ApiResult<Void>> createPushAlarm(@Valid @RequestBody CreateAlarmRequest request) {
 
         alarmService.createPushAlarm(request);
 

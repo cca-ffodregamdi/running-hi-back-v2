@@ -1,9 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.application.dto.image.response.CreateImageResponse;
-import com.runninghi.runninghibackv2.application.dto.image.response.DownloadImageResponse;
 import com.runninghi.runninghibackv2.application.service.ImageService;
-import com.runninghi.runninghibackv2.application.service.ImageServiceImpl;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
@@ -11,9 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

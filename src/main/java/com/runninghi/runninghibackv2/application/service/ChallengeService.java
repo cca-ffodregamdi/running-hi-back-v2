@@ -22,7 +22,6 @@ public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final MemberChallengeRepository memberChallengeRepository;
-    private final MemberRepository memberRepository;
     private final ChallengeQueryRepository challengeQueryRepository;
 
     @Transactional

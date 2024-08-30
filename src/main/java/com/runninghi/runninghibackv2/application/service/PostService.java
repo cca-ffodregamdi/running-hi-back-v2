@@ -4,8 +4,6 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
@@ -25,7 +23,6 @@ import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.domain.service.GpsCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -60,12 +57,8 @@ public class PostService {
 
     private final PostChecker postChecker;
     private final PostRepository postRepository;
-    private final PostKeywordService postKeywordService;
-    private final UpdatePostService updateService;
     private final ImageService imageService;
     private final MemberRepository memberRepository;
-    private final JPAQueryFactory jpaQueryFactory;
-    private final GpsCoordinateExtractor gpsCoordinateExtractor;
     private final PostQueryRepository postQueryRepository;
     private final MemberChallengeRepository memberChallengeRepository;
     private final RecordService recordService;
@@ -90,7 +83,7 @@ public class PostService {
         return dirName + "/" + newFileName + ".txt";
     }
 
-    public String uploadGpsToS3(MultipartFile file, String dirName) throws IOException {
+    public String uploadGpsToS3(MultipartFile file, String dirName) {
         String key = buildKey(dirName);
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -253,7 +246,7 @@ public class PostService {
     }
 
     @Transactional
-    public CreateRecordResponse createRecord(Long memberNo, MultipartFile file) throws IOException, FirebaseMessagingException {
+    public CreateRecordResponse createRecord(Long memberNo, MultipartFile file) throws IOException {
         log.info("GPS 기록 생성 시작. 회원번호: {}", memberNo);
         try {
             GpsDataVO gpsDataVO = getRunDataFromTxt(file);
