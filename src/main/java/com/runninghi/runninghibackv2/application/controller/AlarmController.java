@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @RestController
@@ -57,7 +55,7 @@ public class AlarmController {
     }
 
     @DeleteMapping(value = "/{alarmNo}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResult<Void>> deleteAlarm(@PathVariable("alarmNo") Long alarmNo) throws FirebaseMessagingException {
+    public ResponseEntity<ApiResult<Void>> deleteAlarm(@PathVariable("alarmNo") Long alarmNo) {
 
         alarmService.deleteAlarm(alarmNo);
 

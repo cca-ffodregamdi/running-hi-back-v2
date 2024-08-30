@@ -4,7 +4,9 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
@@ -15,8 +17,10 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
+import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
+import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
 import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
@@ -65,6 +69,9 @@ public class PostService {
     private final PostQueryRepository postQueryRepository;
     private final MemberChallengeRepository memberChallengeRepository;
     private final RecordService recordService;
+    private final AlarmService alarmService;
+
+    private static final String LEVEL_FCM_TITLE = "새로운 레벨에 도달했습니다! 계속 나아가세요!";
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -246,7 +253,7 @@ public class PostService {
     }
 
     @Transactional
-    public CreateRecordResponse createRecord(Long memberNo, MultipartFile file) throws IOException {
+    public CreateRecordResponse createRecord(Long memberNo, MultipartFile file) throws IOException, FirebaseMessagingException {
         log.info("GPS 기록 생성 시작. 회원번호: {}", memberNo);
         try {
             GpsDataVO gpsDataVO = getRunDataFromTxt(file);
@@ -255,9 +262,26 @@ public class PostService {
 
             String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
+            int nowLevel = member.getRunDataVO().getLevel();
+
             updateRecordOfMyChallenges(member, gpsDataVO);
             recordService.createRecord(member, gpsDataVO);
             member.getRunDataVO().updateTotalDistanceKcalAndLevel(gpsDataVO.getDistance(), gpsDataVO.getKcal());
+
+            int updateLevel = member.getRunDataVO().getLevel();
+
+            if (nowLevel < updateLevel) {
+                // 레벨업 알림
+                CreateAlarmRequest alarmRequest = CreateAlarmRequest.builder()
+                        .title(LEVEL_FCM_TITLE)
+                        .targetMemberNo(member.getMemberNo())
+                        .alarmType(AlarmType.LEVEL_UP)
+                        .targetPage(TargetPage.MYPAGE)
+                        .targetId(member.getMemberNo())
+                        .fcmToken(member.getFcmToken())
+                        .build();
+                alarmService.createPushAlarm(alarmRequest);
+            }
 
             Post createdPost = postRepository.save(Post.builder()
                     .member(member)

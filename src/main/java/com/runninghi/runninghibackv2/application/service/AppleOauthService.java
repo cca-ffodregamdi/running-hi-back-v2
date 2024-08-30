@@ -1,5 +1,7 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.member.request.AppleLoginRequest;
 import com.runninghi.runninghibackv2.application.dto.member.response.AppleTokenResponse;
 import com.runninghi.runninghibackv2.auth.apple.*;
@@ -7,9 +9,12 @@ import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.exception.custom.AppleOauthException;
+import com.runninghi.runninghibackv2.common.exception.custom.FcmException;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
+import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
+import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,6 +39,7 @@ public class AppleOauthService {
     private static final int NICKNAME_DIGIT_LENGTH = 6;
     private static final int RANDOM_NUMBER_RANGE = 10;
     private static final String GRANT_TYPE = "authorization_code";
+    private static final String SIGNUP_FCM_TITLE = "환영합니다! 러닝을 시작하여 2레벨에 도전하세요!";
 
     private final AppleTokenParser appleTokenParser;
     private final AppleClient appleClient;
@@ -43,6 +49,7 @@ public class AppleOauthService {
 
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AlarmService alarmService;
 
     private final SecureRandom random = new SecureRandom();
 
@@ -107,7 +114,13 @@ public class AppleOauthService {
         Optional<Member> optionalMember = memberRepository.findByAppleId(appleResponse.get("sub"));
 
         return optionalMember.map(this::loginWithApple)
-                .orElseGet(() -> loginWithAppleCreateMember(appleResponse, appleTokenResponse.refreshToken()));
+                .orElseGet(() -> {
+                    try {
+                        return Collections.unmodifiableMap(loginWithAppleCreateMember(appleResponse, appleTokenResponse.refreshToken()));
+                    } catch (FirebaseMessagingException e) {
+                        throw new FcmException(e.getMessage());
+                    }
+                });
     }
 
     // id-token에서 sub, name 추출
@@ -194,7 +207,7 @@ public class AppleOauthService {
     }
 
     // 회원 생성 및 로그인 메서드
-    private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToken) {
+    private Map<String, String> loginWithAppleCreateMember(Map<String, String> appleResponse, String appleRefreshToken) throws FirebaseMessagingException {
         log.info("새로운 애플 회원 생성 및 로그인 처리. 애플 응답: {}", appleResponse);
 
         Member member = Member.builder()
@@ -212,6 +225,17 @@ public class AppleOauthService {
 
         memberRepository.saveAndFlush(member);
         log.info("새로운 애플 회원 생성 완료. 회원 번호: {}", member.getMemberNo());
+
+        // 회원가입한 사용자에게 알림
+        CreateAlarmRequest alarmRequest = CreateAlarmRequest.builder()
+                .title(SIGNUP_FCM_TITLE)
+                .targetMemberNo(member.getMemberNo())
+                .alarmType(AlarmType.LEVEL_UP)
+                .targetPage(TargetPage.MYPAGE)
+                .targetId(member.getMemberNo())
+                .fcmToken(member.getFcmToken())
+                .build();
+        alarmService.createPushAlarm(alarmRequest);
 
         return generateTokens(member, true);
     }

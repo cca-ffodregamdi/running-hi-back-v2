@@ -159,10 +159,10 @@ public class FeedbackService {
 
         feedbackRepository.save(updatedFeedback);
 
-        // 피드백/문의사항 작성자에게 푸쉬 알림
+        // 피드백/문의사항 작성자에게 알림
         CreateAlarmRequest alarmRequest = CreateAlarmRequest.builder()
                 .title(FEEDBACK_REPLY_FCM_TITLE)
-                .targetMemberNo(member.getMemberNo())
+                .targetMemberNo(updatedFeedback.getFeedbackNo())
                 .alarmType(AlarmType.FEEDBACK)
                 .targetPage(TargetPage.FEEDBACK)
                 .targetId(updatedFeedback.getFeedbackNo())

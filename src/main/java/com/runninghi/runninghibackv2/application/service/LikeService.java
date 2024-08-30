@@ -1,10 +1,14 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.like.response.LikeResponse;
 import com.runninghi.runninghibackv2.domain.entity.Like;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.vo.LikeId;
+import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
+import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
 import com.runninghi.runninghibackv2.domain.repository.LikeRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
@@ -20,9 +24,12 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final AlarmService alarmService;
+
+    private static final String LIKE_FCM_TITLE = "새로운 댓글이 도착했습니다.";
 
     @Transactional
-    public LikeResponse createLike(Long memberNo, Long postNo) {
+    public LikeResponse createLike(Long memberNo, Long postNo) throws FirebaseMessagingException {
 
         Member member = memberRepository.findById(memberNo)
                 .orElseThrow(EntityNotFoundException::new);
@@ -35,6 +42,17 @@ public class LikeService {
                 .build();
 
         likeRepository.save(like);
+
+        // 포스트 작성자에게 알림
+        CreateAlarmRequest alarmRequest = CreateAlarmRequest.builder()
+                .title(LIKE_FCM_TITLE)
+                .targetMemberNo(post.getMember().getMemberNo())
+                .alarmType(AlarmType.LIKE)
+                .targetPage(TargetPage.POST)
+                .targetId(post.getPostNo())
+                .fcmToken(member.getFcmToken())
+                .build();
+        alarmService.createPushAlarm(alarmRequest);
 
 
         return LikeResponse.of(likeRepository.countByPost_PostNo(postNo));
