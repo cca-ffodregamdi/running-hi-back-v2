@@ -6,7 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import lombok.*;
-import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.Comment;
 import org.locationtech.jts.geom.Point;
 
