@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.challenge.response;
 
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.ChallengeRankResponse;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetChallengeRankingResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
@@ -30,9 +31,9 @@ public record GetChallengeResponse(
         @Schema(description = "챌린지 참여자 수", example = "4132")
         int participantsCount,
         @Schema(description = "전체 회원 랭킹", example = "10")
-        List<GetChallengeRankingResponse> ranking
-) implements ChallengeResponse {
-    public static GetChallengeResponse from(Challenge challenge, List<GetChallengeRankingResponse> ranking) {
+        List<ChallengeRankResponse> ranking
+) {
+    public static GetChallengeResponse from(Challenge challenge, List<ChallengeRankResponse> ranking) {
         return new GetChallengeResponse(
                 challenge.getChallengeNo(),
                 challenge.getTitle(),

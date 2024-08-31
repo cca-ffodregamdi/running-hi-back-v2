@@ -12,11 +12,14 @@ import com.runninghi.runninghibackv2.application.service.MyChallengeService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -47,15 +50,15 @@ public class ChallengeController {
     }
 
     /**
-     * 활성화 상태 여부 값으로 챌린지를 조회합니다.
-     * @param status true이면 현재 진행중인 챌린지, false인 경우 종료된 챌린지가 조회됩니다.
+     * 챌린지 상태 값으로 챌린지를 조회합니다.
+     * @param status SCHEDULED=예정된 챌린지, IN_PROGRESS=진행중인 챌린지, COMPLETED=종료된 챌린지가 조회됩니다.
      * @return Challenge 리스트를 반환합니다.
      */
-    @Operation(summary = "활성화 상태 여부에 따른 챌린지 전체 조회", description = "status가 true이면 현재 진행중인 챌린지 \n" +
-            "status가 false인 경우 종료된 챌린지가 조회됩니다.")
+    @Operation(summary = "챌린지 상태 별 챌린지 조회", description = "SCHEDULED=예정된 챌린지, IN_PROGRESS=진행중인 챌린지, \n" +
+            "COMPLETED=종료된 챌린지가 조회됩니다.")
     @GetMapping("/status")
     public ResponseEntity<ApiResult<GetAllChallengeResponse>> getAllChallengesByStatus(
-            @RequestParam(name = "status") boolean status,
+            @RequestParam(name = "status") ChallengeStatus status,
             @RequestHeader(name = "Authorization") String bearerToken) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
@@ -121,18 +124,23 @@ public class ChallengeController {
 
     /**
      * 회원이 참여한 챌린지 데이터입니다.
-     * 활성화 상태 여부 값으로 회원의 챌린지를 조회합니다.
-     * @param status true이면 현재 진행중인 챌린지, false인 경우 종료된 챌린지가 조회됩니다.
+     * 챌린지 상태 값으로 회원의 챌린지를 조회합니다.
+     * @param status IN_PROGRESS-진행중인 챌린지, COMPLETED-종료된 챌린지가 조회됩니다. SCHEDULED는 허용되지 않습니다.
      * @return MemberChallenge 리스트를 반환합니다.
      * @apiNote 이 메서드를 사용하기 위해서는 요청 헤더에 유효한 Bearer 토큰이 포함되어야 합니다.
      *          토큰이 유효하지 않거나, 토큰에 해당하는 사용자가 존재하지 않을 경우 접근이 거부됩니다.
      */
     @Operation(summary = "활성화 여부에 따른 나의 챌린지 전체 조회",
-            description = "status가 true이면 로그인한 사용자가 참여한 모든 진행중인 챌린지,\nfalse인 경우 종료된 챌린지가 조회됩니다.")
+            description = "IN_PROGRESS-진행중인 챌린지, COMPLETED-종료된 챌린지가 조회됩니다. \n" +
+                    "SCHEDULED는 허용되지 않습니다.")
     @GetMapping("/my-challenge/status")
     public ResponseEntity<ApiResult<GetAllMyChallengeResponse>> getAllMyChallengesByStatus(
-            @RequestParam(name = "status") boolean status,
+            @RequestParam(name = "status") ChallengeStatus status,
             @RequestHeader(name = "Authorization") String bearerToken) {
+
+        if (status == ChallengeStatus.SCHEDULED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "SCHEDULED는 잘못된 요청입니다.");
+        }
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
 

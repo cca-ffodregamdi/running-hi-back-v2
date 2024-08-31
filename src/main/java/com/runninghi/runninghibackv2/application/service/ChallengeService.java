@@ -3,14 +3,17 @@ package com.runninghi.runninghibackv2.application.service;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.response.*;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.ChallengeRankResponse;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetChallengeRankingResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import com.runninghi.runninghibackv2.domain.repository.ChallengeQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.ChallengeRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,7 @@ public class ChallengeService {
                 .goalDetail(request.goalDetail())
                 .startDate(request.startDate())
                 .endDate(request.endDate())
+                .status(ChallengeStatus.SCHEDULED)
                 .build();
 
         challengeRepository.save(challenge);
@@ -45,7 +49,7 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public GetAllChallengeResponse getAllChallengesByStatus(boolean status, Long memberNo) {
+    public GetAllChallengeResponse getAllChallengesByStatus(ChallengeStatus status, Long memberNo) {
 
         List<ChallengeListResponse> challengeList =
                 challengeQueryRepository.findChallengesByStatusAndMember(status, memberNo).stream()
@@ -62,8 +66,8 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeNo)
                 .orElseThrow(EntityNotFoundException::new);
 
-        List<GetChallengeRankingResponse> challengeRanking =
-                memberChallengeRepository.findChallengeRanking(challenge.getChallengeNo());
+        List<ChallengeRankResponse> challengeRanking =
+                challengeQueryRepository.findTop100ByChallengeNo(challenge.getChallengeNo());
 
         return GetChallengeResponse.from(challenge, challengeRanking);
     }

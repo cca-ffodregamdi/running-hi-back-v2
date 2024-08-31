@@ -3,6 +3,7 @@ package com.runninghi.runninghibackv2.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -22,7 +23,7 @@ public class Challenge extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long challengeNo;
+    private long challengeNo;
 
     @NotNull
     @Comment("챌린지명")
@@ -54,8 +55,10 @@ public class Challenge extends BaseTimeEntity {
     @Comment("챌린지 종료일자")
     private LocalDateTime endDate;
 
-    @Comment("챌린지 활성화 상태")
-    private boolean status;
+    @NotNull
+    @Enumerated(value = EnumType.STRING)
+    @Comment("챌린지 상태")
+    private ChallengeStatus status;
 
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Comment("챌린지에 참여한 멤버 리스트")
@@ -63,9 +66,9 @@ public class Challenge extends BaseTimeEntity {
     private List<MemberChallenge> participants;
 
     @Builder
-    public Challenge(Long challengeNo, String title, String content, ChallengeCategory challengeCategory,
+    public Challenge(long challengeNo, String title, String content, ChallengeCategory challengeCategory,
                      String imageUrl, float goal, String goalDetail, LocalDateTime startDate, LocalDateTime endDate,
-                     boolean status, List<MemberChallenge> participants) {
+                     ChallengeStatus status, List<MemberChallenge> participants) {
         this.challengeNo = challengeNo;
         this.title = title;
         this.content = content;

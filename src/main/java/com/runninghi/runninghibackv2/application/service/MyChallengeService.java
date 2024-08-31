@@ -5,6 +5,7 @@ import com.runninghi.runninghibackv2.application.dto.memberchallenge.request.Cre
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import com.runninghi.runninghibackv2.domain.repository.ChallengeRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
@@ -46,7 +47,7 @@ public class MyChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public GetAllMyChallengeResponse getAllMyChallengesByStatus(Long memberNo, boolean status) {
+    public GetAllMyChallengeResponse getAllMyChallengesByStatus(Long memberNo, ChallengeStatus status) {
 
         Member member = memberRepository.findByMemberNo(memberNo);
         List<MyChallengeListResponse> myChallengeList =

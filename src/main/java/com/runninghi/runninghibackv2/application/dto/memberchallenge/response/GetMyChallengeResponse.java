@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.application.dto.memberchallenge.response;
 
-import com.runninghi.runninghibackv2.application.dto.challenge.response.ChallengeResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
@@ -40,7 +39,7 @@ public record GetMyChallengeResponse(
         List<GetChallengeRankingResponse> challengeRanking,
         @Schema(description = "로그인한 회원 랭킹")
         GetChallengeRankingResponse memberRanking
-) implements ChallengeResponse {
+) {
     public static GetMyChallengeResponse from(MemberChallenge memberChallenge,
                                               List<GetChallengeRankingResponse> challengeRanking,
                                               GetChallengeRankingResponse memberRanking) {
