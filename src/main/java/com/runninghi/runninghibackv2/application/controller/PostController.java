@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.response.*;
@@ -141,7 +142,7 @@ public class PostController {
     @PostMapping(value = "/gps", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "러닝 데이터 저장", description = "러닝이 끝난 직후 txt 형식의 gps 파일을 저장합니다. ")
     public ResponseEntity<ApiResult<CreateRecordResponse>> createGPSRecord(@RequestHeader("Authorization") String bearerToken,
-                                                                           @RequestPart("file") MultipartFile file) throws IOException {
+                                                                           @RequestPart("file") MultipartFile file) throws IOException, FirebaseMessagingException {
         log.info("GPS 데이터 저장 요청이 들어왔습니다.");
 
         AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);

@@ -2,7 +2,6 @@ package com.runninghi.runninghibackv2.application.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.postreport.response.*;
-import com.runninghi.runninghibackv2.common.response.PageResult;
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.enumtype.ProcessingStatus;
@@ -17,7 +16,6 @@ import com.runninghi.runninghibackv2.domain.service.PostReportChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
