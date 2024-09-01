@@ -21,7 +21,7 @@ public class RunDataVO {
 
     @Column
     @Comment("다음 레벨에 필요한 거리")
-    private int distanceToNextLevel = 2;
+    private double distanceToNextLevel = 2.0;
 
     @Column
     @Comment("누적거리에 따른 레벨")
@@ -39,27 +39,27 @@ public class RunDataVO {
     public void updateTotalDistanceKcalAndLevel(double distance, double kcal) {
         this.totalDistance += distance;
         this.totalKcal += kcal;
-        checkAndLevelUp();
+
+        while (distance >= distanceToNextLevel) {
+            distance -= distanceToNextLevel;
+            checkAndLevelUp();
+        }
+
+        this.distanceToNextLevel -= distance;
     }
 
     // 레벨 업데이트를 확인하고 처리
     private void checkAndLevelUp() {
-       if((2 + this.distanceToNextLevel) * this.level / 2 < this.totalDistance) {
-           this.level ++;
-           this.distanceToNextLevel = calculateDistanceForNextLevel();
-       }
-    }
-
-    // 다음 레벨까지의 거리 업데이트
-    private int calculateDistanceForNextLevel() {
-        return this.level * 2;
+        this.level++;
+        this.distanceToNextLevel = 2 * this.level;
     }
 
     public void cleanupDeactivateMemberRunData() {
         this.totalDistance = 0;
         this.totalKcal = 0;
         this.distanceToNextLevel = 2;
-        this.level = 0;
+        this.level = 1;
     }
 
 }
+

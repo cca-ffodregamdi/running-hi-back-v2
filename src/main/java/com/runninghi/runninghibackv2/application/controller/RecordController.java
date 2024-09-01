@@ -10,12 +10,10 @@ import com.runninghi.runninghibackv2.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Tag(name = "사용자 일간/주간/월간 기록 API", description = "기록 페이지에서 나의 데이터를 일간, 주간, 월간으로 확인할 수 있는 API 입니다.")
 @RestController

@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
 import com.runninghi.runninghibackv2.application.dto.post.request.CreatePostRequest;
 import com.runninghi.runninghibackv2.application.dto.post.request.UpdatePostRequest;
@@ -15,13 +15,14 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
+import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
+import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
 import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.domain.service.GpsCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -56,15 +57,14 @@ public class PostService {
 
     private final PostChecker postChecker;
     private final PostRepository postRepository;
-    private final PostKeywordService postKeywordService;
-    private final UpdatePostService updateService;
     private final ImageService imageService;
     private final MemberRepository memberRepository;
-    private final JPAQueryFactory jpaQueryFactory;
-    private final GpsCoordinateExtractor gpsCoordinateExtractor;
     private final PostQueryRepository postQueryRepository;
     private final MemberChallengeRepository memberChallengeRepository;
     private final RecordService recordService;
+    private final AlarmService alarmService;
+
+    private static final String LEVEL_FCM_TITLE = "새로운 레벨에 도달했습니다! 계속 나아가세요!";
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -83,7 +83,7 @@ public class PostService {
         return dirName + "/" + newFileName + ".txt";
     }
 
-    public String uploadGpsToS3(MultipartFile file, String dirName) throws IOException {
+    public String uploadGpsToS3(MultipartFile file, String dirName) {
         String key = buildKey(dirName);
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -245,6 +245,13 @@ public class PostService {
         return  postQueryRepository.findMyBookmarkedPostsByPageable(pageable, memberNo);
     }
 
+    @Transactional(readOnly = true)
+    public GetAllPostsResponse getPostByPostNo(Long memberNo, Long postNo) {
+        log.info("게시물 하나 조회. 회원번호: {}, 게시물번호: {}", memberNo, postNo);
+        return postQueryRepository.getPostByPostNo(memberNo, postNo);
+    }
+
+
     @Transactional
     public CreateRecordResponse createRecord(Long memberNo, MultipartFile file) throws IOException {
         log.info("GPS 기록 생성 시작. 회원번호: {}", memberNo);
@@ -255,9 +262,26 @@ public class PostService {
 
             String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
+            int nowLevel = member.getRunDataVO().getLevel();
+
             updateRecordOfMyChallenges(member, gpsDataVO);
             recordService.createRecord(member, gpsDataVO);
             member.getRunDataVO().updateTotalDistanceKcalAndLevel(gpsDataVO.getDistance(), gpsDataVO.getKcal());
+
+            int updateLevel = member.getRunDataVO().getLevel();
+
+            if (nowLevel < updateLevel) {
+                // 레벨업 알림
+                CreateAlarmRequest alarmRequest = CreateAlarmRequest.builder()
+                        .title(LEVEL_FCM_TITLE)
+                        .targetMemberNo(member.getMemberNo())
+                        .alarmType(AlarmType.LEVEL_UP)
+                        .targetPage(TargetPage.MYPAGE)
+                        .targetId(member.getMemberNo())
+                        .fcmToken(member.getFcmToken())
+                        .build();
+                alarmService.createPushAlarm(alarmRequest);
+            }
 
             Post createdPost = postRepository.save(Post.builder()
                     .member(member)
@@ -286,7 +310,9 @@ public class PostService {
 
         postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
-        savePostImage(request.imageUrl(), post.getPostNo());
+        if (!request.imageUrl().isBlank()) {
+            savePostImage(request.imageUrl(), post.getPostNo());
+        }
 
         String mainData = getMainData(request.mainData(), post.getGpsDataVO());
 
@@ -371,5 +397,7 @@ public class PostService {
             myChallenge.updateRecord(gpsDataVO);
         }
     }
+
+
 
 }

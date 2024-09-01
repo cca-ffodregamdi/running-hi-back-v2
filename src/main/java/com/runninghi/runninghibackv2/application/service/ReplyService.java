@@ -41,7 +41,7 @@ public class ReplyService {
 
     private final AlarmService alarmService;
 
-    private final String POST_REPLY_FCM_TITLE = "회원님의 게시글에 댓글이 등록되었습니다.";
+    private static final String POST_REPLY_FCM_TITLE = "회원님의 게시글에 댓글이 등록되었습니다.";
 
     /**
      * 게시글 조회 시 해당 게시글에 대한 댓글들 조회 메소드
@@ -82,7 +82,7 @@ public class ReplyService {
      * @return 댓글 번호, 작성자 닉네임, 게시글 번호, 댓글 내용, 삭제 여부, 생성 일, 수정 일
      */
     @Transactional
-    public CreateReplyResponse createReply(CreateReplyRequest request, Long memberNo) throws FirebaseMessagingException {
+    public CreateReplyResponse createReply(CreateReplyRequest request, Long memberNo) {
 
         Member member = memberRepository.findByMemberNo(memberNo);
         Post post = postRepository.findById(request.postNo())

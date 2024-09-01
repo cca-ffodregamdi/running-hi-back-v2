@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
 import com.runninghi.runninghibackv2.application.dto.bookmark.request.CreateBookmarkRequest;
-import com.runninghi.runninghibackv2.application.dto.bookmark.response.BookmarkedPostListResponse;
 import com.runninghi.runninghibackv2.application.dto.bookmark.response.CreateBookmarkResponse;
 import com.runninghi.runninghibackv2.application.service.BookmarkService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
@@ -18,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,7 +28,6 @@ public class BookmarkController {
     private final BookmarkService bookmarkService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    private final static String GET_RESPONSE_MESSAGE = "북마크된 게시물 리스트 조회 성공";
     private final static String POST_RESPONSE_MESSAGE = "북마크 생성 성공";
     private final static String DELETE_RESPONSE_MESSAGE = "북마크 취소 성공";
 

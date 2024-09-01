@@ -16,7 +16,7 @@ public record GetMemberResponse(
         @Schema(description = "회원이 달린 총 거리", example = "200.3")
         double totalDistance,
         @Schema(description = "다음 레벨 거리", example = "1000")
-        int distanceToNextLevel,
+        double distanceToNextLevel,
         @Schema(description = "총 소모 칼로리", example = "500.1")
         double totalKcal
 ) {
