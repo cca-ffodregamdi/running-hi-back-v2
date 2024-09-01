@@ -4,7 +4,6 @@ import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateCha
 import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.response.*;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.ChallengeRankResponse;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetChallengeRankingResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import com.runninghi.runninghibackv2.domain.repository.ChallengeQueryRepository;
@@ -13,7 +12,6 @@ import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +65,7 @@ public class ChallengeService {
                 .orElseThrow(EntityNotFoundException::new);
 
         List<ChallengeRankResponse> challengeRanking =
-                challengeQueryRepository.findTop100ByChallengeNo(challenge.getChallengeNo());
+                challengeQueryRepository.findTop100Ranking(challenge.getChallengeNo());
 
         return GetChallengeResponse.from(challenge, challengeRanking);
     }
