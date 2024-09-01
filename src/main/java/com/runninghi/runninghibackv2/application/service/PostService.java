@@ -303,7 +303,9 @@ public class PostService {
 
         postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
-        savePostImage(request.imageUrl(), post.getPostNo());
+        if (!request.imageUrl().isBlank()) {
+            savePostImage(request.imageUrl(), post.getPostNo());
+        }
 
         String mainData = getMainData(request.mainData(), post.getGpsDataVO());
 
