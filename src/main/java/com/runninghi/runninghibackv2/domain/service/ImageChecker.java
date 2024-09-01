@@ -48,7 +48,7 @@ public class ImageChecker {
 
     private boolean isImageExtension(String extension) {
 
-        String[] imageExtensions = {"jpg", "jpeg", "png", "gif", "bmp"};
+        String[] imageExtensions = {"jpg", "jpeg", "png", "gif", "bmp", "heic", "heif"};
 
         for (String ext : imageExtensions) {
             if (extension.equalsIgnoreCase(ext)) {
