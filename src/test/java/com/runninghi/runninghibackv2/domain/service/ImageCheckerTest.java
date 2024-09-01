@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.service;
 
+import com.runninghi.runninghibackv2.common.exception.custom.ImageException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,12 +40,10 @@ class ImageCheckerTest {
 
         // given
         String fileName = "test.test";
-        String fileName2 = "      ";
-        String fileName3 = null;
 
         // when & then
-        Assertions.assertThatIllegalArgumentException()
-                .isThrownBy(() -> imageChecker.checkImageFile(fileName));
+        Assertions.assertThatThrownBy(() -> imageChecker.checkImageFile(fileName))
+                .isInstanceOf(ImageException.UnSupportedImageTypeException.class);
     }
 
     @Test
@@ -64,7 +63,7 @@ class ImageCheckerTest {
                     imageChecker.checkImageFile(fileName3);
                 }
 
-        ).isInstanceOf( IllegalArgumentException.class);
+        ).isInstanceOf( ImageException.InvalidFileName.class);
     }
 
     @Test
@@ -98,8 +97,9 @@ class ImageCheckerTest {
         multipartFiles.add(new MockMultipartFile("file7", "filename7.txt", "text/plain", "some text".getBytes()));
 
         // when & then
-        Assertions.assertThatIllegalArgumentException()
-                .isThrownBy(() -> imageChecker.checkMaxLength(multipartFiles));
+        Assertions.assertThatThrownBy(
+                        () -> imageChecker.checkMaxLength(multipartFiles))
+                .isInstanceOf(ImageException.InvalidImageLength.class);
     }
 
 }
