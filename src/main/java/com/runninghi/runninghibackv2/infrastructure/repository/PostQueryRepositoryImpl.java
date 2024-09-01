@@ -138,6 +138,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                         .and(bookmark.post.postNo.eq(post.getPostNo())))
                 .fetchFirst() != null;
 
+
         return GetPostResponse.from(post, imageUrl,likeCnt, bookmarkCnt, replyCnt, isWriter, isLiked, isBookmarked);
     }
 
@@ -198,8 +199,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -266,8 +269,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -334,8 +339,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -398,8 +405,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -450,9 +459,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
 
-
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -505,8 +514,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
 
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -626,7 +637,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                         like.member.memberNo.eq(memberNo))
                 .fetchOne() != null;
 
-        return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+        Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
+        return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
     }
 
 }
