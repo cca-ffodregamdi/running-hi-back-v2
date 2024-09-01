@@ -121,6 +121,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = {
+            CustomEntityNotFoundException.class,
             ImageException.InvalidFileName.class,
             ImageException.UnSupportedImageTypeException.class,
             ImageException.InvalidImageLength.class
