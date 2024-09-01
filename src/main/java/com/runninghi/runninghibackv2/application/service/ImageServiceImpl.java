@@ -6,7 +6,6 @@ import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
 import com.runninghi.runninghibackv2.domain.service.ImageChecker;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
@@ -175,17 +174,34 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public byte[] resizeImage(MultipartFile multipartFile) throws IOException {
 
+        log.info("{} 이미지를 리사이징합니다.", multipartFile.getOriginalFilename());
+        String fileExtension = imageChecker.getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        log.info("fileExtension: {}", fileExtension);
+
+        // HEIC/HEIF 파일은 리사이징하지 않고 그대로 반환
+        if (imageChecker.isHeifOrHeic(fileExtension)) {
+            return multipartFile.getBytes();
+        }
+
         BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
         if (originalImage == null) {
-            throw new IOException();
+            throw new IOException("이미지 리사이징 중 오류가 발생하였습니다.");
         }
-        BufferedImage resizedImage =
-                Scalr.resize(originalImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_TO_WIDTH, IMAGE_RESIZE_TARGET_WIDTH, Scalr.THRESHOLD_QUALITY_BALANCED);
-        String fileExtension = imageChecker.getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
 
+        BufferedImage resizedImage = Scalr.resize(
+                originalImage,
+                Scalr.Method.QUALITY,
+                Scalr.Mode.FIT_TO_WIDTH,
+                IMAGE_RESIZE_TARGET_WIDTH,
+                Scalr.THRESHOLD_QUALITY_BALANCED
+        );
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, fileExtension, outputStream);
+        boolean success = ImageIO.write(resizedImage, fileExtension, outputStream);
+
+        if (!success) {
+            throw new IOException("이미지를 " + fileExtension + " 형식으로 저장할 수 없습니다.");
+        }
 
         log.info("성공적으로 이미지가 리사이징되었습니다.");
         return outputStream.toByteArray();

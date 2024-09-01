@@ -75,4 +75,8 @@ public class ImageChecker {
     public boolean isSameImage(String image1, String image2) {
         return Objects.equals(image1, image2);
     }
+
+    public boolean isHeifOrHeic(String fileExtension) {
+        return "heif".equalsIgnoreCase(fileExtension) || "heic".equalsIgnoreCase(fileExtension);
+    }
 }
