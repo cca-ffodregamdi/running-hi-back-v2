@@ -1,6 +1,7 @@
 package com.runninghi.runninghibackv2.application.service;
 
 import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
+import com.runninghi.runninghibackv2.common.exception.custom.CustomEntityNotFoundException;
 import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
@@ -37,6 +38,8 @@ public class ImageServiceImpl implements ImageService {
 
     private final static int IMAGE_RESIZE_TARGET_WIDTH = 650;
 
+    private final static String ENTITY_NOT_FOUND_MESSAGE = "DB에 존재하지 않는 이미지입니다.";
+
     // 저장 경로 - image / memberNo / UUID + 업로드 시간.jpg
     // 이미지 업로드 시 미리 보기만! -> post 생성 시 이미지 업로드 방식으로 할 지 => DB url
 
@@ -44,7 +47,7 @@ public class ImageServiceImpl implements ImageService {
         Image image = imageRepository.findImageByImageUrl(imageUrl)
                 .orElseThrow(() -> {
                     log.error("DB에 존재하지 않는 이미지입니다. imageUrl: {}", imageUrl);
-                    throw new EntityNotFoundException();
+                    return new CustomEntityNotFoundException(ENTITY_NOT_FOUND_MESSAGE, imageUrl);
                 });
         log.info("성공적으로 이미지를 조회하였습니다. imageUrl: {}", imageUrl);
         return image;
@@ -54,7 +57,7 @@ public class ImageServiceImpl implements ImageService {
         Image image = imageRepository.findImageByTargetNo(targetNo)
                 .orElseThrow(() -> {
                     log.error("{}번이 할당된 이미지는 DB에 존재하지 않습니다.", targetNo);
-                    throw new EntityNotFoundException();
+                    return new CustomEntityNotFoundException(ENTITY_NOT_FOUND_MESSAGE, targetNo);
                 });
         log.info("성공적으로 이미지를 조회하였습니다. targetNo: {}", targetNo);
         return image;
@@ -140,6 +143,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void saveTargetNo(String imageUrl, ImageTarget imageTarget, Long targetNo) {
 
+        log.info("이미지에 아이디를 할당합니다. imageTarget: {}, targetNo: {}", imageTarget, targetNo);
         String filename = imageChecker.getFileNameFromUrl(imageUrl);
         imageChecker.checkImageFile(filename);
 
