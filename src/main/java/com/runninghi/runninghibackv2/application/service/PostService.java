@@ -16,11 +16,9 @@ import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
-import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
-import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
-import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
-import com.runninghi.runninghibackv2.domain.repository.PostRepository;
+import com.runninghi.runninghibackv2.domain.repository.*;
 import com.runninghi.runninghibackv2.domain.service.GpsCoordinateExtractor;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
@@ -63,7 +61,7 @@ public class PostService {
     private final JPAQueryFactory jpaQueryFactory;
     private final GpsCoordinateExtractor gpsCoordinateExtractor;
     private final PostQueryRepository postQueryRepository;
-    private final MemberChallengeRepository memberChallengeRepository;
+    private final ChallengeQueryRepository challengeQueryRepository;
     private final RecordService recordService;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -255,7 +253,6 @@ public class PostService {
 
             String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
-            updateRecordOfMyChallenges(member, gpsDataVO);
             recordService.createRecord(member, gpsDataVO);
             member.getRunDataVO().updateTotalDistanceKcalAndLevel(gpsDataVO.getDistance(), gpsDataVO.getKcal());
 
@@ -267,6 +264,9 @@ public class PostService {
                     .status(false)
                     .postTitle(createPostTitle(gpsDataVO))
                     .build());
+
+            updateRecordOfMemberChallenges(memberNo, gpsDataVO);
+
             return new CreateRecordResponse(createdPost.getPostNo());
         } catch (Exception e) {
             log.error("GPS 기록 생성 중 오류 발생. 회원번호: {}", memberNo, e);
@@ -351,19 +351,22 @@ public class PostService {
         post.resetReportedCount();
     }
 
-    private void updateRecordOfMyChallenges(Member member, GpsDataVO gpsDataVO) {
-        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMember(member);
+    private void updateRecordOfMemberChallenges(Long memberNo, GpsDataVO gpsDataVO) {
+        Member member = memberRepository.findByMemberNo(memberNo);
 
-        if (myChallenges.isEmpty()) return;
+        List<MemberChallenge> memberChallenges =
+                challengeQueryRepository.findMemberChallengesByStatus(memberNo, ChallengeStatus.IN_PROGRESS);
+
+        if (memberChallenges.isEmpty()) return;
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = now.toLocalDate().atTime(LocalTime.MAX);
 
-        for (MemberChallenge myChallenge : myChallenges) {
+        for (MemberChallenge myChallenge : memberChallenges) {
             if (myChallenge.getChallenge().getChallengeCategory() == ChallengeCategory.ATTENDANCE) {
-                Optional<Post> post = postRepository.findFirstByMemberAndCreateDateBetween(member, startOfDay, endOfDay);
-                if (post.isEmpty()) {
+                List<Post> postList = postRepository.findByMemberAndCreateDateBetween(member, startOfDay, endOfDay);
+                if (postList.size() == 1) {
                     myChallenge.updateRecord();
                 }
                 continue;
