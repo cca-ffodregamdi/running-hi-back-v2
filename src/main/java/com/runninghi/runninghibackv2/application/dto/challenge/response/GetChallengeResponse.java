@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.application.dto.challenge.response;
 
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.ChallengeRankResponse;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetChallengeRankingResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import io.swagger.v3.oas.annotations.media.Schema;

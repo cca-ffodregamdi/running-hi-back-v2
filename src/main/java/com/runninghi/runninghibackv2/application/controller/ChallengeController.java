@@ -1,14 +1,14 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.request.CreateMyChallengeRequest;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.request.CreateMemberChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.response.*;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.CreateMyChallengeResponse;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetAllMyChallengeResponse;
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetMyChallengeResponse;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.CreateMemberChallengeResponse;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetAllMemberChallengeResponse;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetMemberChallengeResponse;
 import com.runninghi.runninghibackv2.application.service.ChallengeService;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateChallengeRequest;
-import com.runninghi.runninghibackv2.application.service.MyChallengeService;
+import com.runninghi.runninghibackv2.application.service.MemberChallengeService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
@@ -21,8 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
 @Tag(name = "챌린지 API", description = "챌린지 관련 API")
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +28,7 @@ import java.util.List;
 public class ChallengeController {
 
     private final ChallengeService challengeService;
-    private final MyChallengeService myChallengeService;
+    private final MemberChallengeService memberChallengeService;
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
@@ -111,13 +109,13 @@ public class ChallengeController {
 
     @Operation(summary = "나의 챌린지 저장", description = "나의 챌린지를 생성합니다. \n 챌린지 참여하기를 누르면 생성됩니다.")
     @PostMapping("/my-challenge")
-    public ResponseEntity<ApiResult<CreateMyChallengeResponse>> createMyChallenge(
-            @RequestBody CreateMyChallengeRequest request,
+    public ResponseEntity<ApiResult<CreateMemberChallengeResponse>> createMemberChallenge(
+            @RequestBody CreateMemberChallengeRequest request,
             @RequestHeader(name = "Authorization") String bearerToken) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
 
-        CreateMyChallengeResponse response = myChallengeService.createMyChallenge(request, memberNo);
+        CreateMemberChallengeResponse response = memberChallengeService.createMemberChallenge(request, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 저장 성공", response));
     }
@@ -134,7 +132,7 @@ public class ChallengeController {
             description = "IN_PROGRESS-진행중인 챌린지, COMPLETED-종료된 챌린지가 조회됩니다. \n" +
                     "SCHEDULED는 허용되지 않습니다.")
     @GetMapping("/my-challenge/status")
-    public ResponseEntity<ApiResult<GetAllMyChallengeResponse>> getAllMyChallengesByStatus(
+    public ResponseEntity<ApiResult<GetAllMemberChallengeResponse>> getAllMemberChallengesByStatus(
             @RequestParam(name = "status") ChallengeStatus status,
             @RequestHeader(name = "Authorization") String bearerToken) {
 
@@ -144,7 +142,7 @@ public class ChallengeController {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
 
-        GetAllMyChallengeResponse response = myChallengeService.getAllMyChallengesByStatus(memberNo, status);
+        GetAllMemberChallengeResponse response = memberChallengeService.getMemberChallengesByStatus(memberNo, status);
 
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 전체 조회 성공", response));
     }
@@ -162,13 +160,13 @@ public class ChallengeController {
     @Operation(summary = "나의 챌린지 상세 조회", description = "로그인한 사용자가 참여중인 챌린지 목록 화면에서 " +
             "선택한 챌린지의 정보를 조회합니다.")
     @GetMapping("/my-challenge/{challengeNo}")
-    public ResponseEntity<ApiResult<GetMyChallengeResponse>> getMyChallengeById(
+    public ResponseEntity<ApiResult<GetMemberChallengeResponse>> getMemberChallengeById(
             @PathVariable Long challengeNo,
             @RequestHeader(name = "Authorization") String bearerToken) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
 
-        GetMyChallengeResponse response = myChallengeService.getMyChallengeByChallengeId(memberNo, challengeNo);
+        GetMemberChallengeResponse response = memberChallengeService.getMemberChallengeByChallengeId(memberNo, challengeNo);
 
         return ResponseEntity.ok(ApiResult.success("나의 챌린지 상세 조회 성공", response));
     }

@@ -23,7 +23,7 @@ public class Challenge extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long challengeNo;
+    private Long challengeNo;
 
     @NotNull
     @Comment("챌린지명")
@@ -66,7 +66,7 @@ public class Challenge extends BaseTimeEntity {
     private List<MemberChallenge> participants;
 
     @Builder
-    public Challenge(long challengeNo, String title, String content, ChallengeCategory challengeCategory,
+    public Challenge(Long challengeNo, String title, String content, ChallengeCategory challengeCategory,
                      String imageUrl, float goal, String goalDetail, LocalDateTime startDate, LocalDateTime endDate,
                      ChallengeStatus status, List<MemberChallenge> participants) {
         this.challengeNo = challengeNo;
