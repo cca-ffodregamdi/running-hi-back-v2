@@ -245,6 +245,13 @@ public class PostService {
         return  postQueryRepository.findMyBookmarkedPostsByPageable(pageable, memberNo);
     }
 
+    @Transactional(readOnly = true)
+    public GetAllPostsResponse getPostByPostNo(Long memberNo, Long postNo) {
+        log.info("게시물 하나 조회. 회원번호: {}, 게시물번호: {}", memberNo, postNo);
+        return postQueryRepository.getPostByPostNo(memberNo, postNo);
+    }
+
+
     @Transactional
     public CreateRecordResponse createRecord(Long memberNo, MultipartFile file) throws IOException {
         log.info("GPS 기록 생성 시작. 회원번호: {}", memberNo);
@@ -390,5 +397,7 @@ public class PostService {
             myChallenge.updateRecord(gpsDataVO);
         }
     }
+
+
 
 }

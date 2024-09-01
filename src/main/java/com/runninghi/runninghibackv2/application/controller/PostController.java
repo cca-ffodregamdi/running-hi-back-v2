@@ -49,6 +49,7 @@ public class PostController {
      * 3. 나의 게시글 조회 (최신순) <p>
      * 4. 나의 좋아요 게시글 조회 (최신순) <p>
      * 5. 나의 북마크 게시글 조회 (최신순) <p>
+     * 6. postNo 에 따른 게시글 조회 (GetAllPostsResponse)
      */
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -127,6 +128,18 @@ public class PostController {
         PageResultData<GetAllPostsResponse> response = postService.getMyBookmarkedPosts(pageable, memberInfo.memberNo());
 
         return ResponseEntity.ok(PageResult.success(GET_MAPPING_RESPONSE_MESSAGE, response));
+    }
+
+    @GetMapping("/only/{postNo}")
+    @Operation(summary = "게시글 상세보기", description = "게시글 클릭시 상세보기 가능합니다.")
+    public ResponseEntity<ApiResult<GetAllPostsResponse>> getPostByPostNo(@RequestHeader("Authorization") String bearerToken,
+                                                              @PathVariable Long postNo) {
+        log.info("게시글 상세 조회 요청이 들어왔습니다. postNo: {}", postNo);
+
+        AccessTokenInfo memberInfo = jwtTokenProvider.getMemberInfoByBearerToken(bearerToken);
+        GetAllPostsResponse response = postService.getPostByPostNo(memberInfo.memberNo(), postNo);
+
+        return ResponseEntity.ok(ApiResult.success( GET_MAPPING_RESPONSE_MESSAGE, response));
     }
 
 
