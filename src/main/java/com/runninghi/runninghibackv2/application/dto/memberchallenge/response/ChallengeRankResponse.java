@@ -5,6 +5,6 @@ public record ChallengeRankResponse(
         float record,
         String nickname,
         String profileImageUrl,
-        int rank
+        Long rank
 ) {
 }

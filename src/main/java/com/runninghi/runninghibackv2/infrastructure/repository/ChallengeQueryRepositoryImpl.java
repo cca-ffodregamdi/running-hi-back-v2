@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.ChallengeRankResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
+import com.runninghi.runninghibackv2.domain.entity.QMemberChallenge;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import com.runninghi.runninghibackv2.domain.repository.ChallengeQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class ChallengeQueryRepositoryImpl implements ChallengeQueryRepository {
                         memberChallenge.record,
                         memberChallenge.member.nickname,
                         memberChallenge.member.profileImageUrl,
-                        Expressions.numberTemplate(Integer.class,
+                        Expressions.numberTemplate(Long.class,
                                 "RANK() OVER (ORDER BY {0} DESC)",
                                 memberChallenge.record)
                 ))
@@ -57,6 +58,7 @@ public class ChallengeQueryRepositoryImpl implements ChallengeQueryRepository {
 
     @Override
     public ChallengeRankResponse findMemberRanking(Long challengeNo, Long memberNo) {
+        QMemberChallenge m2 = new QMemberChallenge("m2");
 
         return jpaQueryFactory
                 .select(Projections.constructor(ChallengeRankResponse.class,
@@ -64,9 +66,11 @@ public class ChallengeQueryRepositoryImpl implements ChallengeQueryRepository {
                         memberChallenge.record,
                         memberChallenge.member.nickname,
                         memberChallenge.member.profileImageUrl,
-                        Expressions.numberTemplate(Integer.class,
-                                "RANK() OVER (ORDER BY {0} DESC)",
-                                memberChallenge.record)
+                        JPAExpressions
+                                .select(m2.count().add(1))
+                                .from(m2)
+                                .where(m2.challenge.challengeNo.eq(memberChallenge.challenge.challengeNo)
+                                        .and(m2.record.gt(memberChallenge.record)))
                 ))
                 .from(memberChallenge)
                 .where(memberChallenge.challenge.challengeNo.eq(challengeNo)
