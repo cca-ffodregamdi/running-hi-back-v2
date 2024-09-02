@@ -40,12 +40,5 @@ jobs:
             # 포트 사용중일 시에 종료 처리
             sudo fuser -k ${{ secrets.SERVER_PORT }}/tcp || true
             
-            sudo docker run -d --name runninghi-dev \
-              -p ${{ secrets.SERVER_PORT }}:8080 \
-              -v /logs:/app/logs \
-              -e SPRING_PROFILES_ACTIVE=dev \
-              ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
-            
-            # 컨테이너 로그 확인
-            sleep 10
-            sudo docker logs runninghi-dev
+            # Run new container
+            sudo docker run -d --name runninghi-dev -p ${{ secrets.SERVER_PORT }}:8080 -v /logs:/app/logs -e SPRING_PROFILES_ACTIVE=dev ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
