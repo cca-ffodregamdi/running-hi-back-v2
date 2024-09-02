@@ -2,6 +2,7 @@ package com.runninghi.runninghibackv2.application.dto.challenge.request;
 
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +14,7 @@ public record CreateChallengeRequest(
         @Schema(description = "챌린지 타입", example = "DISTANCE")
         ChallengeCategory challengeCategory,
         @Schema(description = "챌린지 이미지", example = "test.jpg")
-        String imageUrl,
+        MultipartFile image,
         @Schema(description = "목표 수치", example = "100.0")
         float goal,
         @Schema(description = "목표 상세정보", example = "10회 이상 달리기")

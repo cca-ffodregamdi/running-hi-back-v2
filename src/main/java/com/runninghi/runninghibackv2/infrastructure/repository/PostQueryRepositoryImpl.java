@@ -10,6 +10,7 @@ import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.QImage;
+import com.runninghi.runninghibackv2.domain.entity.QPost;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
@@ -137,6 +138,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                         .and(bookmark.post.postNo.eq(post.getPostNo())))
                 .fetchFirst() != null;
 
+
         return GetPostResponse.from(post, imageUrl,likeCnt, bookmarkCnt, replyCnt, isWriter, isLiked, isBookmarked);
     }
 
@@ -197,8 +199,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -265,8 +269,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -333,8 +339,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -397,8 +405,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -449,9 +459,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
 
-
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -504,8 +514,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                             like.member.memberNo.eq(memberNo))
                     .fetchOne() != null;
 
+            Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
 
-            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked);
+
+            return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
         }).collect(Collectors.toList());
 
         return new PageResultData<>(responses, pageable, total);
@@ -584,6 +596,50 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
             return GetRecordPostResponse.from(post, imageUrl);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public GetAllPostsResponse getPostByPostNo(Long memberNo, Long postNo) {
+        Post post = jpaQueryFactory.selectFrom(QPost.post)
+                .where(QPost.post.postNo.eq(postNo))
+                .fetchOne();
+
+        if (post == null) {
+            return null; // 또는 적절한 예외 처리
+        }
+
+        Image mainImage = jpaQueryFactory.select(image)
+                .from(image)
+                .where(image.targetNo.eq(postNo))
+                .limit(1)
+                .fetchOne();
+
+        String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
+
+        Long replyCnt = jpaQueryFactory.select(reply.count())
+                .from(reply)
+                .where(reply.post.postNo.eq(postNo))
+                .fetchOne();
+
+        Long likeCnt = jpaQueryFactory.select(like.count())
+                .from(like)
+                .where(like.post.postNo.eq(postNo))
+                .fetchOne();
+
+        Boolean isBookmarked = jpaQueryFactory.selectFrom(bookmark)
+                .where(bookmark.member.memberNo.eq(memberNo)
+                        .and(bookmark.post.postNo.eq(postNo)))
+                .fetchFirst() != null;
+
+        Boolean isLiked = jpaQueryFactory.selectFrom(like)
+                .where(
+                        like.post.postNo.eq(postNo),
+                        like.member.memberNo.eq(memberNo))
+                .fetchOne() != null;
+
+        Boolean isWriter = post.getMember().getMemberNo().equals(memberNo);
+
+        return GetAllPostsResponse.from(post, imageUrl, replyCnt, likeCnt, isBookmarked, isLiked, isWriter);
     }
 
 }

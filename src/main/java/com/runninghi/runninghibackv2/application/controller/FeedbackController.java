@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackRequest;
@@ -338,7 +339,7 @@ public class FeedbackController {
             @RequestHeader(value = "Authorization") String token,
             @PathVariable("feedbackNo") Long feedbackNo,
             @RequestBody UpdateFeedbackReplyRequest request
-    ) throws BadRequestException {
+    ) throws BadRequestException, FirebaseMessagingException {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
 

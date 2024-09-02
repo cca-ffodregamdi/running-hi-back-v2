@@ -26,7 +26,7 @@ import java.util.Objects;
 public class S3StorageUtils {
 
     private final AmazonS3Client amazonS3Client;
-    private static final int SECURE_STRING_BYTE_SIZE = 16; // 16 byte -> 영문 + 숫자 조합 22자리
+    private static final int SECURE_STRING_LENGTH = 22;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -77,7 +77,7 @@ public class S3StorageUtils {
         String date = sdf.format(new Date());
 
         return dirName + "/" +
-                SecureStringUtils.buildSecureString(SECURE_STRING_BYTE_SIZE) + "_" + date + extension;
+                SecureStringUtils.buildSecureString(SECURE_STRING_LENGTH) + "_" + date + extension;
     }
 
     private String extractFileExtension(MultipartFile file) {

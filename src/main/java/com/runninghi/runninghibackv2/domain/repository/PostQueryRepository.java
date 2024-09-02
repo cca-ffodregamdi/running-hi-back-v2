@@ -22,4 +22,5 @@ public interface PostQueryRepository {
     List<GetRecordPostResponse> findWeeklyRecord(Long memberNo, LocalDate date);
     List<GetRecordPostResponse> findMonthlyRecord(Long memberNo, LocalDate date);
     List<GetRecordPostResponse> findYearlyRecord(Long memberNo, LocalDate date);
+    GetAllPostsResponse getPostByPostNo(Long memberNo, Long postNo);
 }
