@@ -46,3 +46,5 @@ jobs:
               -v /logs:/app/logs \
               -e SPRING_PROFILES_ACTIVE=dev \
               ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
+            
+            sudo docker exec runninghi-dev env | grep SPRING_PROFILES_ACTIVE

@@ -9,7 +9,7 @@ WORKDIR /app
 # Log 파일 저장 디렉토리 생성
 RUN mkdir -p /app/logs
 
-ARG PROFILE=dev
+ARG PROFILE
 ENV SPRING_PROFILES_ACTIVE=${PROFILE}
 
 # 인자 정리 -jar
