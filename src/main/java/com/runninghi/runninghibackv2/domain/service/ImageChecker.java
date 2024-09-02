@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.service;
 
+import com.runninghi.runninghibackv2.common.exception.custom.ImageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class ImageChecker {
     public String checkImageFile(String fileName) {
         if (isFileNameInvalid(fileName)) {
             log.error("파일 이름이 유효하지 않습니다. fileName: {}", fileName);
-            throw new IllegalArgumentException();
+            throw new ImageException.InvalidFileName("파일 이름이 유효하지 않습니다.", fileName);
         }
 
         String extension = getFileExtension(fileName);
@@ -26,14 +27,16 @@ public class ImageChecker {
             return extension;
         } else {
             log.error("지원하는 이미지 파일이 아닙니다. fileName: {}", fileName);
-            throw new IllegalArgumentException("이미지 파일이 아닙니다.");
+            throw new ImageException.UnSupportedImageTypeException("지원하는 이미지 파일이 아닙니다.", fileName);
         }
     }
 
     public void checkMaxLength(List<MultipartFile> imageFiles) {
 
         int requestListLength = imageFiles.size();
-        if (IMAGE_MAX_LENGTH < requestListLength) throw new IllegalArgumentException("이미지 업로드 개수는 " + IMAGE_MAX_LENGTH + "개 이하 입니다.");
+        if (IMAGE_MAX_LENGTH < requestListLength) {
+            throw new ImageException.InvalidImageLength("이미지 업로드 개수는 " + IMAGE_MAX_LENGTH + "개 이하 입니다.");
+        }
 
     }
 
@@ -48,7 +51,7 @@ public class ImageChecker {
 
     private boolean isImageExtension(String extension) {
 
-        String[] imageExtensions = {"jpg", "jpeg", "png", "gif", "bmp"};
+        String[] imageExtensions = {"jpg", "jpeg", "png", "gif", "bmp", "heic", "heif"};
 
         for (String ext : imageExtensions) {
             if (extension.equalsIgnoreCase(ext)) {
@@ -64,13 +67,16 @@ public class ImageChecker {
             return null; // 확장자를 찾을 수 없으면 null 반환
         }
 
-        String fileName = url.substring(url.lastIndexOf('/') + 1);
 //        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
 
-        return fileName;
+        return url.substring(url.lastIndexOf('/') + 1);
     }
 
     public boolean isSameImage(String image1, String image2) {
         return Objects.equals(image1, image2);
+    }
+
+    public boolean isHeifOrHeic(String fileExtension) {
+        return "heif".equalsIgnoreCase(fileExtension) || "heic".equalsIgnoreCase(fileExtension);
     }
 }

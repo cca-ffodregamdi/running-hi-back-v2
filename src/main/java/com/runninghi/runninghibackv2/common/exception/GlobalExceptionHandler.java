@@ -120,4 +120,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResult.error(ErrorCode.INTER_SERVER_ERROR));
     }
 
+    @ExceptionHandler(value = {
+            CustomEntityNotFoundException.class,
+            ImageException.InvalidFileName.class,
+            ImageException.UnSupportedImageTypeException.class,
+            ImageException.InvalidImageLength.class
+    })
+    public ResponseEntity<ApiResult<Void>> handleCustomBadRequestException(Exception e) {
+        return ResponseEntity.badRequest().body(ApiResult.error(HttpStatus.BAD_REQUEST, e.getMessage()));
+    }
+
 }

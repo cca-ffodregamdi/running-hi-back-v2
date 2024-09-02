@@ -1,7 +1,5 @@
 package com.runninghi.runninghibackv2.domain.entity;
 
-import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
-import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
 import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
 import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
 import jakarta.persistence.*;

@@ -1,11 +1,15 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.CreateFeedbackRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackReplyRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeedbackRequest;
 import com.runninghi.runninghibackv2.application.dto.feedback.response.*;
 import com.runninghi.runninghibackv2.domain.entity.Feedback;
 import com.runninghi.runninghibackv2.domain.entity.Member;
+import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
+import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.FeedbackRepository;
 import com.runninghi.runninghibackv2.domain.service.FeedbackChecker;
@@ -24,7 +28,9 @@ public class FeedbackService {
     private final MemberRepository memberRepository;
     private final FeedbackRepository feedbackRepository;
     private final FeedbackChecker feedbackChecker;
+    private final AlarmService alarmService;
 
+    private static final String FEEDBACK_REPLY_FCM_TITLE = "회원님의 피드백/문의사항에 답변이 등록되었습니다.";
 
     @Transactional
     public CreateFeedbackResponse createFeedback(CreateFeedbackRequest request, Long memberNo
@@ -132,7 +138,8 @@ public class FeedbackService {
     }
 
     @Transactional
-    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo) throws BadRequestException {
+    public UpdateFeedbackReplyResponse updateFeedbackReply(UpdateFeedbackReplyRequest request, Long feedbackNo, Long memberNo)
+            throws BadRequestException {
 
         Member member = findMemberByNo(memberNo);
         feedbackChecker.isAdmin(member.getRole());
@@ -151,6 +158,17 @@ public class FeedbackService {
                 .build();
 
         feedbackRepository.save(updatedFeedback);
+
+        // 피드백/문의사항 작성자에게 알림
+        CreateAlarmRequest alarmRequest = CreateAlarmRequest.builder()
+                .title(FEEDBACK_REPLY_FCM_TITLE)
+                .targetMemberNo(updatedFeedback.getFeedbackNo())
+                .alarmType(AlarmType.FEEDBACK)
+                .targetPage(TargetPage.FEEDBACK)
+                .targetId(updatedFeedback.getFeedbackNo())
+                .fcmToken(member.getFcmToken())
+                .build();
+        alarmService.createPushAlarm(alarmRequest);
 
         return UpdateFeedbackReplyResponse.from(updatedFeedback);
     }

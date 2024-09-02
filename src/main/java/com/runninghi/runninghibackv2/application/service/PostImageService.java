@@ -3,7 +3,6 @@ package com.runninghi.runninghibackv2.application.service;
 import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,7 @@ import java.util.List;
 public class PostImageService {
 
     private final ImageRepository imageRepository;
-    private final ImageService imageService;
-    private final ImageTarget imageTarget = ImageTarget.POST;
+    private static final ImageTarget imageTarget = ImageTarget.POST;
 
     public void savePostNo(List<String> imageUrlList, Long postNo) {
 

@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-public record GetAllMyChallengeResponse(
+public record GetAllMemberChallengeResponse(
         @Schema(description = "나의 챌린지 리스트")
-        List<MyChallengeListResponse> myChallengeList,
+        List<MemberChallengeListResponse> myChallengeList,
         @Schema(description = "나의 챌린지 개수", example = "5")
         int myChallengeCount
 ) {
