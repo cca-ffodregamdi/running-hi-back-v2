@@ -47,6 +47,10 @@ jobs:
       - name: Setup application-dev.yml
         run: echo "${{ secrets.DEV_APPLICATION_YML }}" > ./src/main/resources/application-dev.yml
 
+
+      - name: Verify application-dev.yml
+        run: cat ./src/main/resources/application-dev.yml
+
       ## firebase sdk 설정
       - name: create-json
         id: create-json
