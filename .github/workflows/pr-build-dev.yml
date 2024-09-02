@@ -18,8 +18,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    env:
-      SPRING_PROFILES_ACTIVE: dev
     environment: dev
 
     steps:
@@ -43,7 +41,7 @@ jobs:
       - name: Setup application.yml
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
         shell: bash
 
       - name: Setup application-dev.yml
