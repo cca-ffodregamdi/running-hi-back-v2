@@ -10,7 +10,6 @@ WORKDIR /app
 RUN mkdir -p /app/logs
 
 ARG PROFILE
-ENV SPRING_PROFILES_ACTIVE=${PROFILE}
 
 # 인자 정리 -jar
 ARG JAR_FILE=build/libs/*.jar
