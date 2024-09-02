@@ -73,6 +73,8 @@ jobs:
 
       - name: Test with Gradle
         run: ./gradlew --info test -Dspring.profiles.active=dev
+        env:
+          SPRING_PROFILES_ACTIVE: dev
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
