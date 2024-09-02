@@ -1,0 +1,100 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: PR Build and Test
+
+on:
+  pull_request:
+    branches: [ "dev" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      ## MySQL 환경을 테스트 환경에서 설정합니다.
+      - name: Setup MySQL
+        uses: samin/mysql-action@v1
+        with:
+          character set server: 'utf8'
+          mysql database: 'runninghi'
+          mysql user: ${{ secrets.MYSQL_USERNAME }}
+          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+
+      ## resources 디렉토리 확인 및 생성, application.yml 설정
+      - name: Setup application.yml
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
+        shell: bash
+
+      - name: Setup application-dev.yml
+        run: echo "${{ secrets.DEV_APPLICATION_YML }}" > ./src/main/resources/application-dev.yml
+
+      ## firebase sdk 설정
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "runninghi-firebase-adminsdk.json"
+          json: ${{ secrets.FIREBASE_SDK }}
+
+      ## firebase 디렉토리 생성 및 JSON 파일 이동
+      - name: Setup Firebase Directory and Move JSON
+        run: |
+          mkdir -p ./src/main/resources/firebase
+          mv ./runninghi-firebase-adminsdk.json ./src/main/resources/firebase/
+
+      ## apple 설정
+      - name: apple setting
+        run: |
+          mkdir -p ./src/main/resources/apple
+          touch ./src/main/resources/apple/Apple_AuthKey.p8
+          echo "${{ secrets.APPLE_AUTHKEY }}" > ./src/main/resources/apple/Apple_AuthKey.p8
+
+      - name: Add permission to make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Test with Gradle
+        run: ./gradlew --info test
+        env:
+          SPRING_PROFILES_ACTIVE: dev
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: build -Pprofile=devㅌ
+
+      ## docker upload image
+      - name: docker image build
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }} --build-arg PROFILE=dev .
+
+      # DockerHub Login
+      - name: docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Docker Hub push
+      - name: docker Hub push
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest

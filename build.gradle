@@ -94,8 +94,6 @@ tasks.named('test') {
 task copyPrivate(type: Copy) {
     copy{
         from './running-hi-config'
-        include "application.yml"
-        include "firebase/runninghi-firebase-adminsdk.json"
         into 'src/main/resources'
     }
 }

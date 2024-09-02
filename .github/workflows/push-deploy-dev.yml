@@ -1,0 +1,44 @@
+name: Deploy on Merge
+
+on:
+  push:
+    branches: [ "dev" ]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # 서버에 통신하기 위한 SSH를 설정합니다.
+      - name: Setup SSH
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 배포 서버에 host 키 확인
+            sudo mkdir -p ~/.ssh
+            sudo ssh-keyscan ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+            
+            # 배포 서버에서 DockerHub Login
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            
+            # Pull Docker Image
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
+            
+            # Stop and Remove existing contrainer
+            sudo docker stop runninghi-dev || true && sudo docker rm runninghi-dev || true
+            
+            # 포트 사용중일 시에 종료 처리
+            sudo fuser -k ${{ secrets.SERVER_PORT }}/tcp || true
+            
+            # Run new container
+            sudo docker run -d --name runninghi-dev -p ${{ secrets.SERVER_PORT }}:8080 -v /logs:/app/logs -e SPRING_PROFILES_ACTIVE=dev ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
