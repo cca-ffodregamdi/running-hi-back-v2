@@ -2,7 +2,7 @@ name: Deploy on Merge
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "prod" ]
 
 permissions:
   contents: read
