@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public record MyChallengeListResponse(
+public record MemberChallengeListResponse(
         @Schema(description = "연관된 챌린지 Id", example = "1")
         Long challengeId,
         @Schema(description = "나의 챌린지 Id", example = "1")
@@ -25,12 +25,12 @@ public record MyChallengeListResponse(
         @Schema(description = "챌린지 참여자 수", example = "4132")
         int participantsCount
 ) {
-    public static MyChallengeListResponse from(MemberChallenge memberChallenge) {
+    public static MemberChallengeListResponse from(MemberChallenge memberChallenge) {
         Challenge challenge = memberChallenge.getChallenge();
         Duration duration = Duration.between(LocalDateTime.now(), challenge.getEndDate());
         Long remainingTime = duration.toDays() >= 0 ? duration.toDays() : 0;
 
-        return new MyChallengeListResponse(
+        return new MemberChallengeListResponse(
                 challenge.getChallengeNo(),
                 memberChallenge.getMemberChallengeId(),
                 challenge.getTitle(),

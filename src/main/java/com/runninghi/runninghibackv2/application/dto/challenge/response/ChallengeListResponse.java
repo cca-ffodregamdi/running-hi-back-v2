@@ -1,6 +1,8 @@
 package com.runninghi.runninghibackv2.application.dto.challenge.response;
 
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
+import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Duration;
@@ -11,12 +13,16 @@ public record ChallengeListResponse(
         Long challengeNo,
         @Schema(description = "챌린지명", example = "1개월 내로 100km 달리기")
         String title,
+        @Schema(description = "챌린지 카테고리", example = "DISTANCE")
+        ChallengeCategory category,
         @Schema(description = "챌린지 이미지", example = "test.jpg")
         String imageUrl,
         @Schema(description = "챌린지 시작일자", example = "2024-06-01T00:00:00")
         LocalDateTime startDate,
         @Schema(description = "챌린지 종료일자", example = "2024-0.6-30T00:00:00")
         LocalDateTime endDate,
+        @Schema(description = "챌린지 상태", example = "IN_PROGRESS")
+        ChallengeStatus status,
         @Schema(description = "챌린지 남은기간", example = "20")
         Long remainingTime,
         @Schema(description = "챌린지 참여자 수", example = "4132")
@@ -29,9 +35,11 @@ public record ChallengeListResponse(
         return new ChallengeListResponse(
                 challenge.getChallengeNo(),
                 challenge.getTitle(),
+                challenge.getChallengeCategory(),
                 challenge.getImageUrl(),
                 challenge.getStartDate(),
                 challenge.getEndDate(),
+                challenge.getStatus(),
                 remainingTime,
                 challenge.getParticipants().size()
         );

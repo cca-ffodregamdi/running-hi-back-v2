@@ -1,6 +1,5 @@
 package com.runninghi.runninghibackv2.application.dto.memberchallenge.response;
 
-import com.runninghi.runninghibackv2.application.dto.challenge.response.ChallengeResponse;
 import com.runninghi.runninghibackv2.domain.entity.Challenge;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
@@ -9,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record GetMyChallengeResponse(
+public record GetMemberChallengeResponse(
         @Schema(description = "나의 챌린지 Id", example = "1")
         Long memberChallengeId,
         @Schema(description = "연관된 멤버 Id", example = "1")
@@ -37,16 +36,16 @@ public record GetMyChallengeResponse(
         @Schema(description = "챌린지 참여자 수", example = "4132")
         int participantsCount,
         @Schema(description = "전체 회원 랭킹")
-        List<GetChallengeRankingResponse> challengeRanking,
+        List<ChallengeRankResponse> challengeRanking,
         @Schema(description = "로그인한 회원 랭킹")
-        GetChallengeRankingResponse memberRanking
-) implements ChallengeResponse {
-    public static GetMyChallengeResponse from(MemberChallenge memberChallenge,
-                                              List<GetChallengeRankingResponse> challengeRanking,
-                                              GetChallengeRankingResponse memberRanking) {
+        ChallengeRankResponse memberRanking
+) {
+    public static GetMemberChallengeResponse from(MemberChallenge memberChallenge,
+                                                  List<ChallengeRankResponse> challengeRanking,
+                                                  ChallengeRankResponse memberRanking) {
         Challenge challenge = memberChallenge.getChallenge();
 
-        return new GetMyChallengeResponse(
+        return new GetMemberChallengeResponse(
                 memberChallenge.getMemberChallengeId(),
                 memberChallenge.getMember().getMemberNo(),
                 challenge.getChallengeNo(),

@@ -15,14 +15,8 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.entity.Post;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
-import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
-import com.runninghi.runninghibackv2.domain.enumtype.ChallengeCategory;
-import com.runninghi.runninghibackv2.domain.enumtype.Difficulty;
-import com.runninghi.runninghibackv2.domain.enumtype.TargetPage;
-import com.runninghi.runninghibackv2.domain.repository.MemberChallengeRepository;
-import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
-import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
-import com.runninghi.runninghibackv2.domain.repository.PostRepository;
+import com.runninghi.runninghibackv2.domain.enumtype.*;
+import com.runninghi.runninghibackv2.domain.repository.*;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +54,7 @@ public class PostService {
     private final ImageService imageService;
     private final MemberRepository memberRepository;
     private final PostQueryRepository postQueryRepository;
-    private final MemberChallengeRepository memberChallengeRepository;
+    private final ChallengeQueryRepository challengeQueryRepository;
     private final RecordService recordService;
     private final AlarmService alarmService;
 
@@ -264,7 +258,6 @@ public class PostService {
 
             int nowLevel = member.getRunDataVO().getLevel();
 
-            updateRecordOfMyChallenges(member, gpsDataVO);
             recordService.createRecord(member, gpsDataVO);
             member.getRunDataVO().updateTotalDistanceKcalAndLevel(gpsDataVO.getDistance(), gpsDataVO.getKcal());
 
@@ -291,6 +284,9 @@ public class PostService {
                     .status(false)
                     .postTitle(createPostTitle(gpsDataVO))
                     .build());
+
+            updateRecordOfMemberChallenges(memberNo, gpsDataVO);
+
             return new CreateRecordResponse(createdPost.getPostNo());
         } catch (Exception e) {
             log.error("GPS 기록 생성 중 오류 발생. 회원번호: {}", memberNo, e);
@@ -306,7 +302,7 @@ public class PostService {
         postChecker.checkPostValidation(request.postContent());
 
         Post post = postRepository.findById(request.postNo())
-                        .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(EntityNotFoundException::new);
 
         postChecker.isWriter(memberNo, post.getMember().getMemberNo());
 
@@ -377,19 +373,22 @@ public class PostService {
         post.resetReportedCount();
     }
 
-    private void updateRecordOfMyChallenges(Member member, GpsDataVO gpsDataVO) {
-        List<MemberChallenge> myChallenges = memberChallengeRepository.findByMember(member);
+    private void updateRecordOfMemberChallenges(Long memberNo, GpsDataVO gpsDataVO) {
+        Member member = memberRepository.findByMemberNo(memberNo);
 
-        if (myChallenges.isEmpty()) return;
+        List<MemberChallenge> memberChallenges =
+                challengeQueryRepository.findMemberChallengesByStatus(memberNo, ChallengeStatus.IN_PROGRESS);
+
+        if (memberChallenges.isEmpty()) return;
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = now.toLocalDate().atTime(LocalTime.MAX);
 
-        for (MemberChallenge myChallenge : myChallenges) {
+        for (MemberChallenge myChallenge : memberChallenges) {
             if (myChallenge.getChallenge().getChallengeCategory() == ChallengeCategory.ATTENDANCE) {
-                Optional<Post> post = postRepository.findFirstByMemberAndCreateDateBetween(member, startOfDay, endOfDay);
-                if (post.isEmpty()) {
+                List<Post> postList = postRepository.findByMemberAndCreateDateBetween(member, startOfDay, endOfDay);
+                if (postList.size() == 1) {
                     myChallenge.updateRecord();
                 }
                 continue;
@@ -397,7 +396,4 @@ public class PostService {
             myChallenge.updateRecord(gpsDataVO);
         }
     }
-
-
-
 }
