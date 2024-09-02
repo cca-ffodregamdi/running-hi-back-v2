@@ -18,6 +18,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - uses: actions/checkout@v3
@@ -40,9 +41,11 @@ jobs:
       - name: Setup application.yml
         run: |
           mkdir -p ./src/main/resources
-          touch ./src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
         shell: bash
+
+      - name: Setup application-dev.yml
+        run: echo "${{ secrets.DEV_APPLICATION_YML }}" > ./src/main/resources/application-dev.yml
 
       ## firebase sdk 설정
       - name: create-json
@@ -69,16 +72,16 @@ jobs:
         run: chmod +x gradlew
 
       - name: Test with Gradle
-        run: ./gradlew --info test
+        run: ./gradlew --info test -Dspring.profiles.active=dev
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
-          arguments: build
+          arguments: build -Dspring.profiles.active=dev
 
       ## docker upload image
       - name: docker image build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }} --build-arg PROFILE=dev .
 
       # DockerHub Login
       - name: docker login
@@ -89,4 +92,7 @@ jobs:
 
       # Docker Hub push
       - name: docker Hub push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
