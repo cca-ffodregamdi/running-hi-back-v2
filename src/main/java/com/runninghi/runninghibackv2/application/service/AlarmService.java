@@ -62,7 +62,7 @@ public class AlarmService {
         return alarmResponseList;
     }
 
-    public void createPushAlarm(CreateAlarmRequest request) throws FirebaseMessagingException {
+    public void createPushAlarm(CreateAlarmRequest request) {
 
         Member member = memberRepository.findByMemberNo(request.getTargetMemberNo());
         Alarm alarm = Alarm.builder()

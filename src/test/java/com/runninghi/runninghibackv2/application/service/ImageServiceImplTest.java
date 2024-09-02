@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.runninghi.runninghibackv2.common.exception.custom.CustomEntityNotFoundException;
 import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
@@ -190,7 +191,7 @@ class ImageServiceImplTest {
         when(imageRepository.findImageByImageUrl(imageUrl)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(EntityNotFoundException.class, () -> {
+        assertThrows(CustomEntityNotFoundException.class, () -> {
             imageService.deleteImageFromDB(imageUrl);
         });
 

@@ -61,8 +61,9 @@ public class PostService {
     private final JPAQueryFactory jpaQueryFactory;
     private final GpsCoordinateExtractor gpsCoordinateExtractor;
     private final PostQueryRepository postQueryRepository;
-    private final ChallengeQueryRepository challengeQueryRepository;
+    private final MemberChallengeRepository memberChallengeRepository;
     private final RecordService recordService;
+    private final ChallengeQueryRepository challengeQueryRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
