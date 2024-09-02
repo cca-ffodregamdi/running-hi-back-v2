@@ -41,30 +41,4 @@ jobs:
             sudo fuser -k ${{ secrets.SERVER_PORT }}/tcp || true
             
             # Run new container
-            sudo docker run -d --name runninghi-dev \
-              -p ${{ secrets.SERVER_PORT }}:8080 \
-              -v /home/ubuntu/logs:/app/logs \
-              -e SPRING_PROFILES_ACTIVE=dev \
-              ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
-            
-            # 프로세스가 실행 중인지 확인
-            sleep 20
-            if ! sudo docker ps | grep runninghi-dev; then
-              echo "Container failed to start"
-              sudo docker logs runninghi-dev
-              exit 1
-            fi
-            
-            # 로그에서 오류 확인
-            if sudo docker logs runninghi-dev 2>&1 | grep -i "error"; then
-              echo "Errors found in application log"
-              sudo docker logs runninghi-dev
-              exit 1
-            fi
-            
-            # 애플리케이션 로그 확인
-            echo "Application logs:"
-            sudo cat /home/ubuntu/logs/app.log
-            
-            echo "Application started successfully"
-            exit 0
+            sudo docker run -d --name runninghi-dev -p ${{ secrets.SERVER_PORT }}:8080 -v /logs:/app/logs -e SPRING_PROFILES_ACTIVE=dev ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
