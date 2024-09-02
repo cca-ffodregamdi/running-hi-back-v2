@@ -18,4 +18,4 @@ ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
 
 # jar 파일 실행 및 로그 입출력 지정 명령
-ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -jar app.jar > /app/logs/app.log 2>&1"]
+ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=dev -jar app.jar > /app/logs/app.log 2>&1"]
