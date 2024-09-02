@@ -1,13 +1,13 @@
 package com.runninghi.runninghibackv2.application.controller;
 
-import com.runninghi.runninghibackv2.application.dto.memberchallenge.request.CreateMemberChallengeRequest;
+import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.request.UpdateChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.challenge.response.*;
+import com.runninghi.runninghibackv2.application.dto.memberchallenge.request.CreateMemberChallengeRequest;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.CreateMemberChallengeResponse;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetAllMemberChallengeResponse;
 import com.runninghi.runninghibackv2.application.dto.memberchallenge.response.GetMemberChallengeResponse;
 import com.runninghi.runninghibackv2.application.service.ChallengeService;
-import com.runninghi.runninghibackv2.application.dto.challenge.request.CreateChallengeRequest;
 import com.runninghi.runninghibackv2.application.service.MemberChallengeService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.annotations.HasAccess;
@@ -16,6 +16,8 @@ import com.runninghi.runninghibackv2.domain.enumtype.ChallengeStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,9 +42,12 @@ public class ChallengeController {
     @HasAccess
     @PostMapping()
     public ResponseEntity<ApiResult<CreateChallengeResponse>> createChallenge(
-            @RequestBody CreateChallengeRequest request) {
+            @ModelAttribute CreateChallengeRequest request,
+            @RequestHeader(name = "Authorization") String bearerToken) {
 
-        CreateChallengeResponse response = challengeService.createChallenge(request);
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(bearerToken);
+
+        CreateChallengeResponse response = challengeService.createChallenge(request, memberNo);
 
         return ResponseEntity.ok(ApiResult.success("챌린지 저장 성공", response));
     }
