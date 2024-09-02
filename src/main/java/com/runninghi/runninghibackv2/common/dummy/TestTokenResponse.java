@@ -7,4 +7,8 @@ public record TestTokenResponse(
     public static TestTokenResponse from(TokensAndInfo admin, TokensAndInfo user) {
         return new TestTokenResponse(admin, user);
     }
+
+    public static TestTokenResponse from(TokensAndInfo user) {
+        return new TestTokenResponse(null, user);
+    }
 }

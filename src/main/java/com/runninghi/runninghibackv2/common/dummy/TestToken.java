@@ -15,7 +15,9 @@ import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -27,6 +29,38 @@ public class TestToken {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final TestMemberRepository testMemberRepository;
+
+    @GetMapping("/test/app-review")
+    public ResponseEntity<ApiResult<TestReviewerResponse>> checkVersion(@RequestParam("ver") String version) {
+
+        String userName = "유저 : 테스트 계정 이름";
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        Point point = geometryFactory.createPoint(new Coordinate(127.543, 36.9876));
+
+        if (Double.parseDouble(version) > 0.0) {
+            Member user = testMemberRepository.findByName(userName)
+                    .orElseGet(() -> {
+                        Member newUser = Member.builder()
+                                .alarmConsent(true)
+                                .kakaoId("67890")
+                                .name(userName)
+                                .nickname(userName)
+                                .isActive(true)
+                                .role(Role.USER)
+                                .runDataVO(new RunDataVO(0.0, 0.0, 2, 1))
+                                .geometry(point)
+                                .build();
+                        testMemberRepository.saveAndFlush(newUser);
+                        return newUser;
+                    });
+
+            TestReviewerResponse response = createTokens(user);
+            return ResponseEntity.ok(ApiResult.success("테스터 토큰 발급 완료", response));
+        } else {
+            return ResponseEntity.ok(ApiResult.success("테스터가 아닙니다.", new TestReviewerResponse(false, null)));
+        }
+    }
+
 
     @PostMapping("/test/token")
     public ResponseEntity<ApiResult<TestTokenResponse>> getTokens() {
@@ -103,6 +137,29 @@ public class TestToken {
         TokensAndInfo userTokensAndInfo = TokensAndInfo.from(user, userAccessToken, userRefreshToken);
 
         return TestTokenResponse.from(adminTokensAndInfo, userTokensAndInfo);
+    }
+
+
+    private TestReviewerResponse createTokens(Member user) {
+        List<Member> members = new ArrayList<>();
+
+        members.add(user);
+
+        AccessTokenInfo userTokenInfo = AccessTokenInfo.from(user);
+
+        String userAccessToken = jwtTokenProvider.createAccessToken(userTokenInfo);
+
+        RefreshTokenInfo userRefreshTokenInfo = RefreshTokenInfo.from(user);
+
+        String userRefreshToken = jwtTokenProvider.createRefreshToken(userRefreshTokenInfo);
+
+        user.updateRefreshToken(userRefreshToken);
+
+        saveAllAndFlushMembers(members);
+
+        TokensAndInfo userTokensAndInfo = TokensAndInfo.from(user, userAccessToken, userRefreshToken);
+
+        return TestReviewerResponse.from(true, userTokensAndInfo);
     }
 
     private void saveAllAndFlushMembers(List<Member> members) {
