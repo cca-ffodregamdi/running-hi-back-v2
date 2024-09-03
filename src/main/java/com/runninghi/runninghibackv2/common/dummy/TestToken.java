@@ -31,13 +31,16 @@ public class TestToken {
     private final TestMemberRepository testMemberRepository;
 
     @GetMapping("/test/app-review")
-    public ResponseEntity<ApiResult<TestReviewerResponse>> checkVersion(@RequestParam("ver") String version) {
+    public ResponseEntity<ApiResult<TestReviewerResponse>> checkVersion(@RequestParam("ver") String version) {  //1.0.1
+
+        String[] versionParts = version.split("\\.");
+        String minorVersion = versionParts[versionParts.length - 2] + "." + versionParts[versionParts.length - 1];
 
         String userName = "유저 : 테스트 계정 이름";
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Point point = geometryFactory.createPoint(new Coordinate(127.543, 36.9876));
 
-        if (Double.parseDouble(version) > 0.0) {
+        if (Double.parseDouble(minorVersion) > 0.0) {
             Member user = testMemberRepository.findByName(userName)
                     .orElseGet(() -> {
                         Member newUser = Member.builder()
