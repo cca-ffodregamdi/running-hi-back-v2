@@ -110,7 +110,7 @@ public class PostService {
                     mainData = gpsDataVO.getKcal() + "Kcal";
                     break;
                 case 3:
-                    mainData = gpsDataVO.getMeanPace() + "' " + gpsDataVO.getMeanPace()%60 + "\"";
+                    mainData = gpsDataVO.getMeanPace()/60 + "' " + gpsDataVO.getMeanPace()%60 + "\"";
                     break;
                 case 4:
                     break;
