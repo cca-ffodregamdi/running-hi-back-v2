@@ -36,6 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -95,11 +96,12 @@ public class PostService {
 
     private String getMainData(int dataNo, GpsDataVO gpsDataVO) {
         String mainData = null;
+        DecimalFormat df = new DecimalFormat("#.##");
 
         try {
             switch (dataNo) {
                 case 0:
-                    mainData = gpsDataVO.getDistance() + "km";
+                    mainData = df.format(gpsDataVO.getDistance()) + "km";
                     break;
                 case 1:
                     mainData = gpsDataVO.getTime()/60 + "분 " + gpsDataVO.getTime()%60 + "초";
@@ -108,7 +110,7 @@ public class PostService {
                     mainData = gpsDataVO.getKcal() + "Kcal";
                     break;
                 case 3:
-                    mainData = gpsDataVO.getMeanPace()/60 + "' " + gpsDataVO.getMeanPace()%60 + "\"";
+                    mainData = gpsDataVO.getMeanPace() + "' " + gpsDataVO.getMeanPace()%60 + "\"";
                     break;
                 case 4:
                     break;
