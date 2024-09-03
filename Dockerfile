@@ -7,10 +7,7 @@ FROM openjdk:17-jdk
 WORKDIR /app
 
 # Log 파일 저장 디렉토리 생성
-RUN mkdir -p /app/logs
-
-ARG PROFILE
-ENV SPRING_PROFILES_ACTIVE=$PROFILE
+RUN mkdir -p /app/logsㄴ
 
 # 인자 정리 -jar
 ARG JAR_FILE=build/libs/*.jar
@@ -19,4 +16,4 @@ ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
 
 # jar 파일 실행 및 로그 입출력 지정 명령
-ENTRYPOINT ["sh", "-c", "echo Using profile: ${SPRING_PROFILES_ACTIVE} && java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -jar app.jar > /app/logs/app.log 2>&1"]
+ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -jar app.jar > /app/logs/app.log 2>&1"]
