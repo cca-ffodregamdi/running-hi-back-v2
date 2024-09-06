@@ -178,7 +178,7 @@ public class PostService {
                 .locationName(runInfoNode.get("location").asText())
                 .startPoint(startPoint)
                 .runStartTime(LocalDateTime.parse(runInfoNode.get("runStartDate").asText()))
-                .distance((float) runInfoNode.get("distance").asDouble())
+                .distance(Math.round(runInfoNode.get("distance").asDouble() * 100) / 100.0f)
                 .time(runInfoNode.get("time").asInt())
                 .kcal(runInfoNode.get("kcal").asInt())
                 .meanPace(runInfoNode.get("meanPace").asInt())
