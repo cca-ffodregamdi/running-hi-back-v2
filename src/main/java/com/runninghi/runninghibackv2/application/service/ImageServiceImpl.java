@@ -164,22 +164,27 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void updateImage(ImageTarget target, Long targetNo, String newImageUrl) {
+        Image image = imageRepository.findImageByTargetNoAndImageTarget(targetNo, target)
+                .orElse(null);
 
-        // 이미지 유효성 검증
-        String filename = imageChecker.getFileNameFromUrl(newImageUrl);
-        imageChecker.checkImageFile(filename);
-
-        Image image = getImageByImageTargetAndTargetNo(target, targetNo);
-        String currentImageUrl = image.getImageUrl();
-
-        if (imageChecker.isSameImage(currentImageUrl, newImageUrl)) {
+        if (image == null || imageChecker.isSameImage(image.getImageUrl(), newImageUrl)) {
             return;
         }
 
-        deleteImageFromStorage(currentImageUrl);
+        if (!newImageUrl.isBlank()) {
+            imageChecker.checkImageFile(imageChecker.getFileNameFromUrl(newImageUrl));
+        }
+
+        deleteImageFromStorage(image.getImageUrl());
         image.updateImageUrl(newImageUrl);
+
+        if (newImageUrl.isBlank()) {
+            imageRepository.delete(image);
+        }
+
         log.info("{} - {}의 이미지가 변경되었습니다.", image.getImageTarget(), targetNo);
     }
+
 
     @Override
     public byte[] resizeImage(MultipartFile multipartFile) throws IOException {
