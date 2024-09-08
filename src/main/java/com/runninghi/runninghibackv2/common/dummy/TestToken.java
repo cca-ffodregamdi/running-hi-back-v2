@@ -8,10 +8,12 @@ import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class TestToken {
@@ -30,17 +33,32 @@ public class TestToken {
     private final JwtTokenProvider jwtTokenProvider;
     private final TestMemberRepository testMemberRepository;
 
+    @Value("${runninghi.version}")
+    private String currentVersion;
+
     @GetMapping("/test/app-review")
     public ResponseEntity<ApiResult<TestReviewerResponse>> checkVersion(@RequestParam("ver") String version) {  //1.0.1
 
         String[] versionParts = version.split("\\.");
-        String minorVersion = versionParts[versionParts.length - 2] + "." + versionParts[versionParts.length - 1];
+        String[] currentVersionParts = currentVersion.split("\\.");
+
+        StringBuilder targetVersion = new StringBuilder();
+        StringBuilder targetCurrentVersion = new StringBuilder();
+        int arrayLength = currentVersionParts.length;
+        for ( int i = 0; i < arrayLength; i++ ) {
+            targetVersion.append(versionParts[i]);
+            targetCurrentVersion.append(currentVersionParts[i]);
+        }
+//        String minorVersion = versionParts[versionParts.length - 2] + "." + versionParts[versionParts.length - 1];
 
         String userName = "유저 : 테스트 계정 이름";
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Point point = geometryFactory.createPoint(new Coordinate(127.543, 36.9876));
 
-        if (Double.parseDouble(minorVersion) > 0.0) {
+        System.out.println(Integer.parseInt(targetVersion.toString()));
+        System.out.println(Integer.parseInt(targetCurrentVersion.toString()));
+        System.out.println(Integer.parseInt(targetVersion.toString()) > Integer.parseInt(targetCurrentVersion.toString()));
+        if (Integer.parseInt(targetVersion.toString()) > Integer.parseInt(targetCurrentVersion.toString())) {
             Member user = testMemberRepository.findByName(userName)
                     .orElseGet(() -> {
                         Member newUser = Member.builder()
