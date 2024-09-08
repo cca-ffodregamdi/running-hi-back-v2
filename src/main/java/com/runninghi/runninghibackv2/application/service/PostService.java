@@ -336,8 +336,6 @@ public class PostService {
         try {
             post.update(request, mainData);
             if (request.imageUrl().isBlank()) {
-                imageService.deleteImageFromDBByImageTargetAndTargetNo(ImageTarget.POST, postNo);
-            } else {
                 imageService.updateImage(ImageTarget.POST, postNo, request.imageUrl());
             }
         } catch (Exception e) {
