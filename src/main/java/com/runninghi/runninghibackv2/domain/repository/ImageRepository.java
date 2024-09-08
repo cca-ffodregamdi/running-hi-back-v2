@@ -1,5 +1,6 @@
 package com.runninghi.runninghibackv2.domain.repository;
 
+import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,8 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     Optional<Image> findImageByImageUrl(String imageUrl);
 
     Optional<Image> findImageByTargetNo(Long targetNo);
+
+    Optional<Image> findImageByTargetNoAndImageTarget(Long targetNo, ImageTarget target);
 
     @Query("DELETE FROM Image i WHERE i.imageUrl IN :imageUrls")
     @Modifying

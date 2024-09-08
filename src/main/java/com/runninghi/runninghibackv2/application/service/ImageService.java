@@ -15,10 +15,10 @@ public interface ImageService {
     void saveImage(String imageUrl);
     void saveTargetNo(List<String> imageUrlList, ImageTarget imageTarget, Long targetNo);
     void saveTargetNo(String imageUrl, ImageTarget imageTarget, Long targetNo);
-    void updateImage(Long targetNo, String imageUrl);
+    void updateImage(ImageTarget target, Long targetNo, String imageUrl);
     byte[] resizeImage(MultipartFile multipartFile) throws IOException;
     void deleteImageList(List<String> imageUrlList);
     void deleteImageFromStorage(String imageUrl);
     void deleteImageFromDB(String imageUrl);
-
+    void deleteImageFromDBByImageTargetAndTargetNo(ImageTarget target, Long targetNo);
 }

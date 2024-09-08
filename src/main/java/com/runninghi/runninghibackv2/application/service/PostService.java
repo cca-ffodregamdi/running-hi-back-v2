@@ -335,7 +335,11 @@ public class PostService {
 
         try {
             post.update(request, mainData);
-            imageService.updateImage(postNo, request.imageUrl());
+            if (request.imageUrl().isBlank()) {
+                imageService.deleteImageFromDBByImageTargetAndTargetNo(ImageTarget.POST, postNo);
+            } else {
+                imageService.updateImage(ImageTarget.POST, postNo, request.imageUrl());
+            }
         } catch (Exception e) {
             log.error("게시글 수정 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, postNo, e);
             throw e;
