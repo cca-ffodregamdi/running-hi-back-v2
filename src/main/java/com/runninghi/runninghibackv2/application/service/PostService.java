@@ -14,6 +14,7 @@ import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.MemberChallenge;
 import com.runninghi.runninghibackv2.domain.entity.Post;
+import com.runninghi.runninghibackv2.domain.entity.Record;
 import com.runninghi.runninghibackv2.domain.entity.vo.GpsDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.*;
 import com.runninghi.runninghibackv2.domain.repository.*;
@@ -259,8 +260,6 @@ public class PostService {
             String gpsUrl = uploadGpsToS3(file, member.getMemberNo().toString());
 
             int nowLevel = member.getRunDataVO().getLevel();
-
-            recordService.createRecord(member, gpsDataVO);
             member.getRunDataVO().updateTotalDistanceKcalAndLevel(gpsDataVO.getDistance(), gpsDataVO.getKcal());
 
             int updateLevel = member.getRunDataVO().getLevel();
@@ -286,7 +285,7 @@ public class PostService {
                     .status(false)
                     .postTitle(createPostTitle(gpsDataVO))
                     .build());
-
+            recordService.createRecord(member, gpsDataVO, createdPost.getPostNo());
             updateRecordOfMemberChallenges(memberNo, gpsDataVO);
 
             return new CreateRecordResponse(createdPost.getPostNo());
@@ -355,6 +354,7 @@ public class PostService {
 
         try {
             postRepository.deleteById(postNo);
+            recordService.deleteRecord(postNo);
         } catch (Exception e) {
             log.error("게시글 삭제 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, postNo, e);
             throw e;
