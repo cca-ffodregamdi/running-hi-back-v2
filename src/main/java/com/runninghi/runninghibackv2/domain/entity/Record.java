@@ -46,13 +46,18 @@ public class Record {
     @Comment("날짜")
     private LocalDate date;
 
+    @Column
+    @Comment(value = "POST 엔티티 식별 값")
+    private Long targetNo;
+
     @Builder
-    public Record(Member member, Float distance, int time, int meanPaceSec, int kcal, LocalDate date) {
+    public Record(Member member, Float distance, int time, int meanPaceSec, int kcal, LocalDate date, Long targetNo) {
         this.member = member;
         this.distance = distance;
         this.time = time;
         this.meanPaceSec = meanPaceSec;
         this.kcal = kcal;
         this.date = date;
+        this.targetNo = targetNo;
     }
 }
