@@ -245,6 +245,7 @@ public class MemberService {
         if (memberChecker.isCustomProfileImage(currentProfileImageUrl, defaultProfileImageUrl)) {
             try {
                 // cloud starage의 이미지 삭제 로직
+                imageService.deleteImageFromDB(currentProfileImageUrl);
                 imageService.deleteImageFromStorage(currentProfileImageUrl);
                 log.info("기존 프로필 이미지 삭제 완료: {}", currentProfileImageUrl);
             } catch (Exception e) {

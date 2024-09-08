@@ -62,6 +62,16 @@ public class ImageServiceImpl implements ImageService {
         return image;
     }
 
+    private Image getImageByImageTargetAndTargetNo(ImageTarget target, Long targetNo) {
+        Image image = imageRepository.findImageByTargetNoAndImageTarget(targetNo, target)
+                .orElseThrow(() -> {
+                    log.error("DB에 존재하지 않는 이미지입니다. target: {}, targetNo: {}", target, targetNo);
+                    return new CustomEntityNotFoundException(ENTITY_NOT_FOUND_MESSAGE);
+                });
+        log.info("성공적으로 이미지를 조회하였습니다. targetNo: {}", targetNo);
+        return image;
+    }
+
     /**
      * 이미지를 단순히 S3에 업로드하고 반환된 url을 String 형태로 반환해주는 메서드입니다.
      *
@@ -153,13 +163,13 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void updateImage(Long targetNo, String newImageUrl) {
+    public void updateImage(ImageTarget target, Long targetNo, String newImageUrl) {
 
         // 이미지 유효성 검증
         String filename = imageChecker.getFileNameFromUrl(newImageUrl);
         imageChecker.checkImageFile(filename);
 
-        Image image = getImageByTargetNo(targetNo);
+        Image image = getImageByImageTargetAndTargetNo(target, targetNo);
         String currentImageUrl = image.getImageUrl();
 
         if (imageChecker.isSameImage(currentImageUrl, newImageUrl)) {
@@ -239,6 +249,13 @@ public class ImageServiceImpl implements ImageService {
         Image image = getImageByImageUrl(imageUrl);
         imageRepository.delete(image);
         log.info("{} 이미지가 DB에서 삭제되었습니다.", imageUrl);
+    }
+
+    @Override
+    public void deleteImageFromDBByImageTargetAndTargetNo(ImageTarget target, Long targetNo) {
+        Image image = getImageByImageTargetAndTargetNo(target, targetNo);
+        imageRepository.delete(image);
+        log.info("{} 이미지가 DB에서 삭제되었습니다.", image.getImageUrl());
     }
 
     @Scheduled(cron = "0 0 1 * * ?") // 매일 새벽 1시에 실행
