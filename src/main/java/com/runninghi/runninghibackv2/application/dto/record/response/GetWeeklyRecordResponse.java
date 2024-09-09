@@ -13,7 +13,7 @@ public record GetWeeklyRecordResponse(
         @Schema(description = "1주 동안 달린 전체 시간 (초 단위)", example = "21600")
         int totalTime,
         @Schema(description = "1주 평균 페이스 (초 단위)", example = "300")
-        int totalMeanPace,
+        int meanPace,
         @Schema(description = "1주 동안 소모한 전체 칼로리", example = "800")
         int totalKcal,
         @Schema(description = "해당 날짜 구간에 해당하는 기록")

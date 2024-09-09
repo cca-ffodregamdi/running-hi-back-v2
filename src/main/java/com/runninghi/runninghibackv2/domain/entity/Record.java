@@ -36,7 +36,7 @@ public class Record {
 
     @Column
     @Comment("평균 페이스")
-    private int meanPaceSec;
+    private int meanPace;
 
     @Column
     @Comment("소모 칼로리")
@@ -51,11 +51,11 @@ public class Record {
     private Long targetNo;
 
     @Builder
-    public Record(Member member, Float distance, int time, int meanPaceSec, int kcal, LocalDate date, Long targetNo) {
+    public Record(Member member, Float distance, int time, int meanPace, int kcal, LocalDate date, Long targetNo) {
         this.member = member;
         this.distance = distance;
         this.time = time;
-        this.meanPaceSec = meanPaceSec;
+        this.meanPace = meanPace;
         this.kcal = kcal;
         this.date = date;
         this.targetNo = targetNo;

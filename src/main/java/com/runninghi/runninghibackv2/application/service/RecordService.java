@@ -27,7 +27,7 @@ public class RecordService {
         Record runRecord = Record.builder()
                 .member(member)
                 .kcal(recordData.getKcal())
-                .meanPaceSec(recordData.getMeanPace())
+                .meanPace(recordData.getMeanPace())
                 .distance(recordData.getDistance())
                 .time(recordData.getTime())
                 .date(LocalDate.from(recordData.getRunStartTime()))
