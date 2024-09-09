@@ -14,7 +14,8 @@
 
 ## 👟 1. TECH STACK
 
-![Slide 16_9 - 1](https://github.com/user-attachments/assets/b9ebc5c4-0722-4c18-a2fb-e33111b7a28d)
+![fianl](https://github.com/user-attachments/assets/d9bc2737-dad9-4124-b029-9717f229136e)
+
 
 
 <br/><br/>
