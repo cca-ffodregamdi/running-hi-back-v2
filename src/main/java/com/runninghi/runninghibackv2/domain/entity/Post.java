@@ -62,12 +62,18 @@ public class Post extends BaseTimeEntity {
     private String gpsUrl;
 
     @Column
+    @Nullable
+    @Comment("메인페이지 대표 데이터 타입")
+    private Integer mainDataType;
+
+    @Column
+    @Nullable
     @Comment("메인페이지 표시 대표 데이터")
     private String mainData;
 
     @Builder
     public Post(Member member, @Nullable String postContent, Role role, String locationName,
-                Point geometry, Boolean status, String gpxUrl, GpsDataVO gpsDataVO, String mainData, String postTitle) {
+                Point geometry, Boolean status, String gpxUrl, GpsDataVO gpsDataVO, String mainData, int mainDataType, String postTitle) {
         this.member = member;
         this.postContent = postContent;
         this.reportCnt = 0;
@@ -76,13 +82,15 @@ public class Post extends BaseTimeEntity {
         this.gpsUrl = gpxUrl;
         this.gpsDataVO = gpsDataVO;
         this.mainData = mainData;
+        this.mainDataType = mainDataType;
         this.postTitle = postTitle;
     }
 
-    public void shareToPost(CreatePostRequest request, String mainData) {
+    public void shareToPost(CreatePostRequest request, String mainData, int mainDataType) {
         this.postContent = request.postContent();
         this.status = true;
         this.mainData = mainData;
+        this.mainDataType = mainDataType;
     }
 
     public void update(UpdatePostRequest request, String mainData) {

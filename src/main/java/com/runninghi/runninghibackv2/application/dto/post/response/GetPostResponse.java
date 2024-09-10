@@ -47,7 +47,9 @@ public record GetPostResponse(
         @Schema(description = "좋아요 여부", example = "true")
         Boolean isBookmarked,
         @Schema(description = "GPS txt URL", example = "https://picsum.photos/200")
-        String gpsUrl
+        String gpsUrl,
+        @Schema(description = "메인 데이터 타입", example = "0")
+        Integer mainData
 ) {
     public static GetPostResponse from(Post post, String imageUrl, Long likeCnt,Long bookmarkCnt, Long replyCnt, Boolean isOwner, Boolean isLiked, Boolean isBookmarked) {
         return new GetPostResponse(
@@ -70,7 +72,8 @@ public record GetPostResponse(
                 post.getGpsDataVO().getDifficulty().toString(),
                 isLiked,
                 isBookmarked,
-                post.getGpsUrl()
+                post.getGpsUrl(),
+                (!post.getStatus()) ? null : post.getMainDataType()
         );
     }
 }
