@@ -63,7 +63,7 @@
 <br/><br/>
 
 
-## 👟 4. TEAM RULES
+## 👟 4. COLABORATION
 
 #### 1️⃣ [기획과 이벤트 스토밍](https://github.com/cca-ffodregamdi/running-hi-back-v2/wiki/%EA%B8%B0%ED%9A%8D%EA%B3%BC-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EC%8A%A4%ED%86%A0%EB%B0%8D)
 
