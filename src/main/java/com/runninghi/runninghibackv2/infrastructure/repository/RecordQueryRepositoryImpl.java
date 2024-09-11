@@ -72,7 +72,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
 
         List<GetRecordPostResponse> postList = postQueryRepository.findWeeklyRecord(memberNo, date);
 
-        return new GetWeeklyRecordResponse(weeklyRecordData, totalTime, overallMeanPace, totalKcal, postList);
+        return new GetWeeklyRecordResponse(weeklyRecordData, records.size(), totalTime, overallMeanPace, totalKcal, postList);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
 
         List<GetRecordPostResponse> postList = postQueryRepository.findMonthlyRecord(memberNo, date);
 
-        return new GetMonthlyRecordResponse(dailyRecordData, totalTime, overallMeanPace, totalKcal, postList);
+        return new GetMonthlyRecordResponse(dailyRecordData, records.size(), totalTime, overallMeanPace, totalKcal, postList);
     }
 
     @Override
@@ -168,6 +168,6 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
 
         List<GetRecordPostResponse> postList = postQueryRepository.findYearlyRecord(memberNo, date);
 
-        return new GetYearlyRecordResponse(monthlyRecordData, totalTime, overallMeanPace, totalKcal, postList);
+        return new GetYearlyRecordResponse(monthlyRecordData,  records.size(), totalTime, overallMeanPace, totalKcal, postList);
     }
 }
