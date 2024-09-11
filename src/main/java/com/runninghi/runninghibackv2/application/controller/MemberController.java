@@ -547,21 +547,21 @@ public class MemberController {
      * 사용자의 약관 동의 여부를 조회하는 API입니다.
      *
      * <p>이 API는 사용자의 약관 동의 여부를 조회합니다. 클라이언트는 사용자 ID를 요청 파라미터로 전달해야 합니다.</p>
-     * @param token 사용자 인증을 위한 Bearer 토큰. 요청 헤더에서 'Authorization'으로 제공되어야 합니다. 필수 파라미터입니다.
+     * @param memberNo 사용자 식별 값을 위한 memberNo
      * @return ResponseEntity 객체를 통해 ApiResult 타입의 응답을 반환합니다. 약관 동의 여부(Boolean)가 응답 본문에 포함됩니다.
      */
-    @GetMapping(value = "/api/v1/member/terms-agreement", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/v1/member/terms-agreement/{memberNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "약관 동의 여부 조회",
             description = "사용자의 약관 동의 여부를 조회합니다. " +
                     "클라이언트는 Authorization 헤더에 Bearer 토큰을 포함하여 해당 엔드포인트를 호출해야 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "약관 동의 여부 조회 성공")
     })
-    public ResponseEntity<ApiResult<GetIsTermsAgreedResponse>> getTermsAgreement(@RequestHeader(value = "Authorization") String token) {
-        log.info("약관 동의 여부 조회 요청: 토큰 = {}", token);
+    public ResponseEntity<ApiResult<GetIsTermsAgreedResponse>> getTermsAgreement(@PathVariable(value = "memberNo") Long memberNo) {
+//        log.info("약관 동의 여부 조회 요청: 토큰 = {}", token);
 
-        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
-        log.debug("추출된 멤버 번호: {}", memberNo);
+//        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+//        log.debug("추출된 멤버 번호: {}", memberNo);
 
         GetIsTermsAgreedResponse response = memberService.getTermsAgreement(memberNo);
 
