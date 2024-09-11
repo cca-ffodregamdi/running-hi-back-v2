@@ -21,9 +21,7 @@ public class Notice extends BaseTimeEntity {
     @Comment("공지사항 제목")
     private String title;
 
-
-    @Lob
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "varchar(1000)", nullable = false)
     @Comment("공지사항 내용 (Base64 인코딩된 이미지 포함 가능)")
     private String content;
 

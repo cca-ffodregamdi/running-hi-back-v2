@@ -105,13 +105,13 @@ public class PostService {
                     mainData = df.format(gpsDataVO.getDistance()) + "km";
                     break;
                 case 1:
-                    mainData = gpsDataVO.getTime()/60 + "분 " + gpsDataVO.getTime()%60 + "초";
+                    mainData = gpsDataVO.getTime() / 60 + "분 " + gpsDataVO.getTime() % 60 + "초";
                     break;
                 case 2:
                     mainData = gpsDataVO.getKcal() + "Kcal";
                     break;
                 case 3:
-                    mainData = gpsDataVO.getMeanPace()/60 + "' " + gpsDataVO.getMeanPace()%60 + "\"";
+                    mainData = gpsDataVO.getMeanPace() / 60 + "' " + gpsDataVO.getMeanPace() % 60 + "\"";
                     break;
                 case 4:
                     break;
@@ -148,11 +148,12 @@ public class PostService {
             String content = reader.lines().collect(Collectors.joining("\n"));
             log.info("런데이터 GPS 파일 읽기 완료: {}", LocalDateTime.now());
             return content;
-        }  catch (IOException e) {
+        } catch (IOException e) {
             log.error("런데이터 GPS 파일 읽기 중 오류 발생: {}", LocalDateTime.now(), e);
             throw e;
         }
     }
+
     private List<Integer> getIntegerList(JsonNode node) {
         return StreamSupport.stream(node.spliterator(), false)
                 .map(JsonNode::asInt)
@@ -190,7 +191,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResultData<GetAllPostsResponse>  getPostScroll(Long memberNo, Pageable pageable, String sort) {
+    public PageResultData<GetAllPostsResponse> getPostScroll(Long memberNo, Pageable pageable, String sort) {
         log.info("게시물 전체 조회 요청. 회원번호: {}, 정렬기준: {}", memberNo, sort);
 
         PageResultData<GetAllPostsResponse> result;
@@ -228,18 +229,19 @@ public class PostService {
     @Transactional(readOnly = true)
     public PageResultData<GetMyPostsResponse> getMyPostsScroll(Pageable pageable, Long memberNo) {
         log.info("내 게시물 리스트 조회. 회원번호: {}", memberNo);
-        return  postQueryRepository.findMyPostsByPageable(pageable, memberNo);
+        return postQueryRepository.findMyPostsByPageable(pageable, memberNo);
     }
 
     @Transactional(readOnly = true)
     public PageResultData<GetAllPostsResponse> getMyLikedPosts(Pageable pageable, Long memberNo) {
         log.info("나의 좋아요된 게시글 리스트 조회. 회원번호: {}", memberNo);
-        return  postQueryRepository.findMyLikedPostsByPageable(pageable, memberNo);
+        return postQueryRepository.findMyLikedPostsByPageable(pageable, memberNo);
     }
+
     @Transactional(readOnly = true)
     public PageResultData<GetAllPostsResponse> getMyBookmarkedPosts(Pageable pageable, Long memberNo) {
         log.info("나의 북마크된 게시글 리스트 조회. 회원번호: {}", memberNo);
-        return  postQueryRepository.findMyBookmarkedPostsByPageable(pageable, memberNo);
+        return postQueryRepository.findMyBookmarkedPostsByPageable(pageable, memberNo);
     }
 
     @Transactional(readOnly = true)
@@ -334,9 +336,7 @@ public class PostService {
 
         try {
             post.update(request, mainData);
-            if (request.imageUrl().isBlank()) {
-                imageService.updateImage(ImageTarget.POST, postNo, request.imageUrl());
-            }
+            imageService.updateImage(ImageTarget.POST, postNo, request.imageUrl());
         } catch (Exception e) {
             log.error("게시글 수정 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, postNo, e);
             throw e;

@@ -180,6 +180,7 @@ public class ImageServiceImpl implements ImageService {
 
         if (newImageUrl.isBlank()) {
             imageRepository.delete(image);
+            log.info("{} 이미지가 DB에서 삭제되었습니다.", image.getImageUrl());
         }
 
         log.info("{} - {}의 이미지가 변경되었습니다.", image.getImageTarget(), targetNo);

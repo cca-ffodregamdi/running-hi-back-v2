@@ -79,7 +79,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 "/api/v1/sign-in/**",
                 "/api/v1/sign-up/**",
                 "/sign-in/**",
-                "/sign-up/**"
+                "/sign-up/**",
+                "/api/v1/member/terms-agreement"
         };
         String path = request.getRequestURI();
         AntPathMatcher pathMatcher = new AntPathMatcher();
