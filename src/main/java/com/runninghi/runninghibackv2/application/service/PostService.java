@@ -314,7 +314,7 @@ public class PostService {
         String mainData = getMainData(request.mainData(), post.getGpsDataVO());
 
         try {
-            post.shareToPost(request, mainData);
+            post.shareToPost(request, mainData, request.mainData());
         } catch (Exception e) {
             log.error("게시글 생성 중 오류 발생. 회원번호: {}, 게시글 번호: {}", memberNo, request.postNo(), e);
             throw e;
