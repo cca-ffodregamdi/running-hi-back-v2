@@ -6,6 +6,7 @@ import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
 import com.runninghi.runninghibackv2.domain.service.ImageChecker;
+import io.grpc.Metadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
@@ -19,9 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 @Slf4j
@@ -110,9 +109,33 @@ public class ImageServiceImpl implements ImageService {
 
         dirName += memberNo;
         String key = s3StorageUtils.buildKey(multipartFile, dirName);
-        byte[] resizedImage = resizeImage(multipartFile);
 
-        return s3StorageUtils.uploadFile(resizedImage, key);
+        Map<String, String> metadata = extractMetadata(multipartFile);
+        byte[] processedImage;
+
+        String fileExtension = imageChecker.getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        if (imageChecker.isHeifOrHeic(fileExtension)) {
+            processedImage = multipartFile.getBytes();
+        } else {
+            processedImage = resizeImage(multipartFile);
+        }
+
+        return s3StorageUtils.uploadFileWithMetadata(processedImage, key, metadata);
+    }
+
+    private Map<String, String> extractMetadata(MultipartFile multipartFile) throws IOException {
+        Map<String, String> metadata = new HashMap<>();
+        try {
+            Metadata imageMetadata = ImageMetadataReader.readMetadata(multipartFile.getInputStream());
+            for (Directory directory : imageMetadata.getDirectories()) {
+                for (Tag tag : directory.getTags()) {
+                    metadata.put(tag.getTagName(), tag.getDescription());
+                }
+            }
+        } catch (ImageProcessingException e) {
+            log.warn("메타데이터 추출 중 오류 발생", e);
+        }
+        return metadata;
     }
 
     @Override

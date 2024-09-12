@@ -18,6 +18,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -55,6 +56,31 @@ public class S3StorageUtils {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         objectMetadata.setContentLength(fileContent.length);
+
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent)) {
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, inputStream, objectMetadata);
+            amazonS3Client.putObject(putObjectRequest);
+            log.info("S3에 성공적으로 업로드되었습니다. Bucket: {}, Key: {}", bucketName, key);
+            return amazonS3Client.getUrl(bucketName, key).toString();
+        } catch (IOException e) {
+            log.error("파일 변환 중 오류가 발생하였습니다. Bucket: {}, Key: {}", bucketName, key, e);
+            throw new RuntimeException("파일 변환 중 오류가 발생하였습니다.", e);
+        } catch (AmazonServiceException e) {
+            log.error("S3에 업로드 중 에러가 발생하였습니다. Bucket: {}, Key: {}", bucketName, key, e);
+            throw new RuntimeException("Failed to upload file to S3", e);
+        }
+    }
+
+    public String uploadFileWithMetadata(byte[] fileContent, String key, Map<String, String> metadata) throws IOException {
+        log.info("메타데이터와 함께 이미지를 {}로 업로드합니다.", key);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        objectMetadata.setContentLength(fileContent.length);
+
+        // 사용자 정의 메타데이터 추가
+        for (Map.Entry<String, String> entry : metadata.entrySet()) {
+            objectMetadata.addUserMetadata(entry.getKey(), entry.getValue());
+        }
 
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent)) {
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, inputStream, objectMetadata);
