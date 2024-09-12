@@ -77,9 +77,9 @@ public class S3StorageUtils {
         objectMetadata.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         objectMetadata.setContentLength(fileContent.length);
 
-        // 사용자 정의 메타데이터 추가
-        for (Map.Entry<String, String> entry : metadata.entrySet()) {
-            objectMetadata.addUserMetadata(entry.getKey(), entry.getValue());
+        // 방향 메타데이터만 추가
+        if (metadata.containsKey("Orientation")) {
+            objectMetadata.addUserMetadata("Orientation", metadata.get("Orientation"));
         }
 
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent)) {

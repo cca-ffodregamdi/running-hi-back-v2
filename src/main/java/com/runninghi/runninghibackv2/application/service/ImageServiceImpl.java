@@ -1,12 +1,18 @@
 package com.runninghi.runninghibackv2.application.service;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataException;
+import com.drew.metadata.Tag;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
 import com.runninghi.runninghibackv2.common.exception.custom.CustomEntityNotFoundException;
 import com.runninghi.runninghibackv2.common.utils.S3StorageUtils;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.repository.ImageRepository;
 import com.runninghi.runninghibackv2.domain.service.ImageChecker;
-import io.grpc.Metadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
@@ -123,16 +129,22 @@ public class ImageServiceImpl implements ImageService {
         return s3StorageUtils.uploadFileWithMetadata(processedImage, key, metadata);
     }
 
+    /**
+     * 이미지의 메타데이터를 추출합니다. 다만, 최소한의 정보로 이미지의 방향만을 추출합니다.
+     * @param multipartFile
+     * @return
+     * @throws IOException
+     */
     private Map<String, String> extractMetadata(MultipartFile multipartFile) throws IOException {
         Map<String, String> metadata = new HashMap<>();
         try {
             Metadata imageMetadata = ImageMetadataReader.readMetadata(multipartFile.getInputStream());
-            for (Directory directory : imageMetadata.getDirectories()) {
-                for (Tag tag : directory.getTags()) {
-                    metadata.put(tag.getTagName(), tag.getDescription());
-                }
+            ExifIFD0Directory exifIFD0Directory = imageMetadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+            if (exifIFD0Directory != null && exifIFD0Directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
+                int orientation = exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+                metadata.put("Orientation", String.valueOf(orientation));
             }
-        } catch (ImageProcessingException e) {
+        } catch (ImageProcessingException | MetadataException e) {
             log.warn("메타데이터 추출 중 오류 발생", e);
         }
         return metadata;
@@ -217,15 +229,12 @@ public class ImageServiceImpl implements ImageService {
         String fileExtension = imageChecker.getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         log.info("fileExtension: {}", fileExtension);
 
-        // HEIC/HEIF 파일은 리사이징하지 않고 그대로 반환
-        if (imageChecker.isHeifOrHeic(fileExtension)) {
-            return multipartFile.getBytes();
-        }
-
         BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
         if (originalImage == null) {
             throw new IOException("이미지 리사이징 중 오류가 발생하였습니다.");
         }
+
+        originalImage = rotateImageIfRequired(originalImage, multipartFile);
 
         BufferedImage resizedImage = Scalr.resize(
                 originalImage,
@@ -244,6 +253,27 @@ public class ImageServiceImpl implements ImageService {
 
         log.info("성공적으로 이미지가 리사이징되었습니다.");
         return outputStream.toByteArray();
+    }
+
+    private BufferedImage rotateImageIfRequired(BufferedImage image, MultipartFile multipartFile) throws IOException {
+        try {
+            Metadata metadata = ImageMetadataReader.readMetadata(multipartFile.getInputStream());
+            Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+            if (directory != null && directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
+                int orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+                switch (orientation) {
+                    case 3:
+                        return Scalr.rotate(image, Scalr.Rotation.CW_180);
+                    case 6:
+                        return Scalr.rotate(image, Scalr.Rotation.CW_90);
+                    case 8:
+                        return Scalr.rotate(image, Scalr.Rotation.CW_270);
+                }
+            }
+        } catch (ImageProcessingException | com.drew.metadata.MetadataException e) {
+            log.warn("이미지 방향 정보 읽기 실패", e);
+        }
+        return image;
     }
 
     @Override
