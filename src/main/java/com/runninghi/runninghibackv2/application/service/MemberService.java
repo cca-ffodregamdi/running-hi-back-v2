@@ -245,7 +245,6 @@ public class MemberService {
         if (memberChecker.isCustomProfileImage(currentProfileImageUrl, defaultProfileImageUrl)) {
             try {
                 // cloud starage의 이미지 삭제 로직
-                imageService.deleteImageFromDB(currentProfileImageUrl);
                 imageService.deleteImageFromStorage(currentProfileImageUrl);
                 log.info("기존 프로필 이미지 삭제 완료: {}", currentProfileImageUrl);
             } catch (Exception e) {
@@ -254,15 +253,15 @@ public class MemberService {
             }
         }
 
-        String profileImageUrl;
+        String newProfileImageUrl;
         try {
-            profileImageUrl = imageService.uploadImage(profileImage, memberNo, "profile/");
+            newProfileImageUrl = imageService.uploadImage(profileImage, memberNo, "profile/");
         } catch (IOException e) {
             log.error("이미지 업로드 중 오류 발생: {}", e.getMessage());
             throw new ImageException("프로필 이미지 업로드 중 오류가 발생했습니다.");
         }
 
-        member.updateProfileImageUrl(profileImageUrl);
+        member.updateProfileImageUrl(newProfileImageUrl);
 
         return UpdateProfileImageResponse.of(member);
     }
