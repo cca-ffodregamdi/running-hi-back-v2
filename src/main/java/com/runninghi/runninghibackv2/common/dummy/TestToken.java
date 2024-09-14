@@ -33,7 +33,7 @@ public class TestToken {
     private final JwtTokenProvider jwtTokenProvider;
     private final TestMemberRepository testMemberRepository;
 
-    @Value("${runninghi.version}")
+    @Value("1.0.2")
     private String currentVersion;
 
     @GetMapping("/test/app-review")
