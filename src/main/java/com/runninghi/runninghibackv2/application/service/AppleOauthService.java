@@ -8,8 +8,7 @@ import com.runninghi.runninghibackv2.auth.apple.*;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
-import com.runninghi.runninghibackv2.common.exception.custom.AppleOauthException;
-import com.runninghi.runninghibackv2.common.exception.custom.FcmException;
+import com.runninghi.runninghibackv2.common.exception.custom.*;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
@@ -68,7 +67,7 @@ public class AppleOauthService {
             return appleClientSecretProvider.createClientSecret();
         } catch (Exception e) {
             log.error("Apple 클라이언트 시크릿 생성에 실패했습니다. 오류: {}", e.getMessage(), e);
-            throw new AppleOauthException("apple client secret 생성에 실패했습니다. : " + e.getMessage());
+            throw new AppleOauthClientSecretException();
         }
     }
 
@@ -81,7 +80,7 @@ public class AppleOauthService {
             return appleClient.appleAuth(clientId, code, GRANT_TYPE, clientSecret);
         } catch (Exception e) {
             log.error("Apple 토큰 요청에 실패했습니다. 오류: {}", e.getMessage(), e);
-            throw new AppleOauthException("apple refresh token 요청에 실패했습니다. : " + e.getMessage());
+            throw new AppleOauthTokenException();
         }
     }
 
@@ -105,8 +104,8 @@ public class AppleOauthService {
 
         // iss, aud, exp, 검증
         if (!appleClaimsValidator.isValid(claims)) {
-            log.error("Apple Claims 유효성 검사 실패. 잘못된 Apple 토큰입니다.");
-            throw new AppleOauthException("Apple Claims 유효성 검사 실패 : 잘못된 apple 토큰입니다.");
+            log.error("Apple Claims 유효성 검사 실패. 잘못된 Apple 토큰입니다. {}", claims);
+            throw new AppleOauthClaimsException();
         }
 
         Map<String, String> appleResponse = extractAppleResponse(claims);
@@ -164,11 +163,11 @@ public class AppleOauthService {
                 return member.isActive();
             } else {
                 log.error("애플 회원 탈퇴 실패. 응답 코드: {}", response.getStatusCode());
-                throw new BadRequestException("애플 회원 탈퇴 실패");
+                throw new AppleOauthUnlinkException();
             }
         } catch (Exception e) {
             log.error("회원 탈퇴 중 오류 발생. 오류: {}", e.getMessage(), e);
-            throw new InterruptedException("회원 탈퇴 중 오류 발생 : " + e.getMessage());
+            throw new AppleOauthUnlinkException();
         }
 
     }
@@ -203,6 +202,7 @@ public class AppleOauthService {
         log.info("애플 로그인 처리. 회원 번호: {}", member.getMemberNo());
 
         member.activateMember();  // 멤버의 활성화 상태를 true로 변경, deactivateDate를 null로 설정
+
         return generateTokens(member, false);
     }
 
@@ -254,6 +254,7 @@ public class AppleOauthService {
 
         String randomDigits = stringBuilder.toString();
         log.debug("생성된 무작위 숫자 문자열: {}", randomDigits);
+
         return randomDigits;
     }
 

@@ -31,7 +31,7 @@ public class LikeController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "좋아요 생성",
-            description = "특정 게시글을 좋아요합니다. <br /> 사용자 요청으로 '사용자 번호'와 '게시글 번호'를 입력 받아 북마크 정보를 저장하고 저장 정보를 반환합니다.",
+            description = "특정 게시글을 좋아요합니다. <br /> 사용자 요청으로 '회원 번호'와 '게시글 번호'를 입력 받아 북마크 정보를 저장하고 저장 정보를 반환합니다.",
             responses = @ApiResponse(responseCode = "201", description = "좋아요 생성 성공"))
     public ResponseEntity<ApiResult<LikeResponse>> createLike (@Parameter(description = "사용자 인증을 위한 Bearer 토큰") @RequestHeader("Authorization")String bearerToken,
                                                                @Schema(description = "post 번호", example = "{\"postNo\" : 1}") @RequestBody Map<String, Long> body) {

@@ -1,7 +1,6 @@
 package com.runninghi.runninghibackv2.common.exception;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.protobuf.Api;
 import com.runninghi.runninghibackv2.common.exception.custom.*;
 import com.runninghi.runninghibackv2.common.response.ApiResult;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
@@ -59,20 +58,88 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(KakaoOauthException.class)
-    public ResponseEntity<ApiResult> handleKakaoLoginException(KakaoOauthException e) {
-        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_FAIL.getStatus(), e.getMessage());
+    public ResponseEntity<ApiResult> handleKakaoLoginException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_FAIL.getStatus(), ErrorCode.KAKAO_OAUTH_FAIL.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(KakaoOauthUnlinkException.class)
+    public ResponseEntity<ApiResult> handleKakaoUnlinkException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_UNLINK_FAIL.getStatus(), ErrorCode.KAKAO_OAUTH_UNLINK_FAIL.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(KakaoOauthProfileException.class)
+    public ResponseEntity<ApiResult> handleKakaoProfileException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.KAKAO_OAUTH_PROFILE_FAIL.getStatus(), ErrorCode.KAKAO_OAUTH_UNLINK_FAIL.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(AppleOauthException.class)
+    public ResponseEntity<ApiResult> handleAppleOauthException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_FAIL.getStatus(), ErrorCode.APPLE_OAUTH_FAIL.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(AppleOauthClientSecretException.class)
+    public ResponseEntity<ApiResult> handleAppleOauthClientSecretException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_CLIENT_SECRET_FAIL.getStatus(), ErrorCode.APPLE_OAUTH_CLIENT_SECRET_FAIL.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(AppleOauthTokenException.class)
+    public ResponseEntity<ApiResult> handleAppleOauthTokenException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_TOKEN_FAIL.getStatus(), ErrorCode.APPLE_OAUTH_TOKEN_FAIL.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(AppleOauthClaimsException.class)
+    public ResponseEntity<ApiResult> handleAppleOauthClaimsException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_CLAIMS_FAIL.getStatus(), ErrorCode.APPLE_OAUTH_CLAIMS_FAIL.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(AppleOauthUnlinkException.class)
+    public ResponseEntity<ApiResult> handleAppleOauthUnlinkException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_UNLINK_FAIL.getStatus(), ErrorCode.APPLE_OAUTH_UNLINK_FAIL.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(FeedbackInvalidDataException.class)
+    public ResponseEntity<ApiResult> handleFeedbackInvalidDataException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.FEEDBACK_INVALID_DATA.getStatus(), ErrorCode.FEEDBACK_INVALID_DATA.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(AdminUnauthorizedException.class)
+    public ResponseEntity<ApiResult> handleAdminUnauthorizedException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.ADMIN_UNAUTHORIZED.getStatus(), ErrorCode.ADMIN_UNAUTHORIZED.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+    @ExceptionHandler(AdminInvalidInvitationCodeException.class)
+    public ResponseEntity<ApiResult> handleAdminInvalidInvitationCodeException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.ADMIN_SIGNUP_INVALID_INVITATION.getStatus(), ErrorCode.ADMIN_SIGNUP_INVALID_INVITATION.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+
+    @ExceptionHandler(AdminInvalidPasswordException.class)
+    public ResponseEntity<ApiResult> handleAdminInvalidPasswordException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.ADMIN_INVALID_PASSWORD.getStatus(), ErrorCode.ADMIN_INVALID_PASSWORD.getMessage());
+        return ResponseEntity.status(apiResult.status()).body(apiResult);
+    }
+
+
+    @ExceptionHandler(MemberInvalidDataException.class)
+    public ResponseEntity<ApiResult> handleMemberInvalidDataException() {
+        ApiResult apiResult = ApiResult.error(ErrorCode.MEMBER_INVALID_DATA.getStatus(), ErrorCode.MEMBER_INVALID_DATA.getMessage());
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ApiResult> handleHandlerMethodValidationException() {
         ApiResult apiResult = ApiResult.error(ErrorCode.VALIDATION_FAIL);
-        return ResponseEntity.status(apiResult.status()).body(apiResult);
-    }
-
-    @ExceptionHandler(AppleOauthException.class)
-    public ResponseEntity<ApiResult> handleAppleOauthException(AppleOauthException e) {
-        ApiResult apiResult = ApiResult.error(ErrorCode.APPLE_OAUTH_FAIL.getStatus(), e.getMessage());
         return ResponseEntity.status(apiResult.status()).body(apiResult);
     }
 
@@ -96,7 +163,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResult<Void>> handleIllegarArgumentException(IllegalArgumentException e) {
+    public ResponseEntity<ApiResult<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResult.error(ErrorCode.BAD_REQUEST));
     }
 
@@ -108,11 +175,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FirebaseMessagingException.class)
     public ResponseEntity<ApiResult<Void>> handleFirebaseMessagingException(FirebaseMessagingException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResult.error(ErrorCode.FCM_SEND_FAIL));
-    }
-
-    @ExceptionHandler(AdminLoginException.class)
-    public ResponseEntity<ApiResult<Void>> handleAdminLoginException(AdminLoginException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResult.error(HttpStatus.FORBIDDEN, e.getMessage()));
     }
 
     @ExceptionHandler(S3UploadException.class)
