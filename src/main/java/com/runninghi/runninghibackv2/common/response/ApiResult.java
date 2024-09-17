@@ -21,8 +21,7 @@ public record ApiResult<T>(
     }
 
     public static <T> ApiResult<T> error(ErrorCode errorCode) {
-        String errorMessage = errorCode.getCode() + " : " + errorCode.getMessage();
-        return new ApiResult<>(LocalDateTime.now(), errorCode.getStatus(), errorMessage, null);
+        return new ApiResult<>(LocalDateTime.now(), errorCode.getStatus(), errorCode.getMessage(), null);
     }
 
     public static <T> ApiResult<T> error(HttpStatus httpStatus, String errorMessage) {
