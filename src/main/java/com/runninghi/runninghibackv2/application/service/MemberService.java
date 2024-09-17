@@ -8,8 +8,7 @@ import com.runninghi.runninghibackv2.application.dto.member.response.*;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
-import com.runninghi.runninghibackv2.common.exception.custom.AdminLoginException;
-import com.runninghi.runninghibackv2.common.exception.custom.ImageException;
+import com.runninghi.runninghibackv2.common.exception.custom.*;
 import com.runninghi.runninghibackv2.common.utils.PasswordUtils;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
@@ -40,9 +39,6 @@ public class MemberService {
     private final MemberChecker memberChecker;
     private final ImageService imageService;
 
-    private static final String MEMBER_NOT_FOUND_MESSAGE = "회원 정보를 찾을 수 없습니다.";
-    private static final String INVALID_NICKNAME_MESSAGE = "유효하지 않은 닉네임입니다.";
-    private static final String MEMBER_NOT_FOUND_DETAIL_MESSAGE = "회원 번호 %d에 해당하는 회원을 찾을 수 없습니다.";
     private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${admin.invitation-code}")
@@ -51,25 +47,17 @@ public class MemberService {
     @Value("${cloud.aws.s3.default-profile}")
     private String defaultProfileImageUrl;
 
-    private Member findMemberByNoWithLogging(Long memberNo) {
-        log.info("회원 조회 요청. 회원 번호: {}", memberNo);
-        return memberRepository.findById(memberNo)
-                .orElseThrow(() -> {
-                    log.error(MEMBER_NOT_FOUND_DETAIL_MESSAGE, memberNo);
-                    return new EntityNotFoundException(MEMBER_NOT_FOUND_MESSAGE);
-                });
-    }
 
     @Transactional
     public UpdateMemberInfoResponse updateMemberInfo(Long memberNo, UpdateMemberInfoRequest request) throws BadRequestException {
         log.info("회원 정보 업데이트 요청. 회원 번호: {}, 요청 정보: {}", memberNo, request);
-        Member member = findMemberByNoWithLogging(memberNo);
+        Member member = findMemberByNo(memberNo);
 
         try {
             memberChecker.checkNicknameValidation(request.nickname());
         } catch (IllegalArgumentException e) {
             log.error("닉네임 검증 실패: {}", e.getMessage());
-            throw new BadRequestException(INVALID_NICKNAME_MESSAGE);
+            throw new MemberInvalidDataException();
         }
 
         member.updateNickname(request.nickname());
@@ -82,7 +70,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public GetMemberResponse getMemberInfo(Long memberNo) {
         log.info("회원 정보 조회 요청. 회원 번호: {}", memberNo);
-        Member member = findMemberByNoWithLogging(memberNo);
+        Member member = findMemberByNo(memberNo);
 
         log.info("회원 정보 조회 성공. 회원 번호: {}", memberNo);
         return GetMemberResponse.from(member);
@@ -90,7 +78,7 @@ public class MemberService {
 
     public void addReportedCount(Long memberNo) {
         log.info("신고 수 추가 요청. 회원 번호: {}", memberNo);
-        Member member = findMemberByNoWithLogging(memberNo);
+        Member member = findMemberByNo(memberNo);
 
         member.addReportedCount();
         log.info("신고 수 추가 완료. 회원 번호: {}", memberNo);
@@ -98,7 +86,7 @@ public class MemberService {
 
     public void saveFCMToken(Long memberNo, String fcmToken, boolean alarmConsent) {
         log.info("FCM 토큰 저장 요청. 회원 번호: {}, FCM 토큰: {}, 알림 동의: {}", memberNo, fcmToken, alarmConsent);
-        Member member = findMemberByNoWithLogging(memberNo);
+        Member member = findMemberByNo(memberNo);
 
         member.updateFCMToken(fcmToken);
         member.updateAlarmConsent(alarmConsent);
@@ -109,8 +97,7 @@ public class MemberService {
     @Transactional
     public UpdateCurrentLocationResponse updateCurrentLocation(Long memberNo, UpdateCurrentLocationRequest request) {
         log.info("위치 정보 업데이트 요청. 회원 번호: {}, 좌표: ({}, {})", memberNo, request.latitude(), request.longitude());
-
-        Member member = findMemberByNoWithLogging(memberNo);
+        Member member = findMemberByNo(memberNo);
 
         GeometryFactory gf = new GeometryFactory();
         Point geometry = gf.createPoint(new Coordinate(request.longitude(), request.latitude())); // longitude 경도 == x, latitude 위도 == y
@@ -131,17 +118,17 @@ public class MemberService {
         Member member = memberRepository.findByAccount(request.account())
                 .orElseThrow(() -> {
                     log.warn("관리자 로그인 실패: 잘못된 관리자 account = {}", request.account());
-                    return new RuntimeException("관리자 account가 잘못되었습니다.");
+                    return new EntityNotFoundException();
                 });
 
         if (!PasswordUtils.checkPassword(request.password(), member.getPassword())) {
             log.warn("관리자 로그인 실패: 잘못된 비밀번호. 사용자 account = {}", request.account());
-            throw new AdminLoginException("관리자 비밀번호가 잘못되었습니다.");
+            throw new AdminInvalidPasswordException();
         }
 
         if (member.getRole() != Role.ADMIN) {
             log.warn("관리자 로그인 실패: 권한 부족. 사용자 account = {}", request.account());
-            throw new AdminLoginException("관리자 권한이 필요합니다.");
+            throw new AdminUnauthorizedException();
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(new AccessTokenInfo(member.getMemberNo(), member.getRole()));
@@ -161,14 +148,16 @@ public class MemberService {
     @Transactional
     public void signupAdmin(AdminSignUpRequest request) {
         if (memberRepository.findByAccount(request.account()).isPresent()) {
-            throw new IllegalArgumentException("이미 가입된 account입니다.");
+            log.error("이미 가입된 관리자 계정입니다. 관리자 계정: {}", request.account());
+            throw new AdminAccountDuplicatedException();
         }
 
         Role role;
         if (request.invitationCode() != null && request.invitationCode().equals(adminInvitationCode)) {
             role = Role.ADMIN;
         } else {
-            throw new IllegalArgumentException("잘못된 초대 코드입니다.");
+            log.error("잘못된 초대 코드입니다.: {}", request.invitationCode());
+            throw new AdminInvalidInvitationCodeException();
         }
 
         Member newMember = Member.builder()
@@ -183,49 +172,34 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetIsTermsAgreedResponse getTermsAgreement(Long memberNo) {
-        log.info("약관 동의 여부 조회 시도: 사용자 memberNo = {}", memberNo);
+        log.info("약관 동의 여부 조회 시도. 회원 번호: {}", memberNo);
+        Member member = findMemberByNo(memberNo);
 
-        Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> {
-                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
-                    return new EntityNotFoundException();
-                });
-
-        log.info("약관 동의 여부 조회 완료: 사용자 memberNo = {}", memberNo);
+        log.info("약관 동의 여부 조회 완료. 회원 번호: {}", memberNo);
 
         return GetIsTermsAgreedResponse.of(member.isTermsAgreed());
     }
 
     @Transactional
     public TermsAgreementResponse acceptTermsAgreement(Long memberNo) {
-        log.info("약관 동의 처리 시도: 사용자 memberNo = {}", memberNo);
-
-        Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> {
-                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
-                    return new EntityNotFoundException();
-                });
+        log.info("약관 동의 처리 시도. 회원 번호: {}", memberNo);
+        Member member = findMemberByNo(memberNo);
 
         member.updateTermsAgreed(true);
 
-        log.info("약관 동의 처리 완료: 사용자 memberNo = {}", memberNo);
+        log.info("약관 동의 처리 완료. 회원 번호: {}", memberNo);
 
         return TermsAgreementResponse.of(member.isTermsAgreed());
     }
 
     @Transactional(readOnly = true)
     public GetIsLocationResponse getLocationSetting(Long memberNo) {
-        log.info("지역 설정 여부 조회 시도: 사용자 memberNo = {}", memberNo);
-
-        Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> {
-                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
-                    return new EntityNotFoundException();
-                });
+        log.info("지역 설정 여부 조회 시도. 회원 번호: {}", memberNo);
+        Member member = findMemberByNo(memberNo);
 
         boolean isLocation = member.getGeometry() != null;
 
-        log.info("지역 설정 여부 조회 처리 완료: 사용자 memberNo = {}", memberNo);
+        log.info("지역 설정 여부 조회 처리 완료. 회원 번호: {}", memberNo);
 
         return GetIsLocationResponse.of(isLocation);
 
@@ -233,13 +207,8 @@ public class MemberService {
 
     @Transactional
     public UpdateProfileImageResponse updateProfileImage(Long memberNo, MultipartFile profileImage) throws IOException {
-        log.info("프로필 사진 수정 시도: 사용자 memberNo = {}", memberNo);
-
-        Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> {
-                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
-                    return new EntityNotFoundException();
-                });
+        log.info("프로필 사진 수정 시도. 회원 번호: {}", memberNo);
+        Member member = findMemberByNo(memberNo);
 
         String currentProfileImageUrl = member.getProfileImageUrl();
         if (memberChecker.isCustomProfileImage(currentProfileImageUrl, defaultProfileImageUrl)) {
@@ -249,7 +218,7 @@ public class MemberService {
                 log.info("기존 프로필 이미지 삭제 완료: {}", currentProfileImageUrl);
             } catch (Exception e) {
                 log.warn("기존 프로필 이미지 삭제 중 오류 발생: {}", currentProfileImageUrl, e);
-                throw new ImageException("기존 프로필 이미지 삭제 중 오류가 발생했습니다.");
+                throw new ImageException();
             }
         }
 
@@ -268,13 +237,8 @@ public class MemberService {
 
     @Transactional
     public DeleteProfileImageResponse deleteProfileImage(Long memberNo) {
-        log.info("프로필 사진 삭제 시도: 사용자 memberNo = {}", memberNo);
-
-        Member member = memberRepository.findById(memberNo)
-                .orElseThrow(() -> {
-                    log.error("회원 번호 {}에 해당하는 회원을 찾을 수 없습니다.", memberNo);
-                    return new EntityNotFoundException();
-                });
+        log.info("프로필 사진 삭제 시도. 회원 번호: {}", memberNo);
+        Member member = findMemberByNo(memberNo);
 
         String currentProfileImageUrl = member.getProfileImageUrl();
         if (memberChecker.isCustomProfileImage(currentProfileImageUrl, defaultProfileImageUrl)) {
@@ -284,7 +248,7 @@ public class MemberService {
                 log.info("기존 프로필 이미지 삭제 완료. URL: {}", currentProfileImageUrl);
             } catch (Exception e) {
                 log.error("프로필 이미지 삭제 중 오류 발생. URL: {}", currentProfileImageUrl, e);
-                throw new ImageException("프로필 이미지 삭제 중 오류가 발생했습니다.");
+                throw new ImageException();
             }
         } else {
             log.info("삭제할 프로필 이미지가 없거나 이미 기본 이미지입니다. 현재 URL: {}", currentProfileImageUrl);
@@ -293,6 +257,14 @@ public class MemberService {
         member.updateProfileImageUrl(defaultProfileImageUrl);
 
         return DeleteProfileImageResponse.of(member);
+    }
+
+    private Member findMemberByNo(Long memberNo) {
+        return memberRepository.findById(memberNo)
+                .orElseThrow(() -> {
+                    log.error("해당 번호의 회원을 찾을 수 없음. 회원 번호: {}", memberNo);
+                    return new EntityNotFoundException();
+                });
     }
 
 }

@@ -1,6 +1,8 @@
 package com.runninghi.runninghibackv2.auth.apple;
 
 import com.runninghi.runninghibackv2.common.exception.custom.AppleOauthException;
+import com.runninghi.runninghibackv2.common.exception.custom.ApplePublicKeyGenerationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -12,6 +14,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class ApplePublicKeyGenerator {
 
@@ -44,7 +47,8 @@ public class ApplePublicKeyGenerator {
             // 생성한 KeyFactory와 PublicKeySpec으로 RSAPublicKey 생성
             return keyFactory.generatePublic(rsaPublicKeySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
-            throw new AppleOauthException("RSAPublicKey생성 중 오류가 발생했습니다.");
+            log.error("RSAPublicKey 생성 중 오류가 발생했습니다.");
+            throw new ApplePublicKeyGenerationException();
         }
     }
 }
