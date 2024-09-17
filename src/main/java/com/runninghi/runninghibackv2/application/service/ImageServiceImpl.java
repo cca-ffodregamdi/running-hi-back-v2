@@ -5,7 +5,6 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
-import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.runninghi.runninghibackv2.application.dto.image.response.ImageTarget;
 import com.runninghi.runninghibackv2.common.exception.custom.CustomEntityNotFoundException;
@@ -199,26 +198,43 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void updateImage(ImageTarget target, Long targetNo, String newImageUrl) {
-        Image image = imageRepository.findImageByTargetNoAndImageTarget(targetNo, target)
+        Image existingImage = imageRepository.findImageByTargetNoAndImageTarget(targetNo, target)
                 .orElse(null);
 
-        if (image == null || imageChecker.isSameImage(image.getImageUrl(), newImageUrl)) {
-            return;
+        // 새 이미지 URL이 제공되었고, 기존 이미지와 다른 경우
+        if (!newImageUrl.isBlank() && (existingImage == null || !imageChecker.isSameImage(existingImage.getImageUrl(), newImageUrl))) {
+            handleNewImage(existingImage, target, targetNo, newImageUrl);
+        }
+        // 새 이미지 URL이 비어있는 경우 (이미지 삭제)
+        else if (newImageUrl.isBlank() && existingImage != null) {
+            handleImageDeletion(existingImage);
+        }
+        // 변경사항이 없는 경우
+        else {
+            log.info("이미지 변경 사항이 없습니다. target: {}, targetNo: {}", target, targetNo);
+        }
+    }
+
+    private void handleNewImage(Image existingImage, ImageTarget target, Long targetNo, String newImageUrl) {
+        // 새 이미지 URL에 대한 유효성 검사
+        imageChecker.checkImageFile(imageChecker.getFileNameFromUrl(newImageUrl));
+
+        // 기존 이미지가 있다면 스토리지에서 삭제
+        if (existingImage != null && !existingImage.getImageUrl().isBlank()) {
+            deleteImageFromStorage(existingImage.getImageUrl());
+            imageRepository.delete(existingImage);
         }
 
-        if (!newImageUrl.isBlank()) {
-            imageChecker.checkImageFile(imageChecker.getFileNameFromUrl(newImageUrl));
-        }
+        // 새 이미지에 대한 targetNo와 imageTarget 할당
+        saveTargetNo(newImageUrl, target, targetNo);
 
-        deleteImageFromStorage(image.getImageUrl());
-        image.updateImageUrl(newImageUrl);
+        log.info("{} - {}의 이미지가 {}로 변경되었습니다.", target, targetNo, newImageUrl);
+    }
 
-        if (newImageUrl.isBlank()) {
-            imageRepository.delete(image);
-            log.info("{} 이미지가 DB에서 삭제되었습니다.", image.getImageUrl());
-        }
-
-        log.info("{} - {}의 이미지가 변경되었습니다.", image.getImageTarget(), targetNo);
+    private void handleImageDeletion(Image existingImage) {
+        deleteImageFromStorage(existingImage.getImageUrl());
+        imageRepository.delete(existingImage);
+        log.info("{} 이미지가 삭제되었습니다.", existingImage.getImageUrl());
     }
 
 

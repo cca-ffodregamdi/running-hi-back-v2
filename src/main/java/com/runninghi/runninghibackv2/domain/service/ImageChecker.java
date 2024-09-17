@@ -67,8 +67,6 @@ public class ImageChecker {
             return null; // 확장자를 찾을 수 없으면 null 반환
         }
 
-//        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-
         return url.substring(url.lastIndexOf('/') + 1);
     }
 
