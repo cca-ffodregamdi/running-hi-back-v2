@@ -93,9 +93,10 @@ public class Post extends BaseTimeEntity {
         this.mainDataType = mainDataType;
     }
 
-    public void update(UpdatePostRequest request, String mainData) {
+    public void update(UpdatePostRequest request, String mainData, Integer mainDataType) {
         this.postContent = request.postContent();
         this.mainData = mainData;
+        this.mainDataType = mainDataType;
     }
 
     public void addReportedCount() {
