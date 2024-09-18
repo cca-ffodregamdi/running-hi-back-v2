@@ -23,7 +23,8 @@
 
 ## 👟 2. PROJECT ARCHITECTURE
 
-![Slide 16_9 - 2](https://github.com/user-attachments/assets/827862fc-406e-4acd-a1db-55bb25757d3c)
+![Slide 16_9 - 2](https://github.com/user-attachments/assets/0d3b270d-0e0d-4348-b079-1f6fb1dab08e)
+
 
 
 
