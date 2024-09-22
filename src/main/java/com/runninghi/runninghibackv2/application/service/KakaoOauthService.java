@@ -6,6 +6,8 @@ import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
 import com.runninghi.runninghibackv2.common.dto.AccessTokenInfo;
 import com.runninghi.runninghibackv2.common.dto.RefreshTokenInfo;
 import com.runninghi.runninghibackv2.common.exception.custom.FcmException;
+import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthProfileException;
+import com.runninghi.runninghibackv2.common.exception.custom.KakaoOauthUnlinkException;
 import com.runninghi.runninghibackv2.domain.entity.vo.RunDataVO;
 import com.runninghi.runninghibackv2.domain.enumtype.AlarmType;
 import com.runninghi.runninghibackv2.domain.enumtype.Role;
@@ -67,7 +69,7 @@ public class KakaoOauthService {
             KakaoProfileResponse kakaoProfileResponse = getKakaoProfile(kakaoToken);
             if (kakaoProfileResponse == null) {
                 log.error("카카오 프로필 정보를 가져오는 데 실패했습니다.");
-                throw new KakaoOauthException();
+                throw new KakaoOauthProfileException();
             }
             log.info("카카오 프로필 정보를 성공적으로 가져왔습니다. 프로필: {}", kakaoProfileResponse);
 
@@ -82,7 +84,7 @@ public class KakaoOauthService {
             });
         } catch (Exception e) {
             log.error("카카오 OAuth 처리 중 오류 발생: {}", e.getMessage(), e);
-            throw new KakaoOauthException("카카오 OAuth 오류입니다. : " + e.getMessage());
+            throw new KakaoOauthException();
         }
     }
 
@@ -181,7 +183,7 @@ public class KakaoOauthService {
      * @param memberNo 회원 번호
      * @return 회원의 활성화 상태를 토글한 결과 (활성화되었으면 true, 비활성화되었으면 false)
      * @throws EntityNotFoundException 요청된 회원 번호에 해당하는 회원을 찾을 수 없을 때 발생하는 예외
-     * @throws KakaoOauthException 카카오 API 호출이 실패한 경우 발생하는 예외
+     * @throws KakaoOauthUnlinkException 카카오 API 호출이 실패한 경우 발생하는 예외
      */
     @Transactional
     public boolean unlinkAndDeleteMember(Long memberNo) {
@@ -208,7 +210,7 @@ public class KakaoOauthService {
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             log.error("카카오 계정 연결 해제 요청이 실패했습니다. 응답 상태: {}", response.getStatusCode());
-            throw new KakaoOauthException();
+            throw new KakaoOauthUnlinkException();
         }
 
         // 멤버의 활성화 상태를 false로 변경, deactivateDate 설정

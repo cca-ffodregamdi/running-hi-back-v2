@@ -23,7 +23,9 @@
 
 ## 👟 2. PROJECT ARCHITECTURE
 
-#### 준비중입니다.
+![Slide 16_9 - 2](https://github.com/user-attachments/assets/0d3b270d-0e0d-4348-b079-1f6fb1dab08e)
+
+
 
 
 

@@ -7,6 +7,7 @@ import com.runninghi.runninghibackv2.application.dto.feedback.request.UpdateFeed
 import com.runninghi.runninghibackv2.application.dto.feedback.response.*;
 import com.runninghi.runninghibackv2.application.service.FeedbackService;
 import com.runninghi.runninghibackv2.auth.jwt.JwtTokenProvider;
+import com.runninghi.runninghibackv2.common.exception.custom.FeedbackInvalidDataException;
 import com.runninghi.runninghibackv2.common.response.ErrorCode;
 import com.runninghi.runninghibackv2.domain.enumtype.FeedbackCategory;
 import jakarta.persistence.EntityNotFoundException;
@@ -72,7 +73,7 @@ class FeedbackControllerTest {
     }
 
     private String getErrorMessage(ErrorCode errorCode) {
-        return errorCode.getCode() + " : " + errorCode.getMessage();
+        return errorCode.getMessage();
     }
 
     private String getErrorStatus(ErrorCode errorCode) {
@@ -110,13 +111,13 @@ class FeedbackControllerTest {
     @Test
     @DisplayName("피드백 생성 실패 - 유효하지않은 요청(제목 누락)")
     void testCreateFeedback_MissingRequiredTitle() throws Exception {
-        String errorStatus = getErrorStatus(ErrorCode.BAD_REQUEST);
-        String errorMessage = getErrorMessage(ErrorCode.BAD_REQUEST);
+        String errorStatus = getErrorStatus(ErrorCode.FEEDBACK_INVALID_DATA);
+        String errorMessage = getErrorMessage(ErrorCode.FEEDBACK_INVALID_DATA);
         CreateFeedbackRequest request = new CreateFeedbackRequest(null, content, category);
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
-        when(feedbackService.createFeedback(request, memberNo)).thenThrow(new BadRequestException());
+        when(feedbackService.createFeedback(request, memberNo)).thenThrow(new FeedbackInvalidDataException());
 
         // request를 Json 형태로 매핑
         ObjectMapper objectMapper = new ObjectMapper();
@@ -139,7 +140,7 @@ class FeedbackControllerTest {
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
-        when(feedbackService.createFeedback(request, memberNo)).thenThrow(new BadRequestException());
+        when(feedbackService.createFeedback(request, memberNo)).thenThrow(new FeedbackInvalidDataException());
 
         // request를 Json 형태로 매핑
         ObjectMapper objectMapper = new ObjectMapper();
@@ -152,8 +153,8 @@ class FeedbackControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.BAD_REQUEST)))
-                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.BAD_REQUEST)));
+                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.FEEDBACK_INVALID_DATA)))
+                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.FEEDBACK_INVALID_DATA)));
     }
 
     @Test
@@ -163,7 +164,7 @@ class FeedbackControllerTest {
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
-        when(feedbackService.createFeedback(request, memberNo)).thenThrow(new BadRequestException());
+        when(feedbackService.createFeedback(request, memberNo)).thenThrow(new FeedbackInvalidDataException());
 
         // request를 Json 형태로 매핑
         ObjectMapper objectMapper = new ObjectMapper();
@@ -175,8 +176,8 @@ class FeedbackControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.BAD_REQUEST)))
-                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.BAD_REQUEST)));
+                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.FEEDBACK_INVALID_DATA)))
+                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.FEEDBACK_INVALID_DATA)));
     }
 
     @Test
@@ -427,7 +428,7 @@ class FeedbackControllerTest {
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
-        when(feedbackService.updateFeedback(request, feedbackNo,memberNo)).thenThrow(new BadRequestException());
+        when(feedbackService.updateFeedback(request, feedbackNo,memberNo)).thenThrow(new FeedbackInvalidDataException());
 
         // request를 Json 형태로 매핑
         ObjectMapper objectMapper = new ObjectMapper();
@@ -439,8 +440,8 @@ class FeedbackControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.BAD_REQUEST)))
-                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.BAD_REQUEST)));
+                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.FEEDBACK_INVALID_DATA)))
+                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.FEEDBACK_INVALID_DATA)));
     }
 
     @Test
@@ -453,7 +454,7 @@ class FeedbackControllerTest {
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
-        when(feedbackService.updateFeedback(request, feedbackNo, memberNo)).thenThrow(new BadRequestException());
+        when(feedbackService.updateFeedback(request, feedbackNo, memberNo)).thenThrow(new FeedbackInvalidDataException());
 
         // request를 Json 형태로 매핑
         ObjectMapper objectMapper = new ObjectMapper();
@@ -465,8 +466,8 @@ class FeedbackControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.BAD_REQUEST)))
-                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.BAD_REQUEST)));
+                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.FEEDBACK_INVALID_DATA)))
+                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.FEEDBACK_INVALID_DATA)));
     }
 
 
@@ -514,7 +515,7 @@ class FeedbackControllerTest {
 
         // Mockito를 사용하여 서비스 호출 및 응답 객체 반환 설정
         when(jwtTokenProvider.getMemberNoFromToken(token)).thenReturn(memberNo);
-        when(feedbackService.updateFeedbackReply(request, feedbackNo, memberNo)).thenThrow(new BadRequestException());
+        when(feedbackService.updateFeedbackReply(request, feedbackNo, memberNo)).thenThrow(new FeedbackInvalidDataException());
 
         // request를 Json 형태로 매핑
         ObjectMapper objectMapper = new ObjectMapper();
@@ -526,8 +527,8 @@ class FeedbackControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.BAD_REQUEST)))
-                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.BAD_REQUEST)));
+                .andExpect(jsonPath("$.status").value(getErrorStatus(ErrorCode.FEEDBACK_INVALID_DATA)))
+                .andExpect(jsonPath("$.message").value(getErrorMessage(ErrorCode.FEEDBACK_INVALID_DATA)));
     }
 
 }
