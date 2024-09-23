@@ -126,7 +126,7 @@ public class PostService {
         return mainData;
     }
 
-    private Post findPostByNo(Long postNo) {
+    public Post findPostByNo(Long postNo) {
         return postRepository.findById(postNo)
                 .orElseThrow(EntityNotFoundException::new);
     }
