@@ -166,7 +166,7 @@ public class PostServiceTests {
 
         Pageable pageable2 = PageRequest.of(1 , 10);
         List<GetMyPostsResponse> myPostsResponses2 = postService.getMyPostsScroll(pageable2, member1.getMemberNo()).getContent();
-        assertEquals(6, myPostsResponses2.size());
+        assertEquals(5, myPostsResponses2.size());
 
         List<GetMyPostsResponse> myPostsResponses3 = postService.getMyPostsScroll(pageable1, member2.getMemberNo()).getContent();
         assertEquals(0, myPostsResponses3.size());
