@@ -53,12 +53,13 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     @Override
     public PageResultData<GetMyPostsResponse> findMyPostsByPageable(Pageable pageable, Long memberNo) {
         long total = jpaQueryFactory.selectFrom(post)
-                .where(post.member.memberNo.eq(memberNo))
+                .where(post.member.memberNo.eq(memberNo)
+                        .and(post.status.eq(true)))
                 .fetchCount();
 
         List<Post> posts = jpaQueryFactory.select(post)
                 .from(post)
-                .where(post.member.memberNo.eq(memberNo))
+                .where(post.member.memberNo.eq(memberNo).and(post.status.eq(true)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(post.createDate.desc(), post.postNo.desc())
