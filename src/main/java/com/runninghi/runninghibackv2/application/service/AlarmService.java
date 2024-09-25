@@ -6,6 +6,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.runninghi.runninghibackv2.application.dto.alarm.request.CreateAlarmRequest;
 import com.runninghi.runninghibackv2.application.dto.alarm.response.GetAllAlarmResponse;
+import com.runninghi.runninghibackv2.common.exception.custom.FcmException;
 import com.runninghi.runninghibackv2.domain.entity.Alarm;
 import com.runninghi.runninghibackv2.domain.entity.Member;
 import com.runninghi.runninghibackv2.domain.repository.AlarmRepository;
@@ -75,9 +76,13 @@ public class AlarmService {
 
         alarmRepository.save(alarm);
 
-//        if (member.isAlarmConsent()) { // 알림 동의했을 시 발송, 아닐 시 stop
-//            sendPushAlarm(request);
-//        }
+        if (member.isAlarmConsent()) { // 알림 동의했을 시 발송, 아닐 시 stop
+            try {
+                sendPushAlarm(request);
+            } catch (FirebaseMessagingException e) {
+                throw new FcmException(e.getMessage());
+            }
+        }
 
         sendSseAlarm(request); // 알림 동의 여부 상관 없이 발송
     }
