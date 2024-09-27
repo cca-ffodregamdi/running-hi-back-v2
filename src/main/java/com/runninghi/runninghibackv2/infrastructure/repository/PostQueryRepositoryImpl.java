@@ -73,10 +73,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
 
-            Long replyCnt = jpaQueryFactory.select(reply.count())
-                    .from(reply)
-                    .where(reply.post.postNo.eq(post.getPostNo()))
-                    .fetchOne();
+            Long replyCnt = replyQueryRepository.getCountByPostNo(post.getPostNo());
 
             Long likeCnt = jpaQueryFactory.select(like.count())
                     .from(like)
@@ -125,8 +122,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .from(bookmark)
                 .where(bookmark.post.postNo.eq(postNo))
                 .fetchOne();
-
-//        Long replyCnt = replyRepository.countByPost_PostNo(postNo);
 
         Long replyCnt = replyQueryRepository.getCountByPostNo(postNo);
 
@@ -181,10 +176,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .limit(1)
                     .fetchOne();
 
-            Long replyCnt = jpaQueryFactory.select(reply.count())
-                    .from(reply)
-                    .where(reply.post.postNo.eq(post.getPostNo()))
-                    .fetchOne();
+            Long replyCnt = replyQueryRepository.getCountByPostNo(post.getPostNo());
 
             Long likeCnt = jpaQueryFactory.select(like.count())
                     .from(like)
@@ -251,10 +243,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .limit(1)
                     .fetchOne();
 
-            Long replyCnt = jpaQueryFactory.select(reply.count())
-                    .from(reply)
-                    .where(reply.post.postNo.eq(post.getPostNo()))
-                    .fetchOne();
+            Long replyCnt = replyQueryRepository.getCountByPostNo(post.getPostNo());
 
             Long likeCnt = jpaQueryFactory.select(like.count())
                     .from(like)
@@ -321,10 +310,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .limit(1)
                     .fetchOne();
 
-            Long replyCnt = jpaQueryFactory.select(reply.count())
-                    .from(reply)
-                    .where(reply.post.postNo.eq(post.getPostNo()))
-                    .fetchOne();
+            Long replyCnt = replyQueryRepository.getCountByPostNo(post.getPostNo());
 
             Long likeCnt = jpaQueryFactory.select(like.count())
                     .from(like)
@@ -387,10 +373,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                     .limit(1)
                     .fetchOne();
 
-            Long replyCnt = jpaQueryFactory.select(reply.count())
-                    .from(reply)
-                    .where(reply.post.postNo.eq(post.getPostNo()))
-                    .fetchOne();
+            Long replyCnt = replyQueryRepository.getCountByPostNo(post.getPostNo());
 
             Long likeCnt = jpaQueryFactory.select(like.count())
                     .from(like)
@@ -441,10 +424,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
 
-            Long replyCnt = jpaQueryFactory.select(reply.count())
-                    .from(reply)
-                    .where(reply.post.postNo.eq(post.getPostNo()))
-                    .fetchOne();
+            Long replyCnt = replyQueryRepository.getCountByPostNo(post.getPostNo());
 
             Long likeCnt = jpaQueryFactory.select(like.count())
                     .from(like)
@@ -496,10 +476,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
             String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
 
-            Long replyCnt = jpaQueryFactory.select(reply.count())
-                    .from(reply)
-                    .where(reply.post.postNo.eq(post.getPostNo()))
-                    .fetchOne();
+            Long replyCnt = replyQueryRepository.getCountByPostNo(post.getPostNo());
 
             Long likeCnt = jpaQueryFactory.select(like.count())
                     .from(like)
@@ -619,10 +596,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         String imageUrl = mainImage != null ? mainImage.getImageUrl() : null;
 
-        Long replyCnt = jpaQueryFactory.select(reply.count())
-                .from(reply)
-                .where(reply.post.postNo.eq(postNo))
-                .fetchOne();
+        Long replyCnt = replyQueryRepository.getCountByPostNo(postNo);
 
         Long likeCnt = jpaQueryFactory.select(like.count())
                 .from(like)
