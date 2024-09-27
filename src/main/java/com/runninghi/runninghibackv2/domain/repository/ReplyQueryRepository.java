@@ -18,4 +18,6 @@ public interface ReplyQueryRepository {
     List<GetReplyList> findAllByMemberNo(Long memberNo, Sort sort);
 
     List<GetReplyList> findAllByPostNo(GetReplyListRequest request);
+
+    Long getCountByPostNo(Long postNo);
 }

@@ -9,12 +9,11 @@ import com.runninghi.runninghibackv2.application.dto.post.response.GetRecordPost
 import com.runninghi.runninghibackv2.common.response.PageResultData;
 import com.runninghi.runninghibackv2.domain.entity.Image;
 import com.runninghi.runninghibackv2.domain.entity.Post;
-import com.runninghi.runninghibackv2.domain.entity.QImage;
 import com.runninghi.runninghibackv2.domain.entity.QPost;
 import com.runninghi.runninghibackv2.domain.repository.MemberRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostQueryRepository;
 import com.runninghi.runninghibackv2.domain.repository.PostRepository;
-import com.runninghi.runninghibackv2.domain.repository.ReplyRepository;
+import com.runninghi.runninghibackv2.domain.repository.ReplyQueryRepository;
 import com.runninghi.runninghibackv2.domain.service.PostChecker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
     private final PostRepository postRepository;
-    private final ReplyRepository replyRepository;
+    private final ReplyQueryRepository replyQueryRepository;
     private final PostChecker postChecker;
     private final MemberRepository memberRepository;
 
@@ -127,7 +126,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .where(bookmark.post.postNo.eq(postNo))
                 .fetchOne();
 
-        Long replyCnt = replyRepository.countByPost_PostNo(postNo);
+//        Long replyCnt = replyRepository.countByPost_PostNo(postNo);
+
+        Long replyCnt = replyQueryRepository.getCountByPostNo(postNo);
+
         Boolean isLiked = jpaQueryFactory.selectFrom(like)
                 .where(
                         like.post.postNo.eq(post.getPostNo()),

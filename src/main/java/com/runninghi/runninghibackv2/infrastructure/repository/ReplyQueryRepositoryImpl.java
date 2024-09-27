@@ -122,16 +122,16 @@ public class ReplyQueryRepositoryImpl implements ReplyQueryRepository {
                 .fetchOne();
     }
 
-    private Long getCountByPostNo(GetReplyListRequest request) {
+    @Override
+    public Long getCountByPostNo(Long postNo) {
 
         return jpaQueryFactory
                 .select(reply.replyNo.count())
                 .from(reply)
                 .where(
-                        reply.post.postNo.eq(request.getPostNo()),
+                        reply.post.postNo.eq(postNo),
                         reply.isDeleted.eq(false))
                 .fetchOne();
-
     }
 
     private Long getReportedCount(GetReportedReplyRequest request) {
