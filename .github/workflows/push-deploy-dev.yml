@@ -41,4 +41,4 @@ jobs:
             sudo fuser -k ${{ secrets.SERVER_PORT }}/tcp || true
             
             # Run new container
-            sudo docker run -d --name runninghi-dev -p ${{ secrets.SERVER_PORT }}:8080 -v /logs:/app/logs -e SPRING_PROFILES_ACTIVE=dev ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
+            sudo docker run -d --name runninghi-dev -p ${{ secrets.SERVER_PORT }}:${{ secrets.DOCKER_PORT }} -v /logs:/app/logs -e SPRING_PROFILES_ACTIVE=dev ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
