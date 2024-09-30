@@ -81,7 +81,7 @@ jobs:
 
       ## docker upload image
       - name: docker image build
-        run: docker build -f Docker.prod -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:${{ github.sha }} .
+        run: docker build -f Docker-prod -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:${{ github.sha }} .
 
 
       # DockerHub Login

@@ -83,7 +83,7 @@ jobs:
 
       ## docker upload image
       - name: docker image build
-        run: docker build -f Docker.dev -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }} .
+        run: docker build -f Docker-dev -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }} .
 
       # DockerHub Login
       - name: docker login
