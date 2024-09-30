@@ -13,11 +13,9 @@ assignees: ''
 
 🤷WHAT
 -
-어떤 문제가 발생했는지
 
 ✏️HOW
 -
-어떻게 해결했는지
 
 ✅TODO
 - [ ] <!-- todo -->
