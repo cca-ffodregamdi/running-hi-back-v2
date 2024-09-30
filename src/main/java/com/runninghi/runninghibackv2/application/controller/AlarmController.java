@@ -55,7 +55,7 @@ public class AlarmController {
         return ResponseEntity.ok().body(ApiResult.success("알림 생성 성공", null));
     }
 
-    @PostMapping(value = "/only/pushAlarm/test", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/pushAlarm/test", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResult<Void>> pushAlarmTest(@Valid @RequestBody CreateAlarmRequest request) {
 
         alarmService.pushAlarmTest(request);
