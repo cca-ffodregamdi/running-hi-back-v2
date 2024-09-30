@@ -30,6 +30,7 @@ public class CreateAlarmRequest {
         private Long targetId;
 
         @Schema(description = "FCM 토큰")
+        @NotBlank(message = "토큰을 포함시켜주세요.")
         private String fcmToken;
 
 }

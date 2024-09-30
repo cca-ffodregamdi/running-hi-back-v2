@@ -10,11 +10,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -51,6 +53,18 @@ public class AlarmController {
         alarmService.createPushAlarm(request);
 
         return ResponseEntity.ok().body(ApiResult.success("알림 생성 성공", null));
+    }
+
+    @PostMapping(value = "/pushAlarm/test", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResult<Void>> pushAlarmTest(@Valid @RequestBody CreateAlarmRequest request) {
+
+        alarmService.pushAlarmTest(request);
+        return ResponseEntity.ok().
+                body(ApiResult.<Void>builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.OK)
+                .message("알림 테스트 성공")
+                .build());
     }
 
     @DeleteMapping(value = "/{alarmNo}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,10 +1,12 @@
 package com.runninghi.runninghibackv2.common.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
+@Builder
 public record ApiResult<T>(
         @Schema(description = "응답 시간", example = "2024-03-27T14:20:52.026425")
         LocalDateTime timeStamp,
