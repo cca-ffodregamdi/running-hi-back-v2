@@ -33,7 +33,7 @@ jobs:
         uses: samin/mysql-action@v1
         with:
           character set server: 'utf8'
-          mysql database: 'runninghi'
+          mysql database: 'runninghi_dev'
           mysql user: ${{ secrets.MYSQL_USERNAME }}
           mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
@@ -83,7 +83,7 @@ jobs:
 
       ## docker upload image
       - name: docker image build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }} --build-arg PROFILE=dev .
+        run: docker build -f Docker.dev -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:${{ github.sha }} .
 
       # DockerHub Login
       - name: docker login
