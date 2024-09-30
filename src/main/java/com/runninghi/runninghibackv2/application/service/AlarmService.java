@@ -87,15 +87,15 @@ public class AlarmService {
         sendSseAlarm(request); // 알림 동의 여부 상관 없이 발송
     }
 
-    private void sendPushAlarm (CreateAlarmRequest request) throws FirebaseMessagingException {
+    private void sendPushAlarm(CreateAlarmRequest request) throws FirebaseMessagingException {
 
         Notification notification = Notification.builder()
-                        .setTitle(request.getTitle())
-                        .build();
+                .setTitle(request.getTitle())
+                .build();
         Message message = Message.builder()
-                        .setToken(request.getFcmToken())
-                        .setNotification(notification)
-                        .build();
+                .setToken(request.getFcmToken())
+                .setNotification(notification)
+                .build();
 
         firebaseMessaging.send(message);
     }
@@ -134,4 +134,13 @@ public class AlarmService {
         alarmRepository.deleteReadAlarmsOlderThan(thirtyDaysAgo);
     }
 
+    public void pushAlarmTest(CreateAlarmRequest request) {
+
+        try {
+            sendPushAlarm(request);
+        } catch (FirebaseMessagingException e) {
+            throw new FcmException(e.getMessage());
+        }
+
+    }
 }
