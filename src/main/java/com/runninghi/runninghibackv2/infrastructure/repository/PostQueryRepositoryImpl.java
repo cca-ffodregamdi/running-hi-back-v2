@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -507,8 +508,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     @Override
     public List<GetRecordPostResponse> findWeeklyRecord(Long memberNo, LocalDate date) {
 
-        LocalDateTime start = date.with(DayOfWeek.MONDAY).atStartOfDay();
-        LocalDateTime end = date.with(DayOfWeek.SUNDAY).atTime(23, 59, 59);
+        LocalDateTime start = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).atStartOfDay();
+        LocalDateTime end = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).atTime(23, 59, 59);
 
         List<Post> posts = jpaQueryFactory.select(post)
                 .from(post)
@@ -556,8 +557,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     @Override
     public List<GetRecordPostResponse> findYearlyRecord(Long memberNo, LocalDate date) {
         int year = date.getYear();
-        LocalDateTime start = LocalDateTime.of(year, 1,1,0,0,0);
-        LocalDateTime end = LocalDateTime.of(year, 12,31,23,59,59);
+        LocalDateTime start = LocalDateTime.of(year, 1, 1, 0, 0, 0);
+        LocalDateTime end = LocalDateTime.of(year, 12, 31, 23, 59, 59);
 
         List<Post> posts = jpaQueryFactory.select(post)
                 .from(post)
