@@ -25,7 +25,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # 배포 서버에 host 키 확인
-            sudo mkdir -p ~/.ssh
+            sudo mkdir -p ~/.ssh && chmod 700 ~/.ssh
             sudo ssh-keyscan ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
             
             # 배포 서버에서 DockerHub Login
@@ -41,4 +41,4 @@ jobs:
             sudo fuser -k ${{ secrets.SERVER_PORT }}/tcp || true
             
             # Run new container
-            sudo docker run -d --name runninghi --network myapp_network --ip ${{ secrets.DOCKER_IP }} -v /home/runninghi/develop/logs:/app/logs ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
+            sudo docker run -d --name runninghi-dev --network myapp_network --ip ${{ secrets.DOCKER_IP }} -v /home/runninghi/develop/logs:/app/logs ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-dev:latest
