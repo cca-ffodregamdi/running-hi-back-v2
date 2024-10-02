@@ -1,13 +1,11 @@
-# Dockerfile.dev
-
 # JDK 17 기반 이미지 사용
 FROM openjdk:17-jdk
 
 # 작업 디렉토리 설정
-WORKDIR /home/runninghi/develop
+WORKDIR /app
 
 # 로그 디렉토리 생성
-RUN mkdir -p /home/runninghi/develop/logs
+RUN mkdir -p /app/logs
 
 # JAR 파일 빌드 아티팩트 설정
 ARG JAR_FILE=build/libs/*.jar
@@ -15,23 +13,10 @@ ARG JAR_FILE=build/libs/*.jar
 # JAR 파일 복사
 COPY ${JAR_FILE} app.jar
 
-# 애플리케이션 실행 및 로그 출력 설정
-# Dockerfile.prod
-
-# JDK 17 기반 이미지 사용
-FROM openjdk:17-jdk
-
-# 작업 디렉토리 설정
-WORKDIR /home/runninghi/prod
-
-# 로그 디렉토리 생성
-RUN mkdir -p /home/runninghi/prod/logs
-
-# JAR 파일 빌드 아티팩트 설정
-ARG JAR_FILE=build/libs/*.jar
-
-# JAR 파일 복사
-COPY ${JAR_FILE} app.jar
+# 로그 파일에 대한 권한 설정
+RUN touch /app/logs/runninghi.out && \
+    chmod 666 /app/logs/runninghi.out
 
 # 애플리케이션 실행 및 로그 출력 설정
-ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-jar", "app.jar"]
+CMD ["sh", "-c", "java -Dspring.profiles.active=dev -jar app.jar | tee /app/logs/runninghi-dev.out"]
+
