@@ -16,4 +16,4 @@ ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
 
 # 애플리케이션 실행 및 로그 출력 설정
-ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=dev -jar app.jar > /develop/logs/runninghi-dev.log 2>&1"]
+ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=dev -jar app.jar > /home/runninghi/develop/logs/runninghi.log 2>&1"]

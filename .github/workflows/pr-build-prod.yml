@@ -41,7 +41,7 @@ jobs:
       - name: Setup application.yml
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
         shell: bash
 
       - name: Setup application-prod.yml
@@ -73,15 +73,17 @@ jobs:
 
       - name: Test with Gradle
         run: ./gradlew --info test
+        env:
+          SPRING_PROFILES_ACTIVE: prod
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
-          arguments: build -Pprofile=prod
+          arguments: build -Dspring.profiles.active=prod
 
       ## docker upload image
       - name: docker image build
-        run: docker build -f Dockerfile-prod -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:${{ github.sha }} .
+        run: docker build -f Dockerfile-prod -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:${{ github.sha }} .
 
 
       # DockerHub Login
@@ -94,6 +96,6 @@ jobs:
       # Docker Hub push
       - name: docker Hub push
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:${{ github.sha }}
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:${{ github.sha }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:latest
