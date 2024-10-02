@@ -32,13 +32,13 @@ jobs:
             echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             
             # Pull Docker Image
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:latest
             
             # Stop and Remove existing contrainer
-            sudo docker stop runninghi-prod || true && sudo docker rm runninghi-prod || true
+            sudo docker stop runninghi || true && sudo docker rm runninghi || true
             
             # 포트 사용중일 시에 종료 처리
             sudo fuser -k ${{ secrets.SERVER_PORT }}/tcp || true
             
             # Run new container
-            sudo docker run -d --name runninghi-prod -p ${{ secrets.SERVER_PORT }}:${{ secrets.DOCKER_PORT }} -v /logs:/app/logs ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:latest
+            sudo docker run -d --name runninghi --network myapp_network --ip ${{ secrets.DOCKER_IP }} -v /home/runninghi/prod/logs:/app/logs ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:latest
