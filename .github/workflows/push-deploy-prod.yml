@@ -25,9 +25,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # 배포 서버에 host 키 확인
-            sudo mkdir -p /home/runninghi/prod/logs
-            sudo chown -R $USER:$USER /home/runninghi/prod/logs
-            sudo chmod 755 /home/runninghi/prod/logs
+            sudo mkdir -p ~/.ssh
             sudo ssh-keyscan ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
             
             # 배포 서버에서 DockerHub Login
