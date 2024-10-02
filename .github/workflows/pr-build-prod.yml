@@ -81,7 +81,7 @@ jobs:
 
       ## docker upload image
       - name: docker image build
-        run: docker build -f Dockerfile-prod -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:${{ github.sha }} .
+        run: docker build -f Dockerfile-prod -t ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:${{ github.sha }} .
 
 
       # DockerHub Login
@@ -94,6 +94,6 @@ jobs:
       # Docker Hub push
       - name: docker Hub push
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:${{ github.sha }}
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi-prod:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:${{ github.sha }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/runninghi:latest

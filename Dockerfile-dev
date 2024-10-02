@@ -1,19 +1,19 @@
-    # Dockerfile.dev
+# Dockerfile.dev
 
-    # JDK 17 기반 이미지 사용
-    FROM openjdk:17-jdk
+# JDK 17 기반 이미지 사용
+FROM openjdk:17-jdk
 
-    # 작업 디렉토리 설정
-    WORKDIR /develop
+# 작업 디렉토리 설정
+WORKDIR /develop
 
-    # 로그 디렉토리 생성
-    RUN mkdir -p /develop/logs
+# 로그 디렉토리 생성
+RUN mkdir -p /develop/logs
 
-    # JAR 파일 빌드 아티팩트 설정
-    ARG JAR_FILE=build/libs/*.jar
+# JAR 파일 빌드 아티팩트 설정
+ARG JAR_FILE=build/libs/*.jar
 
-    # JAR 파일 복사
-    COPY ${JAR_FILE} app.jar
+# JAR 파일 복사
+COPY ${JAR_FILE} app.jar
 
-    # 애플리케이션 실행 및 로그 출력 설정
-    ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=dev -jar app.jar > /develop/logs/runninghi-dev.log 2>&1"]
+# 애플리케이션 실행 및 로그 출력 설정
+ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=dev -jar app.jar > /home/runninghi/develop/logs/runninghi.log 2>&1"]
