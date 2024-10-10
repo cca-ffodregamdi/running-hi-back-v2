@@ -76,13 +76,14 @@ public class AlarmService {
 
         alarmRepository.save(alarm);
 
-//        if (member.isAlarmConsent()) { // 알림 동의했을 시 발송, 아닐 시 stop
-//            try {
-//                sendPushAlarm(request);
-//            } catch (FirebaseMessagingException e) {
-//                throw new FcmException(e.getMessage());
-//            }
-//        }
+        if (member.isAlarmConsent()) { // 알림 동의했을 시 발송, 아닐 시 stop
+            try {
+                sendPushAlarm(request);
+            } catch (FirebaseMessagingException e) {
+                log.info(e.getMessage());
+                throw new FcmException(e.getMessage());
+            }
+        }
 
         sendSseAlarm(request); // 알림 동의 여부 상관 없이 발송
     }
@@ -98,6 +99,7 @@ public class AlarmService {
                 .build();
 
         firebaseMessaging.send(message);
+        log.info("푸쉬 알림 전송에 성공하였습니다. memberNo: {}, alarmType: {}", request.getTargetMemberNo(), request.getAlarmType());
     }
 
     private void sendSseAlarm(CreateAlarmRequest request) {
