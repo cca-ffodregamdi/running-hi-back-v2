@@ -33,11 +33,11 @@ public class TestToken {
     private final JwtTokenProvider jwtTokenProvider;
     private final TestMemberRepository testMemberRepository;
 
-    @Value("1.0.2")
+    @Value("1.0.3")
     private String currentVersion;
 
     @GetMapping("/test/app-review")
-    public ResponseEntity<ApiResult<TestReviewerResponse>> checkVersion(@RequestParam("ver") String version) {  //1.0.1
+    public ResponseEntity<ApiResult<TestReviewerResponse>> checkVersion(@RequestParam("ver") String version) {
 
         String[] versionParts = version.split("\\.");
         String[] currentVersionParts = currentVersion.split("\\.");
@@ -49,15 +49,11 @@ public class TestToken {
             targetVersion.append(versionParts[i]);
             targetCurrentVersion.append(currentVersionParts[i]);
         }
-//        String minorVersion = versionParts[versionParts.length - 2] + "." + versionParts[versionParts.length - 1];
 
         String userName = "유저 : 테스트 계정 이름";
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Point point = geometryFactory.createPoint(new Coordinate(127.543, 36.9876));
 
-        System.out.println(Integer.parseInt(targetVersion.toString()));
-        System.out.println(Integer.parseInt(targetCurrentVersion.toString()));
-        System.out.println(Integer.parseInt(targetVersion.toString()) > Integer.parseInt(targetCurrentVersion.toString()));
         if (Integer.parseInt(targetVersion.toString()) > Integer.parseInt(targetCurrentVersion.toString())) {
             Member user = testMemberRepository.findByName(userName)
                     .orElseGet(() -> {
